@@ -33,7 +33,7 @@ stub.GetById.Of<User>().Return((id) => new User { Id = id });
 stub.Name.Get("TestRepo");
 
 // Indexer interceptor
-stub.Indexer.Backing["key1"] = new User { Id = 1 };
+stub.Indexer["key1"].Returns(new User { Id = 1 });
 
 // Event interceptor
 repo.Changed += (s, e) => { };
@@ -320,22 +320,34 @@ stub.Timeout.Set((val) => { /* handle set */ });
 
 ## Indexer Interceptor
 
-Generated for interface indexers. Maintains a backing dictionary, tracks get/set operations, and supports indexed callbacks.
+Generated for interface indexers. Supports per-key configuration, all-keys callbacks, tracks get/set operations, and provides sequences.
+
+### Per-Key Configuration
+
+Access the per-key builder via the interceptor's C# indexer:
+
+```csharp
+stub.Indexer[key].Returns(value);     // Configure return value for specific key
+stub.Indexer[key].Get(() => value);   // Per-key getter callback (no key param, already bound)
+stub.Indexer[key].Set((value) => {}); // Per-key setter callback
+stub.Indexer[key].Returns(v1).ThenReturns(v2); // Per-key sequence
+```
+
+For multi-param indexers, use flattened syntax: `stub.Indexer[row, col].Returns(value)`
 
 ### Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `Backing` | `Dictionary<TKey, TValue>` | Backing dictionary used by default get/set operations |
 | `LastGetKey` | `TKey?` | The key from the most recent getter call |
 | `LastSetEntry` | `(TKey, TValue)?` | Tuple of key and value from the most recent setter call |
 
-### Configuration Methods
+### Configuration Methods (All-Keys)
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Get(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey>` | Configures getter callback that repeats indefinitely |
-| `Set(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configures setter callback that repeats indefinitely |
+| `Get(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey>` | Configures all-keys getter callback (fallback for unconfigured keys) |
+| `Set(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configures all-keys setter callback |
 
 ### Verification Methods
 
@@ -350,22 +362,23 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Behavior Notes
 
-- **Backing dictionary**: By default, get returns `Backing[key]` and set stores to `Backing[key]`
-- **Get override**: When `Get` is set, the callback's return value is used instead of `Backing`
-- **Set override**: When `Set` is set, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
+- **Priority chain**: Per-key Returns > All-keys sequence > All-keys Get callback > Source delegation > Strict mode check > Default value
+- **Per-key Returns**: `stub.Indexer[key].Returns(value)` takes highest priority for that specific key
+- **All-keys Get callback**: Handles keys not configured with per-key Returns
+- **Multi-indexer**: When an interface has multiple indexers (by key type), the interceptor provides C# indexer overloads that resolve by key type
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves `Get`/`Set` callbacks and `Backing` dictionary
+- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves per-key Returns and `Get`/`Set` callbacks
 
 ### Example
 
 <!-- snippet: indexer-interceptor-complete-api-demo -->
 ```cs
-// Backing: default dictionary storage for indexer
-stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
+// Per-key Returns: configure specific keys
+stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice" });
 
-// Get: override backing lookup with callback
+// Get: all-keys callback as fallback
 stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
 // Set: configure setter callback
@@ -572,13 +585,13 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 | **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Stub Override** | Call counts, `LastArg` | `Return`/`Call` configuration, verifiable marking |
 | **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `Get`/`Set` callbacks, sequence structure, verifiable marking |
-| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | Per-key Returns, `Get`/`Set` callbacks, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
 | **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
 | **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments |
 
-**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions, source delegation reference) but preserves configured callbacks and structural state (backing dictionaries, sequence/When chain structures, verifiable marking).
+**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions, source delegation reference) but preserves configured callbacks and structural state (per-key Returns, sequence/When chain structures, verifiable marking).
 
 ---
 

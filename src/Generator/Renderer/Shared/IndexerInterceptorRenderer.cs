@@ -1,250 +1,383 @@
 // src/Generator/Renderer/Shared/IndexerInterceptorRenderer.cs
 #nullable enable
+using System.Collections.Generic;
+using System.Linq;
 using KnockOff.Model.Shared;
 
 namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders indexer interceptor classes for both inline and flat stubs.
-/// Generates Get() returning IIndexerGetBuilder (repeating callback, elevatable to sequence via ThenGet),
-/// Set() returning IIndexerSetBuilder similarly for setters,
-/// nested builder and sequence implementation classes, InvokeGet/InvokeSet methods,
-/// Backing dictionary, and verification.
+/// Supports single-indexer and multi-indexer interfaces.
+/// Generates per-key builders, all-keys Get/Set callbacks, sequences,
+/// InvokeGet/InvokeSet with priority chain, tracking, and verification.
 /// </summary>
 internal static class IndexerInterceptorRenderer
 {
 	/// <summary>
-	/// Renders a complete indexer interceptor class.
+	/// Renders a complete indexer interceptor class for one or more indexers.
+	/// When models.Count > 1, generates a multi-indexer interceptor with type-suffixed members.
 	/// </summary>
 	public static void RenderInterceptorClass(
 		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
 		IndexerInterceptorRenderOptions options)
 	{
+		if (models.Count == 0) return;
+
+		// Deduplicate by key type -- diamond inheritance can produce duplicate models
+		// (e.g., IEntityBase.this[string] and IValidateBase.this[string] both have KeyType=string).
+		// Keep the first model per KeyTypeFriendlyName (they share the same generated infrastructure).
+		var seen = new HashSet<string>();
+		var deduped = new List<UnifiedIndexerInterceptorModel>();
+		foreach (var m in models)
+		{
+			if (seen.Add(m.KeyTypeFriendlyName))
+				deduped.Add(m);
+		}
+		models = deduped;
+
+		// Source interfaces from deduped models (one per key type, avoids duplicate _source fields)
+		var allSourceInterfaces = models
+			.Where(m => !string.IsNullOrEmpty(m.DeclaringInterface))
+			.Select(m => m.DeclaringInterface)
+			.Distinct()
+			.ToList();
+
+		var isMulti = models.Count > 1;
+		var first = models[0];
+		var interceptorClassName = first.InterceptorClassName;
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
-		var classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
-		var fullInterceptorClassName = model.InterceptorClassName + typeParams;
+		var classDecl = $"public sealed class {interceptorClassName}{typeParams}{constraints}";
+		var fullInterceptorClassName = interceptorClassName + typeParams;
 
 		w.Line($"/// <summary>Tracks and configures behavior for indexer.</summary>");
 		using (w.Block(classDecl))
 		{
-			// Source field for Source(T) feature
-			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			// Source fields for Source(T) feature - one per declaring interface
+			// Uses allSourceInterfaces (computed before dedup) to handle diamond inheritance.
+			foreach (var iface in allSourceInterfaces)
 			{
 				w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
-				w.Line($"internal {model.DeclaringInterface}? _source;");
+				w.Line($"internal {iface}? _source;");
 				w.Line();
 			}
 
-			// Backing dictionary
-			w.Line($"/// <summary>Backing storage for this indexer.</summary>");
-			w.Line($"public global::System.Collections.Generic.Dictionary<{model.SingleKeyType}, {model.ValueType}> Backing {{ get; }} = new();");
+			// Per-key storage and builders for each key type
+			foreach (var model in models)
+			{
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var builderName = isMulti ? $"{model.KeyTypeFriendlyName}PerKeyBuilder" : "PerKeyBuilder";
+
+				w.Line($"private readonly global::System.Collections.Generic.Dictionary<{model.KeyType}, {builderName}> _perKeyBuilders{suffix} = new();");
+			}
 			w.Line();
 
-			// Getter storage and tracking (if has getter)
-			if (model.HasGetter)
+			// Indexer accessor(s) returning per-key builders
+			foreach (var model in models)
 			{
-				w.Line($"private global::System.Func<{model.KeyType}, {model.ValueType}>? _get;");
-				w.Line("private IndexerGetBuilderImpl? _getTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.KeyType}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
-				w.Line("private int _getSequenceIndex;");
-				w.Line("private bool _getRepeatLastValue = true;");
-				w.Line("private bool _isGetVerifiable;");
-				w.Line("private global::KnockOff.Called? _getVerifiableTimes;");
-				w.Line("private int _unconfiguredGetCount;");
-				w.Line($"private {model.NullableKeyType} _unconfiguredLastGetKey;");
-				w.Line();
-			}
+				var builderName = isMulti ? $"{model.KeyTypeFriendlyName}PerKeyBuilder" : "PerKeyBuilder";
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
 
-			// Setter storage and tracking (if has setter)
-			if (model.HasSetter)
-			{
-				w.Line($"private global::System.Action<{model.KeyType}, {model.ValueType}>? _set;");
-				w.Line("private IndexerSetBuilderImpl? _setTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.KeyType}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
-				w.Line("private int _setSequenceIndex;");
-				w.Line("private bool _setRepeatLastValue = true;");
-				w.Line("private bool _isSetVerifiable;");
-				w.Line("private global::KnockOff.Called? _setVerifiableTimes;");
-				w.Line("private int _unconfiguredSetCount;");
-				w.Line($"private ({model.KeyType} Key, {model.ValueType} Value)? _unconfiguredLastSetEntry;");
-				w.Line();
-			}
-
-			// Aggregate counts (private - use VerifyGet/VerifySet to check)
-			if (model.HasGetter)
-			{
-				w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_getTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
-			}
-			if (model.HasSetter)
-			{
-				w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_setTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
-			}
-			if (model.HasGetter || model.HasSetter)
-			{
-				w.Line();
-			}
-
-			// LastGetKey for backward compatibility (if has getter)
-			if (model.HasGetter)
-			{
-				w.Line($"/// <summary>The key from the last getter access (from most recently called registration).</summary>");
-				w.Line($"public {model.NullableKeyType} LastGetKey {{ get {{ if ((_getTracking?._callCount ?? 0) > 0) return _getTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking._callCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; }} }}");
-				w.Line();
-			}
-
-			// LastSetEntry for backward compatibility (if has setter)
-			if (model.HasSetter)
-			{
-				w.Line($"/// <summary>The key-value pair from the last setter access (from most recently called registration).</summary>");
-				w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? LastSetEntry {{ get {{ if ((_setTracking?._callCount ?? 0) > 0) return _setTracking!.LastEntry; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastEntry; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetEntry : default; }} }}");
-				w.Line();
-			}
-
-			// Get() method (if has getter)
-			if (model.HasGetter)
-			{
-				w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> Get(global::System.Func<{model.KeyType}, {model.ValueType}> callback)");
+				w.Line($"/// <summary>Gets or creates a per-key builder for the specified key.</summary>");
+				w.Line($"public {builderName} this[{model.ParameterSignature}]");
 				using (w.Braces())
 				{
-					w.Line("_getSequence = null;");
-					w.Line("_getSequenceIndex = 0;");
-					w.Line("_isGetVerifiable = false;");
-					w.Line("_getVerifiableTimes = null;");
-					w.Line("_get = callback;");
-					w.Line("_getTracking = new IndexerGetBuilderImpl(this);");
-					w.Line("return _getTracking;");
+					w.Line("get");
+					using (w.Braces())
+					{
+						var keyExpr = model.KeyExpression;
+						w.Line($"return _perKeyBuilders{suffix}.TryGetValue({keyExpr}, out var __existing) ? __existing : (_perKeyBuilders{suffix}[{keyExpr}] = new {builderName}());");
+					}
 				}
 				w.Line();
-
 			}
 
-			// Set() method (if has setter)
-			if (model.HasSetter)
+			// All-keys callback storage and tracking per key type
+			foreach (var model in models)
 			{
-				w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> Set(global::System.Action<{model.KeyType}, {model.ValueType}> callback)");
-				using (w.Braces())
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				if (model.HasGetter)
 				{
-					w.Line("_setSequence = null;");
-					w.Line("_setSequenceIndex = 0;");
-					w.Line("_isSetVerifiable = false;");
-					w.Line("_setVerifiableTimes = null;");
-					w.Line("_set = callback;");
-					w.Line("_setTracking = new IndexerSetBuilderImpl(this);");
-					w.Line("return _setTracking;");
+					w.Line($"private global::System.Func<{model.KeyType}, {model.ValueType}>? _get{suffix};");
+					w.Line($"private IndexerGetBuilderImpl{friendlyName}? _getTracking{suffix};");
+					w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.KeyType}, {model.ValueType}> Callback, IndexerGetBuilderImpl{friendlyName} Tracking)>? _getSequence{suffix};");
+					w.Line($"private int _getSequenceIndex{suffix};");
+					w.Line($"private bool _getRepeatLastValue{suffix} = true;");
+					w.Line($"private bool _isGetVerifiable{suffix};");
+					w.Line($"private global::KnockOff.Called? _getVerifiableTimes{suffix};");
+					w.Line($"private int _unconfiguredGetCount{suffix};");
+					w.Line($"private {model.NullableKeyType} _unconfiguredLastGetKey{suffix};");
+					w.Line();
 				}
-				w.Line();
 
+				if (model.HasSetter)
+				{
+					w.Line($"private global::System.Action<{model.KeyType}, {model.ValueType}>? _set{suffix};");
+					w.Line($"private IndexerSetBuilderImpl{friendlyName}? _setTracking{suffix};");
+					w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.KeyType}, {model.ValueType}> Callback, IndexerSetBuilderImpl{friendlyName} Tracking)>? _setSequence{suffix};");
+					w.Line($"private int _setSequenceIndex{suffix};");
+					w.Line($"private bool _setRepeatLastValue{suffix} = true;");
+					w.Line($"private bool _isSetVerifiable{suffix};");
+					w.Line($"private global::KnockOff.Called? _setVerifiableTimes{suffix};");
+					w.Line($"private int _unconfiguredSetCount{suffix};");
+					w.Line($"private ({model.KeyType} Key, {model.ValueType} Value)? _unconfiguredLastSetEntry{suffix};");
+					w.Line();
+				}
 			}
 
-			// Ref return backing field (for ref return indexers)
-			if (model.IsRefReturn)
+			// Aggregate total get/set count properties
+			RenderTotalCountProperties(w, models, isMulti);
+
+			// Tracking properties: LastGetKey, LastSetEntry (type-suffixed for multi)
+			foreach (var model in models)
 			{
-				w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRefGet before use");
-				w.Line($"internal {model.ValueType} _refReturnBacking;");
-				w.Line("#pragma warning restore CS8618");
-				w.Line();
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var propSuffix = isMulti ? model.KeyTypeFriendlyName : "";
+
+				if (model.HasGetter)
+				{
+					w.Line($"/// <summary>The key from the last getter access{(isMulti ? $" ({model.KeyTypeFriendlyName} indexer)" : "")}.</summary>");
+					w.Line($"public {model.NullableKeyType} Last{propSuffix}GetKey => _unconfiguredLastGetKey{suffix};");
+					w.Line();
+				}
+
+				if (model.HasSetter)
+				{
+					w.Line($"/// <summary>The key-value pair from the last setter access{(isMulti ? $" ({model.KeyTypeFriendlyName} indexer)" : "")}.</summary>");
+					w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? Last{propSuffix}SetEntry => _unconfiguredLastSetEntry{suffix};");
+					w.Line();
+				}
 			}
 
-			// InvokeGet/InvokeSet methods
-			if (model.HasGetter)
+			// All-keys Get/Set methods (overloaded for multi-indexer)
+			foreach (var model in models)
 			{
-				RenderInvokeGet(w, model, options);
-				// InvokeRefGet for ref return indexers - writes to _refReturnBacking instead of returning
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				if (model.HasGetter)
+				{
+					w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+					w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> Get(global::System.Func<{model.KeyType}, {model.ValueType}> callback)");
+					using (w.Braces())
+					{
+						w.Line($"_getSequence{suffix} = null;");
+						w.Line($"_getSequenceIndex{suffix} = 0;");
+						w.Line($"_isGetVerifiable{suffix} = false;");
+						w.Line($"_getVerifiableTimes{suffix} = null;");
+						w.Line($"_get{suffix} = callback;");
+						w.Line($"_getTracking{suffix} = new IndexerGetBuilderImpl{friendlyName}(this);");
+						w.Line($"return _getTracking{suffix};");
+					}
+					w.Line();
+				}
+
+				if (model.HasSetter)
+				{
+					w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+					w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> Set(global::System.Action<{model.KeyType}, {model.ValueType}> callback)");
+					using (w.Braces())
+					{
+						w.Line($"_setSequence{suffix} = null;");
+						w.Line($"_setSequenceIndex{suffix} = 0;");
+						w.Line($"_isSetVerifiable{suffix} = false;");
+						w.Line($"_setVerifiableTimes{suffix} = null;");
+						w.Line($"_set{suffix} = callback;");
+						w.Line($"_setTracking{suffix} = new IndexerSetBuilderImpl{friendlyName}(this);");
+						w.Line($"return _setTracking{suffix};");
+					}
+					w.Line();
+				}
+			}
+
+			// Ref return backing fields (per key type for multi-indexer)
+			foreach (var model in models)
+			{
 				if (model.IsRefReturn)
 				{
-					RenderInvokeRefGet(w, model, options);
+					var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+					w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRefGet before use");
+					w.Line($"internal {model.ValueType} _refReturnBacking{suffix};");
+					w.Line("#pragma warning restore CS8618");
+					w.Line();
 				}
 			}
-			if (model.HasSetter)
+
+			// InvokeGet/InvokeSet/InvokeRefGet methods per key type
+			foreach (var model in models)
 			{
-				RenderInvokeSet(w, model, options);
+				var invokeSuffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var fieldSuffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var builderName = isMulti ? $"{model.KeyTypeFriendlyName}PerKeyBuilder" : "PerKeyBuilder";
+
+				if (model.HasGetter)
+				{
+					RenderInvokeGet(w, model, options, invokeSuffix, fieldSuffix, builderName);
+					if (model.IsRefReturn)
+					{
+						RenderInvokeRefGet(w, model, options, invokeSuffix, fieldSuffix, builderName);
+					}
+				}
+				if (model.HasSetter)
+				{
+					RenderInvokeSet(w, model, options, invokeSuffix, fieldSuffix, builderName);
+				}
 			}
 
 			// Reset method
-			RenderResetMethod(w, model, hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
+			RenderResetMethod(w, models, isMulti, allSourceInterfaces.Count > 0);
 
-			// Verification methods
-			RenderVerificationMethods(w, model, fullInterceptorClassName);
+			// Verification methods (combined across all key types)
+			RenderVerificationMethods(w, models, isMulti, fullInterceptorClassName);
 
 			// Internal verification support
-			RenderInternalVerification(w, model);
+			RenderInternalVerification(w, models, isMulti, fullInterceptorClassName);
 
-			// Nested classes
-			if (model.HasGetter)
+			// Nested PerKeyBuilder and PerKeySequence classes per key type
+			foreach (var model in models)
 			{
-				RenderIndexerGetBuilderImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
-				RenderIndexerGetSequenceImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
+				var builderName = isMulti ? $"{model.KeyTypeFriendlyName}PerKeyBuilder" : "PerKeyBuilder";
+				var sequenceName = isMulti ? $"{model.KeyTypeFriendlyName}PerKeySequence" : "PerKeySequence";
+				RenderPerKeyBuilder(w, model, builderName, sequenceName);
+				RenderPerKeySequence(w, model, builderName, sequenceName);
 			}
-			if (model.HasSetter)
+
+			// Nested all-keys builder and sequence implementation classes per key type
+			foreach (var model in models)
 			{
-				RenderIndexerSetBuilderImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
-				RenderIndexerSetSequenceImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				if (model.HasGetter)
+				{
+					RenderIndexerGetBuilderImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
+					RenderIndexerGetSequenceImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
+				}
+				if (model.HasSetter)
+				{
+					RenderIndexerSetBuilderImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
+					RenderIndexerSetSequenceImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
+				}
 			}
 		}
 		w.Line();
 	}
 
-	#region InvokeGet / InvokeSet Methods
+	#region TotalCount Properties
+
+	private static void RenderTotalCountProperties(
+		CodeWriter w,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
+		bool isMulti)
+	{
+		// Build combined total get count across all key types using explicit loops (avoid LINQ in generated code)
+		var hasAnyGetter = models.Any(m => m.HasGetter);
+		var hasAnySetter = models.Any(m => m.HasSetter);
+
+		if (hasAnyGetter)
+		{
+			w.Line("private int TotalGetCount { get { var sum = 0;");
+			foreach (var model in models)
+			{
+				if (!model.HasGetter) continue;
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				w.Line($"sum += _unconfiguredGetCount{suffix} + (_getTracking{suffix}?._callCount ?? 0);");
+				w.Line($"if (_getSequence{suffix} != null) foreach (var s in _getSequence{suffix}) sum += s.Tracking._callCount;");
+				w.Line($"foreach (var b in _perKeyBuilders{suffix}.Values) sum += b._getCallCount;");
+			}
+			w.Line("return sum; } }");
+		}
+		if (hasAnySetter)
+		{
+			w.Line("private int TotalSetCount { get { var sum = 0;");
+			foreach (var model in models)
+			{
+				if (!model.HasSetter) continue;
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				w.Line($"sum += _unconfiguredSetCount{suffix} + (_setTracking{suffix}?._callCount ?? 0);");
+				w.Line($"if (_setSequence{suffix} != null) foreach (var s in _setSequence{suffix}) sum += s.Tracking._callCount;");
+				w.Line($"foreach (var b in _perKeyBuilders{suffix}.Values) sum += b._setCallCount;");
+			}
+			w.Line("return sum; } }");
+		}
+		if (hasAnyGetter || hasAnySetter)
+		{
+			w.Line();
+		}
+	}
+
+	#endregion
+
+	#region InvokeGet / InvokeSet / InvokeRefGet Methods
 
 	private static void RenderInvokeGet(
 		CodeWriter w,
 		UnifiedIndexerInterceptorModel model,
-		IndexerInterceptorRenderOptions options)
+		IndexerInterceptorRenderOptions options,
+		string invokeSuffix,
+		string fieldSuffix,
+		string builderName)
 	{
 		var strictParam = options.IncludeStrictParameter ? "bool strict, " : "";
 
 		w.Line($"/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>");
-		w.Line($"internal {model.ValueType} InvokeGet({strictParam}{model.ParameterSignature})");
+		w.Line($"internal {model.ValueType} InvokeGet{invokeSuffix}({strictParam}{model.ParameterSignature})");
 		using (w.Braces())
 		{
-			// Priority 1: Sequence (if present and not exhausted)
-			w.Line("if (_getSequence != null && _getSequenceIndex < _getSequence.Count)");
+			// Always record the last key accessed (for LastGetKey tracking)
+			w.Line($"_unconfiguredLastGetKey{fieldSuffix} = {model.KeyExpression};");
+			w.Line();
+
+			// Priority 1: Per-key builder (if configured)
+			w.Line($"if (_perKeyBuilders{fieldSuffix}.TryGetValue({model.KeyExpression}, out var perKeyBuilder) && perKeyBuilder.HasGetConfig)");
 			using (w.Braces())
 			{
-				w.Line("var (callback, tracking) = _getSequence[_getSequenceIndex];");
+				w.Line($"perKeyBuilder._getCallCount++;");
+				w.Line("return perKeyBuilder.InvokeGet();");
+			}
+			w.Line();
+
+			// Priority 2: All-keys sequence (if present and not exhausted)
+			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} < _getSequence{fieldSuffix}.Count)");
+			using (w.Braces())
+			{
+				w.Line($"var (callback, tracking) = _getSequence{fieldSuffix}[_getSequenceIndex{fieldSuffix}];");
 				w.Line($"tracking.RecordCall({model.KeyExpression});");
-				w.Line("_getSequenceIndex++;");
+				w.Line($"_getSequenceIndex{fieldSuffix}++;");
 				w.Line($"return callback({model.KeyExpression});");
 			}
 			w.Line();
 
 			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
-			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
+			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} >= _getSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
-				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (get)\");");
-				// Repeat last value if enabled (default behavior in non-strict mode)
-				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				w.Line($"if (_getRepeatLastValue{fieldSuffix} && _getSequence{fieldSuffix}.Count > 0)");
 				using (w.Braces())
 				{
-					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line($"var (callback, tracking) = _getSequence{fieldSuffix}[_getSequence{fieldSuffix}.Count - 1];");
 					w.Line($"tracking.RecordCall({model.KeyExpression});");
 					w.Line($"return callback({model.KeyExpression});");
 				}
 			}
 			w.Line();
 
-			// Priority 2: Repeating Get callback
-			w.Line("if (_get != null && _getTracking != null)");
+			// Priority 3: Repeating Get callback
+			w.Line($"if (_get{fieldSuffix} != null && _getTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
-				w.Line($"_getTracking.RecordCall({model.KeyExpression});");
-				w.Line($"return _get({model.KeyExpression});");
+				w.Line($"_getTracking{fieldSuffix}.RecordCall({model.KeyExpression});");
+				w.Line($"return _get{fieldSuffix}({model.KeyExpression});");
 			}
 			w.Line();
 
-			// No callback configured - track unconfigured call
-			w.Line("_unconfiguredGetCount++;");
-			w.Line($"_unconfiguredLastGetKey = {model.KeyExpression};");
-			w.Line();
-
-			// Priority 3: Backing dictionary
-			w.Line($"if (Backing.TryGetValue({model.KeyExpression}, out var backingValue)) return backingValue;");
+			// No callback configured - track unconfigured call count
+			w.Line($"_unconfiguredGetCount{fieldSuffix}++;");
 			w.Line();
 
 			// Priority 4: Source (if available)
@@ -266,147 +399,161 @@ internal static class IndexerInterceptorRenderer
 	private static void RenderInvokeSet(
 		CodeWriter w,
 		UnifiedIndexerInterceptorModel model,
-		IndexerInterceptorRenderOptions options)
+		IndexerInterceptorRenderOptions options,
+		string invokeSuffix,
+		string fieldSuffix,
+		string builderName)
 	{
 		var strictParam = options.IncludeStrictParameter ? "bool strict, " : "";
 
 		w.Line($"/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>");
-		w.Line($"internal void InvokeSet({strictParam}{model.ParameterSignature}, {model.ValueType} value)");
+		w.Line($"internal void InvokeSet{invokeSuffix}({strictParam}{model.ParameterSignature}, {model.ValueType} value)");
 		using (w.Braces())
 		{
-			// Priority 1: Sequence (if present and not exhausted)
-			w.Line("if (_setSequence != null && _setSequenceIndex < _setSequence.Count)");
+			// Always record the last set entry (for LastSetEntry tracking)
+			w.Line($"_unconfiguredLastSetEntry{fieldSuffix} = ({model.KeyExpression}, value);");
+			w.Line();
+
+			// Priority 1: Per-key builder (if configured)
+			w.Line($"if (_perKeyBuilders{fieldSuffix}.TryGetValue({model.KeyExpression}, out var perKeyBuilder) && perKeyBuilder.HasSetConfig)");
 			using (w.Braces())
 			{
-				w.Line("var (callback, tracking) = _setSequence[_setSequenceIndex];");
+				w.Line($"perKeyBuilder._setCallCount++;");
+				w.Line("perKeyBuilder.InvokeSet(value);");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Priority 2: All-keys sequence (if present and not exhausted)
+			w.Line($"if (_setSequence{fieldSuffix} != null && _setSequenceIndex{fieldSuffix} < _setSequence{fieldSuffix}.Count)");
+			using (w.Braces())
+			{
+				w.Line($"var (callback, tracking) = _setSequence{fieldSuffix}[_setSequenceIndex{fieldSuffix}];");
 				w.Line($"tracking.RecordCall({model.KeyExpression}, value);");
-				w.Line("_setSequenceIndex++;");
+				w.Line($"_setSequenceIndex{fieldSuffix}++;");
 				w.Line($"callback({model.KeyExpression}, value);");
 				w.Line("return;");
 			}
 			w.Line();
 
-			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then do nothing
-			w.Line("if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)");
+			// Sequence exhausted
+			w.Line($"if (_setSequence{fieldSuffix} != null && _setSequenceIndex{fieldSuffix} >= _setSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
-				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (set)\");");
-				// Repeat last value if enabled (default behavior in non-strict mode)
-				w.Line("if (_setRepeatLastValue && _setSequence.Count > 0)");
+				w.Line($"if (_setRepeatLastValue{fieldSuffix} && _setSequence{fieldSuffix}.Count > 0)");
 				using (w.Braces())
 				{
-					w.Line("var (callback, tracking) = _setSequence[_setSequence.Count - 1];");
+					w.Line($"var (callback, tracking) = _setSequence{fieldSuffix}[_setSequence{fieldSuffix}.Count - 1];");
 					w.Line($"tracking.RecordCall({model.KeyExpression}, value);");
 					w.Line($"callback({model.KeyExpression}, value);");
 					w.Line("return;");
 				}
-				// Store in Backing (only reached when _repeatLastValue is false via ThenDefault())
-				w.Line($"Backing[{model.KeyExpression}] = value;");
 				w.Line("return;");
 			}
 			w.Line();
 
-			// Priority 2: Repeating Set callback
-			w.Line("if (_set != null && _setTracking != null)");
+			// Priority 3: Repeating Set callback
+			w.Line($"if (_set{fieldSuffix} != null && _setTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
-				w.Line($"_setTracking.RecordCall({model.KeyExpression}, value);");
-				w.Line($"_set({model.KeyExpression}, value);");
+				w.Line($"_setTracking{fieldSuffix}.RecordCall({model.KeyExpression}, value);");
+				w.Line($"_set{fieldSuffix}({model.KeyExpression}, value);");
 				w.Line("return;");
 			}
 			w.Line();
 
-			// No callback configured - track unconfigured call
-			w.Line("_unconfiguredSetCount++;");
-			w.Line($"_unconfiguredLastSetEntry = ({model.KeyExpression}, value);");
+			// No callback configured - track unconfigured call count
+			w.Line($"_unconfiguredSetCount{fieldSuffix}++;");
 			w.Line();
 
-			// Priority 3: Source (if available) - skip for init-only indexers (can't assign outside init context)
+			// Priority 4: Source (if available) - skip for init-only indexers
 			if (!string.IsNullOrEmpty(model.DeclaringInterface) && !model.IsInitOnly)
 			{
 				w.Line($"if (_source is {{ }} src) {{ src[{model.ArgumentList}] = value; return; }}");
 				w.Line();
 			}
 
-			// Priority 4: Strict mode check
+			// Priority 5: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
-
-			// Priority 5: Update Backing
-			w.Line($"Backing[{model.KeyExpression}] = value;");
 		}
 		w.Line();
 	}
 
-	/// <summary>
-	/// Renders InvokeRefGet for ref return indexers.
-	/// Same priority chain as InvokeGet but writes to _refReturnBacking instead of returning.
-	/// </summary>
 	private static void RenderInvokeRefGet(
 		CodeWriter w,
 		UnifiedIndexerInterceptorModel model,
-		IndexerInterceptorRenderOptions options)
+		IndexerInterceptorRenderOptions options,
+		string invokeSuffix,
+		string fieldSuffix,
+		string builderName)
 	{
 		var strictParam = options.IncludeStrictParameter ? "bool strict, " : "";
 
 		w.Line($"/// <summary>Invokes the configured getter callback, writing result to _refReturnBacking. Called by ref return interface implementations.</summary>");
-		w.Line($"internal void InvokeRefGet({strictParam}{model.ParameterSignature})");
+		w.Line($"internal void InvokeRefGet{invokeSuffix}({strictParam}{model.ParameterSignature})");
 		using (w.Braces())
 		{
-			// Priority 1: Sequence (if present and not exhausted)
-			w.Line("if (_getSequence != null && _getSequenceIndex < _getSequence.Count)");
+			// Always record the last key accessed (for LastGetKey tracking)
+			w.Line($"_unconfiguredLastGetKey{fieldSuffix} = {model.KeyExpression};");
+			w.Line();
+
+			// Priority 1: Per-key builder (if configured)
+			w.Line($"if (_perKeyBuilders{fieldSuffix}.TryGetValue({model.KeyExpression}, out var perKeyBuilder) && perKeyBuilder.HasGetConfig)");
 			using (w.Braces())
 			{
-				w.Line("var (callback, tracking) = _getSequence[_getSequenceIndex];");
-				w.Line($"tracking.RecordCall({model.KeyExpression});");
-				w.Line("_getSequenceIndex++;");
-				w.Line($"_refReturnBacking = callback({model.KeyExpression});");
+				w.Line($"perKeyBuilder._getCallCount++;");
+				w.Line($"_refReturnBacking{fieldSuffix} = perKeyBuilder.InvokeGet();");
 				w.Line("return;");
 			}
 			w.Line();
 
-			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
-			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
+			// Priority 2: All-keys sequence
+			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} < _getSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
-				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"var (callback, tracking) = _getSequence{fieldSuffix}[_getSequenceIndex{fieldSuffix}];");
+				w.Line($"tracking.RecordCall({model.KeyExpression});");
+				w.Line($"_getSequenceIndex{fieldSuffix}++;");
+				w.Line($"_refReturnBacking{fieldSuffix} = callback({model.KeyExpression});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Sequence exhausted
+			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} >= _getSequence{fieldSuffix}.Count)");
+			using (w.Braces())
+			{
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (get)\");");
-				// Repeat last value if enabled (default behavior in non-strict mode)
-				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				w.Line($"if (_getRepeatLastValue{fieldSuffix} && _getSequence{fieldSuffix}.Count > 0)");
 				using (w.Braces())
 				{
-					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line($"var (callback, tracking) = _getSequence{fieldSuffix}[_getSequence{fieldSuffix}.Count - 1];");
 					w.Line($"tracking.RecordCall({model.KeyExpression});");
-					w.Line($"_refReturnBacking = callback({model.KeyExpression});");
+					w.Line($"_refReturnBacking{fieldSuffix} = callback({model.KeyExpression});");
 					w.Line("return;");
 				}
 			}
 			w.Line();
 
-			// Priority 2: Repeating Get callback
-			w.Line("if (_get != null && _getTracking != null)");
+			// Priority 3: Repeating Get callback
+			w.Line($"if (_get{fieldSuffix} != null && _getTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
-				w.Line($"_getTracking.RecordCall({model.KeyExpression});");
-				w.Line($"_refReturnBacking = _get({model.KeyExpression});");
+				w.Line($"_getTracking{fieldSuffix}.RecordCall({model.KeyExpression});");
+				w.Line($"_refReturnBacking{fieldSuffix} = _get{fieldSuffix}({model.KeyExpression});");
 				w.Line("return;");
 			}
 			w.Line();
 
-			// No callback configured - track unconfigured call
-			w.Line("_unconfiguredGetCount++;");
-			w.Line($"_unconfiguredLastGetKey = {model.KeyExpression};");
-			w.Line();
-
-			// Priority 3: Backing dictionary
-			w.Line($"if (Backing.TryGetValue({model.KeyExpression}, out var backingValue)) {{ _refReturnBacking = backingValue; return; }}");
+			// No callback configured - track unconfigured call count
+			w.Line($"_unconfiguredGetCount{fieldSuffix}++;");
 			w.Line();
 
 			// Priority 4: Source (if available)
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
-				// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection)
-				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src[{model.ArgumentList}]; return; }}");
+				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking{fieldSuffix} = src[{model.ArgumentList}]; return; }}");
 				w.Line();
 			}
 
@@ -414,7 +561,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
 
 			// Priority 6: Default
-			w.Line("_refReturnBacking = default!;");
+			w.Line($"_refReturnBacking{fieldSuffix} = default!;");
 		}
 		w.Line();
 	}
@@ -425,44 +572,52 @@ internal static class IndexerInterceptorRenderer
 
 	private static void RenderResetMethod(
 		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
+		bool isMulti,
 		bool hasSourceField)
 	{
-		w.Line("/// <summary>Resets tracking state but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (Get, Set, per-key builders) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{
-			if (model.HasGetter)
+			foreach (var model in models)
 			{
-				w.Line("_unconfiguredGetCount = 0;");
-				w.Line("_unconfiguredLastGetKey = default;");
-				w.Line("_getTracking?.Reset();");
-				w.Line("if (_getSequence != null)");
-				using (w.Braces())
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+
+				if (model.HasGetter)
 				{
-					w.Line("foreach (var (_, tracking) in _getSequence)");
-					w.Line("\ttracking.Reset();");
+					w.Line($"_unconfiguredGetCount{suffix} = 0;");
+					w.Line($"_unconfiguredLastGetKey{suffix} = default;");
+					w.Line($"_getTracking{suffix}?.Reset();");
+					w.Line($"if (_getSequence{suffix} != null)");
+					using (w.Braces())
+					{
+						w.Line($"foreach (var (_, tracking) in _getSequence{suffix})");
+						w.Line("\ttracking.Reset();");
+					}
+					w.Line($"_getSequenceIndex{suffix} = 0;");
 				}
-				w.Line("_getSequenceIndex = 0;");
-			}
-			if (model.HasSetter)
-			{
-				w.Line("_unconfiguredSetCount = 0;");
-				w.Line("_unconfiguredLastSetEntry = default;");
-				w.Line("_setTracking?.Reset();");
-				w.Line("if (_setSequence != null)");
-				using (w.Braces())
+				if (model.HasSetter)
 				{
-					w.Line("foreach (var (_, tracking) in _setSequence)");
-					w.Line("\ttracking.Reset();");
+					w.Line($"_unconfiguredSetCount{suffix} = 0;");
+					w.Line($"_unconfiguredLastSetEntry{suffix} = default;");
+					w.Line($"_setTracking{suffix}?.Reset();");
+					w.Line($"if (_setSequence{suffix} != null)");
+					using (w.Braces())
+					{
+						w.Line($"foreach (var (_, tracking) in _setSequence{suffix})");
+						w.Line("\ttracking.Reset();");
+					}
+					w.Line($"_setSequenceIndex{suffix} = 0;");
 				}
-				w.Line("_setSequenceIndex = 0;");
+
+				// Reset per-key builders
+				w.Line($"foreach (var b in _perKeyBuilders{suffix}.Values) b.Reset();");
 			}
 			if (hasSourceField)
 			{
 				w.Line("_source = null;");
 			}
-			// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 		}
 		w.Line();
 	}
@@ -471,12 +626,19 @@ internal static class IndexerInterceptorRenderer
 
 	#region Verification Methods
 
-	private static void RenderVerificationMethods(CodeWriter w, UnifiedIndexerInterceptorModel model, string fullInterceptorClassName)
+	private static void RenderVerificationMethods(
+		CodeWriter w,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
+		bool isMulti,
+		string fullInterceptorClassName)
 	{
-		// Build total count expression based on available accessors
-		var totalCountExpr = model.HasGetter && model.HasSetter
+		var hasAnyGetter = models.Any(m => m.HasGetter);
+		var hasAnySetter = models.Any(m => m.HasSetter);
+		var indexerName = models[0].IndexerName;
+
+		var totalCountExpr = hasAnyGetter && hasAnySetter
 			? "TotalGetCount + TotalSetCount"
-			: (model.HasGetter ? "TotalGetCount" : "TotalSetCount");
+			: (hasAnyGetter ? "TotalGetCount" : "TotalSetCount");
 
 		// Verify() - combined
 		w.Line("/// <summary>Verifies the indexer was accessed at least once. Throws VerificationException if not.</summary>");
@@ -489,12 +651,12 @@ internal static class IndexerInterceptorRenderer
 		{
 			w.Line($"var totalCount = {totalCountExpr};");
 			w.Line("if (!times.Validate(totalCount))");
-			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.IndexerName}\", times, totalCount));");
+			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexerName}\", times, totalCount));");
 		}
 		w.Line();
 
-		// VerifyGet (if has getter)
-		if (model.HasGetter)
+		// VerifyGet (combined across all key types)
+		if (hasAnyGetter)
 		{
 			w.Line("/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
 			w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
@@ -505,13 +667,13 @@ internal static class IndexerInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(TotalGetCount))");
-				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.IndexerName} (get)\", times, TotalGetCount));");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexerName} (get)\", times, TotalGetCount));");
 			}
 			w.Line();
 		}
 
-		// VerifySet (if has setter)
-		if (model.HasSetter)
+		// VerifySet (combined across all key types)
+		if (hasAnySetter)
 		{
 			w.Line("/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
 			w.Line("public void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
@@ -522,23 +684,48 @@ internal static class IndexerInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(TotalSetCount))");
-				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.IndexerName} (set)\", times, TotalSetCount));");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexerName} (set)\", times, TotalSetCount));");
 			}
 			w.Line();
 		}
 
 		// Verifiable fluent methods
+		RenderVerifiableMethods(w, models, isMulti, fullInterceptorClassName);
+	}
+
+	private static void RenderVerifiableMethods(
+		CodeWriter w,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
+		bool isMulti,
+		string fullInterceptorClassName)
+	{
+		var hasAnyGetter = models.Any(m => m.HasGetter);
+		var hasAnySetter = models.Any(m => m.HasSetter);
+
+		// Build verifiable body that marks ALL key types
+		var verifiableParts = new List<string>();
+		var verifiableTimesParts = new List<string>();
+		foreach (var model in models)
+		{
+			var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+			if (model.HasGetter)
+			{
+				verifiableParts.Add($"_isGetVerifiable{suffix} = true; _getVerifiableTimes{suffix} = null;");
+				verifiableTimesParts.Add($"_isGetVerifiable{suffix} = true; _getVerifiableTimes{suffix} = times;");
+			}
+			if (model.HasSetter)
+			{
+				verifiableParts.Add($"_isSetVerifiable{suffix} = true; _setVerifiableTimes{suffix} = null;");
+				verifiableTimesParts.Add($"_isSetVerifiable{suffix} = true; _setVerifiableTimes{suffix} = times;");
+			}
+		}
+
 		w.Line($"/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-		var verifiableBody = model.HasGetter && model.HasSetter
-			? "_isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null;"
-			: (model.HasGetter ? "_isGetVerifiable = true; _getVerifiableTimes = null;" : "_isSetVerifiable = true; _setVerifiableTimes = null;");
-		w.Line($"public {fullInterceptorClassName} Verifiable() {{ {verifiableBody} return this; }}");
+		w.Line($"public {fullInterceptorClassName} Verifiable() {{ {string.Join(" ", verifiableParts)} return this; }}");
 		w.Line();
-		var verifiableTimesBody = model.HasGetter && model.HasSetter
-			? "_isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times;"
-			: (model.HasGetter ? "_isGetVerifiable = true; _getVerifiableTimes = times;" : "_isSetVerifiable = true; _setVerifiableTimes = times;");
+
 		w.Line($"/// <summary>Marks this indexer for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
-		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ {verifiableTimesBody} return this; }}");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ {string.Join(" ", verifiableTimesParts)} return this; }}");
 		w.Line();
 	}
 
@@ -546,83 +733,298 @@ internal static class IndexerInterceptorRenderer
 
 	#region Internal Verification Support
 
-	private static void RenderInternalVerification(CodeWriter w, UnifiedIndexerInterceptorModel model)
+	private static void RenderInternalVerification(
+		CodeWriter w,
+		IReadOnlyList<UnifiedIndexerInterceptorModel> models,
+		bool isMulti,
+		string fullInterceptorClassName)
 	{
-		var isVerifiableExpr = model.HasGetter && model.HasSetter
-			? "_isGetVerifiable || _isSetVerifiable"
-			: (model.HasGetter ? "_isGetVerifiable" : "_isSetVerifiable");
+		var indexerName = models[0].IndexerName;
+		var hasAnyGetter = models.Any(m => m.HasGetter);
+		var hasAnySetter = models.Any(m => m.HasSetter);
 
-		var isConfiguredParts = new System.Collections.Generic.List<string> { "Backing.Count > 0" };
-		if (model.HasGetter) isConfiguredParts.Add("_get != null || (_getSequence?.Count ?? 0) > 0");
-		if (model.HasSetter) isConfiguredParts.Add("_set != null || (_setSequence?.Count ?? 0) > 0");
-		var isConfiguredExpr = string.Join(" || ", isConfiguredParts);
-
-		var totalCountExpr = model.HasGetter && model.HasSetter
-			? "TotalGetCount + TotalSetCount"
-			: (model.HasGetter ? "TotalGetCount" : "TotalSetCount");
-
+		// IsVerifiable: check if ANY key type's get or set is verifiable
+		var isVerifiableParts = new List<string>();
+		foreach (var model in models)
+		{
+			var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+			if (model.HasGetter) isVerifiableParts.Add($"_isGetVerifiable{suffix}");
+			if (model.HasSetter) isVerifiableParts.Add($"_isSetVerifiable{suffix}");
+		}
 		w.Line("/// <summary>Whether this indexer was marked with Verifiable().</summary>");
-		w.Line($"internal bool IsVerifiable => {isVerifiableExpr};");
+		w.Line($"internal bool IsVerifiable => {string.Join(" || ", isVerifiableParts)};");
 		w.Line();
 
+		// IsConfigured: check per-key builder CONFIG state + all-keys state (using explicit loops, no LINQ)
 		w.Line("/// <summary>Whether this indexer has been configured.</summary>");
-		w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
+		w.Line("internal bool IsConfigured { get {");
+		foreach (var model in models)
+		{
+			var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+			var configCheck = model.HasGetter && model.HasSetter
+				? "b.HasGetConfig || b.HasSetConfig"
+				: model.HasGetter ? "b.HasGetConfig" : "b.HasSetConfig";
+			w.Line($"foreach (var b in _perKeyBuilders{suffix}.Values) if ({configCheck}) return true;");
+			if (model.HasGetter) w.Line($"if (_get{suffix} != null || (_getSequence{suffix}?.Count ?? 0) > 0) return true;");
+			if (model.HasSetter) w.Line($"if (_set{suffix} != null || (_setSequence{suffix}?.Count ?? 0) > 0) return true;");
+		}
+		w.Line("return false; } }");
 		w.Line();
+
+		// CheckVerification
+		var totalCountExpr = hasAnyGetter && hasAnySetter
+			? "TotalGetCount + TotalSetCount"
+			: (hasAnyGetter ? "TotalGetCount" : "TotalSetCount");
 
 		w.Line("/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
 		w.Line($"internal global::KnockOff.VerificationFailure? CheckVerification()");
 		using (w.Braces())
 		{
-			w.Line($"if (!({isVerifiableExpr})) return null;");
+			w.Line("if (!IsVerifiable) return null;");
 
-			// When BOTH get and set are verifiable (e.g., Verifiable() called on interceptor),
-			// check combined count - "indexer was used" means either get or set.
-			// When only one is verifiable (e.g., Get().Verifiable()), check individually.
-			if (model.HasGetter && model.HasSetter)
+			// For simplicity in the new design, use combined verification
+			w.Line($"var times = global::KnockOff.Called.AtLeastOnce;");
+
+			// Find any verifiable times constraint
+			foreach (var model in models)
 			{
-				w.Line("if (_isGetVerifiable && _isSetVerifiable)");
-				using (w.Braces())
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				if (model.HasGetter)
 				{
-					w.Line("// Both marked verifiable - check combined count (either accessor satisfies)");
-					w.Line("var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-					w.Line($"var totalCount = {totalCountExpr};");
-					w.Line($"return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{model.IndexerName}\", times, totalCount);");
+					w.Line($"if (_getVerifiableTimes{suffix} != null) times = _getVerifiableTimes{suffix}.Value;");
+				}
+				if (model.HasSetter)
+				{
+					w.Line($"if (_setVerifiableTimes{suffix} != null) times = _setVerifiableTimes{suffix}.Value;");
 				}
 			}
 
-			// Check getter verifiable (when only getter is marked)
-			if (model.HasGetter)
-			{
-				var condition = model.HasSetter ? "_isGetVerifiable && !_isSetVerifiable" : "_isGetVerifiable";
-				w.Line($"if ({condition})");
-				using (w.Braces())
-				{
-					w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-					w.Line($"if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure(\"{model.IndexerName} (get)\", times, TotalGetCount);");
-				}
-			}
-			// Check setter verifiable (when only setter is marked)
-			if (model.HasSetter)
-			{
-				var condition = model.HasGetter ? "_isSetVerifiable && !_isGetVerifiable" : "_isSetVerifiable";
-				w.Line($"if ({condition})");
-				using (w.Braces())
-				{
-					w.Line("var times = _setVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-					w.Line($"if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure(\"{model.IndexerName} (set)\", times, TotalSetCount);");
-				}
-			}
-			w.Line("return null;");
+			w.Line($"var totalCount = {totalCountExpr};");
+			w.Line($"return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{indexerName}\", times, totalCount);");
 		}
 		w.Line();
 
+		// CheckVerificationAll
 		w.Line("/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
 		w.Line($"internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
 		using (w.Braces())
 		{
 			w.Line("if (!IsConfigured) return null;");
 			w.Line($"var totalCount = {totalCountExpr};");
-			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{model.IndexerName}\", global::KnockOff.Called.AtLeastOnce, totalCount);");
+			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{indexerName}\", global::KnockOff.Called.AtLeastOnce, totalCount);");
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested PerKeyBuilder
+
+	private static void RenderPerKeyBuilder(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string builderName,
+		string sequenceName)
+	{
+		w.Line($"/// <summary>Per-key builder for configuring behavior for a specific key.</summary>");
+		w.Line($"public sealed class {builderName}");
+		using (w.Braces())
+		{
+			// Internal state for getter configuration
+			if (model.HasGetter)
+			{
+				// Use ValueType directly with default!. _hasValue tracks whether a value was configured.
+				// Cannot use ValueType? because int? breaks List<int>.Add(_getValue!).
+				// Cannot use NullableValueType because nullable-ref types like User? would not need _hasValue.
+				w.Line($"private {model.ValueType} _getValue = default!;");
+				w.Line("private bool _hasValue;");
+				w.Line($"private global::System.Func<{model.ValueType}>? _getCallback;");
+				// internal so PerKeySequence (sibling class) can access for ThenReturns
+				w.Line($"internal global::System.Collections.Generic.List<{model.ValueType}>? _getSequence;");
+				w.Line("private int _getSequenceIndex;");
+				w.Line();
+			}
+
+			// Internal state for setter configuration
+			if (model.HasSetter)
+			{
+				w.Line($"private global::System.Action<{model.ValueType}>? _setCallback;");
+				w.Line();
+			}
+
+			// Call count tracking (for TotalGetCount/TotalSetCount)
+			if (model.HasGetter)
+			{
+				w.Line("internal int _getCallCount;");
+			}
+			if (model.HasSetter)
+			{
+				w.Line("internal int _setCallCount;");
+			}
+			w.Line();
+
+			// HasGetConfig / HasSetConfig
+			if (model.HasGetter)
+			{
+				w.Line("/// <summary>Whether getter configuration has been set (Returns, Get, or sequence).</summary>");
+				w.Line("internal bool HasGetConfig => _hasValue || _getCallback != null || _getSequence != null;");
+			}
+			if (model.HasSetter)
+			{
+				w.Line("/// <summary>Whether setter configuration has been set (Set).</summary>");
+				w.Line("internal bool HasSetConfig => _setCallback != null;");
+			}
+			w.Line();
+
+			// Returns(TValue) - only if has getter
+			if (model.HasGetter)
+			{
+				w.Line($"/// <summary>Configures this key to return the specified value.</summary>");
+				w.Line($"public {builderName} Returns({model.ValueType} value)");
+				using (w.Braces())
+				{
+					w.Line("_getValue = value;");
+					w.Line("_hasValue = true;");
+					w.Line("_getCallback = null;");
+					w.Line("_getSequence = null;");
+					w.Line("_getSequenceIndex = 0;");
+					w.Line("return this;");
+				}
+				w.Line();
+
+				// ThenReturns(TValue) - elevates to per-key sequence
+				w.Line($"/// <summary>Adds another value to the per-key return sequence.</summary>");
+				w.Line($"public {sequenceName} ThenReturns({model.ValueType} value)");
+				using (w.Braces())
+				{
+					w.Line("if (_getSequence == null)");
+					using (w.Braces())
+					{
+						w.Line($"_getSequence = new global::System.Collections.Generic.List<{model.ValueType}>();");
+						w.Line("if (_hasValue) _getSequence.Add(_getValue!);");
+					}
+					w.Line("_getSequence.Add(value);");
+					w.Line("_hasValue = false;");
+					w.Line("_getCallback = null;");
+					w.Line($"return new {sequenceName}(this);");
+				}
+				w.Line();
+
+				// Get(Func<TValue>) - per-key callback (no key param since key is already bound)
+				w.Line($"/// <summary>Configures this key to use the specified callback for getter.</summary>");
+				w.Line($"public {builderName} Get(global::System.Func<{model.ValueType}> callback)");
+				using (w.Braces())
+				{
+					w.Line("_getCallback = callback;");
+					w.Line("_hasValue = false;");
+					w.Line("_getValue = default!;");
+					w.Line("_getSequence = null;");
+					w.Line("_getSequenceIndex = 0;");
+					w.Line("return this;");
+				}
+				w.Line();
+			}
+
+			// Set(Action<TValue>) - only if has setter
+			if (model.HasSetter)
+			{
+				w.Line($"/// <summary>Configures this key to use the specified callback for setter.</summary>");
+				w.Line($"public {builderName} Set(global::System.Action<{model.ValueType}> callback)");
+				using (w.Braces())
+				{
+					w.Line("_setCallback = callback;");
+					w.Line("return this;");
+				}
+				w.Line();
+			}
+
+			// InvokeGet() - called by interceptor's InvokeGet
+			if (model.HasGetter)
+			{
+				w.Line($"/// <summary>Invokes the configured getter for this key.</summary>");
+				w.Line($"internal {model.ValueType} InvokeGet()");
+				using (w.Braces())
+				{
+					// Sequence first
+					w.Line("if (_getSequence != null)");
+					using (w.Braces())
+					{
+						w.Line("if (_getSequenceIndex < _getSequence.Count)");
+						using (w.Braces())
+						{
+							w.Line("return _getSequence[_getSequenceIndex++];");
+						}
+						w.Line("// Repeat last value");
+						w.Line("return _getSequence[_getSequence.Count - 1];");
+					}
+					// Callback
+					w.Line("if (_getCallback != null) return _getCallback();");
+					// Value
+					w.Line("return _getValue!;");
+				}
+				w.Line();
+			}
+
+			// InvokeSet(TValue) - called by interceptor's InvokeSet
+			if (model.HasSetter)
+			{
+				w.Line($"/// <summary>Invokes the configured setter for this key.</summary>");
+				w.Line($"internal void InvokeSet({model.ValueType} value)");
+				using (w.Braces())
+				{
+					w.Line("_setCallback?.Invoke(value);");
+				}
+				w.Line();
+			}
+
+			// Reset
+			w.Line("/// <summary>Resets call counts for this per-key builder.</summary>");
+			w.Line("internal void Reset()");
+			using (w.Braces())
+			{
+				if (model.HasGetter)
+				{
+					w.Line("_getCallCount = 0;");
+					w.Line("_getSequenceIndex = 0;");
+				}
+				if (model.HasSetter)
+				{
+					w.Line("_setCallCount = 0;");
+				}
+			}
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested PerKeySequence
+
+	private static void RenderPerKeySequence(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string builderName,
+		string sequenceName)
+	{
+		if (!model.HasGetter) return;
+
+		w.Line($"/// <summary>Per-key sequence for chaining multiple return values.</summary>");
+		w.Line($"public sealed class {sequenceName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {builderName} _builder;");
+			w.Line();
+
+			w.Line($"internal {sequenceName}({builderName} builder) => _builder = builder;");
+			w.Line();
+
+			w.Line($"/// <summary>Adds another value to the per-key return sequence.</summary>");
+			w.Line($"public {sequenceName} ThenReturns({model.ValueType} value)");
+			using (w.Braces())
+			{
+				w.Line("_builder._getSequence!.Add(value);");
+				w.Line("return this;");
+			}
 		}
 		w.Line();
 	}
@@ -633,19 +1035,24 @@ internal static class IndexerInterceptorRenderer
 
 	private static void RenderIndexerGetBuilderImpl(
 		CodeWriter w,
-		string keyType,
-		string valueType,
-		string parameterTypes,
-		string interceptorClassName)
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
 	{
+		var className = $"IndexerGetBuilderImpl{friendlyName}";
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var parameterTypes = model.KeyType;
+
 		w.Line($"/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
-		w.Line($"private sealed class IndexerGetBuilderImpl : global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}>");
+		w.Line($"private sealed class {className} : global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerGetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"private {keyType} _lastKey = default!;");
@@ -684,18 +1091,18 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("if (_interceptor._getSequence == null)");
+				w.Line($"if (_interceptor._getSequence{fieldSuffix} == null)");
 				using (w.Braces())
 				{
-					w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{parameterTypes}, {valueType}> Callback, IndexerGetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._getSequence.Add((_interceptor._get!, this));");
-					w.Line("_interceptor._get = null;");
-					w.Line("_interceptor._getTracking = null;");  // Clear to prevent double-counting in TotalGetCount
-					w.Line("_interceptor._getSequenceIndex = 0;");
+					w.Line($"_interceptor._getSequence{fieldSuffix} = new global::System.Collections.Generic.List<(global::System.Func<{parameterTypes}, {valueType}> Callback, {className} Tracking)>();");
+					w.Line($"_interceptor._getSequence{fieldSuffix}.Add((_interceptor._get{fieldSuffix}!, this));");
+					w.Line($"_interceptor._get{fieldSuffix} = null;");
+					w.Line($"_interceptor._getTracking{fieldSuffix} = null;");
+					w.Line($"_interceptor._getSequenceIndex{fieldSuffix} = 0;");
 				}
-				w.Line("var nextBuilder = new IndexerGetBuilderImpl(_interceptor);");
-				w.Line("_interceptor._getSequence.Add((callback, nextBuilder));");
-				w.Line("return new IndexerGetSequenceImpl(_interceptor);");
+				w.Line($"var nextBuilder = new {className}(_interceptor);");
+				w.Line($"_interceptor._getSequence{fieldSuffix}.Add((callback, nextBuilder));");
+				w.Line($"return new IndexerGetSequenceImpl{friendlyName}(_interceptor);");
 			}
 			w.Line();
 
@@ -703,8 +1110,8 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._isGetVerifiable = true;");
-				w.Line("_interceptor._getVerifiableTimes = null;");
+				w.Line($"_interceptor._isGetVerifiable{fieldSuffix} = true;");
+				w.Line($"_interceptor._getVerifiableTimes{fieldSuffix} = null;");
 				w.Line("return this;");
 			}
 			w.Line();
@@ -722,19 +1129,24 @@ internal static class IndexerInterceptorRenderer
 
 	private static void RenderIndexerSetBuilderImpl(
 		CodeWriter w,
-		string keyType,
-		string valueType,
-		string parameterTypes,
-		string interceptorClassName)
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
 	{
+		var className = $"IndexerSetBuilderImpl{friendlyName}";
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var parameterTypes = model.KeyType;
+
 		w.Line($"/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
-		w.Line($"private sealed class IndexerSetBuilderImpl : global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}>");
+		w.Line($"private sealed class {className} : global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerSetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"private ({keyType} Key, {valueType} Value)? _lastEntry;");
@@ -773,18 +1185,18 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("if (_interceptor._setSequence == null)");
+				w.Line($"if (_interceptor._setSequence{fieldSuffix} == null)");
 				using (w.Braces())
 				{
-					w.Line($"_interceptor._setSequence = new global::System.Collections.Generic.List<(global::System.Action<{parameterTypes}, {valueType}> Callback, IndexerSetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._setSequence.Add((_interceptor._set!, this));");
-					w.Line("_interceptor._set = null;");
-					w.Line("_interceptor._setTracking = null;");  // Clear to prevent double-counting in TotalSetCount
-					w.Line("_interceptor._setSequenceIndex = 0;");
+					w.Line($"_interceptor._setSequence{fieldSuffix} = new global::System.Collections.Generic.List<(global::System.Action<{parameterTypes}, {valueType}> Callback, {className} Tracking)>();");
+					w.Line($"_interceptor._setSequence{fieldSuffix}.Add((_interceptor._set{fieldSuffix}!, this));");
+					w.Line($"_interceptor._set{fieldSuffix} = null;");
+					w.Line($"_interceptor._setTracking{fieldSuffix} = null;");
+					w.Line($"_interceptor._setSequenceIndex{fieldSuffix} = 0;");
 				}
-				w.Line("var nextBuilder = new IndexerSetBuilderImpl(_interceptor);");
-				w.Line("_interceptor._setSequence.Add((callback, nextBuilder));");
-				w.Line("return new IndexerSetSequenceImpl(_interceptor);");
+				w.Line($"var nextBuilder = new {className}(_interceptor);");
+				w.Line($"_interceptor._setSequence{fieldSuffix}.Add((callback, nextBuilder));");
+				w.Line($"return new IndexerSetSequenceImpl{friendlyName}(_interceptor);");
 			}
 			w.Line();
 
@@ -792,8 +1204,8 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._isSetVerifiable = true;");
-				w.Line("_interceptor._setVerifiableTimes = null;");
+				w.Line($"_interceptor._isSetVerifiable{fieldSuffix} = true;");
+				w.Line($"_interceptor._setVerifiableTimes{fieldSuffix} = null;");
 				w.Line("return this;");
 			}
 			w.Line();
@@ -811,27 +1223,33 @@ internal static class IndexerInterceptorRenderer
 
 	private static void RenderIndexerGetSequenceImpl(
 		CodeWriter w,
-		string keyType,
-		string valueType,
-		string parameterTypes,
-		string interceptorClassName)
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
 	{
+		var className = $"IndexerGetSequenceImpl{friendlyName}";
+		var builderClassName = $"IndexerGetBuilderImpl{friendlyName}";
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var parameterTypes = model.KeyType;
+
 		w.Line($"/// <summary>Sequence implementation for ThenGet chaining.</summary>");
-		w.Line($"private sealed class IndexerGetSequenceImpl : global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}>");
+		w.Line($"private sealed class {className} : global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerGetSequenceImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>");
 			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new IndexerGetBuilderImpl(_interceptor);");
-				w.Line("_interceptor._getSequence!.Add((callback, tracking));");
+				w.Line($"var tracking = new {builderClassName}(_interceptor);");
+				w.Line($"_interceptor._getSequence{fieldSuffix}!.Add((callback, tracking));");
 				w.Line("return this;");
 			}
 			w.Line();
@@ -840,9 +1258,9 @@ internal static class IndexerInterceptorRenderer
 			w.Line("public void Verify()");
 			using (w.Braces())
 			{
-				w.Line("if (_interceptor._getSequence == null) return;");
-				w.Line("var sequenceLength = _interceptor._getSequence.Count;");
-				w.Line("var completedCount = _interceptor._getSequenceIndex;");
+				w.Line($"if (_interceptor._getSequence{fieldSuffix} == null) return;");
+				w.Line($"var sequenceLength = _interceptor._getSequence{fieldSuffix}.Count;");
+				w.Line($"var completedCount = _interceptor._getSequenceIndex{fieldSuffix};");
 				w.Line("if (completedCount < sequenceLength)");
 				w.Line("\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer getter\", sequenceLength, completedCount));");
 			}
@@ -856,8 +1274,8 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._isGetVerifiable = true;");
-				w.Line("_interceptor._getVerifiableTimes = null;");
+				w.Line($"_interceptor._isGetVerifiable{fieldSuffix} = true;");
+				w.Line($"_interceptor._getVerifiableTimes{fieldSuffix} = null;");
 				w.Line("return this;");
 			}
 			w.Line();
@@ -867,7 +1285,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line("public void ThenDefault()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._getRepeatLastValue = false;");
+				w.Line($"_interceptor._getRepeatLastValue{fieldSuffix} = false;");
 			}
 		}
 		w.Line();
@@ -879,27 +1297,33 @@ internal static class IndexerInterceptorRenderer
 
 	private static void RenderIndexerSetSequenceImpl(
 		CodeWriter w,
-		string keyType,
-		string valueType,
-		string parameterTypes,
-		string interceptorClassName)
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
 	{
+		var className = $"IndexerSetSequenceImpl{friendlyName}";
+		var builderClassName = $"IndexerSetBuilderImpl{friendlyName}";
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var parameterTypes = model.KeyType;
+
 		w.Line($"/// <summary>Sequence implementation for ThenSet chaining.</summary>");
-		w.Line($"private sealed class IndexerSetSequenceImpl : global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}>");
+		w.Line($"private sealed class {className} : global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerSetSequenceImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>");
 			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new IndexerSetBuilderImpl(_interceptor);");
-				w.Line("_interceptor._setSequence!.Add((callback, tracking));");
+				w.Line($"var tracking = new {builderClassName}(_interceptor);");
+				w.Line($"_interceptor._setSequence{fieldSuffix}!.Add((callback, tracking));");
 				w.Line("return this;");
 			}
 			w.Line();
@@ -908,9 +1332,9 @@ internal static class IndexerInterceptorRenderer
 			w.Line("public void Verify()");
 			using (w.Braces())
 			{
-				w.Line("if (_interceptor._setSequence == null) return;");
-				w.Line("var sequenceLength = _interceptor._setSequence.Count;");
-				w.Line("var completedCount = _interceptor._setSequenceIndex;");
+				w.Line($"if (_interceptor._setSequence{fieldSuffix} == null) return;");
+				w.Line($"var sequenceLength = _interceptor._setSequence{fieldSuffix}.Count;");
+				w.Line($"var completedCount = _interceptor._setSequenceIndex{fieldSuffix};");
 				w.Line("if (completedCount < sequenceLength)");
 				w.Line("\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer setter\", sequenceLength, completedCount));");
 			}
@@ -924,18 +1348,18 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._isSetVerifiable = true;");
-				w.Line("_interceptor._setVerifiableTimes = null;");
+				w.Line($"_interceptor._isSetVerifiable{fieldSuffix} = true;");
+				w.Line($"_interceptor._setVerifiableTimes{fieldSuffix} = null;");
 				w.Line("return this;");
 			}
 			w.Line();
 
-			// ThenDefault() - terminates sequence with default after exhaustion (do nothing for setters)
-			w.Line("/// <summary>Terminates sequence after exhaustion instead of repeating last callback (do nothing after exhaustion).</summary>");
+			// ThenDefault()
+			w.Line("/// <summary>Terminates sequence after exhaustion instead of repeating last callback.</summary>");
 			w.Line("public void ThenDefault()");
 			using (w.Braces())
 			{
-				w.Line("_interceptor._setRepeatLastValue = false;");
+				w.Line($"_interceptor._setRepeatLastValue{fieldSuffix} = false;");
 			}
 		}
 		w.Line();

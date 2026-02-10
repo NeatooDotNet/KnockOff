@@ -218,10 +218,10 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 <!-- snippet: indexer-interceptor-complete-api-demo -->
 ```cs
-// Backing: default dictionary storage for indexer
-stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
+// Per-key Returns: configure specific keys
+stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice" });
 
-// Get: override backing lookup with callback
+// Get: all-keys callback as fallback
 stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
 // Set: configure setter callback

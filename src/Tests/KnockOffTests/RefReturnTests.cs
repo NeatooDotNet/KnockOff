@@ -144,7 +144,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = knockOff;
 
 		ref int value = ref service[0];
-		knockOff.Indexer.OfInt32.VerifyGet(Called.Once);
+		knockOff.Indexer.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -154,7 +154,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = knockOff;
 
 		ref readonly int value = ref service["key"];
-		knockOff.Indexer.OfString.VerifyGet(Called.Once);
+		knockOff.Indexer.VerifyGet(Called.Once);
 	}
 
 	#endregion
@@ -320,7 +320,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = stub;
 
 		ref int value = ref service[0];
-		stub.Indexer.OfInt32.VerifyGet(Called.Once);
+		stub.Indexer.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -330,7 +330,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = stub;
 
 		ref readonly int value = ref service["key"];
-		stub.Indexer.OfString.VerifyGet(Called.Once);
+		stub.Indexer.VerifyGet(Called.Once);
 	}
 
 	#endregion

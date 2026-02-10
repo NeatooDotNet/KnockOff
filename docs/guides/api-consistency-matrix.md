@@ -91,14 +91,14 @@ All 8 patterns use identical API:
 
 <!-- snippet: matrix-indexer-interception -->
 ```cs
-// Configure getter
+// Per-key Returns
+stub.Indexer["preloaded"].Returns("data");
+
+// Configure getter callback (fallback for unconfigured keys)
 stub.Indexer.Get((key) => $"value-{key}");
 
 // Configure setter
 stub.Indexer.Set((key, value) => { });
-
-// Use backing dictionary
-stub.Indexer.Backing["preloaded"] = "data";
 
 // Verify
 stub.Indexer.VerifyGet(Called.Never);
@@ -112,9 +112,9 @@ stub.Indexer.VerifySet(Called.Never);
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `Get((key) => value)` | ✓ |
+| `Indexer[key].Returns(value)` (per-key) | ✓ |
+| `Get((key) => value)` (all-keys callback) | ✓ |
 | `Set((key, value) => { })` | ✓ |
-| `Backing` dictionary | ✓ |
 | `VerifyGet()` / `VerifySet()` | ✓ |
 | `LastGetKey` / `LastSetEntry` | ✓ |
 

@@ -68,16 +68,6 @@ internal static class FlatModelBuilder
 				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
 			.ToList();
 
-		// Group indexers by BaseName for OfXxx pattern
-		var flatIndexerGroups = indexers
-			.GroupBy(i => i.BaseName)
-			.Select(g => new FlatIndexerGroup(
-				BaseName: g.Key,
-				ContainerClassName: $"{g.Key}Container",
-				NeedsNewKeyword: g.Any(i => i.NeedsNewKeyword),
-				Indexers: new EquatableArray<FlatIndexerModel>(g.ToArray())))
-			.ToList();
-
 		// Build containing types models
 		var containingTypes = typeInfo.ContainingTypes.Select(ct => new ContainingTypeModel(
 			Keyword: ct.Keyword,
@@ -85,7 +75,7 @@ internal static class FlatModelBuilder
 			AccessModifier: ct.AccessibilityModifier)).ToEquatableArray();
 
 		// Build source providers for Source(T) methods
-		var sourceProviders = BuildSourceProviders(typeInfo.Interfaces, properties, indexers, flatIndexerGroups, methods, genericHandlers, nameMap);
+		var sourceProviders = BuildSourceProviders(typeInfo.Interfaces, properties, indexers, methods, genericHandlers, nameMap);
 
 		// Build generic stub override handler groups (for overloaded generic stub overrides)
 		var genericStubOverrideHandlerGroups = BuildGenericStubOverrideHandlerGroups(methods, nameMap);
@@ -98,7 +88,6 @@ internal static class FlatModelBuilder
 			ContainingTypes: containingTypes,
 			Properties: properties,
 			Indexers: indexers,
-			IndexerGroups: new EquatableArray<FlatIndexerGroup>(flatIndexerGroups.ToArray()),
 			Methods: methods,
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
 			StubOverrideGroups: new EquatableArray<FlatMethodGroup>(flatStubOverrideGroups.ToArray()),
@@ -129,22 +118,30 @@ internal static class FlatModelBuilder
 		// Note: Stub override methods use MethodName_ suffix so they don't conflict
 		// with interceptor properties named MethodName.
 
-		// Count indexers to determine naming strategy
-		var indexerCount = SymbolHelpers.CountIndexers(flatMembers);
-
 		// Process properties and indexers
+		// For indexers: all indexers share a single interceptor named "Indexer" (regardless of count)
+		string? sharedIndexerName = null;
 		foreach (var member in flatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
 				var key = GetMemberKey(member);
-				// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
-				var baseName = member.IsIndexer
-					? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
-					: member.Name;
-				var finalName = GetUniqueInterceptorName(baseName, usedNames);
-				nameMap[key] = finalName;
-				usedNames.Add(finalName);
+				if (member.IsIndexer)
+				{
+					// All indexers share the same interceptor name "Indexer"
+					if (sharedIndexerName == null)
+					{
+						sharedIndexerName = GetUniqueInterceptorName("Indexer", usedNames);
+						usedNames.Add(sharedIndexerName);
+					}
+					nameMap[key] = sharedIndexerName;
+				}
+				else
+				{
+					var finalName = GetUniqueInterceptorName(member.Name, usedNames);
+					nameMap[key] = finalName;
+					usedNames.Add(finalName);
+				}
 			}
 		}
 
@@ -646,7 +643,6 @@ internal static class FlatModelBuilder
 					SimpleInterfaceName: simpleIfaceName,
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetTypeSuffix(keyType),
-					BaseName: "Indexer",
 					ParameterSignature: paramSignature,
 					ParameterTypes: paramTypesList,
 					KeyExpression: keyExpression,
@@ -1865,35 +1861,12 @@ internal static class FlatModelBuilder
 		EquatableArray<InterfaceInfo> interfaces,
 		EquatableArray<FlatPropertyModel> properties,
 		EquatableArray<FlatIndexerModel> indexers,
-		List<FlatIndexerGroup> indexerGroups,
 		EquatableArray<FlatMethodModel> methods,
 		EquatableArray<FlatGenericMethodHandlerModel> genericHandlers,
 		Dictionary<string, string> nameMap)
 	{
 		// Build a map of interface full name -> set of interfaces it inherits from (including itself)
 		var interfaceHierarchy = BuildInterfaceHierarchy(interfaces);
-
-		// Build indexer access map (same logic as FlatRenderer.BuildIndexerAccessMap)
-		var indexerAccessMap = new Dictionary<string, string>();
-		foreach (var group in indexerGroups)
-		{
-			var indexerArray = group.Indexers.GetArray();
-			if (indexerArray == null) continue;
-
-			if (group.Indexers.Count == 1)
-			{
-				// Single indexer - direct access
-				indexerAccessMap[indexerArray[0].InterceptorName] = group.BaseName;
-			}
-			else
-			{
-				// Multiple indexers - container with OfXxx pattern
-				foreach (var indexer in indexerArray)
-				{
-					indexerAccessMap[indexer.InterceptorName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
-				}
-			}
-		}
 
 		// Collect all unique interceptor names with their declaring interfaces
 		var interceptorToDeclaringInterface = new Dictionary<string, string>();
@@ -1910,14 +1883,11 @@ internal static class FlatModelBuilder
 				interceptorToDeclaringInterface[prop.InterceptorName] = prop.DeclaringInterface;
 		}
 
-		// For indexers, use the access path from indexerAccessMap
+		// For indexers, use the interceptor name directly (no container indirection)
 		foreach (var indexer in indexers)
 		{
-			var accessPath = indexerAccessMap.TryGetValue(indexer.InterceptorName, out var path)
-				? path
-				: indexer.InterceptorName;
-			if (!interceptorToDeclaringInterface.ContainsKey(accessPath))
-				interceptorToDeclaringInterface[accessPath] = indexer.DeclaringInterface;
+			if (!interceptorToDeclaringInterface.ContainsKey(indexer.InterceptorName))
+				interceptorToDeclaringInterface[indexer.InterceptorName] = indexer.DeclaringInterface;
 		}
 
 		foreach (var method in methods)

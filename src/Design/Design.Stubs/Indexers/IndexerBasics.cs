@@ -2,11 +2,12 @@
 // Design.Stubs - Basic Indexer Stubbing
 // -----------------------------------------------------------------------------
 // This file demonstrates the fundamental indexer stubbing APIs:
-// - Get(callback) with key access
+// - Per-key Returns(value) for simple value configuration
+// - Get(callback) with key access for dynamic behavior
 // - Set(callback) with key and value
-// - Backing dictionary for storage
 // - LastGetKey and LastSetEntry tracking
 // - Multi-key indexers (tuple keys)
+// - Per-key builder pattern: stub.Indexer[key].Returns(value)
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Entities;
@@ -24,10 +25,10 @@ namespace Design.Stubs.Indexers;
 public partial class IndexerBasicsDemo
 {
     // =========================================================================
-    // Get(callback) - Getter with Key Access
+    // Per-Key Returns - Simple Value Configuration
     // =========================================================================
-    // DESIGN DECISION: Indexer getters receive the key as a callback parameter.
-    // This differs from property getters which have no parameters.
+    // DESIGN DECISION: Each key gets its own PerKeyBuilder accessed via the
+    // interceptor's C# indexer: stub.Indexer[key].Returns(value)
     //
     // GENERATOR BEHAVIOR: For indexer:
     //
@@ -37,22 +38,54 @@ public partial class IndexerBasicsDemo
     //
     //   public class IndexerInterceptor
     //   {
-    //       public void Get(Func<string, int> callback) { _getCallback = callback; }
+    //       private readonly Dictionary<string, PerKeyBuilder> _perKeyBuilders = new();
     //
-    //       public int Get(string key)
+    //       public PerKeyBuilder this[string key] => ...;
+    //
+    //       public sealed class PerKeyBuilder
     //       {
-    //           LastGetKey = key;
-    //           return _getCallback?.Invoke(key) ?? default;
+    //           public PerKeyBuilder Returns(int value) { ... }
+    //           public PerKeyBuilder Get(Func<int> callback) { ... }
+    //           public PerKeyBuilder Set(Action<int> callback) { ... }
     //       }
     //   }
     //
-    // DID NOT DO THIS: Make indexer getters parameterless like properties
+    // DID NOT DO THIS: Use a Backing dictionary that magically connects get/set
     //
-    // REJECTED PATTERN:
-    //   stub.Indexer.Get(42);  // How would we know which key returns 42?
+    // WHY NOT: Per-key builders are explicit, composable, and avoid confusion
+    // about whether Get/Set callbacks override Backing or vice versa.
+    // =========================================================================
+
+    public void PerKey_Returns()
+    {
+        var stub = new Stubs.ICollection();
+
+        // Configure specific keys to return specific values
+        stub.Indexer["existing"].Returns(100);
+
+        ICollection<string, int> collection = stub;
+
+        // Get returns configured value
+        var val = collection["existing"]; // Returns 100
+    }
+
+    // =========================================================================
+    // Get(callback) - Getter with Key Access
+    // =========================================================================
+    // DESIGN DECISION: The all-keys Get callback receives the key as a parameter.
+    // This is the fallback for keys not configured with per-key Returns.
     //
-    // WHY NOT: Indexers are fundamentally key-based. The callback MUST receive
-    // the key to provide meaningful behavior.
+    // GENERATOR BEHAVIOR:
+    //
+    //   public IIndexerGetBuilder<string, int> Get(Func<string, int> callback) { ... }
+    //
+    // PRIORITY CHAIN:
+    //   1. Per-key builder (stub.Indexer[key].Returns(value))
+    //   2. All-keys sequence (Get(...).ThenGet(...))
+    //   3. All-keys Get callback
+    //   4. Source delegation
+    //   5. Strict mode check
+    //   6. Default value
     // =========================================================================
 
     public void Get_ReceivesKey()
@@ -76,13 +109,7 @@ public partial class IndexerBasicsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Set(Action<string, int> callback) { _setCallback = callback; }
-    //
-    //   public void Set(string key, int value)
-    //   {
-    //       LastSetEntry = (key, value);
-    //       _setCallback?.Invoke(key, value);
-    //   }
+    //   public IIndexerSetBuilder<string, int> Set(Action<string, int> callback) { ... }
     // =========================================================================
 
     public void Set_ReceivesKeyAndValue()
@@ -102,70 +129,45 @@ public partial class IndexerBasicsDemo
     }
 
     // =========================================================================
-    // Backing - Dictionary for Storage
+    // Per-Key with All-Keys Fallback
     // =========================================================================
-    // DESIGN DECISION: The Backing property provides a Dictionary<TKey, TValue>
-    // for simple indexer scenarios. This is analogous to Value for properties.
-    //
-    // When Backing is used:
-    // - Gets retrieve from the dictionary
-    // - Sets store into the dictionary
-    // - No Get/Set callbacks needed
-    //
-    // GENERATOR BEHAVIOR:
-    //
-    //   public Dictionary<string, int> Backing { get; } = new();
-    //
-    //   public int Get(string key)
-    //   {
-    //       if (_getCallback != null) return _getCallback(key);
-    //       return Backing.TryGetValue(key, out var v) ? v : default;
-    //   }
-    //
-    //   public void Set(string key, int value)
-    //   {
-    //       if (_setCallback != null) { _setCallback(key, value); return; }
-    //       Backing[key] = value;
-    //   }
+    // DESIGN DECISION: Per-key builders take priority over all-keys callbacks.
+    // This allows configuring specific keys with Returns while using a callback
+    // as a fallback for unconfigured keys.
     // =========================================================================
 
-    public void Backing_DictionaryForStorage()
+    public void PerKey_WithAllKeysFallback()
     {
         var stub = new Stubs.ICollection();
 
-        // Pre-populate backing store
-        stub.Indexer.Backing["existing"] = 100;
+        // Specific keys get specific values
+        stub.Indexer["special"].Returns(999);
+
+        // All other keys use the callback
+        stub.Indexer.Get((key) => key.Length);
 
         ICollection<string, int> collection = stub;
 
-        // Get from backing
-        var val = collection["existing"]; // Returns 100
-
-        // Set into backing
-        collection["new"] = 200;
-        var newVal = stub.Indexer.Backing["new"]; // 200
+        var special = collection["special"]; // Returns 999 (per-key wins)
+        var other = collection["hello"];     // Returns 5 (callback fallback)
     }
 
     // =========================================================================
     // LastGetKey and LastSetEntry - Tracking
     // =========================================================================
     // DESIGN DECISION: Indexer interceptors track:
-    // - LastGetKey: The key used in the most recent get
-    // - LastSetEntry: A (Key, Value) tuple from the most recent set
+    // - LastGetKey: The key used in the most recent get (any path)
+    // - LastSetEntry: A (Key, Value) tuple from the most recent set (any path)
     //
-    // Note: The interface uses LastKey/LastEntry, but the GENERATOR adds
-    // Get/Set prefixes to disambiguate when both get and set exist.
-    //
-    // GENERATOR BEHAVIOR:
-    //   public string LastGetKey { get; private set; }
-    //   public (string Key, int Value) LastSetEntry { get; private set; }
+    // These track ALL accesses regardless of whether the call was handled by
+    // a per-key builder, all-keys callback, or was unconfigured.
     // =========================================================================
 
     public void Tracking_LastGetKeyAndLastSetEntry()
     {
         var stub = new Stubs.ICollection();
-        stub.Indexer.Backing["a"] = 1;
-        stub.Indexer.Backing["b"] = 2;
+        stub.Indexer["a"].Returns(1);
+        stub.Indexer["b"].Returns(2);
 
         ICollection<string, int> collection = stub;
 
@@ -191,27 +193,29 @@ public partial class IndexerBasicsDemo
     // DESIGN DECISION: Multi-key indexers like this[int row, int col] use
     // tuple keys internally. The KeyType is (int row, int col).
     // All callbacks (Get, Set, ThenGet, ThenSet) use the tuple key type.
+    // Per-key builders use flattened multi-param indexer accessors.
     //
     // GENERATOR BEHAVIOR:
     //
     //   public class IndexerInterceptor
     //   {
-    //       public void Get(Func<(int row, int col), double> callback) { ... }
-    //       public void Set(Action<(int row, int col), double> callback) { ... }
-    //
-    //       public (int row, int col) LastGetKey { get; }
-    //       public ((int row, int col) Key, double Value) LastSetEntry { get; }
+    //       public PerKeyBuilder this[int row, int col] { get { ... } }
+    //       public IIndexerGetBuilder<...> Get(Func<(int row, int col), double> callback) { ... }
+    //       public IIndexerSetBuilder<...> Set(Action<(int row, int col), double> callback) { ... }
     //   }
-    //
-    // DID NOT DO THIS: Flatten tuple into individual parameters for callbacks
-    //
-    // REJECTED PATTERN:
-    //   stub.Indexer.Get((row, col) => row * 10.0 + col);  // Func<int, int, double>
-    //
-    // WHY NOT: Library interfaces use Func<TKey, TValue> where TKey is the
-    // tuple. Flattening would create a mismatch between Get() and ThenGet()
-    // callback signatures. Using the tuple key consistently avoids this.
     // =========================================================================
+
+    public void MultiKeyIndexer_PerKey()
+    {
+        var stub = new Stubs.IMatrix();
+
+        // Flattened indexer accessor for per-key configuration
+        stub.Indexer[1, 2].Returns(12.0);
+        stub.Indexer[3, 4].Returns(34.0);
+
+        IMatrix matrix = stub;
+        var val = matrix[1, 2]; // Returns 12.0
+    }
 
     public void MultiKeyIndexer_TupleKeys()
     {
@@ -222,18 +226,6 @@ public partial class IndexerBasicsDemo
 
         IMatrix matrix = stub;
         var val = matrix[2, 3]; // Returns 23.0 (2*10 + 3)
-    }
-
-    public void MultiKeyIndexer_Backing()
-    {
-        var stub = new Stubs.IMatrix();
-
-        // Backing uses tuple key
-        stub.Indexer.Backing[(1, 2)] = 12.0;
-        stub.Indexer.Backing[(3, 4)] = 34.0;
-
-        IMatrix matrix = stub;
-        var val = matrix[1, 2]; // Returns 12.0
     }
 
     public void MultiKeyIndexer_SetCallback()
@@ -271,12 +263,12 @@ public partial class IndexerBasicsDemo
     // differs.
     // =========================================================================
 
-    public void InitIndexer_Backing()
+    public void InitIndexer_PerKey()
     {
         var stub = new Stubs.IInitIndexerCollection();
 
-        // Init-only indexer still uses Backing for get
-        stub.Indexer.Backing["key"] = 42;
+        // Init-only indexer uses per-key Returns for get
+        stub.Indexer["key"].Returns(42);
 
         IInitIndexerCollection<string, int> collection = stub;
         var val = collection["key"]; // Returns 42
@@ -286,13 +278,14 @@ public partial class IndexerBasicsDemo
     // VerifyGet() and VerifySet()
     // =========================================================================
     // DESIGN DECISION: Like properties, indexers have separate verification
-    // for get and set operations.
+    // for get and set operations. Verification counts include ALL access paths
+    // (per-key, all-keys callback, unconfigured).
     // =========================================================================
 
     public void Verify_GetterAndSetter()
     {
         var stub = new Stubs.ICollection();
-        stub.Indexer.Backing["test"] = 1;
+        stub.Indexer["test"].Returns(1);
 
         ICollection<string, int> collection = stub;
 
@@ -305,32 +298,32 @@ public partial class IndexerBasicsDemo
     }
 
     // =========================================================================
-    // COMMON MISTAKE: Using Get/Set with Backing
+    // Per-Key vs All-Keys Get Priority
     // =========================================================================
     //
-    // COMMON MISTAKE: Expecting Backing to work when Get/Set is configured
+    // Per-key Returns always takes priority over all-keys Get callback.
+    // This is the recommended pattern: use per-key for specific values,
+    // and all-keys Get as a fallback.
     //
-    // When you set Get or Set, they OVERRIDE Backing behavior:
-    //
-    //   stub.Indexer.Backing["key"] = 100;
-    //   stub.Indexer.Get((k) => 999);
-    //   collection["key"]; // Returns 999, NOT 100!
-    //
-    // Backing is for simple scenarios. Get/Set are for custom behavior.
+    //   stub.Indexer["key"].Returns(100);  // Per-key: always returns 100 for "key"
+    //   stub.Indexer.Get((k) => 999);      // All-keys: returns 999 for other keys
+    //   collection["key"];                 // Returns 100 (per-key wins)
+    //   collection["other"];               // Returns 999 (callback fallback)
     // =========================================================================
 
-    public void Backing_VsGet()
+    public void PerKey_VsGet()
     {
         var stub = new Stubs.ICollection();
 
-        // Backing alone works as expected
-        stub.Indexer.Backing["key"] = 100;
+        // Per-key for specific keys
+        stub.Indexer["key"].Returns(100);
 
         ICollection<string, int> collection = stub;
         var val1 = collection["key"]; // 100
 
-        // But Get overrides Backing behavior
+        // All-keys Get as fallback
         stub.Indexer.Get((k) => 999);
-        var val2 = collection["key"]; // 999 - Backing ignored!
+        var val2 = collection["key"];   // 100 - per-key still wins!
+        var val3 = collection["other"]; // 999 - callback handles unconfigured keys
     }
 }

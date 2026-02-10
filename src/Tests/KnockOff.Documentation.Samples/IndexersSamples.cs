@@ -50,20 +50,20 @@ public partial class UserLookupStub : IUserLookup { }
 public partial class MultiKeyStoreStub : IMultiKeyStore { }
 
 // =============================================================================
-// Backing Dictionary Samples
+// Per-Key Returns Samples
 // =============================================================================
 
-public class BackingDictionarySamples
+public class PerKeyReturnsSamples
 {
     [Fact]
-    public void Backing_BasicUsage()
+    public void PerKey_BasicUsage()
     {
         var stub = new UserCacheStub();
 
-        #region indexers-backing-basic
-        // Populate the backing dictionary with test data
-        stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
-        stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
+        #region indexers-perkey-basic
+        // Configure per-key return values
+        stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice" });
+        stub.Indexer[2].Returns(new User { Id = 2, Name = "Bob" });
         #endregion
 
         IUserCache cache = stub;
@@ -76,16 +76,16 @@ public class BackingDictionarySamples
     }
 
     [Fact]
-    public void Backing_MultipleEntries()
+    public void PerKey_MultipleEntries()
     {
         var stub = new ConfigStoreStub();
 
-        #region indexers-backing-multiple
+        #region indexers-perkey-multiple
         // Pre-populate multiple configuration values
-        stub.Indexer.Backing["ConnectionString"] = "Server=localhost;Database=Test";
-        stub.Indexer.Backing["ApiKey"] = "abc123";
-        stub.Indexer.Backing["Timeout"] = "30";
-        stub.Indexer.Backing["MaxRetries"] = "3";
+        stub.Indexer["ConnectionString"].Returns("Server=localhost;Database=Test");
+        stub.Indexer["ApiKey"].Returns("abc123");
+        stub.Indexer["Timeout"].Returns("30");
+        stub.Indexer["MaxRetries"].Returns("3");
         #endregion
 
         IConfigStore config = stub;
@@ -212,7 +212,7 @@ public class VerificationSamples
     public void Verify_IndexerAccess()
     {
         var stub = new ConfigStoreStub();
-        stub.Indexer.Backing["ApiKey"] = "secret";
+        stub.Indexer["ApiKey"].Returns("secret");
 
         IConfigStore config = stub;
 
@@ -231,8 +231,8 @@ public class VerificationSamples
     public void CaptureLastAccess()
     {
         var stub = new ConfigStoreStub();
-        stub.Indexer.Backing["First"] = "1";
-        stub.Indexer.Backing["Second"] = "2";
+        stub.Indexer["First"].Returns("1");
+        stub.Indexer["Second"].Returns("2");
 
         IConfigStore config = stub;
 
@@ -310,9 +310,9 @@ public class MultipleOverloadsSamples
         var stub = new MultiKeyStoreStub();
 
         #region indexers-multiple-overloads
-        // Each overload has its own interceptor: Indexer.OfString, Indexer.OfInt32
-        stub.Indexer.OfString.Backing["name"] = "Alice";
-        stub.Indexer.OfInt32.Backing[0] = 100;
+        // C# indexer overloads resolve by key type -- no OfXxx needed
+        stub.Indexer["name"].Returns("Alice");
+        stub.Indexer[0].Returns(100);
         #endregion
 
         IMultiKeyStore store = stub;
@@ -320,8 +320,7 @@ public class MultipleOverloadsSamples
         Assert.Equal("Alice", store["name"]);
         Assert.Equal(100, store[0]);
 
-        stub.Indexer.OfString.VerifyGet(Called.Once);
-        stub.Indexer.OfInt32.VerifyGet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Exactly(2));
     }
 }
 
@@ -332,44 +331,37 @@ public class MultipleOverloadsSamples
 public class PrioritySamples
 {
     [Fact]
-    public void OnGet_TakesPrecedenceOverBacking()
+    public void PerKey_TakesPrecedenceOverGetCallback()
     {
         var stub = new ConfigStoreStub();
 
         #region indexers-priority
-        // Get takes precedence over Backing dictionary
-        stub.Indexer.Backing["ApiKey"] = "from-backing";
+        // Per-key Returns takes precedence over all-keys Get callback
+        stub.Indexer["ApiKey"].Returns("from-per-key");
         stub.Indexer.Get((key) => "from-callback");
         #endregion
 
         IConfigStore config = stub;
 
-        Assert.Equal("from-callback", config["ApiKey"]);
+        Assert.Equal("from-per-key", config["ApiKey"]);
+        Assert.Equal("from-callback", config["Other"]);
     }
 
     [Fact]
-    public void OnSet_WithBackingUpdate()
+    public void PerKeyWithFallback()
     {
         var stub = new ConfigStoreStub();
-        var validationLog = new List<string>();
 
-        #region indexers-onset-with-backing
-        // Set must manually update Backing if reads should reflect writes
-        stub.Indexer.Set((key, value) =>
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be empty");
-            validationLog.Add(key);
-            stub.Indexer.Backing[key] = value;
-        });
+        #region indexers-perkey-with-fallback
+        // Per-key for specific keys, Get callback as fallback for others
+        stub.Indexer["ApiKey"].Returns("secret123");
+        stub.Indexer.Get((key) => $"default-{key}");
         #endregion
 
         IConfigStore config = stub;
 
-        config["ApiKey"] = "secret123";
-
-        Assert.Single(validationLog);
-        Assert.Equal("secret123", stub.Indexer.Backing["ApiKey"]);
+        Assert.Equal("secret123", config["ApiKey"]);
+        Assert.Equal("default-Timeout", config["Timeout"]);
     }
 }
 
@@ -380,12 +372,12 @@ public class PrioritySamples
 public class ResetSamples
 {
     [Fact]
-    public void Reset_ClearsTrackingPreservesBacking()
+    public void Reset_ClearsTrackingPreservesPerKeyAndCallbacks()
     {
         var stub = new ConfigStoreStub();
 
-        stub.Indexer.Backing["ApiKey"] = "secret";
-        stub.Indexer.Backing["Timeout"] = "30";
+        stub.Indexer["ApiKey"].Returns("secret");
+        stub.Indexer["Timeout"].Returns("30");
 
         IConfigStore config = stub;
 
@@ -396,7 +388,7 @@ public class ResetSamples
         stub.Indexer.VerifySet(Called.Once);
 
         #region indexers-reset
-        // Reset clears tracking but preserves Backing and callbacks
+        // Reset clears tracking but preserves per-key Returns and callbacks
         stub.Indexer.Reset();
         #endregion
 
@@ -405,8 +397,8 @@ public class ResetSamples
         Assert.Null(stub.Indexer.LastGetKey);
         Assert.Null(stub.Indexer.LastSetEntry);
 
+        // Per-key Returns still works after reset
         Assert.Equal("secret", config["ApiKey"]);
-        Assert.True(stub.Indexer.Backing.ContainsKey("Timeout"));
     }
 }
 
@@ -423,10 +415,10 @@ public class CompleteExampleTests
         var cacheUpdates = new List<(int id, User? user)>();
 
         #region indexers-complete-example
-        // 1. Backing: Pre-populate test data
-        stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
+        // 1. Per-key Returns: Pre-configure specific keys
+        stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice", Email = "alice@example.com" });
 
-        // 2. Get: Compute values dynamically
+        // 2. Get: Dynamic fallback for unconfigured keys
         stub.Indexer.Get((id) => id == 999
             ? new User { Id = 999, Name = "Dynamic User", Email = "dynamic@example.com" }
             : null);
@@ -437,12 +429,15 @@ public class CompleteExampleTests
 
         IUserCache cache = stub;
 
+        // Per-key Returns wins for key 1
         var alice = cache[1];
-        Assert.Null(alice); // Get takes precedence, returns null for id=1
+        Assert.Equal("Alice", alice?.Name);
 
+        // Get callback handles key 999
         var dynamicUser = cache[999];
         Assert.Equal("Dynamic User", dynamicUser?.Name);
 
+        // Get callback returns null for unknown keys
         Assert.Null(cache[404]);
 
         stub.Indexer.VerifyGet(Called.AtLeast(3));

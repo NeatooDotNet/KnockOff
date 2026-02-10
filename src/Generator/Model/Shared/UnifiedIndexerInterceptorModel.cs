@@ -25,8 +25,8 @@ internal sealed record UnifiedIndexerInterceptorModel(
     string NullableKeyType,
     /// <summary>The key parameter name (e.g., "key", "index").</summary>
     string KeyParamName,
-    /// <summary>The single key type for the dictionary backing (e.g., same as KeyType for single param, or tuple type).</summary>
-    string SingleKeyType,
+    /// <summary>Friendly name for the key type (e.g., "Int32", "String") for type-suffixed invoke methods in multi-indexer.</summary>
+    string KeyTypeFriendlyName,
     /// <summary>The value/return type of the indexer.</summary>
     string ValueType,
     /// <summary>The nullable version of the value type.</summary>

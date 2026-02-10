@@ -181,13 +181,13 @@ public partial class ProtectedMethodBehaviorDemo
         // item == "item-3"
     }
 
-    public void ProtectedIndexer_UseBacking()
+    public void ProtectedIndexer_PerKeyReturns()
     {
         var stub = new Stubs.ServiceBase();
 
-        // Use backing dictionary for protected indexer
-        stub.Indexer.Backing[0] = "first";
-        stub.Indexer.Backing[1] = "second";
+        // Use per-key Returns for protected indexer
+        stub.Indexer[0].Returns("first");
+        stub.Indexer[1].Returns("second");
         stub.Name.Get("test");
         stub.GetInternalId.Return("id");
 

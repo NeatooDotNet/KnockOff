@@ -868,7 +868,7 @@ public class IndexersGetterKnockOffTests
     public void KnockOff_IndexerGetter()
     {
         var stub = new CompareCacheStub();
-        stub.Indexer.Backing["key"] = "42";
+        stub.Indexer["key"].Returns("42");
 
         ICache cache = stub;
         Assert.Equal("42", cache["key"]);

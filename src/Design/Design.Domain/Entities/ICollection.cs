@@ -99,3 +99,25 @@ public interface IInitIndexerCollection<TKey, TValue>
     /// </summary>
     TValue this[TKey key] { get; init; }
 }
+
+/// <summary>
+/// An interface with multiple indexers distinguished by key type.
+///
+/// This interface demonstrates:
+/// - Multi-indexer disambiguation by C# overload resolution
+/// - Different return types per key type
+/// - Mixed get/set and get-only indexers
+/// </summary>
+public interface IMultiIndexerCollection
+{
+    /// <summary>
+    /// String-keyed indexer with get and set.
+    /// </summary>
+    string this[string key] { get; set; }
+
+    /// <summary>
+    /// Int-keyed indexer with get only.
+    /// </summary>
+    int this[int index] { get; }
+}
+

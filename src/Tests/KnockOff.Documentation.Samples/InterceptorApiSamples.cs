@@ -119,7 +119,7 @@ public class OverviewQuickExampleTests
         stub.Name.Get("TestRepo");
 
         // Indexer interceptor
-        stub.Indexer.Backing["key1"] = new User { Id = 1 };
+        stub.Indexer["key1"].Returns(new User { Id = 1 });
 
         // Event interceptor
         repo.Changed += (s, e) => { };
@@ -314,27 +314,31 @@ public class IndexerInterceptorApiTests
         IApiIndexerRepo repository = stub;
 
         #region indexer-interceptor-complete-api-demo
-        // Backing: default dictionary storage for indexer
-        stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
+        // Per-key Returns: configure specific keys
+        stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice" });
 
-        // Get: override backing lookup with callback
+        // Get: all-keys callback as fallback
         stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
         // Set: configure setter callback
         stub.Indexer.Set((key, value) => { /* handle set */ });
         #endregion
 
-        // Get configured above, so it returns FromCallback
-        var fromCallback = repository[1];
+        // Per-key Returns wins for key 1
+        var fromPerKey = repository[1];
+        Assert.Equal("Alice", fromPerKey?.Name);
+
+        // Get callback handles unconfigured keys
+        var fromCallback = repository[2];
         Assert.Equal("FromCallback", fromCallback?.Name);
 
         // VerifyGet: Check read count
-        stub.Indexer.VerifyGet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Exactly(2));
 
         // LastGetKey: Key from most recent get
-        Assert.Equal(1, stub.Indexer.LastGetKey);
+        Assert.Equal(2, stub.Indexer.LastGetKey);
 
-        // Set configured above, callback fires (but doesn't update Backing)
+        // Set configured above, callback fires
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
         // VerifySet: Check write count
@@ -344,9 +348,6 @@ public class IndexerInterceptorApiTests
         var lastEntry = stub.Indexer.LastSetEntry;
         Assert.Equal(3, lastEntry?.Key);
         Assert.Equal("Charlie", lastEntry?.Value?.Name);
-
-        // Backing wasn't updated by Set (unless callback explicitly does it)
-        Assert.False(stub.Indexer.Backing.ContainsKey(3));
     }
 }
 

@@ -134,8 +134,8 @@ public class IndexerGapReproductionTests
 		// Arrange - multi-param indexer should use tuple key
 		var stub = new IndexerGapTestClass.Stubs.IMultiParamIndexerGetterSetter();
 
-		// Backing should be Dictionary<(int, string), int>
-		stub.Indexer.Backing[(3, "b")] = 42;
+		// Per-key configuration using multi-param flattened indexer accessor
+		stub.Indexer[3, "b"].Returns(42);
 
 		// Act
 		IMultiParamIndexerGetterSetter svc = stub;
@@ -190,7 +190,7 @@ public class IndexerGapReproductionTests
 	{
 		// Arrange
 		var stub = new IndexerGapTestClass.Stubs.IMultiParamIndexerGetterSetter();
-		stub.Indexer.Backing[(1, "x")] = 10;
+		stub.Indexer[1, "x"].Returns(10);
 
 		// Act
 		IMultiParamIndexerGetterSetter svc = stub;
@@ -206,7 +206,7 @@ public class IndexerGapReproductionTests
 	{
 		// Arrange
 		var stub = new IndexerGapTestClass.Stubs.IMultiParamIndexerGetter();
-		stub.Indexer.Backing[(3, "b")] = 99;
+		stub.Indexer[3, "b"].Returns(99);
 
 		// Act
 		IMultiParamIndexerGetter svc = stub;
@@ -221,7 +221,7 @@ public class IndexerGapReproductionTests
 	{
 		// Arrange
 		var stub = new MultiParamIndexerGetterSetterKnockOff();
-		stub.Indexer.Backing[(3, "b")] = 42;
+		stub.Indexer[3, "b"].Returns(42);
 
 		// Act
 		IMultiParamIndexerGetterSetter svc = stub;
@@ -255,7 +255,7 @@ public class IndexerGapReproductionTests
 	{
 		// Arrange - indexer with { get; init; }
 		var stub = new IndexerGapTestClass.Stubs.IInitIndexer();
-		stub.Indexer.Backing[3] = 42;
+		stub.Indexer[3].Returns(42);
 
 		// Act
 		IInitIndexer svc = stub;
@@ -279,7 +279,7 @@ public class IndexerGapReproductionTests
 	{
 		// Arrange
 		var stub = new InitIndexerKnockOff();
-		stub.Indexer.Backing[3] = 42;
+		stub.Indexer[3].Returns(42);
 
 		// Act
 		IInitIndexer svc = stub;
@@ -292,27 +292,17 @@ public class IndexerGapReproductionTests
 	// =========================================================================
 	// Gap #5: Argument-specific indexer configuration (design gap, not bug)
 	// =========================================================================
-	// Note: This is a design difference, not a bug. Rocks allows:
-	//   expectations.Setups[3].Gets().ReturnValue(42)  // matches only key 3
-	// KnockOff uses callbacks that handle ALL keys:
-	//   stub.Indexer.Get(key => key == 3 ? 42 : default)
-	//
-	// This test documents the KnockOff workaround pattern.
+	// KnockOff now supports per-key configuration directly:
+	//   stub.Indexer[3, "b"].Returns(42)  // matches only key (3, "b")
 
 	[Fact]
-	public void Gap5_WorkaroundPattern_PerKeyConfiguration()
+	public void Gap5_PerKeyConfiguration()
 	{
-		// Arrange - KnockOff workaround for per-key configuration
+		// Arrange - KnockOff per-key configuration
 		var stub = new IndexerGapTestClass.Stubs.IMultiParamIndexerGetter();
 
-		// Instead of Rocks' expectations.Setups[3, "b"].Gets().ReturnValue(42),
-		// KnockOff uses a callback that can differentiate by key:
-		stub.Indexer.Get(key =>
-		{
-			if (key.a == 3 && key.b == "b") return 42;
-			if (key.a == 5 && key.b == "x") return 99;
-			return 0;
-		});
+		stub.Indexer[3, "b"].Returns(42);
+		stub.Indexer[5, "x"].Returns(99);
 
 		// Act
 		IMultiParamIndexerGetter svc = stub;
@@ -320,7 +310,7 @@ public class IndexerGapReproductionTests
 		// Assert
 		Assert.Equal(42, svc[3, "b"]);
 		Assert.Equal(99, svc[5, "x"]);
-		Assert.Equal(0, svc[1, "other"]);
+		Assert.Equal(0, svc[1, "other"]); // unconfigured returns default
 	}
 
 	// =========================================================================
@@ -328,18 +318,18 @@ public class IndexerGapReproductionTests
 	// =========================================================================
 
 	[Fact]
-	public void Gap17_Inline_ParamsIndexer_GetFromBacking_KnownLimitation()
+	public void Gap17_Inline_ParamsIndexer_PerKey_KnownLimitation()
 	{
-		// Known limitation: params array indexers use (int, string[]) as the Backing
-		// dictionary key type. Arrays use reference equality, so Backing.TryGetValue
+		// Known limitation: params array indexers use (int, string[]) as the per-key
+		// dictionary key type. Arrays use reference equality, so per-key configuration
 		// will NOT match a different array instance with the same contents.
-		// Use Get() callbacks instead of Backing for params indexers.
+		// Use Get() callbacks instead of per-key Returns for params indexers.
 
 		var stub = new IndexerGapTestClass.Stubs.IParamsIndexer();
-		stub.Indexer.Backing[(1, new[] { "b" })] = 42;
+		stub.Indexer[1, new[] { "b" }].Returns(42);
 
 		IParamsIndexer svc = stub;
-		// svc[1, "b"] creates a NEW string[] instance that won't match the Backing key
+		// svc[1, "b"] creates a NEW string[] instance that won't match the per-key builder
 		var value = svc[1, "b"];
 
 		// Returns default (0) because array reference equality fails
@@ -347,12 +337,11 @@ public class IndexerGapReproductionTests
 	}
 
 	[Fact]
-	public void Gap17_Inline_ParamsIndexer_GetFromBacking_SameReference()
+	public void Gap17_Inline_ParamsIndexer_GetCallback_Simple()
 	{
-		// Workaround: use the same array reference for Backing lookup
+		// Use Get callback for params indexers instead of per-key
 		var stub = new IndexerGapTestClass.Stubs.IParamsIndexer();
 
-		// Use Get callback for params indexers instead of Backing
 		stub.Indexer.Get(key => key.a * 100);
 
 		IParamsIndexer svc = stub;
@@ -362,7 +351,7 @@ public class IndexerGapReproductionTests
 	}
 
 	[Fact]
-	public void Gap17_Inline_ParamsIndexer_GetCallback()
+	public void Gap17_Inline_ParamsIndexer_GetCallback_MultiValue()
 	{
 		// Arrange
 		var stub = new IndexerGapTestClass.Stubs.IParamsIndexer();
@@ -377,11 +366,11 @@ public class IndexerGapReproductionTests
 	}
 
 	[Fact]
-	public void Gap17_Standalone_ParamsIndexer_GetFromBacking_KnownLimitation()
+	public void Gap17_Standalone_ParamsIndexer_PerKey_KnownLimitation()
 	{
 		// Known limitation: same as inline -- params array reference equality
 		var stub = new ParamsIndexerKnockOff();
-		stub.Indexer.Backing[(1, new[] { "b" })] = 42;
+		stub.Indexer[1, new[] { "b" }].Returns(42);
 
 		IParamsIndexer svc = stub;
 		var value = svc[1, "b"];
@@ -443,10 +432,10 @@ public class IndexerGapReproductionTests
 	}
 
 	[Fact]
-	public void ThreeParam_Inline_Backing()
+	public void ThreeParam_Inline_PerKey()
 	{
 		var stub = new IndexerGapTestClass.Stubs.IThreeParamIndexer();
-		stub.Indexer.Backing[(1, 2, 3)] = 42.0;
+		stub.Indexer[1, 2, 3].Returns(42.0);
 
 		IThreeParamIndexer svc = stub;
 		Assert.Equal(42.0, svc[1, 2, 3]);
@@ -477,10 +466,10 @@ public class IndexerGapReproductionTests
 	}
 
 	[Fact]
-	public void FourParam_Inline_Backing()
+	public void FourParam_Inline_PerKey()
 	{
 		var stub = new IndexerGapTestClass.Stubs.IFourParamIndexer();
-		stub.Indexer.Backing[("dbo", "Users", "Id", 0)] = "int";
+		stub.Indexer["dbo", "Users", "Id", 0].Returns("int");
 
 		IFourParamIndexer svc = stub;
 		Assert.Equal("int", svc["dbo", "Users", "Id", 0]);

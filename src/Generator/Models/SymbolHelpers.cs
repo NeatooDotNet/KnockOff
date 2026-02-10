@@ -140,23 +140,43 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
-	/// Counts the number of indexers in a collection of interface members.
+	/// Counts the number of unique-key-type indexers in a collection of interface members.
+	/// Diamond-inherited indexers with the same key type signature are counted as one.
 	/// </summary>
 	public static int CountIndexers(EquatableArray<InterfaceMemberInfo> members)
 	{
 		var arr = members.GetArray();
 		if (arr is null) return 0;
-		return arr.Count(m => m.IsIndexer);
+		var uniqueKeyTypes = new HashSet<string>();
+		foreach (var m in arr)
+		{
+			if (m.IsIndexer)
+			{
+				var keyTypeSig = string.Join(",", m.IndexerParameters.GetArray()?.Select(p => p.Type) ?? Enumerable.Empty<string>());
+				uniqueKeyTypes.Add(keyTypeSig);
+			}
+		}
+		return uniqueKeyTypes.Count;
 	}
 
 	/// <summary>
-	/// Counts the number of indexers in a collection of class members.
+	/// Counts the number of unique-key-type indexers in a collection of class members.
+	/// Diamond-inherited indexers with the same key type signature are counted as one.
 	/// </summary>
 	public static int CountClassIndexers(EquatableArray<ClassMemberInfo> members)
 	{
 		var arr = members.GetArray();
 		if (arr is null) return 0;
-		return arr.Count(m => m.IsIndexer);
+		var uniqueKeyTypes = new HashSet<string>();
+		foreach (var m in arr)
+		{
+			if (m.IsIndexer)
+			{
+				var keyTypeSig = string.Join(",", m.IndexerParameters.GetArray()?.Select(p => p.Type) ?? Enumerable.Empty<string>());
+				uniqueKeyTypes.Add(keyTypeSig);
+			}
+		}
+		return uniqueKeyTypes.Count;
 	}
 
 	/// <summary>

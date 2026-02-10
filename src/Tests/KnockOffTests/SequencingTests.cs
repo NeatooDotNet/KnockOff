@@ -278,24 +278,24 @@ public class SequencingTests
 
 /// <summary>
 /// Tests for the Indexer pattern with multiple key types.
-/// Indexers are accessed via IndexerString and IndexerInt32 properties.
+/// Multi-indexers use C# indexer overloads on the interceptor and type-suffixed tracking properties.
 /// </summary>
-public class IndexerOfXxxTests
+public class MultiIndexerTests
 {
     [Fact]
     public void Indexer_String_AccessesStringIndexer()
     {
         var stub = new IndexerTestKnockOff();
 
-        // Configure via IndexerString
-        stub.Indexer.OfString.Backing["key1"] = "value1";
+        // Configure via per-key Returns
+        stub.Indexer["key1"].Returns("value1");
 
         IIndexerTestService svc = stub;
         var result = svc["key1"];
 
         Assert.Equal("value1", result);
-        stub.Indexer.OfString.VerifyGet(Called.Once);
-        Assert.Equal("key1", stub.Indexer.OfString.LastGetKey);
+        stub.Indexer.VerifyGet(Called.Once);
+        Assert.Equal("key1", stub.Indexer.LastStringGetKey);
     }
 
     [Fact]
@@ -303,16 +303,16 @@ public class IndexerOfXxxTests
     {
         var stub = new IndexerTestKnockOff();
 
-        // Configure via IndexerInt32
-        stub.Indexer.OfInt32.Backing[0] = 100;
-        stub.Indexer.OfInt32.Backing[1] = 200;
+        // Configure via per-key Returns
+        stub.Indexer[0].Returns(100);
+        stub.Indexer[1].Returns(200);
 
         IIndexerTestService svc = stub;
         Assert.Equal(100, svc[0]);
         Assert.Equal(200, svc[1]);
 
-        stub.Indexer.OfInt32.VerifyGet(Called.Exactly(2));
-        Assert.Equal(1, stub.Indexer.OfInt32.LastGetKey);
+        stub.Indexer.VerifyGet(Called.Exactly(2));
+        Assert.Equal(1, stub.Indexer.LastInt32GetKey);
     }
 
     [Fact]
@@ -320,7 +320,7 @@ public class IndexerOfXxxTests
     {
         var stub = new IndexerTestKnockOff();
 
-        stub.Indexer.OfString.Get((key) => $"Value for {key}");
+        stub.Indexer.Get((string key) => $"Value for {key}");
 
         IIndexerTestService svc = stub;
         Assert.Equal("Value for foo", svc["foo"]);
@@ -336,8 +336,8 @@ public class IndexerOfXxxTests
         svc["key1"] = "value1";
         svc["key2"] = "value2";
 
-        stub.Indexer.OfString.VerifySet(Called.Exactly(2));
-        Assert.Equal(("key2", "value2"), stub.Indexer.OfString.LastSetEntry);
+        stub.Indexer.VerifySet(Called.Exactly(2));
+        Assert.Equal(("key2", "value2"), stub.Indexer.LastStringSetEntry);
     }
 
     [Fact]
@@ -346,7 +346,7 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
         var callbackCalls = new System.Collections.Generic.List<(string key, string value)>();
 
-        stub.Indexer.OfString.Set((key, value) =>
+        stub.Indexer.Set((string key, string value) =>
         {
             callbackCalls.Add((key, value));
         });
@@ -366,8 +366,8 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
 
         // Configure both indexers
-        stub.Indexer.OfString.Backing["test"] = "string value";
-        stub.Indexer.OfInt32.Backing[42] = 42;
+        stub.Indexer["test"].Returns("string value");
+        stub.Indexer[42].Returns(42);
 
         IIndexerTestService svc = stub;
 
@@ -375,9 +375,10 @@ public class IndexerOfXxxTests
         Assert.Equal("string value", svc["test"]);
         Assert.Equal(42, svc[42]);
 
-        // Verify tracking is independent
-        stub.Indexer.OfString.VerifyGet(Called.Once);
-        stub.Indexer.OfInt32.VerifyGet(Called.Once);
+        // Verify total tracking
+        stub.Indexer.VerifyGet(Called.Exactly(2));
+        Assert.Equal("test", stub.Indexer.LastStringGetKey);
+        Assert.Equal(42, stub.Indexer.LastInt32GetKey);
     }
 }
 

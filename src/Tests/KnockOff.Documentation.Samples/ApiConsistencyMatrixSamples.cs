@@ -159,14 +159,14 @@ public class IndexerInterceptionTests
         IMatrixCache cache = stub;
 
         #region matrix-indexer-interception
-        // Configure getter
+        // Per-key Returns
+        stub.Indexer["preloaded"].Returns("data");
+
+        // Configure getter callback (fallback for unconfigured keys)
         stub.Indexer.Get((key) => $"value-{key}");
 
         // Configure setter
         stub.Indexer.Set((key, value) => { });
-
-        // Use backing dictionary
-        stub.Indexer.Backing["preloaded"] = "data";
 
         // Verify
         stub.Indexer.VerifyGet(Called.Never);

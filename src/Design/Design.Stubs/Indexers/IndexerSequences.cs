@@ -108,8 +108,8 @@ public partial class IndexerSequencesDemo
     // This matches how method sequences work - tracking the sequence of calls,
     // not the sequence of calls per argument value.
     //
-    // For per-key behavior, use Get with a callback that maintains its own
-    // dictionary, or use the Backing dictionary.
+    // For per-key behavior, use per-key Returns (stub.Indexer[key].Returns(value))
+    // or use Get with a callback that maintains its own dictionary.
     // =========================================================================
 
     public void Sequences_GlobalNotPerKey()

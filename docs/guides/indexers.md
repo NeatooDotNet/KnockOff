@@ -1,8 +1,8 @@
 # Indexer Configuration Guide
 
-Indexers in KnockOff work similarly to properties but with key-based access. Each interface indexer gets a corresponding interceptor that maintains a backing dictionary, tracks access, and supports custom get/set callbacks.
+Indexers in KnockOff support per-key configuration, all-keys callbacks, sequences, and verification. Each interface indexer gets a corresponding interceptor on the stub.
 
-**Quick reference:** For simple test data scenarios, use the `Backing` dictionary. For dynamic or computed values, use `Get` callbacks. For write validation or tracking, use `Set` callbacks.
+**Quick reference:** For simple test data scenarios, use per-key `Returns`. For dynamic or computed values, use `Get` callbacks. For write validation or tracking, use `Set` callbacks.
 
 ---
 
@@ -10,9 +10,9 @@ Indexers in KnockOff work similarly to properties but with key-based access. Eac
 
 Choose your configuration approach based on test requirements:
 
-**Backing Dictionary (Recommended for Test Data)**
-- Populate `Indexer.Backing` with test data before running test
-- Use when the indexer should behave like a standard dictionary
+**Per-Key Returns (Recommended for Test Data)**
+- Configure `Indexer[key].Returns(value)` for specific keys
+- Use when the indexer should return known values for known keys
 - Simple, readable, and covers most test scenarios
 - Example: Pre-loading a cache stub with known user IDs
 
@@ -24,43 +24,41 @@ Choose your configuration approach based on test requirements:
 
 ---
 
-## Backing Dictionary (Recommended for Test Data)
+## Per-Key Returns (Recommended for Test Data)
 
-The simplest way to configure an indexer is to populate the backing dictionary before your test runs.
+The simplest way to configure an indexer is to set per-key return values before your test runs.
 
-<!-- snippet: indexers-backing-basic -->
+<!-- snippet: indexers-perkey-basic -->
 ```cs
-// Populate the backing dictionary with test data
-stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
-stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
+// Configure per-key return values
+stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice" });
+stub.Indexer[2].Returns(new User { Id = 2, Name = "Bob" });
 ```
 <!-- endSnippet -->
 
-When the indexer is accessed via the interface, KnockOff uses the backing dictionary by default:
-- **Get**: Returns `Backing[key]` (throws `KeyNotFoundException` if key doesn't exist)
-- **Set**: Stores to `Backing[key]`
+When the indexer is accessed via the interface, KnockOff checks per-key Returns first, then falls back to all-keys callbacks.
 
-<!-- snippet: indexers-backing-multiple -->
+<!-- snippet: indexers-perkey-multiple -->
 ```cs
 // Pre-populate multiple configuration values
-stub.Indexer.Backing["ConnectionString"] = "Server=localhost;Database=Test";
-stub.Indexer.Backing["ApiKey"] = "abc123";
-stub.Indexer.Backing["Timeout"] = "30";
-stub.Indexer.Backing["MaxRetries"] = "3";
+stub.Indexer["ConnectionString"].Returns("Server=localhost;Database=Test");
+stub.Indexer["ApiKey"].Returns("abc123");
+stub.Indexer["Timeout"].Returns("30");
+stub.Indexer["MaxRetries"].Returns("3");
 ```
 <!-- endSnippet -->
 
-**When to use Backing:**
+**When to use per-key Returns:**
 - Pre-populating repository stub data
 - Configuring lookup tables or caches
 - Setting up test fixtures with known data
-- Any scenario where the indexer should behave like a dictionary
+- Any scenario where the indexer should return known values for specific keys
 
 ---
 
 ## Dynamic Getters
 
-Use `Get` when an indexer's value should be computed at access time based on the key.
+Use `Get` when an indexer's value should be computed at access time based on the key. This is the all-keys fallback for keys not configured with per-key Returns.
 
 <!-- snippet: indexers-onget-computed -->
 ```cs
@@ -156,7 +154,6 @@ Assert.Equal("60", stub.Indexer.LastSetEntry.Value.Value);
 **Inspection properties:**
 - `LastGetKey` - The key from the most recent getter call (null if never accessed)
 - `LastSetEntry` - Nullable KeyValuePair of the most recent setter call (null if never set)
-- `Backing` - The backing dictionary (read/write access for test setup)
 
 ---
 
@@ -204,7 +201,7 @@ stub.Indexer
 
 | Use Case | Use This | Why |
 |----------|----------|-----|
-| Indexer uses backing dictionary | `Backing[key] = value` | Simple, standard dictionary behavior |
+| Fixed values for specific keys | `Indexer[key].Returns(value)` | Simple per-key configuration |
 | Indexer computes values from keys | `Get((key) => computed)` | Key-based computation |
 | Indexer returns different values per access | `Get((k) => v1).ThenGet((k) => v2)` | Different values on successive reads |
 | Indexer validates writes | `Set((k, v) => Validate(k, v))` | Custom validation logic |
@@ -214,50 +211,55 @@ stub.Indexer
 
 ## Multiple Indexer Overloads
 
-When an interface has multiple indexer overloads (different key types), KnockOff generates separate interceptor properties:
+When an interface has multiple indexer overloads (different key types), KnockOff generates C# indexer overloads on the interceptor class:
 
 <!-- snippet: indexers-multiple-overloads -->
 ```cs
-// Each overload has its own interceptor: Indexer.OfString, Indexer.OfInt32
-stub.Indexer.OfString.Backing["name"] = "Alice";
-stub.Indexer.OfInt32.Backing[0] = 100;
+// C# indexer overloads resolve by key type -- no OfXxx needed
+stub.Indexer["name"].Returns("Alice");
+stub.Indexer[0].Returns(100);
 ```
 <!-- endSnippet -->
 
-Overloads use type-based naming in the order they appear in the interface definition:
-- String key indexer: `stub.Indexer.OfString`
-- Int32 key indexer: `stub.Indexer.OfInt32`
+Overloads resolve naturally via C# indexer overload resolution -- access `stub.Indexer[stringKey]` or `stub.Indexer[intKey]` and the compiler selects the correct overload.
 
-Each overload maintains its own backing dictionary and configuration.
+For tracking, multi-indexer stubs provide type-suffixed properties: `LastStringGetKey`, `LastInt32GetKey`, etc.
 
 ---
 
-## Get/Set vs. Backing Priority
+## Per-Key vs. All-Keys Priority
 
-When both `Backing` and `Get`/`Set` are configured:
-- **Get takes precedence**: Callback return value is used instead of `Backing[key]`
-- **Set takes precedence**: Callback is invoked, `Backing` is NOT updated automatically
+When both per-key Returns and all-keys Get callback are configured:
+- **Per-key Returns takes precedence** for keys configured with `Indexer[key].Returns(value)`
+- **All-keys Get callback** handles keys not configured with per-key Returns
 
 <!-- snippet: indexers-priority -->
 ```cs
-// Get takes precedence over Backing dictionary
-stub.Indexer.Backing["ApiKey"] = "from-backing";
+// Per-key Returns takes precedence over all-keys Get callback
+stub.Indexer["ApiKey"].Returns("from-per-key");
 stub.Indexer.Get((key) => "from-callback");
 ```
 <!-- endSnippet -->
 
-**Design principle:** Callbacks override default backing dictionary behavior. If you need to both execute custom logic AND update the backing dictionary, your callback must explicitly write to `Backing`:
+The full priority chain for indexer get operations:
+1. Per-key builder (highest priority)
+2. All-keys sequence (`Get().ThenGet()`)
+3. All-keys Get callback
+4. Source delegation
+5. Strict mode check
+6. Default value (lowest priority)
 
-<!-- snippet: indexers-onset-with-backing -->
+---
+
+## Per-Key with Fallback Pattern
+
+A common pattern is to use per-key Returns for specific keys and a Get callback as a fallback:
+
+<!-- snippet: indexers-perkey-with-fallback -->
 ```cs
-// Set must manually update Backing if reads should reflect writes
-stub.Indexer.Set((key, value) =>
-{
-    if (string.IsNullOrWhiteSpace(value))
-        throw new ArgumentException("Value cannot be empty");
-    validationLog.Add(key);
-    stub.Indexer.Backing[key] = value;
-});
+// Per-key for specific keys, Get callback as fallback for others
+stub.Indexer["ApiKey"].Returns("secret123");
+stub.Indexer.Get((key) => $"default-{key}");
 ```
 <!-- endSnippet -->
 
@@ -265,16 +267,16 @@ stub.Indexer.Set((key, value) =>
 
 ## Resetting Indexers
 
-Calling `Reset()` on an indexer interceptor clears all counters and callbacks but **preserves the Backing dictionary**.
+Calling `Reset()` on an indexer interceptor clears all counters but **preserves per-key Returns and callbacks**.
 
 <!-- snippet: indexers-reset -->
 ```cs
-// Reset clears tracking but preserves Backing and callbacks
+// Reset clears tracking but preserves per-key Returns and callbacks
 stub.Indexer.Reset();
 ```
 <!-- endSnippet -->
 
-**Reset behavior:** Calling `Reset()` clears all tracking counters, `LastGetKey`, `LastSetEntry`, and resets sequence position to the beginning. However, callbacks (`Get`, `Set`), sequence configurations, and the `Backing` dictionary are all preserved. This allows you to verify behavior, reset tracking state, and re-run the same test scenario without reconfiguring callbacks.
+**Reset behavior:** Calling `Reset()` clears all tracking counters, `LastGetKey`, `LastSetEntry`, and resets sequence position to the beginning. However, per-key Returns, callbacks (`Get`, `Set`), and sequence configurations are all preserved. This allows you to verify behavior, reset tracking state, and re-run the same test scenario without reconfiguring.
 
 ---
 
@@ -284,7 +286,8 @@ Choose your configuration approach based on the test scenario:
 
 | Scenario | Use This | Example |
 |----------|----------|---------|
-| Indexer should return fixed test data | `Backing` | `stub.Indexer.Backing[1] = user1;` |
+| Indexer should return fixed test data | Per-key Returns | `stub.Indexer[1].Returns(user1);` |
+| Specific keys with fallback for others | Per-key + Get | `stub.Indexer["x"].Returns(1); stub.Indexer.Get(k => 0);` |
 | Indexer computes values from keys | `Get` | `stub.Cache.Get((id) => LoadById(id));` |
 | Indexer returns different values per access | `Get().ThenGet()` | `stub.Data.Get((k) => v1).ThenGet((k) => v2);` |
 | Track all writes to indexer | `Set` | `stub.Store.Set((k, v) => log.Add((k, v)));` |
@@ -301,10 +304,10 @@ This example demonstrates all indexer configuration approaches in a realistic te
 
 <!-- snippet: indexers-complete-example -->
 ```cs
-// 1. Backing: Pre-populate test data
-stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
+// 1. Per-key Returns: Pre-configure specific keys
+stub.Indexer[1].Returns(new User { Id = 1, Name = "Alice", Email = "alice@example.com" });
 
-// 2. Get: Compute values dynamically
+// 2. Get: Dynamic fallback for unconfigured keys
 stub.Indexer.Get((id) => id == 999
     ? new User { Id = 999, Name = "Dynamic User", Email = "dynamic@example.com" }
     : null);
@@ -318,14 +321,14 @@ stub.Indexer.Set((id, user) => cacheUpdates.Add((id, user)));
 
 ## Key Takeaways
 
-1. **Start with Backing** - It covers most scenarios and behaves like a standard dictionary
-2. **Use Get for computed values** - Key-dependent or state-dependent returns
+1. **Start with per-key Returns** - It covers most scenarios with simple `Indexer[key].Returns(value)` syntax
+2. **Use Get for computed values** - Key-dependent or state-dependent returns as fallback for unconfigured keys
 3. **Use Set for tracking** - When you need to verify writes or simulate validation
 4. **Use sequences for changing behavior** - `Get().ThenGet()` / `Set().ThenSet()` when values or behavior differ across calls
-5. **Get/Set override Backing** - Callbacks take precedence over dictionary lookups
-6. **Reset() preserves Backing and callbacks** - Clears tracking state but not configuration
+5. **Per-key Returns takes priority** - Per-key configuration always wins over all-keys Get callbacks
+6. **Reset() preserves per-key Returns and callbacks** - Clears tracking state but not configuration
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like property verification
-8. **Multiple overloads** - Each indexer signature gets its own interceptor (OfString, OfInt32, etc.)
+8. **Multiple overloads** - Each indexer signature resolves via C# indexer overloads on the interceptor
 
 ---
 
@@ -337,4 +340,4 @@ stub.Indexer.Set((id, user) => cacheUpdates.Add((id, user)));
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-09
