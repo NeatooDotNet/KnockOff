@@ -79,11 +79,12 @@ var r2 = collection["hello"];   // "5" (callback fallback)
 When an indexer getter is invoked, KnockOff resolves the value in this order:
 
 1. **Per-key builder** -- `stub.Indexer[key].Returns(value)` (highest)
-2. **All-keys sequence** -- `Get().ThenGet()` if active
-3. **All-keys Get callback** -- `Get((key) => value)`
-4. **Source delegation** -- `stub.Source(realImpl)`
-5. **Strict mode check** -- throws `StubException` if strict
-6. **Default value** -- `default(T)` (lowest)
+2. **When predicate match** -- `When(key => predicate).Returns(value)`
+3. **All-keys sequence** -- `Get().ThenGet()` if active
+4. **All-keys Get callback** -- `Get((key) => value)`
+5. **Source delegation** -- `stub.Source(realImpl)`
+6. **Strict mode check** -- throws `StubException` if strict
+7. **Default value** -- `default(T)` (lowest)
 
 ---
 
@@ -226,7 +227,87 @@ Tracking counts ALL accesses regardless of whether handled by per-key, callback,
 
 ---
 
-## Verification
+## Per-Key Verification
+
+Verify that a specific key was accessed a specific number of times, rather than checking total indexer access counts.
+
+<!-- snippet: indexers-perkey-verify-get -->
+```cs
+// Verify a specific key was read a specific number of times
+stub.Indexer["ApiKey"].VerifyGet(Called.Exactly(2));
+stub.Indexer["Timeout"].VerifyGet(Called.Once);
+```
+<!-- endSnippet -->
+
+<!-- snippet: indexers-perkey-verify-set -->
+```cs
+// Verify a specific key was written a specific number of times
+stub.Indexer["ApiKey"].VerifySet(Called.Once);
+stub.Indexer["Timeout"].VerifySet(Called.Exactly(2));
+```
+<!-- endSnippet -->
+
+**Per-key vs. all-keys verification:**
+- `stub.Indexer.VerifyGet(Called.Exactly(3))` -- verifies total get count across all keys
+- `stub.Indexer["ApiKey"].VerifyGet(Called.Exactly(2))` -- verifies get count for a specific key only
+
+---
+
+## Predicate-Based Key Matching
+
+Use `When(predicate)` to match keys by condition rather than exact value. Useful for configuring behavior for groups of keys that share a pattern.
+
+<!-- snippet: indexers-when-predicate -->
+```cs
+// When(predicate) matches keys by condition
+stub.Indexer.When(key => key.StartsWith("prefix_", StringComparison.Ordinal)).Returns(99);
+```
+<!-- endSnippet -->
+
+### Combining Per-Key and When Predicate
+
+Per-key exact match always takes priority over When predicate:
+
+<!-- snippet: indexers-when-with-perkey -->
+```cs
+// Per-key exact match takes priority over When predicate
+stub.Indexer["exact"].Returns(100);
+stub.Indexer.When(key => key.Length > 3).Returns(42);
+```
+<!-- endSnippet -->
+
+In this example, `stub["exact"]` returns 100 (per-key wins), while `stub["hello"]` returns 42 (When predicate matches).
+
+### When with Set Callback
+
+Getter and setter When chains are independent:
+
+<!-- snippet: indexers-when-set-callback -->
+```cs
+// When(predicate).Set() intercepts writes for matching keys
+stub.Indexer.When(key => key.StartsWith("temp_", StringComparison.Ordinal)).Set((key, value) =>
+{
+    captured.Add((key, value));
+});
+```
+<!-- endSnippet -->
+
+### When Chains with ThenWhen
+
+Chain multiple predicates with `ThenWhen`. Each matcher advances after matching once; the last matcher repeats:
+
+<!-- snippet: indexers-when-chain -->
+```cs
+// Chain multiple predicates with ThenWhen -- each matcher advances once
+stub.Indexer
+    .When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1)
+    .ThenWhen(key => key.StartsWith("b", StringComparison.Ordinal)).Returns(2);
+```
+<!-- endSnippet -->
+
+---
+
+## Verification (All-Keys)
 
 | Method | Description |
 |--------|-------------|
@@ -273,6 +354,10 @@ Verification counts include ALL access paths (per-key, callback, unconfigured).
 | `Get(Func<TValue>)` | `PerKeyBuilder` | Getter callback for this key (no key param) |
 | `Set(Action<TValue>)` | `PerKeyBuilder` | Setter callback for this key (no key param) |
 | `Returns(v).ThenReturns(v2)` | `PerKeyBuilder` | Per-key sequence |
+| `VerifyGet()` | `void` | Verify this key's getter was called at least once |
+| `VerifyGet(Called)` | `void` | Verify this key's getter call count |
+| `VerifySet()` | `void` | Verify this key's setter was called at least once |
+| `VerifySet(Called)` | `void` | Verify this key's setter call count |
 
 ### All-Keys Configuration
 
@@ -283,3 +368,4 @@ Verification counts include ALL access paths (per-key, callback, unconfigured).
 | `ThenGet(Func<TKey, TValue>)` | `IIndexerGetSequence` | Add to getter sequence |
 | `ThenSet(Action<TKey, TValue>)` | `IIndexerSetSequence` | Add to setter sequence |
 | `ThenDefault()` | `void` | Return default(T) after exhaustion |
+| `When(Func<TKey, bool>)` | `IIndexerWhenBuilder` | Predicate-based key matching |

@@ -259,7 +259,10 @@ stub.Indexer["key2"].Returns("value2");
 stub.Indexer.Get((key) => $"computed-{key}");
 stub.Indexer.Set((key, value) => { /* handle */ });
 
-// Per-key Returns takes priority over Get callback
+// When(predicate) matches keys by condition
+stub.Indexer.When(key => key.StartsWith("prefix_", StringComparison.Ordinal)).Returns("matched");
+
+// Per-key > When > Get callback (priority order)
 ```
 <!-- endSnippet -->
 
