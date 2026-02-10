@@ -466,6 +466,7 @@ internal static class StandaloneClassModelBuilder
             ArgumentList: argList,
             KeyExpression: keyExpr,
             StubClassName: stubClassRef,
+            KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetIndexerKeyTypeFriendlyName(member.IndexerParameters),
             TypeParameterList: typeParamList,
             ConstraintClauses: constraintClause,
             ReturnsByRef: member.ReturnsByRef,
@@ -531,7 +532,7 @@ internal static class StandaloneClassModelBuilder
 
         // Compute invoke suffix for multi-indexer
         var invokeSuffix = indexerCount > 1
-            ? $"_{UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.Count == 1 ? member.IndexerParameters.GetArray()![0].Type : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})")}"
+            ? $"_{UnifiedInterceptorBuilder.GetIndexerKeyTypeFriendlyName(member.IndexerParameters)}"
             : "";
 
         return new InlineClassImplIndexerModel(

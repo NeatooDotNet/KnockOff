@@ -1084,7 +1084,7 @@ internal static class StandaloneClassRenderer
             KeyType: indexer.KeyType,
             NullableKeyType: MakeNullable(indexer.KeyType),
             KeyParamName: "key",
-            KeyTypeFriendlyName: Builder.UnifiedInterceptorBuilder.GetTypeSuffix(indexer.KeyType),
+            KeyTypeFriendlyName: indexer.KeyTypeFriendlyName,
             ValueType: indexer.ReturnType,
             NullableValueType: MakeNullable(indexer.ReturnType),
             DefaultExpression: "default!",

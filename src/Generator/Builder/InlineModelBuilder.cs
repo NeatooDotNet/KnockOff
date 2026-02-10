@@ -286,9 +286,7 @@ internal static class InlineModelBuilder
             : member.DeclaringInterfaceFullName;
 
         // Compute KeyTypeFriendlyName for type-suffixed invoke methods in multi-indexer
-        var keyTypeFriendlyName = member.IndexerParameters.Count == 1
-            ? UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.GetArray()![0].Type)
-            : string.Join("_", member.IndexerParameters.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type)));
+        var keyTypeFriendlyName = UnifiedInterceptorBuilder.GetIndexerKeyTypeFriendlyName(member.IndexerParameters);
 
         return new InlineIndexerModel(
             InterceptorClassName: interceptClassName,
@@ -822,7 +820,7 @@ internal static class InlineModelBuilder
         // Compute invoke suffix for multi-indexer (type-suffixed InvokeGet/InvokeSet)
         var indexerCount = SymbolHelpers.CountIndexers(iface.Members);
         var invokeSuffix = indexerCount > 1
-            ? $"_{UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.Count == 1 ? member.IndexerParameters.GetArray()![0].Type : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})")}"
+            ? $"_{UnifiedInterceptorBuilder.GetIndexerKeyTypeFriendlyName(member.IndexerParameters)}"
             : "";
 
         return new InlineInterfaceImplementation(
