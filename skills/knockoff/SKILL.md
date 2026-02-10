@@ -1,20 +1,16 @@
 ---
 name: knockoff
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "Return", "Call", "Get", "Set", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenReturn", "ThenCall", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
-version: 2.2.0
+description: >-
+  This skill should be used when the user asks about KnockOff stubs, creating stubs, mocking with KnockOff, KnockOff attributes, Return, Call, Get, Set, setup stub behavior, Verify calls, Verifiable, VerifyAll, track method calls, stub patterns, Stand-Alone pattern, Inline Interface, Inline Class, Inline Delegate, stub a delegate, migrate from Moq, KnockOff async, interceptor API, Strict mode, ThenReturn, ThenCall, ThenGet, ThenSet, generic method interceptor, Source() delegation, When(), argument matching, or needs guidance on creating, configuring, or verifying KnockOff test stubs. When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs.
 ---
 
 # KnockOff Usage Guide
 
 KnockOff is a Roslyn Source Generator that creates test stubs at compile time. Stubs are reusable, have zero reflection overhead, and provide compile-time safety.
 
-## CRITICAL BEHAVIORAL GOTCHAS
-
-**Read this section first to avoid common mistakes.**
+## CRITICAL GOTCHAS
 
 ### 1. Sequences REPEAT Last Value After Exhaustion
-
-Sequences repeat the last value after exhaustion (matching NSubstitute):
 
 <!-- snippet: skill-gotcha-sequence-exhaustion -->
 ```cs
@@ -31,9 +27,7 @@ calc.Add(0, 0); // Returns 0 (default - ThenDefault() terminates with default)
 ```
 <!-- endSnippet -->
 
-### 2. Events Use Raise() Method
-
-Events are raised via the `.Raise()` method on the event interceptor:
+### 2. Events Use Raise() and Bare Names
 
 <!-- snippet: skill-gotcha-event-raise -->
 ```cs
@@ -41,8 +35,6 @@ Events are raised via the `.Raise()` method on the event interceptor:
 stub.Started.Raise(stub, EventArgs.Empty);
 ```
 <!-- endSnippet -->
-
-### 3. Event Interceptors Use Direct Event Name
 
 <!-- snippet: skill-gotcha-event-naming -->
 ```cs
@@ -52,18 +44,9 @@ stub.DataReceived.VerifyAdd(Called.Never);
 ```
 <!-- endSnippet -->
 
-### 4. Class Stubs Call Base by Default (Virtual Methods)
+### 3. Class Stubs Call Base by Default + Use .Object
 
-Class stubs (Patterns 3, 4, 6, 9) automatically call the base class implementation for unconfigured virtual methods. This is equivalent to Moq's `.CallBase = true`, but it is the default behavior -- no opt-in required. Abstract methods return `default(T)` when unconfigured (there is no base to call).
-
-- **Virtual method, unconfigured**: calls base class implementation
-- **Virtual method, configured** (Return/Call/When): interceptor handles it, base is NOT called
-- **Abstract method, unconfigured**: returns `default(T)` (or throws in strict mode)
-- **Abstract method, configured**: interceptor handles it
-
-### 5. Class Stubs Use .Object Property
-
-Inline class stubs don't inherit from the base class:
+Class stubs (Patterns 3, 4, 6, 9) call base for unconfigured virtual methods (like Moq's `CallBase = true`, but default). Abstract methods return `default(T)`.
 
 <!-- snippet: skill-gotcha-class-object -->
 ```cs
@@ -75,7 +58,7 @@ service.Initialize();
 ```
 <!-- endSnippet -->
 
-### 6. Closed Generic Stubs Use Simple Names
+### 4. Closed Generic Stubs Use Simple Names
 
 <!-- snippet: skill-gotcha-closed-generic -->
 ```cs
@@ -84,7 +67,7 @@ var stub = new Stubs.IRepository();  // NOT Stubs.IRepository<User>
 ```
 <!-- endSnippet -->
 
-### 7. Called.Between() Does NOT Exist
+### 5. Called.Between() Does NOT Exist
 
 <!-- snippet: skill-gotcha-times-between -->
 ```cs
@@ -95,28 +78,11 @@ stub.Save.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 
-### 8. Configuration Methods — Last One Wins
+### 6. Configuration — Last One Wins
 
-All configuration methods use direct replacement. Calling any configuration method replaces the previous configuration of the same kind:
+All configuration methods use direct replacement. Calling any config method replaces the previous one of the same kind. **Known bug:** `.When()` currently accumulates like `.ThenWhen()` instead of replacing.
 
-- `Return(value)` and `Return(callback)` replace each other
-- Multiple `Call(callback)` calls — last wins
-- Multiple `Get(value)` or `Get(callback)` calls — last wins
-- Multiple `Set(callback)` calls — last wins
-- Multiple `When()` calls — last wins (replaces previous When chain)
-
-Within a When chain, `.ThenWhen()` accumulates matchers. But calling `.When()` again as a new entry point replaces the entire chain.
-
-**Known bug:** `.When()` currently accumulates like `.ThenWhen()` instead of replacing. See `docs/todos/when-entry-point-should-clear-chain.md`.
-
-<!-- snippet: skill-gotcha-returns-vs-oncall -->
-```cs
-stub.GetValue.Return("fixed");           // Sets constant value
-stub.GetValue.Return((id) => $"val-{id}"); // REPLACES constant, now dynamic
-```
-<!-- endSnippet -->
-
-### 9. Set Does NOT Auto-Update Getter
+### 7. Set Does NOT Auto-Update Getter
 
 <!-- snippet: skill-gotcha-onset-no-auto-update -->
 ```cs
@@ -127,45 +93,15 @@ service.Name = "test";
 ```
 <!-- endSnippet -->
 
-### 10. Reset() Clears Tracking BUT Preserves Some State
+### 8. Reset() Clears Tracking BUT Preserves Config
 
-| Interceptor | Reset Clears | Reset Preserves |
-|-------------|--------------|-----------------|
-| Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **Return/Call callbacks**, sequence structure, verifiable flag |
-| Stub Override | Counts, LastArg | **Return/Call configuration**, verifiable flag |
-| Property | Get/set counts, LastSetValue, sequence index, source delegation | **Get/Set callbacks**, verifiable flag |
-| Stub Override Property | Get/set counts, LastSetValue | **Get/Set configuration**, verifiable flag |
-| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Per-key Returns**, Get/Set callbacks |
-| Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **Return/Call callbacks**, sequence structure, verifiable flag |
-| Event | Tracking counts | **Active subscribers**, verifiable flag |
-
-**Note:** Stub override method and property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Return/Call/Get/Set configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+Reset clears counts, captured args, sequence position, source. Reset preserves Return/Call/Get/Set callbacks, sequence structure, Verifiable marking.
 
 ---
 
 ## PROACTIVE: Detect Duplicate Inline Stubs
 
-**When writing tests that need stubs, ALWAYS check for existing stubs first.**
-
-Before creating an inline stub with `[KnockOff<T>]`:
-
-1. **Search for existing standalone stubs** of the target type (e.g., `class *Stub : ITargetType`)
-2. **Search for existing inline stubs** using `[KnockOff<TargetType>]` in other test classes
-
-**If the same interface/class is already stubbed inline in 1+ other test classes:**
-
-Use AskUserQuestion to recommend converting to standalone:
-
-> "I noticed `IUserRepository` is already stubbed inline in `UserServiceTests.cs`. Creating another inline stub would duplicate the definition.
->
-> **Recommendation:** Create a standalone `UserRepositoryStub` that both test classes can share."
-
-**Options to present:**
-1. **Create Stand-Alone stub (Recommended)** - Eliminates duplication, enables reuse
-2. **Add inline stub anyway** - Creates duplication (not recommended)
-3. **Reuse existing** - Move tests to the class that already has the inline stub
-
-**Why this matters:** Inline stubs are convenient for one-off usage, but when the same type is stubbed in multiple test classes, a standalone stub is cleaner and more maintainable.
+Before creating an inline stub with `[KnockOff<T>]`, **always search for existing stubs** of that type. If the same type is already stubbed inline elsewhere, recommend creating a standalone stub.
 
 ---
 
@@ -175,11 +111,11 @@ Use AskUserQuestion to recommend converting to standalone:
 |------|---------|---------------|
 | Reusable stub across files | Standalone | `new MyStub()` |
 | Custom methods on stub | Standalone | `new MyStub()` |
-| Reusable generic stub with type parameters | Generic Standalone | `new MyStub<T>()` |
+| Generic stub with type params | Generic Standalone | `new MyStub<T>()` |
 | Quick test-local stub | Inline Interface | `new Stubs.IService()` |
 | Stub a class (virtual/abstract) | Inline Class | `new Stubs.MyClass()` then `.Object` |
 | Stub a delegate | Inline Delegate | `new Stubs.MyDelegate()` |
-| Test-local stub for generic interface | Open Generic | `new Stubs.IFoo<T>()` |
+| Test-local generic interface | Open Generic | `new Stubs.IFoo<T>()` |
 
 ### Standalone Pattern
 
@@ -190,29 +126,20 @@ public partial class SkillUserRepoStub : ISkillUserRepo { }
 ```
 <!-- endSnippet -->
 
-Usage:
-
 <!-- snippet: skill-standalone-usage -->
 ```cs
-[Fact]
-public void StandaloneStub_ConfigureAndVerify()
-{
-    var stub = new SkillUserRepoStub();
-    stub.GetById.Return((id) => new User { Id = id }).Verifiable();
-    stub.Save.Call((user) => { }).Verifiable();
-    ISkillUserRepo repo = stub;
+var stub = new SkillUserRepoStub();
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((user) => { }).Verifiable();
+ISkillUserRepo repo = stub;
 
-    var user = repo.GetById(42);
-    repo.Save(user!);
-
-    stub.Verify();
-}
+var user = repo.GetById(42);
+repo.Save(user!);
+stub.Verify();
 ```
 <!-- endSnippet -->
 
-**Stub Overrides & Properties:** Stand-Alone stubs can define protected methods and properties that provide default behavior. See the Stub Overrides and Stub Override Properties sections below.
-
-### Inline Interface Pattern
+### Inline Interface / Class / Delegate
 
 <!-- snippet: skill-inline-interface-pattern -->
 ```cs
@@ -230,57 +157,19 @@ public partial class SkillEmailTests
 ```
 <!-- endSnippet -->
 
-### Inline Class Pattern
+**Class stubs** use `.Object`: `ServiceBase service = stub.Object;`
 
-Class stubs call the base class implementation by default for unconfigured virtual methods. Only configure what you need to override. Abstract methods return `default(T)` when unconfigured.
-
-<!-- snippet: skill-inline-class-pattern -->
-```cs
-[KnockOff<SkillDataServiceBase>]
-public partial class SkillDataTests
-{
-    [Fact]
-    public void Test()
-    {
-        var stub = new Stubs.SkillDataServiceBase();
-        stub.GetData.Return((id) => "test").Verifiable();
-        SkillDataServiceBase service = stub.Object;  // Use .Object!
-    }
-}
-```
-<!-- endSnippet -->
-
-### Inline Delegate Pattern
-
-<!-- snippet: skill-inline-delegate-pattern -->
-```cs
-[KnockOff<SkillValidationRule>]  // delegate bool SkillValidationRule(string value);
-public partial class SkillValidationTests
-{
-    [Fact]
-    public void Test()
-    {
-        var stub = new Stubs.SkillValidationRule();
-        stub.Interceptor.Return((val) => val != "invalid");
-        SkillValidationRule rule = stub;  // Implicit conversion
-    }
-}
-```
-<!-- endSnippet -->
+**Delegate stubs** use `stub.Interceptor` for config: `stub.Interceptor.Return(42);`
 
 ---
 
 ## Method Configuration
-
-### Return() - Fixed Values
 
 <!-- snippet: skill-method-returns -->
 ```cs
 stub.GetUser.Return(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
-
-### Return(callback) / Call(callback) - Dynamic Callbacks
 
 <!-- snippet: skill-method-oncall -->
 ```cs
@@ -296,42 +185,23 @@ stub.SaveAsync.Return((user) => { });  // Returns Task.CompletedTask
 ```
 <!-- endSnippet -->
 
-### Sequences (NSubstitute-style)
-
 <!-- snippet: skill-method-sequences -->
 ```cs
-// Concise value sequences (preferred)
-stub.GetNext.Return(1, 2, 3);
-// After third call, repeats 3 (NSubstitute-like behavior)
-
-// Mix callbacks with value sequences
+stub.GetNext.Return(1, 2, 3);          // Repeats 3 after exhaustion
 stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
-// First: computed, then 100, 200, 200...
-
-// Use ThenDefault() to return default(T) instead of repeating:
-stub.GetNext.Return(1, 2).ThenDefault();
+stub.GetNext.Return(1, 2).ThenDefault(); // Returns default(T) after exhaustion
 ```
 <!-- endSnippet -->
 
-### When() - Argument Matching
-
 <!-- snippet: skill-method-when -->
 ```cs
-// Value matching
 stub.GetUser.When(42).Return(adminUser);
-stub.GetUser.When(1).Return(regularUser);
-
-// Predicate matching
 stub.GetUser.When(id => id < 0).Return(null);
-
-// Chaining
 stub.GetUser
     .When(42).Return(adminUser)
     .ThenWhen(id => id > 100).Return(premiumUser)
     .ThenWhen(id => id > 0).Return(regularUser);
-
-// Void methods use Call instead of Return
-stub.Log.When("error").Call((msg) => { /* handle */ });
+stub.Log.When("error").Call((msg) => { /* handle */ }); // Void methods
 ```
 <!-- endSnippet -->
 
@@ -408,40 +278,18 @@ stub.GetById.Of<Product>().Verify(Called.Never);
 
 ## Delegate Configuration
 
-Delegates use `stub.Interceptor` instead of named member properties. All method interceptor features are available.
+Delegates use `stub.Interceptor`. Named delegates only (no `Func<>`/`Action<>`). See **delegates.md** for full reference.
 
 <!-- snippet: skill-delegate-config -->
 ```cs
 var stub = new Stubs.SkillArithmeticOp();
-
-// Returns (value or callback)
-stub.Interceptor.Return(42);
-stub.Interceptor.Return((a, b) => a + b);
-
-// Sequences
-stub.Interceptor.Return(10, 20, 30);
-
-// When chains
-stub.Interceptor.When(1, 2).Return(100)
-    .ThenWhen(3, 4).Return(200);
-
-// Async auto-wrapping (for delegates returning Task<T>)
-// stub.Interceptor.Return(42);              // auto-wraps in Task.FromResult
-// stub.Interceptor.Return((int x) => x * 2); // simplified, auto-wrapped
-
-// Verification (fresh stub for clean tracking)
-var verifyStub = new Stubs.SkillArithmeticOp();
-verifyStub.Interceptor.Return((a, b) => a + b);
-SkillArithmeticOp op = verifyStub;
-op(1, 2);
-verifyStub.Interceptor.Verify(Called.Once);
-Assert.Equal((1, 2), verifyStub.Interceptor.LastArgs);
-
-// Strict mode
-stub.Strict = true;
-
-// Implicit conversion to delegate type
-SkillArithmeticOp opRef = stub;
+stub.Interceptor.Return(42);                         // Value
+stub.Interceptor.Return((a, b) => a + b);            // Callback
+stub.Interceptor.Return(10, 20, 30);                 // Sequence
+stub.Interceptor.When(1, 2).Return(100);             // When chain
+stub.Interceptor.Verify(Called.Once);                 // Verify
+Assert.Equal((1, 2), stub.Interceptor.LastArgs);     // Arg capture
+SkillArithmeticOp op = stub;                         // Implicit conversion
 ```
 <!-- endSnippet -->
 
@@ -449,40 +297,18 @@ SkillArithmeticOp opRef = stub;
 
 ## Verification
 
-### Individual Verification
-
-<!-- snippet: skill-verify-individual -->
-```cs
-var tracking = stub.Save.Call((user) => { });
-// ... exercise stub ...
-```
-<!-- endSnippet -->
-
-### Batch Verification with Verifiable()
+`stub.Verify()` checks `.Verifiable()` members. `stub.VerifyAll()` checks ALL configured members. See **verification.md** for full reference.
 
 <!-- snippet: skill-verify-batch -->
 ```cs
 stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((u) => { }).Verifiable(Called.Once);
 // ... exercise stub ...
+stub.Verify();
 ```
 <!-- endSnippet -->
 
-### Verify() vs VerifyAll()
-
-- `stub.Verify()` - Only members marked with `.Verifiable()`
-- `stub.VerifyAll()` - ALL configured members (Return, Call, Get, etc.)
-
-### Called Constraints
-
-| Constraint | Description |
-|------------|-------------|
-| `Called.Never` | Must not be called |
-| `Called.Once` | Exactly 1 call |
-| `Called.AtLeastOnce` | 1 or more calls |
-| `Called.Exactly(n)` | Exactly n calls |
-| `Called.AtLeast(n)` | n or more calls |
-| `Called.AtMost(n)` | n or fewer calls |
+Called constraints: `Called.Never`, `Called.Once`, `Called.AtLeastOnce`, `Called.Exactly(n)`, `Called.AtLeast(n)`, `Called.AtMost(n)`
 
 ---
 
@@ -525,13 +351,9 @@ stub.Strict();
 
 ---
 
-## Stub Overrides (Stand-Alone Only)
+## Stub Overrides (Standalone Only)
 
-Stub overrides let you define default stub behavior at compile time. The stub override is the fallback when no `Return`/`Call` callback is configured.
-
-### Defining Stub Overrides
-
-Override virtual methods with underscore suffix - the compiler enforces signature correctness:
+Override `protected virtual` methods/properties with underscore suffix for reusable defaults. `Return()`/`Call()`/`Get()`/`Set()` supersede overrides per-test. See **stub-overrides.md** for full reference.
 
 <!-- snippet: skill-stub-override-define -->
 ```cs
@@ -540,165 +362,18 @@ public partial class SkStubOverrideRepoStub : IUserRepo { }
 
 public partial class SkStubOverrideRepoStub
 {
-    // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 ```
 <!-- endSnippet -->
 
-The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless of whether you override the method.
-
-### Return(callback) Supersedes Stub Override
-
-Use `Return(callback)` to override the stub override for specific tests:
-
-<!-- snippet: skill-stub-override-oncall -->
-```cs
-var stub = new SkStubOverrideRepoStub();
-IUserRepo repo = stub;
-
-// Without Returns: stub override is called
-var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
-
-// With Returns: callback supersedes stub override (clean interceptor name)
-stub.GetById.Return(id => new User { Id = id, Name = "Override" });
-var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
-```
-<!-- endSnippet -->
-
-### Return for Constant Values
-
-Use `Return()` for constant return values:
-
-<!-- snippet: skill-stub-override-returns -->
-```cs
-stub.GetById.Return(new User { Id = 99, Name = "Fixed" });
-```
-<!-- endSnippet -->
-
-For async methods (`Task<T>`, `ValueTask<T>`), `Return()` auto-wraps the value:
-
-<!-- snippet: skill-stub-override-async-returns -->
-```cs
-// Returns auto-wraps in Task.FromResult
-stub.GetUserAsync.Return(new User { Id = 1 });
-```
-<!-- endSnippet -->
-
-### Tracking Works with Return
-
-Stub override interceptors provide full tracking even when using `Return`:
-
-<!-- snippet: skill-stub-override-tracking -->
-```cs
-stub.GetById.Return(id => new User { Id = id });
-repo.GetById(42);
-
-stub.GetById.Verify(Called.Once);
-Assert.Equal(42, stub.GetById.LastArg);
-```
-<!-- endSnippet -->
-
-### Reset Preserves Return Configuration
-
-`Reset()` clears tracking state but preserves the Return configuration:
-
-<!-- snippet: skill-stub-override-reset -->
-```cs
-stub.GetById.Return(id => new User { Id = id });
-repo.GetById(1);
-stub.GetById.Verify(Called.Once);
-
-stub.GetById.Reset();
-stub.GetById.Verify(Called.Never);  // Tracking cleared
-
-repo.GetById(2);  // Still uses Returns callback
-```
-<!-- endSnippet -->
+`Return()` supersedes the override: `stub.GetById.Return(id => new User { Id = id, Name = "Override" });`
 
 ---
 
-## Stub Override Properties (Stand-Alone Only)
+## Source Delegation (Interface Stubs Only)
 
-User properties let you define default property behavior at compile time. The stub override property is the fallback when no `Get`/`Set` is configured.
-
-### Defining Stub Override Properties
-
-Override virtual properties with underscore suffix - the compiler enforces signature correctness:
-
-<!-- snippet: skill-stub-override-property-define -->
-```cs
-[KnockOff]
-public partial class SkUserPropServiceStub : IUserService { }
-
-public partial class SkUserPropServiceStub
-{
-    private int _count;
-
-    // Override virtual property with underscore suffix - compiler enforces signature!
-    protected override int Count_ => _count;
-
-    public void SetCount(int value) => _count = value;
-}
-```
-<!-- endSnippet -->
-
-The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of whether you override the property.
-
-### Get/Set Supersede Stub Override Property
-
-Use `Get()` or `Set()` to override the stub override property for specific tests:
-
-<!-- snippet: skill-stub-override-property-onget -->
-```cs
-var stub = new SkUserPropServiceStub();
-stub.SetCount(42);
-IUserService service = stub;
-
-// Without Get: user property is called
-var count1 = service.Count;  // Returns 42 (from Count_ override)
-
-// With Get: Get supersedes user property (clean interceptor name)
-stub.Count.Get(999);
-var count2 = service.Count;  // Returns 999 (Get wins)
-```
-<!-- endSnippet -->
-
-### Tracking Works with Stub Override Properties
-
-Stub override property interceptors provide full tracking even when using the stub override:
-
-<!-- snippet: skill-stub-override-property-tracking -->
-```cs
-_ = service.Count;
-_ = service.Count;
-
-stub.Count.VerifyGet(Called.Exactly(2));
-```
-<!-- endSnippet -->
-
-### Reset Preserves Get/Set Configuration
-
-`Reset()` clears tracking state but preserves the Get/Set configuration:
-
-<!-- snippet: skill-stub-override-property-reset -->
-```cs
-stub.Count.Get(100);
-_ = service.Count;
-stub.Count.VerifyGet(Called.Once);
-
-stub.Count.Reset();
-stub.Count.VerifyGet(Called.Never);  // Tracking cleared
-
-_ = service.Count;  // Still uses Get (returns 100)
-```
-<!-- endSnippet -->
-
----
-
-## Source Delegation
-
-`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured members (Return, Call, When) still take priority -- Source is only consulted when nothing else handles the call.
+`stub.Source(realImpl)` delegates unconfigured calls to a real implementation. See **source-delegation.md** for hierarchy support and details.
 
 <!-- snippet: skill-source-delegation -->
 ```cs
@@ -714,32 +389,6 @@ stub.GetById.Return((id) => testUser);  // This wins over source
 ```
 <!-- endSnippet -->
 
-**Availability:** Source() is available for **interface stubs only** (Standalone and Inline Interface patterns). Class stubs do not need Source() because they already call the base class implementation by default for unconfigured virtual methods (see Gotcha #4).
-
-### Priority Order
-
-KnockOff evaluates member calls in this order:
-
-1. **When chains** -- `stub.Method.When(...).Return(...)`
-2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
-3. **Stub overrides** -- `protected override` with `_` suffix (Standalone only)
-4. **Source delegation** -- `stub.Source(realImplementation)`
-5. **Smart default** -- KnockOff's built-in default value
-
-The first match wins. This makes Source ideal as a baseline: set it once, then selectively override specific members at higher priority levels.
-
-### Interface Hierarchy
-
-When your stub implements an interface that extends other interfaces, KnockOff generates one `Source()` overload per level. Each overload sets `_source` on matching interceptors and clears it on non-matching ones. This means C# overload resolution does the right thing automatically -- pass whatever you have (even a `List<T>` for an `ICustomList<T> : IList<T>` stub) and only the matching members get delegated.
-
-### Clearing Source
-
-Remove source delegation by passing null: `stub.Source(null)`. After clearing, unconfigured methods return smart defaults (or throw in strict mode).
-
-### Reset and Source
-
-`Reset()` on an individual interceptor clears its `_source` reference along with tracking state. If you reset a member and still want delegation, call `stub.Source(realImplementation)` again after the reset.
-
 ---
 
 ## Moq Migration Quick Reference
@@ -753,7 +402,7 @@ Remove source delegation by passing null: `stub.Source(null)`. After clearing, u
 | `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Get(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Return(val)` (auto-wraps) |
 | `.Callback(action)` | Logic inside `Return`/`Call` callback |
-| `mock.CallBase = true` | Default for class stubs (just don't configure the member) |
+| `mock.CallBase = true` | Default for class stubs |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback always receives all args |
@@ -816,38 +465,31 @@ public partial class SkillNamedDelegateHost { }
 ```
 <!-- endSnippet -->
 
-### Expecting Sequences to Return Default After Exhaustion
-
-<!-- snippet: skill-mistake-sequence-exhaustion -->
-```cs
-// Sequences repeat last value by default (NSubstitute-like behavior)
-stub.GetNext.Return(1, 2);
-// After 2 calls, returns 2 (repeats last value)
-
-// Use ThenDefault() to return default(T) instead of repeating
-stub.GetNext.Return(1, 2).ThenDefault();
-// After 2 calls, returns 0 (default)
-
-// Use Strict mode to throw when sequence exhausted
-stub.Strict = true;
-stub.GetNext.Return(1, 2);
-// Third call throws StubException
-```
-<!-- endSnippet -->
-
 ---
 
 ## Reference Documentation
 
-For detailed documentation, see the reference files in `references/`:
+Load these on demand for detailed coverage of specific topics:
 
-- **`references/patterns.md`** - Complete pattern guide with examples
-- **`references/methods.md`** - Method configuration and verification
-- **`references/properties.md`** - Property interceptors and stub override properties
-- **`references/api-reference.md`** - Complete API reference
-- **`references/strict-mode.md`** - Strict mode configuration
-- **`references/moq-migration.md`** - Migration guide
+### Member Types
+- **`references/methods.md`** — Method configuration, ref/out params, overloads, argument capture
+- **`references/properties.md`** — Property Get/Set, LastSetValue, decision guide
+- **`references/indexers.md`** — Per-key builders, all-keys callbacks, multi-param indexers, priority chain
+- **`references/events.md`** — Raise() signatures, HasSubscribers, VerifyAdd/VerifyRemove
+- **`references/delegates.md`** — Named delegate stubs, Interceptor access, implicit conversion
 
----
+### Cross-Cutting Features
+- **`references/sequences.md`** — Method/property/indexer sequences, ThenReturn, ThenDefault, exhaustion
+- **`references/when-chains.md`** — Value matching, predicate matching, ThenWhen, first-match-wins
+- **`references/verification.md`** — Verify/Verifiable/VerifyAll, Called constraints, VerificationException
+- **`references/async-methods.md`** — Three-tier auto-wrapping for Task<T>/ValueTask<T>
+- **`references/generic-methods.md`** — Of<T>() pattern, CalledTypeArguments, multi-type params
 
-**UPDATED:** 2026-02-08
+### Advanced Features
+- **`references/stub-overrides.md`** — Protected override methods/properties, underscore convention
+- **`references/source-delegation.md`** — Interface hierarchy, partial stubbing, priority chain
+- **`references/strict-mode.md`** — Per-stub, runtime, assembly-wide strict configuration
+
+### Guides
+- **`references/patterns.md`** — Complete guide to all 9 stub patterns
+- **`references/moq-migration.md`** — Comprehensive Moq-to-KnockOff migration guide
