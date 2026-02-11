@@ -69,22 +69,6 @@ public static IMyRepo NSubstituteMock(List<User> users)
 ```
 <!-- endSnippet -->
 
-**Moq:**
-```cs
-public static Mock<IMyRepo> MoqMock(List<User> users)
-{
-    var mock = new Mock<IMyRepo>();
-
-    mock.Setup(x => x.GetUser(It.IsAny<int>()))
-        .Returns<int>(id => users.SingleOrDefault(u => u.Id == id));
-
-    mock.Setup(x => x.Update(It.IsAny<User>()))
-        .Callback<User>(u => Assert.Contains(u, users));
-
-    return mock;
-}
-```
-
 Here's another [example from PowerToys](https://github.com/microsoft/PowerToys/blob/main/src/settings-ui/Settings.UI.UnitTests/Mocks/ISettingsUtilsMocks.cs).
 
 But I find that hard to read and unintuitive. Also, my shared methods accumulated extra parameters for variations across different tests.
