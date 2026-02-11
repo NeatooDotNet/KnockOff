@@ -85,6 +85,8 @@ public static Mock<IMyRepo> MoqMock(List<User> users)
 }
 ```
 
+Here's another [example from PowerToys](https://github.com/microsoft/PowerToys/blob/main/src/settings-ui/Settings.UI.UnitTests/Mocks/ISettingsUtilsMocks.cs).
+
 But I find that hard to read and unintuitive. Also, my shared methods accumulated extra parameters for variations across different tests.
 
 
