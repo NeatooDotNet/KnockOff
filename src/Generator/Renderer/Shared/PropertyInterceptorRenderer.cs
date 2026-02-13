@@ -24,7 +24,32 @@ internal static class PropertyInterceptorRenderer
 	{
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
-		var classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
+
+		// Determine emission mode: base class mode for regular properties, inline mode for init-only and ref return
+		var useBaseClass = !model.IsInitOnly && !model.IsRefReturn;
+
+		string classDecl;
+		if (useBaseClass)
+		{
+			string baseClassName;
+			if (model.HasGetter && model.HasSetter)
+			{
+				baseClassName = $"global::KnockOff.Interceptors.PropertyGetSetInterceptorBase<{model.ValueType}>";
+			}
+			else if (model.HasGetter)
+			{
+				baseClassName = $"global::KnockOff.Interceptors.PropertyGetInterceptorBase<{model.ValueType}>";
+			}
+			else
+			{
+				baseClassName = $"global::KnockOff.Interceptors.PropertySetInterceptorBase<{model.ValueType}>";
+			}
+			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams} : {baseClassName}{constraints}";
+		}
+		else
+		{
+			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
+		}
 
 		w.Line($"/// <summary>Tracks and configures behavior for {model.PropertyName}.</summary>");
 		using (w.Block(classDecl))
@@ -33,9 +58,22 @@ internal static class PropertyInterceptorRenderer
 			{
 				RenderInitOnlyPropertyContent(w, model, options);
 			}
+			else if (!useBaseClass)
+			{
+				// Inline mode for ref return properties
+				RenderRegularPropertyContent(w, model, options);
+			}
+			else if (model.HasGetter && model.HasSetter)
+			{
+				RenderBaseClassGetSetContent(w, model, options);
+			}
+			else if (model.HasGetter)
+			{
+				RenderBaseClassGetOnlyContent(w, model, options);
+			}
 			else
 			{
-				RenderRegularPropertyContent(w, model, options);
+				RenderBaseClassSetOnlyContent(w, model, options);
 			}
 		}
 		w.Line();
@@ -310,6 +348,444 @@ internal static class PropertyInterceptorRenderer
 			RenderPropertySetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
 			RenderPropertySetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
 		}
+	}
+
+	#endregion
+
+	#region Base Class Mode: Get-Only Properties
+
+	/// <summary>
+	/// Renders a thin interceptor inheriting from PropertyGetInterceptorBase&lt;TValue&gt;.
+	/// Only emitted for non-init-only, non-ref-return, getter-only properties.
+	/// </summary>
+	private static void RenderBaseClassGetOnlyContent(
+		CodeWriter w,
+		UnifiedPropertyInterceptorModel model,
+		PropertyInterceptorRenderOptions options)
+	{
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// Source field for Source(T) feature
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no Get is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
+		// Constructor
+		w.Line($"public {model.InterceptorClassName}() : base(\"{model.PropertyName}\") {{ }}");
+		w.Line();
+
+		// Abstract override: InvokeGetUnconfigured
+		w.Line($"protected override {model.ValueType} InvokeGetUnconfigured(bool strict)");
+		using (w.Braces())
+		{
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) return src.{model.PropertyName};");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
+			w.Line($"return {model.DefaultExpression};");
+		}
+		w.Line();
+
+		// Reset override (clear source)
+		w.Line("public override void Reset()");
+		using (w.Braces())
+		{
+			w.Line("base.Reset();");
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line("_source = null;");
+			}
+		}
+		w.Line();
+
+		// Typed Get() methods returning IPropertyGetBuilder<TValue> (shadows base class Get)
+		w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get(global::System.Func<{model.ValueType}> callback)");
+		using (w.Braces())
+		{
+			w.Line("_getSequence = null; _getSequenceIndex = 0;");
+			w.Line("_isGetVerifiable = false; _getVerifiableTimes = null;");
+			w.Line("_get = callback;");
+			w.Line("var builder = new PropertyGetBuilderImpl(this);");
+			w.Line("_getTracking = builder;");
+			w.Line("return builder;");
+		}
+		w.Line();
+
+		w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get({model.ValueType} value) => Get(() => value);");
+		w.Line();
+
+		// Verifiable fluent methods
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable() {{ _isGetVerifiable = true; _getVerifiableTimes = null; return this; }}");
+		w.Line();
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ _isGetVerifiable = true; _getVerifiableTimes = times; return this; }}");
+		w.Line();
+
+		// Thin inner classes
+		RenderBaseClassPropertyGetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
+		RenderBaseClassPropertyGetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
+	}
+
+	#endregion
+
+	#region Base Class Mode: Set-Only Properties
+
+	/// <summary>
+	/// Renders a thin interceptor inheriting from PropertySetInterceptorBase&lt;TValue&gt;.
+	/// Only emitted for non-init-only, non-ref-return, setter-only properties.
+	/// </summary>
+	private static void RenderBaseClassSetOnlyContent(
+		CodeWriter w,
+		UnifiedPropertyInterceptorModel model,
+		PropertyInterceptorRenderOptions options)
+	{
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// Source field for Source(T) feature
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no Set is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
+		// Constructor
+		w.Line($"public {model.InterceptorClassName}() : base(\"{model.PropertyName}\") {{ }}");
+		w.Line();
+
+		// Abstract override: InvokeSetUnconfigured
+		w.Line($"protected override void InvokeSetUnconfigured(bool strict, {model.ValueType} value)");
+		using (w.Braces())
+		{
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) {{ src.{model.PropertyName} = value; return; }}");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
+		}
+		w.Line();
+
+		// Reset override (clear source)
+		w.Line("public override void Reset()");
+		using (w.Braces())
+		{
+			w.Line("base.Reset();");
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line("_source = null;");
+			}
+		}
+		w.Line();
+
+		// Typed Set() method returning IPropertySetBuilder<TValue> (shadows base class Set)
+		w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertySetBuilder<{model.ValueType}> Set(global::System.Action<{model.ValueType}> callback)");
+		using (w.Braces())
+		{
+			w.Line("_setSequence = null; _setSequenceIndex = 0;");
+			w.Line("_isSetVerifiable = false; _setVerifiableTimes = null;");
+			w.Line("_set = callback;");
+			w.Line("var builder = new PropertySetBuilderImpl(this);");
+			w.Line("_setTracking = builder;");
+			w.Line("return builder;");
+		}
+		w.Line();
+
+		// Verifiable fluent methods
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable() {{ _isSetVerifiable = true; _setVerifiableTimes = null; return this; }}");
+		w.Line();
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ _isSetVerifiable = true; _setVerifiableTimes = times; return this; }}");
+		w.Line();
+
+		// LastSetValue with correct nullable type (base class TValue? doesn't produce Nullable<T> for value types)
+		w.Line($"/// <summary>The value from the last setter call (from most recently called registration).</summary>");
+		w.Line($"public new {model.NullableValueType} LastSetValue => TotalSetCount > 0 ? ({model.NullableValueType})base.LastSetValue : default;");
+		w.Line();
+
+		// Thin inner classes
+		RenderBaseClassPropertySetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
+		RenderBaseClassPropertySetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
+	}
+
+	#endregion
+
+	#region Base Class Mode: Get+Set Properties
+
+	/// <summary>
+	/// Renders a thin interceptor inheriting from PropertyGetSetInterceptorBase&lt;TValue&gt;.
+	/// Only emitted for non-init-only, non-ref-return properties with both getter and setter.
+	/// </summary>
+	private static void RenderBaseClassGetSetContent(
+		CodeWriter w,
+		UnifiedPropertyInterceptorModel model,
+		PropertyInterceptorRenderOptions options)
+	{
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// Source field for Source(T) feature
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
+		// Constructor
+		w.Line($"public {model.InterceptorClassName}() : base(\"{model.PropertyName}\") {{ }}");
+		w.Line();
+
+		// Abstract override: InvokeGetUnconfiguredFinal (NOT InvokeGetUnconfigured -- that's sealed in get+set base for round-trip)
+		w.Line($"protected override {model.ValueType} InvokeGetUnconfiguredFinal(bool strict)");
+		using (w.Braces())
+		{
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) return src.{model.PropertyName};");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
+			w.Line("return default!;");
+		}
+		w.Line();
+
+		// Abstract override: InvokeSetUnconfigured
+		w.Line($"protected override void InvokeSetUnconfigured(bool strict, {model.ValueType} value)");
+		using (w.Braces())
+		{
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) {{ src.{model.PropertyName} = value; return; }}");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
+		}
+		w.Line();
+
+		// Reset override (clear source)
+		w.Line("public override void Reset()");
+		using (w.Braces())
+		{
+			w.Line("base.Reset();");
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line("_source = null;");
+			}
+		}
+		w.Line();
+
+		// Typed Get() methods returning IPropertyGetBuilder<TValue> (shadows base class Get)
+		w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get(global::System.Func<{model.ValueType}> callback)");
+		using (w.Braces())
+		{
+			w.Line("_getSequence = null; _getSequenceIndex = 0;");
+			w.Line("_isGetVerifiable = false; _getVerifiableTimes = null;");
+			w.Line("_get = callback;");
+			w.Line("var builder = new PropertyGetBuilderImpl(this);");
+			w.Line("_getTracking = builder;");
+			w.Line("return builder;");
+		}
+		w.Line();
+
+		w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get({model.ValueType} value) => Get(() => value);");
+		w.Line();
+
+		// Typed Set() method returning IPropertySetBuilder<TValue> (shadows base class Set)
+		w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public new global::KnockOff.IPropertySetBuilder<{model.ValueType}> Set(global::System.Action<{model.ValueType}> callback)");
+		using (w.Braces())
+		{
+			w.Line("_setSequence = null; _setSequenceIndex = 0;");
+			w.Line("_isSetVerifiable = false; _setVerifiableTimes = null;");
+			w.Line("_set = callback;");
+			w.Line("var builder = new PropertySetBuilderImpl(this);");
+			w.Line("_setTracking = builder;");
+			w.Line("return builder;");
+		}
+		w.Line();
+
+		// Verifiable fluent methods (marks both get and set as verifiable)
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable() {{ _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }}");
+		w.Line();
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }}");
+		w.Line();
+
+		// LastSetValue with correct nullable type (base class TValue? doesn't produce Nullable<T> for value types)
+		w.Line($"/// <summary>The value from the last setter call (from most recently called registration).</summary>");
+		w.Line($"public new {model.NullableValueType} LastSetValue => TotalSetCount > 0 ? ({model.NullableValueType})base.LastSetValue : default;");
+		w.Line();
+
+		// Thin inner classes for both get and set
+		RenderBaseClassPropertyGetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
+		RenderBaseClassPropertyGetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
+		RenderBaseClassPropertySetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
+		RenderBaseClassPropertySetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
+	}
+
+	#endregion
+
+	#region Base Class Mode: Thin Inner Classes
+
+	/// <summary>
+	/// Renders thin PropertyGetBuilderImpl that extends PropertyGetBuilderBase and implements IPropertyGetBuilder&lt;TValue&gt;.
+	/// </summary>
+	private static void RenderBaseClassPropertyGetBuilderImpl(
+		CodeWriter w,
+		string valueType,
+		string interceptorClassName)
+	{
+		w.Line($"/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<{valueType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+
+			w.Line($"public PropertyGetBuilderImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
+			w.Line();
+
+			// ThenGet(callback) - elevates to sequence mode
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(global::System.Func<{valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("ThenGetBase(callback);");
+				w.Line("return new PropertyGetSequenceImpl(_typedInterceptor);");
+			}
+			w.Line();
+
+			// ThenGet(value)
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
+			w.Line();
+
+			// ThenGet(params values)
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values)");
+			using (w.Braces())
+			{
+				w.Line("if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }");
+				w.Line("var seq = ThenGet(values[0]);");
+				w.Line("for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);");
+				w.Line("return seq;");
+			}
+			w.Line();
+
+			// Verifiable
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
+			w.Line($"global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();");
+			w.Line($"global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders thin PropertyGetSequenceImpl that extends PropertyGetSequenceBase and implements IPropertyGetSequence&lt;TValue&gt;.
+	/// </summary>
+	private static void RenderBaseClassPropertyGetSequenceImpl(
+		CodeWriter w,
+		string valueType,
+		string interceptorClassName)
+	{
+		w.Line($"/// <summary>Sequence implementation for ThenGet chaining.</summary>");
+		w.Line($"private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<{valueType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+
+			w.Line($"public PropertyGetSequenceImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
+			w.Line();
+
+			// ThenGet(callback)
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(global::System.Func<{valueType}> callback) {{ ThenGetBase(callback); return this; }}");
+			w.Line();
+
+			// ThenGet(value)
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
+			w.Line();
+
+			// ThenGet(params values)
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values) {{ foreach (var v in values) ThenGet(v); return this; }}");
+			w.Line();
+
+			// Verifiable
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders thin PropertySetBuilderImpl that extends PropertySetBuilderBase and implements IPropertySetBuilder&lt;TValue&gt;.
+	/// For get+set properties, uses PropertyGetSetInterceptorBase.PropertySetBuilderBase.
+	/// For set-only properties, uses PropertySetInterceptorBase.PropertySetBuilderBase.
+	/// Both have the same structure, so this method works for both.
+	/// </summary>
+	private static void RenderBaseClassPropertySetBuilderImpl(
+		CodeWriter w,
+		string valueType,
+		string interceptorClassName)
+	{
+		w.Line($"/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class PropertySetBuilderImpl : PropertySetBuilderBase, global::KnockOff.IPropertySetBuilder<{valueType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+
+			w.Line($"public PropertySetBuilderImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
+			w.Line();
+
+			// ThenSet(callback)
+			w.Line($"public global::KnockOff.IPropertySetSequence<{valueType}> ThenSet(global::System.Action<{valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("ThenSetBase(callback);");
+				w.Line("return new PropertySetSequenceImpl(_typedInterceptor);");
+			}
+			w.Line();
+
+			// Verifiable
+			w.Line($"public global::KnockOff.IPropertySetBuilder<{valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
+			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable() => Verifiable();");
+			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable(global::KnockOff.Called times) => Verifiable();");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders thin PropertySetSequenceImpl that extends PropertySetSequenceBase and implements IPropertySetSequence&lt;TValue&gt;.
+	/// </summary>
+	private static void RenderBaseClassPropertySetSequenceImpl(
+		CodeWriter w,
+		string valueType,
+		string interceptorClassName)
+	{
+		w.Line($"/// <summary>Sequence implementation for ThenSet chaining.</summary>");
+		w.Line($"private sealed class PropertySetSequenceImpl : PropertySetSequenceBase, global::KnockOff.IPropertySetSequence<{valueType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+
+			w.Line($"public PropertySetSequenceImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
+			w.Line();
+
+			// ThenSet(callback)
+			w.Line($"public global::KnockOff.IPropertySetSequence<{valueType}> ThenSet(global::System.Action<{valueType}> callback) {{ ThenSetBase(callback); return this; }}");
+			w.Line();
+
+			// Verifiable
+			w.Line($"public global::KnockOff.IPropertySetSequence<{valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
+		}
+		w.Line();
 	}
 
 	#endregion

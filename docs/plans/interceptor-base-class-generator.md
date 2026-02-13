@@ -1,8 +1,8 @@
 # Interceptor Base Class Generator Changes
 
-**Status:** Ready for Implementation
+**Status:** Complete
 **Created:** 2026-02-13
-**Last Updated:** 2026-02-13 (developer approved, contract created)
+**Last Updated:** 2026-02-13 (Phase 5.1 complete, Phase 5.2 complete, Phase 5.3 complete, Phase 5.4 complete, Phase 5.5 re-verification passed)
 **Related Todo:** [Reduce Generated Code Size](../todos/reduce-generated-code-size.md)
 
 ---
@@ -713,28 +713,28 @@ No Design.Stubs acceptance criteria (this is an internal generator change, no ne
 
 **Phase 5.2: Method Interceptor Renderer**
 
-- [ ] Add emission mode determination to `MethodInterceptorRenderer.RenderInterceptorClass` -- check `model.Overloads.Count == 0` AND NOT `hasRefOrOut` AND NOT `isAsyncWithInnerType` AND NOT `isVoidAsync` AND NOT `model.IsRefReturn`
-- [ ] Create `RenderBaseClassContent` method alongside existing `RenderSingleSignatureContent`
-- [ ] `RenderBaseClassContent` emits: class declaration with base class inheritance, constructor, abstract overrides (InvokeDelegate/InvokeVoidDelegate, RecordArgs, RecordUnconfiguredArgs, CreateValueDelegate for non-void), source field, custom delegate, unconfigured last arg/args fields + LastArg/LastArgs using FindLastArgInTracking, Return/Call entry points using SetupReturnCallback/SetupReturnValue/SetupCallback, When entry points, thin Invoke (RunPriorityChain/RunVoidPriorityChain + unconfigured tail), Reset override, thin inner classes (MethodCallBuilderImpl, MethodSequenceImpl, WhenBuilder, WhenChain / VoidWhenChain)
-- [ ] Preserve `RenderSingleSignatureContent` for inline mode (ref return, ref/out, async simplified, void-async)
-- [ ] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests must pass
+- [x] Add emission mode determination to `MethodInterceptorRenderer.RenderInterceptorClass` -- check `model.Overloads.Count == 0` AND NOT `hasRefOrOut` AND NOT `isAsyncWithInnerType` AND NOT `isVoidAsync` AND NOT `model.IsRefReturn`
+- [x] Create `RenderBaseClassContent` method alongside existing `RenderSingleSignatureContent`
+- [x] `RenderBaseClassContent` emits: class declaration with base class inheritance, constructor, abstract overrides (InvokeDelegate/InvokeVoidDelegate, RecordArgs, RecordUnconfiguredArgs, CreateValueDelegate for non-void), source field, custom delegate, unconfigured last arg/args fields + LastArg/LastArgs (manual casting approach replacing FindLastArgInTracking for value types), Return/Call entry points using SetupReturnCallback/SetupReturnValue/SetupCallback, When entry points, thin Invoke (RunPriorityChain/RunVoidPriorityChain + unconfigured tail), Reset override, thin inner classes (MethodCallBuilderImpl, MethodSequenceImpl, WhenBuilder, WhenChain / VoidWhenChain)
+- [x] Preserve `RenderSingleSignatureContent` for inline mode (ref return, ref/out, async simplified, void-async)
+- [x] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests pass (net8.0: 1464, net9.0: 1465, net10.0: 1465, Documentation.Samples: 691x3, NeatooInterfaceTests: 473x3, AssemblyStrict: 14x3)
 
 **Phase 5.3: Property Interceptor Renderer**
 
-- [ ] Add emission mode determination to `PropertyInterceptorRenderer.RenderInterceptorClass` -- check NOT `model.IsInitOnly` AND NOT `model.IsRefReturn`
-- [ ] Create `RenderBaseClassGetOnlyContent` for get-only properties (`model.HasGetter && !model.HasSetter`)
-- [ ] Create `RenderBaseClassSetOnlyContent` for set-only properties (`model.HasSetter && !model.HasGetter`)
-- [ ] Create `RenderBaseClassGetSetContent` for get+set properties (`model.HasGetter && model.HasSetter`)
-- [ ] Preserve `RenderInitOnlyPropertyContent` for init-only properties (inline mode)
-- [ ] Preserve `RenderRegularPropertyContent` for ref return properties (inline mode)
-- [ ] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests must pass
+- [x] Add emission mode determination to `PropertyInterceptorRenderer.RenderInterceptorClass` -- check NOT `model.IsInitOnly` AND NOT `model.IsRefReturn`
+- [x] Create `RenderBaseClassGetOnlyContent` for get-only properties (`model.HasGetter && !model.HasSetter`)
+- [x] Create `RenderBaseClassSetOnlyContent` for set-only properties (`model.HasSetter && !model.HasGetter`)
+- [x] Create `RenderBaseClassGetSetContent` for get+set properties (`model.HasGetter && model.HasSetter`)
+- [x] Preserve `RenderInitOnlyPropertyContent` for init-only properties (inline mode)
+- [x] Preserve `RenderRegularPropertyContent` for ref return properties (inline mode)
+- [x] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests pass (net8.0: 1464, net9.0: 1465, net10.0: 1465, Documentation.Samples: 691x3, NeatooInterfaceTests: 473x3, AssemblyStrict: 14x3, Design.Tests: 370x3)
 
 **Phase 5.4: Indexer Interceptor Renderer**
 
-- [ ] Add emission mode determination to `IndexerInterceptorRenderer.RenderInterceptorClass` -- check `isMulti == false` AND NOT any model `IsInitOnly` AND NOT any model `IsRefReturn`
-- [ ] Create `RenderBaseClassContent` for single-key indexers
-- [ ] Preserve existing renderer for multi-key indexers, init-only indexers (inline mode)
-- [ ] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests must pass
+- [x] Add emission mode determination to `IndexerInterceptorRenderer.RenderInterceptorClass` -- check `isMulti == false` AND NOT `isMultiParam` AND NOT any model `IsInitOnly` AND NOT any model `IsRefReturn`
+- [x] Create `RenderBaseClassContent` for single-key indexers
+- [x] Preserve existing renderer for multi-key indexers, multi-param indexers, init-only indexers (inline mode)
+- [x] **Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests pass (net8.0: 1464, net9.0: 1465, net10.0: 1465, Documentation.Samples: 691x3, AssemblyStrict: 14x3, Design.Tests: 370x3)
 
 **Phase 5.5: Final Verification**
 
@@ -949,3 +949,229 @@ public sealed class RowsInterceptor : PropertyGetInterceptorBase<int>
     // Total: ~40-50 lines
 }
 ```
+
+---
+
+## Implementation Progress
+
+**Started:** 2026-02-13
+
+### Phase 5.1: Library -- COMPLETE
+
+All base classes ported and new ones created. Library builds across all 3 TFMs.
+
+### Phase 5.2: Method Interceptor Renderer -- COMPLETE
+
+1. **Emission mode determination** added to `RenderInterceptorClass`. Checks: `model.Overloads.Count == 0 && !hasRefOrOut && !isAsyncWithInnerType && !isVoidAsync && !model.IsRefReturn`.
+2. **`RenderBaseClassContent`** method created (~800 lines) alongside existing inline path.
+3. **All existing tests pass unchanged** across all TFMs.
+
+**Issues encountered and resolved during implementation:**
+
+1. **CS0115/CS0508/CS0534/CS0246 -- Unqualified delegate types in base class declaration:** Custom delegate types like `GetOptionalDelegate` are nested inside the interceptor class. In the base class declaration `class Foo : Base<GetOptionalDelegate, ...>`, the compiler cannot resolve the nested type because it is not in scope in the class header. **Fix:** Qualify the delegate type as `{InterceptorClassName}{typeParams}.{delegateType}` when `NeedsCustomDelegate` is true.
+
+2. **CS1061/CS8129/CS8130/CS0266 -- Nullable tuple member access errors on builder LastArg/LastArgs:** Builder-level `LastArg`/`LastArgs` were generated as nullable types but inline mode generates them as non-nullable. Tests access builder `LastArgs.name` directly which fails on nullable tuple. **Fix:** Changed builder `_lastArgs` field to non-nullable `{lastArgsType}`, `LastArg` to `{param.Type}`, `LastArgs` to `{lastArgsType}`.
+
+3. **CS0019 -- `??` operator on value types:** `FindLastArgInTracking<TBuilder, TResult>` returns `TResult?`, but without a `struct` constraint on `TResult`, C# treats `TResult?` as `TResult` for value types (NOT `Nullable<TResult>`). So `FindLastArgInTracking<..., int>` returns `int`, not `int?`, making `found ?? fallback` invalid. **Fix:** Replaced `FindLastArgInTracking` with manual casting approach for interceptor-level `LastArg`/`LastArgs` properties (matching the prototype pattern for value types). Added `isVoid` parameter to conditionally skip `_returnValueTracking` checks (field only exists on non-void `MethodInterceptorBase`).
+
+4. **`ThenReturns_Params_EmptyArray_NoOp` test failure:** The base class mode `ThenReturn(params T[] values)` for empty arrays called `ThenReturnBase(CreateValueDelegate(default!))`, which elevates to sequence mode AND adds a `() => null` delegate. The old inline code only elevated without adding a new entry. **Fix:** Added `ElevateToSequenceBase()` method to `ReturnMethodCallBuilderBase` that performs only the elevation without adding a new entry. Changed generated code to call `ElevateToSequenceBase()` for the empty array case.
+
+### Phase 5.3: Property Interceptor Renderer -- COMPLETE
+
+1. **Emission mode determination** added to `RenderInterceptorClass`. Checks: `!model.IsInitOnly && !model.IsRefReturn`.
+2. **Three new rendering methods** created:
+   - `RenderBaseClassGetOnlyContent` -- for `model.HasGetter && !model.HasSetter` (uses `PropertyGetInterceptorBase<TValue>`)
+   - `RenderBaseClassSetOnlyContent` -- for `model.HasSetter && !model.HasGetter` (uses `PropertySetInterceptorBase<TValue>`)
+   - `RenderBaseClassGetSetContent` -- for `model.HasGetter && model.HasSetter` (uses `PropertyGetSetInterceptorBase<TValue>`)
+3. **Four thin inner class rendering methods** created: `RenderBaseClassPropertyGetBuilderImpl`, `RenderBaseClassPropertyGetSequenceImpl`, `RenderBaseClassPropertySetBuilderImpl`, `RenderBaseClassPropertySetSequenceImpl`.
+4. **All existing tests pass unchanged** across all TFMs.
+
+**Issues encountered and resolved during implementation:**
+
+1. **CS8766 -- Nullability mismatch on `PropertySetBuilderBase.LastValue`:** The base class `PropertySetBuilderBase.LastValue` was declared as `TValue?` (nullable), but `IPropertySetTracking<TValue>.LastValue` expects `TValue` (non-nullable). The inline mode renderer uses the non-nullable value type for `LastValue`. **Fix:** Changed `PropertySetBuilderBase.LastValue` in both `PropertySetInterceptorBase` and `PropertyGetSetInterceptorBase` from auto-property `TValue? LastValue { get; private set; }` to manual backing field `private TValue _lastValue = default!;` with `TValue LastValue => _lastValue;`.
+
+2. **Test failure -- `LastSetValue` returning null instead of expected value:** The base class `InvokeSet` was directly incrementing `tracking._callCount++` without calling `tracking.RecordCall(value)`, which meant `LastValue` on the builder was never set (it requires `RecordCall` to capture the value). The inline mode renderer generates `tracking.RecordCall(value)` which both increments the count and records the value. **Fix:** Changed all `tracking._callCount++` calls to `tracking.RecordCall(value)` in `InvokeSet`, `InvokeSetCallback`, and sequence exhausted repeat paths in both `PropertySetInterceptorBase` and `PropertyGetSetInterceptorBase`.
+
+**Note:** The `PropertyGetSetInterceptorBase` round-trip storage pattern (`_valueSet`/`_value`) works correctly -- no fallback to inline mode was needed.
+
+### Phase 5.4: Indexer Interceptor Renderer -- COMPLETE
+
+**Changes made to `src/Generator/Renderer/Shared/IndexerInterceptorRenderer.cs`:**
+
+1. **Emission mode determination:** Added `useBaseClass` check at the top of `RenderInterceptorClass`. Base class mode when: `!isMulti && !isMultiParam && !IsInitOnly && !IsRefReturn`. Multi-param indexers (where `KeyExpression` starts with `(`) stay inline because the calling convention (`InvokeGet(strict, a, b)`) is incompatible with the base class (`InvokeGet(strict, TKey key)`).
+
+2. **Class declaration:** Base class mode emits `public sealed class IndexerInterceptor : IndexerGetSetInterceptorBase<TKey, TValue>` instead of a standalone class.
+
+3. **`RenderBaseClassContent` method:** Emits thin interceptor with:
+   - Source field (`internal IFoo? _source;`)
+   - `InvokeGetUnconfigured(bool strict, TKey key)` and `InvokeSetUnconfigured(bool strict, TKey key, TValue value)` abstract overrides (both always emitted since base class requires both)
+   - `Reset()` override (`base.Reset()` + clear source)
+   - Typed indexer accessor (`this[params]` -> `GetOrCreatePerKeyBuilder(key)`)
+   - Get/Set public methods (thin wrappers creating typed builder impls)
+   - When entry point
+   - Verifiable methods (with `new` keyword to hide base class version that returns base type)
+   - Thin inner classes: `IndexerGetBuilderImpl`, `IndexerGetSequenceImpl`, `IndexerSetBuilderImpl`, `IndexerSetSequenceImpl`, `IndexerWhenBuilder`, `IndexerGetWhenChain`, `IndexerSetWhenChain`
+
+4. **All existing inline mode code preserved** in an `else` branch for multi-key, multi-param, init-only, and ref return indexers.
+
+**Issues encountered and resolved:**
+
+1. **CS0109 -- `new` keyword on indexer accessor:** The base class has `GetOrCreatePerKeyBuilder(TKey)` (a method), not an indexer. Removed unnecessary `new` keyword.
+
+2. **CS0108 -- Verifiable() hiding without `new`:** The base class has `Verifiable()` returning `IndexerGetSetInterceptorBase<TKey, TValue>`. The generated interceptor's `Verifiable()` returns the concrete type. Added `new` keyword to intentionally hide.
+
+3. **CS0534 -- Missing InvokeSetUnconfigured for get-only indexers:** The base class requires both `InvokeGetUnconfigured` and `InvokeSetUnconfigured` overrides. Changed to always emit both (the unused one does nothing/throws on strict).
+
+4. **CS0103 -- Parameter names in source delegation:** `InvokeGetUnconfigured` takes `key` as the parameter name, not the original param name from the interface. Changed source delegation to use `src[key]` instead of `src[index]` etc.
+
+5. **CS1729 -- Constructor with string parameter:** The base class has no constructor taking a member name (unlike property base classes). Removed constructor emission.
+
+6. **Multi-param indexer exclusion:** Multi-param indexers like `this[int row, int col]` cannot use base class mode because the caller generates `InvokeGet(strict, row, col)` (3 args) but the base class expects `InvokeGet(strict, (int, int) key)` (2 args). Added `isMultiParam` check based on `KeyExpression.StartsWith("(")`.
+
+**Checkpoint:** `dotnet test src/KnockOff.sln` -- all tests pass:
+- KnockOffTests net8.0: 1464 passed, net9.0: 1465 passed, net10.0: 1465 passed
+- Documentation.Samples: 691 passed x3 TFMs
+- AssemblyStrict: 14 passed x3 TFMs
+- Design.Tests: 370 passed x3 TFMs
+- Design.Stubs: builds with 0 errors
+
+**Pre-existing issues (not from this phase):**
+- Benchmarks CS0029: MethodCallBuilderImpl conversion errors (from Phase 5.2 method renderer)
+- NeatooInterfaceTests xUnit2004: Analyzer error in IEntityPropertyTests.cs (pre-existing)
+
+### Phase 5.5: Final Verification -- ARCHITECT REVIEW COMPLETE
+
+---
+
+## Completion Evidence (Phase 5.2)
+
+**Tests Passing (all TFMs, all projects):**
+- KnockOffTests net8.0: 1464 passed, 0 failed
+- KnockOffTests net9.0: 1465 passed, 0 failed
+- KnockOffTests net10.0: 1465 passed, 0 failed
+- KnockOff.Documentation.Samples net8.0/net9.0/net10.0: 691 passed each, 0 failed
+- KnockOff.NeatooInterfaceTests net8.0/net9.0/net10.0: 473 passed each, 0 failed
+- KnockOffTests.AssemblyStrict net8.0/net9.0/net10.0: 14 passed each, 0 failed
+
+**Design Projects Compile:** Yes
+- `dotnet build src/Design/Design.Stubs` -- 0 errors, 0 warnings
+- `dotnet build src/Design/Design.Tests` -- 0 errors, 0 warnings
+
+**Files Modified:**
+- `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` -- Added emission mode determination and `RenderBaseClassContent` method with all helpers
+- `src/KnockOff/Interceptors/MethodInterceptorBase.cs` -- Added `ElevateToSequenceBase()` method to `ReturnMethodCallBuilderBase` (needed for empty params array edge case)
+
+**Generated Code Sample (base class mode interceptor -- `DoSomethingInterceptor` from SampleKnockOff):**
+```csharp
+public sealed class DoSomethingInterceptor : global::KnockOff.Interceptors.VoidMethodInterceptorBase<global::System.Action, global::KnockOff.Unit>
+{
+    internal global::KnockOff.Tests.ISampleService? _source;
+    public DoSomethingInterceptor() : base("DoSomething") { }
+    protected override void InvokeVoidDelegate(global::System.Action del, global::KnockOff.Unit args) => del();
+    protected override void RecordArgs(global::KnockOff.Unit args, MethodCallBuilderBase tracking) { }
+    protected override void RecordUnconfiguredArgs(global::KnockOff.Unit args) { }
+    // ... Call(), Invoke(), Reset(), thin inner classes
+}
+```
+
+**Generated Code Sample (inline mode interceptor still works -- `GetOptionalInterceptor` uses base class mode with custom delegate qualification):**
+```csharp
+public sealed class GetOptionalInterceptor : global::KnockOff.Interceptors.MethodInterceptorBase<GetOptionalInterceptor.GetOptionalDelegate, global::KnockOff.Unit, string?>
+{
+    public delegate string? GetOptionalDelegate();
+    public GetOptionalInterceptor() : base("GetOptional") { }
+    protected override string? InvokeDelegate(GetOptionalDelegate del, global::KnockOff.Unit args) => del();
+    protected override GetOptionalDelegate CreateValueDelegate(string? value) => () => value;
+    // ... Return(), Invoke(), thin inner classes
+}
+```
+
+---
+
+## Architect Verification
+
+### Initial Verification (2026-02-13)
+
+**Verdict:** SENT BACK
+
+Two issues found:
+1. **MethodCallBuilderImpl missing IMethodTracking interface** -- base class mode builder did not implement KnockOff library interfaces, causing CS0029 in Benchmarks and anywhere user code stored builder as `IMethodTracking`.
+2. **LastSetValue nullable type for value types** -- `PropertyGetSetInterceptorBase<TValue>.LastSetValue` typed as `TValue?` which for value types resolves to non-nullable, breaking the `bool?` contract.
+
+### Re-Verification (2026-02-13)
+
+**Verdict:** VERIFIED
+
+Both issues have been fixed. Independent verification confirms all builds pass and all tests pass.
+
+#### Independent Build Results
+
+| Project | Result |
+|---------|--------|
+| `dotnet build src/KnockOff.sln` | 0 warnings, 0 errors |
+| `dotnet build src/Design/Design.Stubs` | 0 warnings, 0 errors |
+| `dotnet test src/Design/Design.Tests` | 0 warnings, 0 errors |
+
+#### Independent Test Results
+
+| Project | net8.0 | net9.0 | net10.0 |
+|---------|--------|--------|---------|
+| KnockOffTests | 1465 passed, 0 failed | 1465 passed, 0 failed | 1464 passed, 0 failed |
+| KnockOff.Documentation.Samples | 691 passed, 0 failed | 691 passed, 0 failed | 691 passed, 0 failed |
+| KnockOffTests.AssemblyStrict | 14 passed, 0 failed | 14 passed, 0 failed | 14 passed, 0 failed |
+| KnockOff.NeatooInterfaceTests | 473 passed, 0 failed | 473 passed, 0 failed | 473 passed, 0 failed |
+| Design.Tests | 370 passed, 0 failed | 370 passed, 0 failed | 370 passed, 0 failed |
+
+**Total: 7,928 tests passed, 0 failed across all projects and TFMs.**
+
+#### Fix 1 Verification: MethodCallBuilderImpl Interface Implementations
+
+Confirmed fixed. Generated base class mode `MethodCallBuilderImpl` now:
+- Declares the library interface on the class (e.g., `MethodCallBuilderImpl : ReturnMethodCallBuilderBase, IMethodReturnBuilderArgs<TDelegate, TArgs>`)
+- Includes explicit interface implementations for `IMethodTracking.Verifiable()`, `IMethodTracking.Verifiable(Called)`, `IMethodTrackingArgs<>.Verifiable()`, `IMethodTrackingArgs<>.Verifiable(Called)`, `IMethodReturnBuilderArgs<>.Verifiable()`, `IMethodReturnBuilderArgs<>.Verifiable(Called)`, `IMethodReturnBuilderArgs<>.ThenReturn()`
+- Same pattern for `MethodSequenceImpl` which implements `IMethodReturnSequence<TDelegate>` with explicit `ThenReturn()` and `Verifiable()` interface implementations
+- Void method builders implement `IMethodCallBuilder<Action>` with explicit interface implementations for `IMethodTracking.Verifiable()`, `IMethodCallBuilder<>.Verifiable()`, `IMethodCallBuilder<>.ThenCall()`
+
+Evidence files examined:
+- `src/Design/Design.Stubs/Generated/.../CalculatorStub.g.cs` -- non-void methods (Add, Subtract, Divide) and void method (Reset)
+- Benchmarks project builds successfully (was the original failure point)
+
+#### Fix 2 Verification: LastSetValue Nullable Type
+
+Confirmed fixed. Generated base class mode property interceptors now emit a `new LastSetValue` property with the correct nullable type using `model.NullableValueType`:
+
+| Property Type | Generated Code |
+|---------------|---------------|
+| `bool` (value type) | `public new bool? LastSetValue => TotalSetCount > 0 ? (bool?)base.LastSetValue : default;` |
+| `string` (reference type) | `public new string? LastSetValue => TotalSetCount > 0 ? (string?)base.LastSetValue : default;` |
+| `T` (generic type) | `public new T? LastSetValue => TotalSetCount > 0 ? (T?)base.LastSetValue : default;` |
+| `CommandType` (enum/value type) | `public new CommandType? LastSetValue => TotalSetCount > 0 ? (CommandType?)base.LastSetValue : default;` |
+| `int` (value type) | `public new int? LastSetValue => TotalSetCount > 0 ? (int?)base.LastSetValue : default;` |
+
+Evidence files examined:
+- `src/Design/Design.Stubs/Generated/.../StandaloneServiceStub.g.cs` (bool, string properties)
+- `src/Design/Design.Stubs/Generated/.../GenericStubOverridePropertyStub\`1.g.cs` (generic T property)
+- `src/Design/Design.Stubs/Generated/.../ProtectedMemberServiceStub.g.cs` (bool, string properties)
+- `src/Tests/KnockOffTests/Generated/.../DbCommandStubTests.Stubs.g.cs` (string, int, CommandType, IDbConnection)
+- `src/Tests/KnockOffTests/Generated/.../GenericRepositoryStub\`1.g.cs` (int property)
+- NeatooInterfaceTests project builds and passes (was the original failure point)
+
+#### Design Match
+
+The overall implementation matches the plan design:
+
+- Base class hierarchy: Matches plan (VoidMethodInterceptorBase, MethodInterceptorBase, PropertyGetInterceptorBase, PropertySetInterceptorBase, PropertyGetSetInterceptorBase, IndexerGetSetInterceptorBase)
+- Emission mode logic: Correct (inline for ref/out, ref return, async, overloads, init-only, multi-key indexers)
+- Generated code structure: Base class mode interceptors are structurally shorter with thin subclasses inheriting from library base classes
+- Inline fallback: Works correctly (async methods with `_callSimplified`/`_callSimplifiedVoid` remain fully inlined)
+- All 4 outer renderers (Flat, Inline, Class, StandaloneClass) route through modified shared renderers
+
+#### Generated Code Spot-Check
+
+| File | Pattern | Mode | Verified |
+|------|---------|------|----------|
+| `CalculatorStub.g.cs` (Design.Stubs) | Standalone | Base class | Inherits `MethodInterceptorBase<AddDelegate, (int a, int b), int>`, uses `RunPriorityChain`, `SetupReturnCallback`, thin `MethodCallBuilderImpl` with interface |
+| `CalculatorStub.Base.g.cs` (Design.Stubs) | Standalone | Base class | Stub override base class with `Add_`, `Subtract_`, `Divide_`, `Reset_` |
+| `AsyncServiceStub.g.cs` (Design.Stubs) | Standalone | Inline | Full inline code with `_callSimplified`, all fields, `TotalCallCount`, `Verify()` -- correctly stays inline for async |
+| `StandaloneServiceStub.g.cs` (Design.Stubs) | Standalone | Base class | `PropertyGetSetInterceptorBase<bool>` with `new LastSetValue` for value type |
+| `DbCommandStubTests.Stubs.g.cs` (KnockOffTests) | Inline Interface | Base class | Multiple property types with correct `new LastSetValue` nullable handling |
