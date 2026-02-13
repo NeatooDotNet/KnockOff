@@ -48,6 +48,9 @@ internal sealed record InterfaceInfo(
 	/// </summary>
 	EquatableArray<InterfaceHierarchyEntry> InterfaceHierarchy = default) : IEquatable<InterfaceInfo>
 {
+	/// <summary>True if this interface has any non-abstract (DIM) members.</summary>
+	public bool HasDimMembers => Members.Any(m => !m.IsAbstract) || Events.Any(e => !e.IsAbstract);
+
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.
 	/// </summary>
@@ -104,7 +107,12 @@ internal sealed record InterfaceMemberInfo(
 	/// <summary>
 	/// True if the member returns by ref readonly (ref readonly T).
 	/// </summary>
-	bool ReturnsByRefReadonly = false) : IEquatable<InterfaceMemberInfo>
+	bool ReturnsByRefReadonly = false,
+	/// <summary>
+	/// True if the member is abstract (has no default implementation).
+	/// False for Default Interface Method (DIM) members.
+	/// </summary>
+	bool IsAbstract = true) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -187,7 +195,8 @@ internal sealed record InterfaceMemberInfo(
 			IndexerTypeSuffix: indexerTypeSuffix,
 			IsInitOnly: isInitOnly,
 			ReturnsByRef: property.ReturnsByRef,
-			ReturnsByRefReadonly: property.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: property.ReturnsByRefReadonly,
+			IsAbstract: property.IsAbstract);
 	}
 
 	/// <summary>
@@ -269,7 +278,8 @@ internal sealed record InterfaceMemberInfo(
 			TypeParameters: typeParameters,
 			DeclaringInterfaceFullName: declaringInterfaceFullName,
 			ReturnsByRef: method.ReturnsByRef,
-			ReturnsByRefReadonly: method.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
+			IsAbstract: method.IsAbstract);
 	}
 }
 

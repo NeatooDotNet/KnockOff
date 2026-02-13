@@ -38,4 +38,8 @@ internal sealed record InlineInterfaceStubModel(
     /// <summary>All explicit interface implementations needed.</summary>
     EquatableArray<InlineInterfaceImplementation> Implementations,
     /// <summary>Source providers for Source(T) methods - one per interface in the hierarchy.</summary>
-    EquatableArray<SourceProviderInfo> SourceProviders);
+    EquatableArray<SourceProviderInfo> SourceProviders,
+    /// <summary>True if a DIM shim class should be generated.</summary>
+    bool HasDimShim = false,
+    /// <summary>Explicit implementations for the DIM shim class (abstract members only). Empty if no shim needed.</summary>
+    EquatableArray<InlineInterfaceImplementation> ShimImplementations = default);

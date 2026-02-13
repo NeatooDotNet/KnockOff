@@ -605,7 +605,18 @@ internal static class StandaloneClassModelBuilder
         // Build set of method-level type parameter names for filtering
         var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
 
-        var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+        // Determine if override needs #nullable disable because of unconstrained nullable type params
+        var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+        var needsNullableDisable = HasUnconstrainedNullableTypeParams(typeParams, member.ReturnType, paramArray);
+
+        var implReturnType = needsNullableDisable ? StripUnconstrainedNullableAnnotations(member.ReturnType, typeParams) : member.ReturnType;
+        var paramList = needsNullableDisable
+            ? string.Join(", ", member.Parameters.Select(p =>
+            {
+                var strippedType = StripUnconstrainedNullableAnnotations(p.Type, typeParams);
+                return $"{GetRefKindPrefix(p.RefKind)}{strippedType} {p.Name}";
+            }))
+            : string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
 
         // Non-generic parameters for RecordCall (exclude params typed with method-level type params)
@@ -647,7 +658,7 @@ internal static class StandaloneClassModelBuilder
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
             MethodName: member.Name,
-            ReturnType: member.ReturnType,
+            ReturnType: implReturnType,
             AccessModifier: member.AccessModifier,
             IsVoid: isVoid,
             IsTask: isTask,
@@ -665,7 +676,8 @@ internal static class StandaloneClassModelBuilder
             NonGenericArgList: nonGenericArgList,
             TaskTypeArg: taskTypeArg,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            NeedsNullableDisable: needsNullableDisable);
     }
 
     /// <summary>
@@ -720,19 +732,30 @@ internal static class StandaloneClassModelBuilder
                 ? $"typeof({typeParams[0].Name})"
                 : $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
 
-            // Build delegate signature (all params, not just non-generic)
-            var delegateReturnType = representative.ReturnType == "void" ? "void" : representative.ReturnType;
+            // Determine if delegate needs #nullable disable because of unconstrained nullable type params
             var allParams = representative.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+            var needsNullableDisable = HasUnconstrainedNullableTypeParams(typeParams, representative.ReturnType, allParams);
+
+            // Build delegate signature (all params, not just non-generic)
+            // Strip nullable annotations from unconstrained type params to avoid CS0453
+            var delegateReturnType = representative.ReturnType == "void" ? "void"
+                : needsNullableDisable ? StripUnconstrainedNullableAnnotations(representative.ReturnType, typeParams)
+                : representative.ReturnType;
             var delegateParams = new List<string>();
             foreach (var p in allParams)
             {
-                delegateParams.Add($"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}");
+                var pType = needsNullableDisable ? StripUnconstrainedNullableAnnotations(p.Type, typeParams) : p.Type;
+                delegateParams.Add($"{GetRefKindPrefix(p.RefKind)}{pType} {p.Name}");
             }
             var delegateParamList = string.Join(", ", delegateParams);
             var isVoid = representative.ReturnType == "void";
             var delegateSignature = isVoid
                 ? $"public delegate void {methodName}Delegate({delegateParamList});"
                 : $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+
+            var strippedReturnType = needsNullableDisable
+                ? StripUnconstrainedNullableAnnotations(representative.ReturnType, typeParams)
+                : representative.ReturnType;
 
             // LastCallArg/Args types
             string? lastCallArgType = null;
@@ -771,10 +794,11 @@ internal static class StandaloneClassModelBuilder
                 TypedHandlerClassName: typedHandlerClassName,
                 DelegateSignature: delegateSignature,
                 IsVoid: isVoid,
-                ReturnType: representative.ReturnType,
+                ReturnType: strippedReturnType,
                 NonGenericParameters: nonGenericParamModels,
                 LastCallArgType: lastCallArgType,
-                LastCallArgsType: lastCallArgsType));
+                LastCallArgsType: lastCallArgsType,
+                NeedsNullableDisable: needsNullableDisable));
         }
 
         return new InlineGenericMethodHandlerModel(
@@ -868,6 +892,56 @@ internal static class StandaloneClassModelBuilder
             }
         }
         return string.Join("", clauses);
+    }
+
+    /// <summary>
+    /// Returns true if the method has unconstrained type parameters that appear with nullable
+    /// annotations (T?) in the return type or parameters. These need special handling:
+    /// the ? must be stripped and nullable context disabled to avoid CS0453/CS8769.
+    /// </summary>
+    private static bool HasUnconstrainedNullableTypeParams(TypeParameterInfo[] typeParams, string returnType, ParameterInfo[] parameters)
+    {
+        foreach (var tp in typeParams)
+        {
+            if (tp.IsKnownReferenceType)
+                continue;
+
+            var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+            if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+                continue;
+
+            var nullableForm = $"{tp.Name}?";
+            if (returnType.Contains(nullableForm))
+                return true;
+            foreach (var p in parameters)
+            {
+                if (p.Type.Contains(nullableForm))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Strips nullable annotations (?) from unconstrained type parameter references.
+    /// For unconstrained T?, C# 9+ interprets this as Nullable&lt;T&gt; which is invalid (CS0453).
+    /// Stripping the ? and wrapping with #nullable disable avoids the error.
+    /// </summary>
+    private static string StripUnconstrainedNullableAnnotations(string typeString, TypeParameterInfo[] typeParams)
+    {
+        var result = typeString;
+        foreach (var tp in typeParams)
+        {
+            if (tp.IsKnownReferenceType)
+                continue;
+
+            var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+            if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+                continue;
+
+            result = result.Replace($"{tp.Name}?", tp.Name);
+        }
+        return result;
     }
 
     #endregion

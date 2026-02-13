@@ -204,6 +204,13 @@ internal static class FlatRenderer
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
+
+			// DIM shim class (if any interface has DIM members)
+			if (unit.HasDimShim)
+			{
+				w.Line();
+				RenderFlatDimShimClass(w, unit);
+			}
 		}
 
 		// Close containing type wrappers for nested classes
@@ -1500,6 +1507,105 @@ internal static class FlatRenderer
 
 	#endregion
 
+	#region DIM Shim Rendering
+
+	private static void RenderFlatDimShimClass(CodeWriter w, FlatGenerationUnit unit)
+	{
+		var typeParams = FormatTypeParameters(unit.TypeParameters);
+		var constraints = FormatConstraints(unit.TypeParameters);
+		var interfaces = string.Join(", ", unit.DimInterfaceNames);
+		w.Line($"private sealed class __DimShim{typeParams} : {interfaces}{constraints}");
+		w.Line("{");
+
+		var primaryInterface = unit.InterfaceList.GetArray()![0];
+		w.Line($"\tprivate readonly {primaryInterface} _stub;");
+		w.Line($"\tinternal __DimShim({primaryInterface} stub) => _stub = stub;");
+
+		// Render delegation implementations for abstract members only
+		foreach (var shimInfo in unit.DimShimInfos)
+		{
+			foreach (var prop in shimInfo.Properties)
+				RenderShimPropertyDelegation(w, prop);
+			foreach (var indexer in shimInfo.Indexers)
+				RenderShimIndexerDelegation(w, indexer);
+			foreach (var method in shimInfo.Methods)
+				RenderShimMethodDelegation(w, method);
+			foreach (var evt in shimInfo.Events)
+				RenderShimEventDelegation(w, evt);
+		}
+
+		w.Line("}");
+	}
+
+	private static void RenderShimPropertyDelegation(CodeWriter w, FlatDimShimPropertyMember prop)
+	{
+		var refPrefix = prop.ReturnsByRef ? "ref " : prop.ReturnsByRefReadonly ? "ref readonly " : "";
+		var stubCast = $"(({prop.InterfaceFullName})_stub)";
+		w.Line();
+		w.Line($"{refPrefix}{prop.ReturnType} {prop.InterfaceFullName}.{prop.Name}");
+		w.Line("{");
+		if (prop.HasGetter)
+			w.Line($"\tget => {stubCast}.{prop.Name};");
+		if (prop.HasSetter)
+		{
+			var setterKeyword = prop.IsInitOnly ? "init" : "set";
+			w.Line($"\t{setterKeyword} => {stubCast}.{prop.Name} = value;");
+		}
+		w.Line("}");
+	}
+
+	private static void RenderShimIndexerDelegation(CodeWriter w, FlatDimShimIndexerMember indexer)
+	{
+		var refPrefix = indexer.ReturnsByRef ? "ref " : indexer.ReturnsByRefReadonly ? "ref readonly " : "";
+		var stubCast = $"(({indexer.InterfaceFullName})_stub)";
+		w.Line();
+		w.Line($"{refPrefix}{indexer.ReturnType} {indexer.InterfaceFullName}.this[{indexer.ParameterDeclarations}]");
+		w.Line("{");
+		if (indexer.HasGetter)
+			w.Line($"\tget => {stubCast}[{indexer.ArgumentList}];");
+		if (indexer.HasSetter)
+		{
+			var setterKeyword = indexer.IsInitOnly ? "init" : "set";
+			w.Line($"\t{setterKeyword} {{ {stubCast}[{indexer.ArgumentList}] = value; }}");
+		}
+		w.Line("}");
+	}
+
+	private static void RenderShimMethodDelegation(CodeWriter w, FlatDimShimMethodMember method)
+	{
+		var stubCast = $"(({method.InterfaceFullName})_stub)";
+		w.Line();
+		if (method.IsGenericMethod)
+		{
+			var returnKw = method.IsVoid ? "" : "return ";
+			w.Line($"{method.ReturnType} {method.InterfaceFullName}.{method.Name}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
+			w.Line($"\t=> {returnKw}{stubCast}.{method.Name}{method.TypeParameterDecl}({method.ArgumentList});");
+		}
+		else if (method.IsVoid)
+		{
+			w.Line($"void {method.InterfaceFullName}.{method.Name}({method.ParameterDeclarations})");
+			w.Line($"\t=> {stubCast}.{method.Name}({method.ArgumentList});");
+		}
+		else
+		{
+			w.Line($"{method.ReturnType} {method.InterfaceFullName}.{method.Name}({method.ParameterDeclarations})");
+			w.Line($"\t=> {stubCast}.{method.Name}({method.ArgumentList});");
+		}
+	}
+
+	private static void RenderShimEventDelegation(CodeWriter w, FlatDimShimEventMember evt)
+	{
+		var stubCast = $"(({evt.InterfaceFullName})_stub)";
+		w.Line();
+		w.Line($"event {evt.DelegateType}? {evt.InterfaceFullName}.{evt.Name}");
+		w.Line("{");
+		w.Line($"\tadd => {stubCast}.{evt.Name} += value;");
+		w.Line($"\tremove => {stubCast}.{evt.Name} -= value;");
+		w.Line("}");
+	}
+
+	#endregion
+
 	#region Standard Members
 
 	private static void RenderStandardMembers(CodeWriter w, FlatGenerationUnit unit)
@@ -1509,6 +1615,21 @@ internal static class FlatRenderer
 		w.Line("/// <summary>When true, throws StubException for unconfigured member access.</summary>");
 		w.Line($"public bool Strict {{ get; set; }} = {strictDefault};");
 		w.Line();
+
+		// Constructor (only when DIM shim needs wiring)
+		if (unit.HasDimShim)
+		{
+			var shimTypeParams = FormatTypeParameters(unit.TypeParameters);
+			w.Line($"public {unit.ClassName}()");
+			w.Line("{");
+			w.Line($"\tvar __shim = new __DimShim{shimTypeParams}(this);");
+			foreach (var name in unit.DimInterceptorNames)
+			{
+				w.Line($"\t{name}._source = __shim;");
+			}
+			w.Line("}");
+			w.Line();
+		}
 
 		// Object accessor - returns the first interface type
 		var typeParams = FormatTypeParameters(unit.TypeParameters);

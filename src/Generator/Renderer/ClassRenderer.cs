@@ -459,9 +459,13 @@ internal static class ClassRenderer
         w.Line($"{indent}public sealed class {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{arity.ConstraintClauses}");
         w.Line($"{indent}{{");
 
-        // Delegate
+        // Delegate — wrap with #nullable disable for unconstrained nullable type params (CS0453)
+        if (arity.NeedsNullableDisable)
+            w.Line("#nullable disable");
         w.Line($"{indent1}/// <summary>Delegate for {methodName}.</summary>");
         w.Line($"{indent1}{arity.DelegateSignature}");
+        if (arity.NeedsNullableDisable)
+            w.Line("#nullable restore");
         w.Line();
 
         // Private callback field
@@ -1058,6 +1062,12 @@ internal static class ClassRenderer
     /// </summary>
     internal static void RenderImplGenericMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        // For methods with unconstrained nullable type parameters (T? without where T : class),
+        // we must disable nullable context. Without this, the compiler interprets T? as Nullable<T>
+        // (CS0453) or reports nullability mismatch (CS8769).
+        if (method.NeedsNullableDisable)
+            w.Line("#nullable disable");
+
         w.Line($"{indent}/// <inheritdoc />");
         // NOTE: No constraint clauses on override -- C# inherits them from the base method.
         w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations})");
@@ -1153,6 +1163,9 @@ internal static class ClassRenderer
         }
 
         w.Line($"{indent}}}");
+
+        if (method.NeedsNullableDisable)
+            w.Line("#nullable restore");
         w.Line();
     }
 

@@ -80,6 +80,131 @@ internal static class FlatModelBuilder
 		// Build generic stub override handler groups (for overloaded generic stub overrides)
 		var genericStubOverrideHandlerGroups = BuildGenericStubOverrideHandlerGroups(methods, nameMap);
 
+		// Compute DIM shim information
+		var hasDimShim = typeInfo.Interfaces.Any(i => i.HasDimMembers);
+		var dimShimInfos = new List<FlatDimShimInfo>();
+		var dimInterceptorNames = new List<string>();
+		var dimInterfaceNames = new List<string>();
+		if (hasDimShim)
+		{
+			// Track generated shim implementations to avoid duplicates from diamond inheritance
+			var generatedShimProps = new HashSet<string>();
+			var generatedShimIndexers = new HashSet<string>();
+			var generatedShimMethods = new HashSet<string>();
+			var generatedShimEvents = new HashSet<string>();
+
+			// Single shim implements all DIM interfaces, so collect all abstract members across all interfaces
+			var allShimProps = new List<FlatDimShimPropertyMember>();
+			var allShimIndexers = new List<FlatDimShimIndexerMember>();
+			var allShimMethods = new List<FlatDimShimMethodMember>();
+			var allShimEvents = new List<FlatDimShimEventMember>();
+
+			foreach (var iface in typeInfo.Interfaces.Where(i => i.HasDimMembers))
+			{
+				dimInterfaceNames.Add(iface.FullName);
+
+				foreach (var member in iface.Members.Where(m => m.IsAbstract))
+				{
+					if (member.IsProperty && !member.IsIndexer)
+					{
+						var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}";
+						if (generatedShimProps.Add(implKey))
+						{
+							allShimProps.Add(new FlatDimShimPropertyMember(
+								InterfaceFullName: member.DeclaringInterfaceFullName,
+								Name: member.Name,
+								ReturnType: member.ReturnType,
+								HasGetter: member.HasGetter,
+								HasSetter: member.HasSetter,
+								IsInitOnly: member.IsInitOnly,
+								ReturnsByRef: member.ReturnsByRef,
+								ReturnsByRefReadonly: member.ReturnsByRefReadonly));
+						}
+					}
+					else if (member.IsIndexer)
+					{
+						var paramTypes = member.IndexerParameters.Select(p => p.Type);
+						var implKey = $"{member.DeclaringInterfaceFullName}.this[{string.Join(",", paramTypes)}]";
+						if (generatedShimIndexers.Add(implKey))
+						{
+							var paramDecls = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
+							var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
+							allShimIndexers.Add(new FlatDimShimIndexerMember(
+								InterfaceFullName: member.DeclaringInterfaceFullName,
+								ReturnType: member.ReturnType,
+								ParameterDeclarations: paramDecls,
+								ArgumentList: argList,
+								HasGetter: member.HasGetter,
+								HasSetter: member.HasSetter,
+								IsInitOnly: member.IsInitOnly,
+								ReturnsByRef: member.ReturnsByRef,
+								ReturnsByRefReadonly: member.ReturnsByRefReadonly));
+						}
+					}
+					else
+					{
+						var paramTypeList = member.Parameters.Select(p => p.Type);
+						var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}({string.Join(",", paramTypeList)})";
+						if (generatedShimMethods.Add(implKey))
+						{
+							var paramDecls = string.Join(", ", member.Parameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {EscapeIdentifier(p.Name)}"));
+							var argList = string.Join(", ", member.Parameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{EscapeIdentifier(p.Name)}"));
+							var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+							var typeParamDecl = tpArray.Length > 0 ? $"<{string.Join(", ", tpArray.Select(tp => tp.Name))}>" : "";
+							var constraintClauses = tpArray.Length > 0 ? GetConstraintClauses(tpArray) : "";
+							allShimMethods.Add(new FlatDimShimMethodMember(
+								InterfaceFullName: member.DeclaringInterfaceFullName,
+								Name: member.Name,
+								ReturnType: member.ReturnType,
+								IsVoid: member.ReturnType == "void",
+								ParameterDeclarations: paramDecls,
+								ArgumentList: argList,
+								IsGenericMethod: member.IsGenericMethod,
+								TypeParameterDecl: typeParamDecl,
+								ConstraintClauses: constraintClauses));
+						}
+					}
+				}
+
+				foreach (var evt in iface.Events.Where(e => e.IsAbstract))
+				{
+					var implKey = $"{evt.DeclaringInterfaceFullName}.{evt.Name}";
+					if (generatedShimEvents.Add(implKey))
+					{
+						var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+						allShimEvents.Add(new FlatDimShimEventMember(
+							InterfaceFullName: evt.DeclaringInterfaceFullName,
+							Name: evt.Name,
+							DelegateType: delegateType));
+					}
+				}
+
+				// Collect DIM interceptor names (for non-abstract members)
+				foreach (var member in iface.Members.Where(m => !m.IsAbstract))
+				{
+					var key = GetMemberKey(member);
+					if (nameMap.TryGetValue(key, out var interceptorName))
+					{
+						dimInterceptorNames.Add(interceptorName);
+					}
+				}
+			}
+
+			// Create a single shim info entry covering all DIM interfaces
+			// The shim class implements all interfaces that have DIM members
+			if (allShimProps.Count > 0 || allShimIndexers.Count > 0 || allShimMethods.Count > 0 || allShimEvents.Count > 0)
+			{
+				// Use the first DIM interface's full name as a placeholder; the renderer uses DimShimInfos for member rendering
+				// but gets the interface list from all DIM interfaces
+				dimShimInfos.Add(new FlatDimShimInfo(
+					InterfaceFullName: "",  // Not used for rendering the class declaration
+					Properties: allShimProps.ToEquatableArray(),
+					Indexers: allShimIndexers.ToEquatableArray(),
+					Methods: allShimMethods.ToEquatableArray(),
+					Events: allShimEvents.ToEquatableArray()));
+			}
+		}
+
 		return new FlatGenerationUnit(
 			ClassName: typeInfo.ClassName,
 			Namespace: typeInfo.Namespace,
@@ -97,7 +222,11 @@ internal static class FlatModelBuilder
 			SourceProviders: sourceProviders,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
 			ImplementsIKnockOffStub: true,
-			Strict: typeInfo.Strict);
+			Strict: typeInfo.Strict,
+			HasDimShim: hasDimShim,
+			DimInterfaceNames: dimInterfaceNames.Distinct().ToEquatableArray(),
+			DimInterceptorNames: dimInterceptorNames.Distinct().ToEquatableArray(),
+			DimShimInfos: dimShimInfos.ToEquatableArray());
 	}
 
 	#region Name Map Building

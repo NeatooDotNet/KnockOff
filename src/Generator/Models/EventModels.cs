@@ -13,7 +13,11 @@ internal sealed record EventMemberInfo(
 	string? ReturnTypeName,
 	bool IsAsync,
 	string DeclaringInterfaceFullName,
-	string AccessModifier = "public") : IEquatable<EventMemberInfo>
+	string AccessModifier = "public",
+	/// <summary>
+	/// True if the event is abstract. False for events with default add/remove handlers (DIM events).
+	/// </summary>
+	bool IsAbstract = true) : IEquatable<EventMemberInfo>
 {
 	/// <summary>
 	/// Creates an EventMemberInfo from an event symbol.
@@ -43,7 +47,8 @@ internal sealed record EventMemberInfo(
 				ReturnTypeName: null,
 				IsAsync: false,
 				DeclaringInterfaceFullName: declaringInterfaceFullName,
-				AccessModifier: accessModifier);
+				AccessModifier: accessModifier,
+				IsAbstract: eventSymbol.IsAbstract);
 		}
 
 		var delegateKind = SymbolHelpers.ClassifyDelegateKind(delegateType);
@@ -64,7 +69,8 @@ internal sealed record EventMemberInfo(
 			ReturnTypeName: returnType,
 			IsAsync: isAsync,
 			DeclaringInterfaceFullName: declaringInterfaceFullName,
-			AccessModifier: accessModifier);
+			AccessModifier: accessModifier,
+			IsAbstract: eventSymbol.IsAbstract);
 	}
 }
 

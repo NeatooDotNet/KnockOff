@@ -205,6 +205,19 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic {iface.StubClassName}(bool strict = {strictDefault})");
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tStrict = strict;");
+        if (iface.HasDimShim)
+        {
+            var shimTypeParams = FormatTypeParameterList(iface.TypeParameters);
+            w.Line($"\t\t\t\tvar __shim = new __DimShim{shimTypeParams}(this);");
+            var emitted = new HashSet<string>();
+            foreach (var impl in iface.Implementations)
+            {
+                if (!impl.IsAbstract && emitted.Add(impl.InterceptorName) && !string.IsNullOrEmpty(impl.InterceptorName))
+                {
+                    w.Line($"\t\t\t\t{impl.InterceptorName}._source = __shim;");
+                }
+            }
+        }
         w.Line("\t\t\t}");
         w.Line();
 
@@ -219,6 +232,13 @@ internal static class InlineRenderer
 
         // Verify and VerifyAll methods
         RenderInlineVerifyMethods(w, iface);
+
+        // DIM Shim class (if interface has DIM members)
+        if (iface.HasDimShim)
+        {
+            w.Line();
+            RenderDimShimClass(w, iface);
+        }
 
         w.Line("\t\t}");
         w.Line();
@@ -1254,6 +1274,97 @@ internal static class InlineRenderer
 
             w.Line("\t\t\t}");
             w.Line();
+        }
+    }
+
+    #endregion
+
+    #region DIM Shim Rendering
+
+    private static void RenderDimShimClass(CodeWriter w, InlineInterfaceStubModel iface)
+    {
+        var typeParams = FormatTypeParameterList(iface.TypeParameters);
+        var constraints = FormatConstraints(iface.TypeParameters);
+        w.Line($"\t\t\tprivate sealed class __DimShim{typeParams} : {iface.BaseType}{constraints}");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {iface.BaseType} _stub;");
+        w.Line($"\t\t\t\tinternal __DimShim({iface.BaseType} stub) {{ _stub = stub; }}");
+
+        // Render explicit implementations for ABSTRACT members only
+        foreach (var impl in iface.ShimImplementations)
+        {
+            w.Line();
+            RenderShimImplementation(w, impl);
+        }
+
+        w.Line("\t\t\t}");
+    }
+
+    private static void RenderShimImplementation(CodeWriter w, InlineInterfaceImplementation impl)
+    {
+        // The shim delegates to _stub via explicit interface cast to ensure the correct
+        // explicit implementation on the stub is called. This avoids type mismatches when
+        // the interface hierarchy has properties with different types across interfaces.
+        var stubCast = $"(({impl.InterfaceFullName})_stub)";
+
+        switch (impl.Kind)
+        {
+            case InlineMemberKind.Property:
+                // Property: delegate getter/setter to _stub via explicit interface cast
+                w.Line($"\t\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}");
+                w.Line("\t\t\t\t{");
+                if (impl.HasGetter)
+                    w.Line($"\t\t\t\t\tget => {stubCast}.{impl.MemberName};");
+                if (impl.HasSetter)
+                {
+                    var setterKeyword = impl.IsInitOnly ? "init" : "set";
+                    w.Line($"\t\t\t\t\t{setterKeyword} => {stubCast}.{impl.MemberName} = value;");
+                }
+                w.Line("\t\t\t\t}");
+                break;
+
+            case InlineMemberKind.Indexer:
+                // Indexer: delegate to _stub[args] via explicit interface cast
+                w.Line($"\t\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.this[{impl.ParameterDeclarations}]");
+                w.Line("\t\t\t\t{");
+                if (impl.HasGetter)
+                    w.Line($"\t\t\t\t\tget => {stubCast}[{impl.ArgumentList}];");
+                if (impl.HasSetter)
+                {
+                    var setterKeyword = impl.IsInitOnly ? "init" : "set";
+                    w.Line($"\t\t\t\t\t{setterKeyword} {{ {stubCast}[{impl.ArgumentList}] = value; }}");
+                }
+                w.Line("\t\t\t\t}");
+                break;
+
+            case InlineMemberKind.Method:
+                // Method: delegate to _stub.Method(args) via explicit interface cast
+                if (impl.IsGenericMethod)
+                {
+                    var returnKw = impl.IsVoid ? "" : "return ";
+                    w.Line($"\t\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}{impl.TypeParameterDecl}({impl.ParameterDeclarations}){impl.ConstraintClauses}");
+                    w.Line($"\t\t\t\t\t=> {returnKw}{stubCast}.{impl.MemberName}{impl.TypeParameterDecl}({impl.ArgumentList});");
+                }
+                else if (impl.IsVoid)
+                {
+                    w.Line($"\t\t\t\tvoid {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
+                    w.Line($"\t\t\t\t\t=> {stubCast}.{impl.MemberName}({impl.ArgumentList});");
+                }
+                else
+                {
+                    w.Line($"\t\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
+                    w.Line($"\t\t\t\t\t=> {stubCast}.{impl.MemberName}({impl.ArgumentList});");
+                }
+                break;
+
+            case InlineMemberKind.Event:
+                // Event: delegate add/remove to _stub via explicit interface cast
+                w.Line($"\t\t\t\tevent {impl.ReturnType}? {impl.InterfaceFullName}.{impl.MemberName}");
+                w.Line("\t\t\t\t{");
+                w.Line($"\t\t\t\t\tadd => {stubCast}.{impl.MemberName} += value;");
+                w.Line($"\t\t\t\t\tremove => {stubCast}.{impl.MemberName} -= value;");
+                w.Line("\t\t\t\t}");
+                break;
         }
     }
 

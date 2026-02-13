@@ -33,4 +33,8 @@ internal sealed record InlineGenericTypeArityGroup(
     /// <summary>LastCallArg type (for single non-generic param) or null.</summary>
     string? LastCallArgType,
     /// <summary>LastCallArgs tuple type (for multiple non-generic params) or null.</summary>
-    string? LastCallArgsType) : IEquatable<InlineGenericTypeArityGroup>;
+    string? LastCallArgsType,
+    /// <summary>Whether the delegate signature needs #nullable disable because of unconstrained nullable type parameters.
+    /// When true, the renderer wraps the delegate declaration with #nullable disable/restore and the
+    /// DelegateSignature/ReturnType have already been stripped of ? on unconstrained type params.</summary>
+    bool NeedsNullableDisable = false) : IEquatable<InlineGenericTypeArityGroup>;

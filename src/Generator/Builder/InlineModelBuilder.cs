@@ -213,6 +213,12 @@ internal static class InlineModelBuilder
         // Build source providers for Source(T) methods
         var sourceProviders = BuildSourceProviders(iface, properties, indexers, methods, methodGroups, stubClassName, typeParamList);
 
+        // Compute DIM shim data: filter implementations to abstract-only for the shim class.
+        var hasDimMembers = iface.HasDimMembers;
+        var shimImplementations = hasDimMembers
+            ? implementations.Where(i => i.IsAbstract).ToEquatableArray()
+            : EquatableArray<InlineInterfaceImplementation>.Empty;
+
         return new InlineInterfaceStubModel(
             StubClassName: stubClassName,
             InterfaceFullName: iface.FullName,
@@ -228,7 +234,9 @@ internal static class InlineModelBuilder
             Events: events.ToEquatableArray(),
             InterceptorProperties: interceptorProperties,
             Implementations: implementations,
-            SourceProviders: sourceProviders);
+            SourceProviders: sourceProviders,
+            HasDimShim: hasDimMembers,
+            ShimImplementations: shimImplementations);
     }
 
     private static InlinePropertyModel BuildPropertyModel(
@@ -790,7 +798,8 @@ internal static class InlineModelBuilder
             DelegationTarget: delegation,
             OutParameterInitializations: EquatableArray<string>.Empty,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsAbstract: member.IsAbstract);
     }
 
     private static InlineInterfaceImplementation BuildIndexerImplementation(
@@ -854,7 +863,8 @@ internal static class InlineModelBuilder
             DelegationTarget: null,
             OutParameterInitializations: EquatableArray<string>.Empty,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsAbstract: member.IsAbstract);
     }
 
     private static InlineInterfaceImplementation BuildMethodImplementation(
@@ -946,7 +956,8 @@ internal static class InlineModelBuilder
             DelegationTarget: null,
             OutParameterInitializations: outParamInits,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsAbstract: member.IsAbstract);
     }
 
     private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads)
@@ -1040,7 +1051,8 @@ internal static class InlineModelBuilder
             OutParameterInitializations: outParamInits,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            NeedsNullableDisable: needsNullableDisable);
+            NeedsNullableDisable: needsNullableDisable,
+            IsAbstract: member.IsAbstract);
     }
 
     private static InlineInterfaceImplementation BuildMethodDelegationImplementation(
@@ -1105,7 +1117,8 @@ internal static class InlineModelBuilder
             DelegationTarget: delegation,
             OutParameterInitializations: EquatableArray<string>.Empty,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsAbstract: true);
     }
 
     private static InlineInterfaceImplementation BuildEventImplementation(
@@ -1143,7 +1156,8 @@ internal static class InlineModelBuilder
             IsGenericMethod: false,
             KeyArg: null,
             DelegationTarget: null,
-            OutParameterInitializations: EquatableArray<string>.Empty);
+            OutParameterInitializations: EquatableArray<string>.Empty,
+            IsAbstract: evt.IsAbstract);
     }
 
     #endregion

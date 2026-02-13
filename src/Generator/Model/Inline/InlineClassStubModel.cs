@@ -342,7 +342,10 @@ internal sealed record InlineClassImplMethodModel(
     /// <summary>True if the method returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>Whether the override method needs #nullable disable because of unconstrained nullable type parameters.
+    /// When true, ReturnType and ParameterDeclarations have already been stripped of ? on unconstrained type params.</summary>
+    bool NeedsNullableDisable = false)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

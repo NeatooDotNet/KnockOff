@@ -78,7 +78,9 @@ internal sealed record InlineInterfaceImplementation(
     /// pragmas because it has unconstrained nullable type parameters (T? without where T : class).
     /// The ReturnType and ParameterDeclarations will have ? stripped from these type parameters.
     /// </summary>
-    bool NeedsNullableDisable = false)
+    bool NeedsNullableDisable = false,
+    /// <summary>True if the member is abstract. False for DIM members.</summary>
+    bool IsAbstract = true)
 {
     /// <summary>True if the member returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

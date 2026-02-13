@@ -29,4 +29,12 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<SourceProviderInfo> SourceProviders,
     bool HasGenericMethods,
     bool ImplementsIKnockOffStub,
-    bool Strict);
+    bool Strict,
+    /// <summary>True if any interface has DIM members requiring a shim class.</summary>
+    bool HasDimShim = false,
+    /// <summary>Fully qualified names of interfaces that have DIM members (for shim class declaration).</summary>
+    EquatableArray<string> DimInterfaceNames = default,
+    /// <summary>DIM member interceptor names that need _source wired to the shim in the constructor.</summary>
+    EquatableArray<string> DimInterceptorNames = default,
+    /// <summary>Shim data for each interface that has DIM members. Contains abstract-only member info for shim generation.</summary>
+    EquatableArray<FlatDimShimInfo> DimShimInfos = default);
