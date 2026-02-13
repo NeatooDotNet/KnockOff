@@ -522,9 +522,8 @@ internal static class MethodInterceptorRenderer
 		RenderBaseClassResetMethod(w, model.LastArgType, model.LastArgsType,
 			hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
 
-		// Thin inner classes
+		// Thin inner classes (builder only -- sequence is handled by base class)
 		RenderBaseClassMethodCallBuilderImpl(w, model, fullInterceptorClassName, delegateType, tArgs);
-		RenderBaseClassMethodSequenceImpl(w, model, fullInterceptorClassName, delegateType, tArgs);
 
 		if (canHaveWhenChain)
 		{
@@ -702,7 +701,7 @@ internal static class MethodInterceptorRenderer
 			// Return(first, params rest) - creates sequence from multiple values
 			var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
 			w.Line($"/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>");
-			w.Line($"public MethodSequenceImpl Return({valueStorageType} first, params {valueStorageType}[] rest)");
+			w.Line($"public ReturnMethodSequenceBase Return({valueStorageType} first, params {valueStorageType}[] rest)");
 			using (w.Braces())
 			{
 				w.Line($"var builder = Return({discardPrefix} => first);");
@@ -715,7 +714,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("for (int i = 1; i < rest.Length; i++)");
 				using (w.Braces())
 				{
-					w.Line("seq = seq.ThenReturn(rest[i]);");
+					w.Line("seq.ThenReturn(rest[i]);");
 				}
 				w.Line("return seq;");
 			}
@@ -1063,14 +1062,21 @@ internal static class MethodInterceptorRenderer
 			// ThenReturn / ThenCall
 			var thenChainName = model.IsVoid ? "ThenCall" : "ThenReturn";
 			w.Line($"/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>");
-			w.Line($"public MethodSequenceImpl {thenChainName}({delegateType} callback)");
-			using (w.Braces())
+			if (model.IsVoid)
 			{
-				if (model.IsVoid)
-					w.Line("ThenCallBase(callback);");
-				else
-					w.Line("ThenReturnBase(callback);");
-				w.Line("return new MethodSequenceImpl(_typedInterceptor);");
+				w.Line($"public MethodSequenceBase {thenChainName}({delegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line("return ThenCallBase(callback);");
+				}
+			}
+			else
+			{
+				w.Line($"public ReturnMethodSequenceBase {thenChainName}({delegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line("return ThenReturnBase(callback);");
+				}
 			}
 			w.Line();
 
@@ -1080,23 +1086,19 @@ internal static class MethodInterceptorRenderer
 				var (valueType, _, _) = GetAsyncTypeInfo(model.ReturnType);
 				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
 				w.Line($"/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>");
-				w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
+				w.Line($"public ReturnMethodSequenceBase ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
 				w.Line();
 
 				// ThenReturn(params values)
 				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
-				w.Line($"public MethodSequenceImpl ThenReturn(params {valueType}[] values)");
+				w.Line($"public ReturnMethodSequenceBase ThenReturn(params {valueType}[] values)");
 				using (w.Braces())
 				{
-					w.Line("if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }");
+					w.Line("if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }");
 					w.Line("var seq = ThenReturn(values[0]);");
-					w.Line("for (int i = 1; i < values.Length; i++) seq = seq.ThenReturn(values[i]);");
+					w.Line("for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);");
 					w.Line("return seq;");
 				}
-				w.Line();
-
-				// CreateValueDelegate helper - access through _typedInterceptor
-				w.Line($"private {delegateType} CreateValueDelegate({valueType} value) => _typedInterceptor.CreateValueDelegate(value);");
 				w.Line();
 			}
 

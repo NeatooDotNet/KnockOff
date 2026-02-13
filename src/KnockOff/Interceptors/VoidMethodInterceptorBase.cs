@@ -432,7 +432,7 @@ public abstract class VoidMethodInterceptorBase<TDelegate, TArgs> where TDelegat
             }
             var nextBuilder = CreateNextBuilder();
             _interceptor._sequence.Add((callback, nextBuilder));
-            return new MethodSequenceBase(_interceptor);
+            return new MethodSequenceBase(_interceptor, CreateNextBuilder);
         }
 
         /// <summary>Creates a new builder instance for sequence entries. Override to return typed builder.</summary>
@@ -460,14 +460,21 @@ public abstract class VoidMethodInterceptorBase<TDelegate, TArgs> where TDelegat
     // Inner class: MethodSequenceBase
     // ========================================================================
 
-    /// <summary>Base class for method sequences. Supports ThenCall chaining, verification.</summary>
-    public class MethodSequenceBase
+    /// <summary>Sequence for void method callbacks. Implements IMethodCallSequence directly.</summary>
+    public class MethodSequenceBase : IMethodCallSequence<TDelegate>, IMethodCallSequence, IMethodSequence
     {
         protected readonly VoidMethodInterceptorBase<TDelegate, TArgs> _interceptor;
+        private readonly Func<MethodCallBuilderBase>? _builderFactory;
 
         public MethodSequenceBase(VoidMethodInterceptorBase<TDelegate, TArgs> interceptor)
         {
             _interceptor = interceptor;
+        }
+
+        public MethodSequenceBase(VoidMethodInterceptorBase<TDelegate, TArgs> interceptor, Func<MethodCallBuilderBase> builderFactory)
+        {
+            _interceptor = interceptor;
+            _builderFactory = builderFactory;
         }
 
         protected int SequenceTotalCallCount
@@ -483,9 +490,9 @@ public abstract class VoidMethodInterceptorBase<TDelegate, TArgs> where TDelegat
         }
 
         /// <summary>Adds another callback to the sequence.</summary>
-        protected MethodSequenceBase ThenCallBase(TDelegate callback)
+        public MethodSequenceBase ThenCall(TDelegate callback)
         {
-            var tracking = CreateNextBuilder();
+            var tracking = _builderFactory != null ? _builderFactory() : CreateNextBuilder();
             _interceptor._sequence!.Add((callback, tracking));
             return this;
         }
@@ -516,10 +523,11 @@ public abstract class VoidMethodInterceptorBase<TDelegate, TArgs> where TDelegat
         public void Reset() => _interceptor.Reset();
 
         /// <summary>Marks this sequence for verification by Stub.Verify().</summary>
-        public void VerifiableBase()
+        public MethodSequenceBase Verifiable()
         {
             _interceptor._isVerifiable = true;
             _interceptor._verifiableTimes = null;
+            return this;
         }
 
         /// <summary>Terminates sequence with default instead of repeating last value.</summary>
@@ -527,5 +535,10 @@ public abstract class VoidMethodInterceptorBase<TDelegate, TArgs> where TDelegat
         {
             _interceptor._repeatLastValue = false;
         }
+
+        // Explicit interface implementations for covariant return types
+        IMethodCallSequence<TDelegate> IMethodCallSequence<TDelegate>.ThenCall(TDelegate callback) => ThenCall(callback);
+        IMethodCallSequence<TDelegate> IMethodCallSequence<TDelegate>.Verifiable() => Verifiable();
+        IMethodSequence IMethodSequence.Verifiable() => Verifiable();
     }
 }

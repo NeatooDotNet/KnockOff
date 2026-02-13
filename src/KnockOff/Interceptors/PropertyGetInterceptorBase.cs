@@ -43,7 +43,7 @@ public abstract class PropertyGetInterceptorBase<TValue>
     // --- Public Get configuration API ---
 
     /// <summary>Configures the getter to invoke the given callback.</summary>
-    public PropertyGetBuilderBase Get(Func<TValue> callback)
+    public IPropertyGetBuilder<TValue> Get(Func<TValue> callback)
     {
         _getSequence = null; _getSequenceIndex = 0;
         _isGetVerifiable = false; _getVerifiableTimes = null;
@@ -54,7 +54,7 @@ public abstract class PropertyGetInterceptorBase<TValue>
     }
 
     /// <summary>Configures the getter to return the given value.</summary>
-    public PropertyGetBuilderBase Get(TValue value) => Get(() => value);
+    public IPropertyGetBuilder<TValue> Get(TValue value) => Get(() => value);
 
     // --- Stub override helpers (structural -- all in base class) ---
 
@@ -176,7 +176,7 @@ public abstract class PropertyGetInterceptorBase<TValue>
     // Inner class: PropertyGetBuilderBase
     // ========================================================================
 
-    public class PropertyGetBuilderBase
+    public class PropertyGetBuilderBase : IPropertyGetBuilder<TValue>, IPropertyGetTracking
     {
         protected readonly PropertyGetInterceptorBase<TValue> _interceptor;
 
@@ -190,13 +190,13 @@ public abstract class PropertyGetInterceptorBase<TValue>
         public void Reset() => _callCount = 0;
 
         public void Verify() => Verify(Called.AtLeastOnce);
-        public void Verify(Called times)
+        public void Verify(Called called)
         {
-            if (!times.Validate(_callCount))
-                throw new VerificationException(new VerificationFailure("property getter", times, _callCount));
+            if (!called.Validate(_callCount))
+                throw new VerificationException(new VerificationFailure("property getter", called, _callCount));
         }
 
-        protected PropertyGetSequenceBase ThenGetBase(Func<TValue> callback)
+        public IPropertyGetSequence<TValue> ThenGet(Func<TValue> callback)
         {
             if (_interceptor._getSequence == null)
             {
@@ -211,28 +211,44 @@ public abstract class PropertyGetInterceptorBase<TValue>
             return new PropertyGetSequenceBase(_interceptor);
         }
 
-        protected PropertyGetSequenceBase ThenGetValueBase(TValue value) => ThenGetBase(() => value);
+        public IPropertyGetSequence<TValue> ThenGet(TValue value) => ThenGet(() => value);
+
+        public IPropertyGetSequence<TValue> ThenGet(params TValue[] values)
+        {
+#pragma warning disable CA1062 // Validate arguments of public methods
+            if (values.Length == 0) { ThenGet(() => default!); return new PropertyGetSequenceBase(_interceptor); }
+            var seq = ThenGet(values[0]);
+            for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
+#pragma warning restore CA1062
+            return seq;
+        }
 
         protected virtual PropertyGetBuilderBase CreateNextBuilder() => new PropertyGetBuilderBase(_interceptor);
 
-        public void VerifiableBase()
+        public PropertyGetBuilderBase Verifiable()
         {
             _interceptor._isGetVerifiable = true;
             _interceptor._getVerifiableTimes = null;
+            return this;
         }
 
-        public void VerifiableBase(Called times)
+        public PropertyGetBuilderBase Verifiable(Called called)
         {
             _interceptor._isGetVerifiable = true;
-            _interceptor._getVerifiableTimes = times;
+            _interceptor._getVerifiableTimes = called;
+            return this;
         }
+
+        IPropertyGetBuilder<TValue> IPropertyGetBuilder<TValue>.Verifiable() => (IPropertyGetBuilder<TValue>)Verifiable();
+        IPropertyGetTracking IPropertyGetTracking.Verifiable() => (IPropertyGetTracking)Verifiable();
+        IPropertyGetTracking IPropertyGetTracking.Verifiable(Called called) => (IPropertyGetTracking)Verifiable(called);
     }
 
     // ========================================================================
     // Inner class: PropertyGetSequenceBase
     // ========================================================================
 
-    public class PropertyGetSequenceBase
+    public class PropertyGetSequenceBase : IPropertyGetSequence<TValue>
     {
         protected readonly PropertyGetInterceptorBase<TValue> _interceptor;
 
@@ -241,14 +257,22 @@ public abstract class PropertyGetInterceptorBase<TValue>
             _interceptor = interceptor;
         }
 
-        protected PropertyGetSequenceBase ThenGetBase(Func<TValue> callback)
+        public IPropertyGetSequence<TValue> ThenGet(Func<TValue> callback)
         {
             var tracking = new PropertyGetBuilderBase(_interceptor);
             _interceptor._getSequence!.Add((callback, tracking));
             return this;
         }
 
-        protected PropertyGetSequenceBase ThenGetValueBase(TValue value) => ThenGetBase(() => value);
+        public IPropertyGetSequence<TValue> ThenGet(TValue value) => ThenGet(() => value);
+
+        public IPropertyGetSequence<TValue> ThenGet(params TValue[] values)
+        {
+#pragma warning disable CA1062 // Validate arguments of public methods
+            foreach (var v in values) ThenGet(v);
+#pragma warning restore CA1062
+            return this;
+        }
 
         public void Verify()
         {
@@ -261,10 +285,11 @@ public abstract class PropertyGetInterceptorBase<TValue>
 
         public void Reset() => _interceptor.Reset();
 
-        public void VerifiableBase()
+        public IPropertyGetSequence<TValue> Verifiable()
         {
             _interceptor._isGetVerifiable = true;
             _interceptor._getVerifiableTimes = null;
+            return this;
         }
 
         public void ThenDefault()

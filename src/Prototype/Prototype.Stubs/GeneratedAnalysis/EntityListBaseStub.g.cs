@@ -28,69 +28,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Get(global::System.Func<global::Neatoo.IValidateBase?> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Get(global::Neatoo.IValidateBase? value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public RootInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public RootInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?>
-		{
-			private readonly RootInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(RootInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::System.Func<global::Neatoo.IValidateBase?> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::Neatoo.IValidateBase? value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(params global::Neatoo.IValidateBase?[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?>
-		{
-			private readonly RootInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(RootInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::System.Func<global::Neatoo.IValidateBase?> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::Neatoo.IValidateBase? value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(params global::Neatoo.IValidateBase?[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -115,69 +57,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Get(global::System.Func<global::Neatoo.IValidateBase?> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Get(global::Neatoo.IValidateBase? value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ParentInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public ParentInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?>
-		{
-			private readonly ParentInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(ParentInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::System.Func<global::Neatoo.IValidateBase?> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::Neatoo.IValidateBase? value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(params global::Neatoo.IValidateBase?[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<global::Neatoo.IValidateBase?> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?>
-		{
-			private readonly ParentInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(ParentInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::System.Func<global::Neatoo.IValidateBase?> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::Neatoo.IValidateBase? value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(params global::Neatoo.IValidateBase?[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -202,69 +86,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsFixedSizeInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsFixedSizeInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsFixedSizeInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsFixedSizeInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsFixedSizeInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsFixedSizeInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -289,69 +115,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsReadOnlyInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsReadOnlyInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsReadOnlyInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsReadOnlyInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsReadOnlyInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsReadOnlyInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -376,69 +144,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<int> Get(global::System.Func<int> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<int> Get(int value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public CountInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public CountInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<int>
-		{
-			private readonly CountInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(CountInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(global::System.Func<int> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(params int[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<int> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<int>
-		{
-			private readonly CountInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(CountInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(global::System.Func<int> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<int> ThenGet(params int[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<int> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -463,69 +173,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSynchronizedInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsSynchronizedInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsSynchronizedInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsSynchronizedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsSynchronizedInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsSynchronizedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -550,69 +202,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<object> Get(global::System.Func<object> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<object> Get(object value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public SyncRootInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public SyncRootInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<object>
-		{
-			private readonly SyncRootInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(SyncRootInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(global::System.Func<object> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(object value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(params object[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<object> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<object>
-		{
-			private readonly SyncRootInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(SyncRootInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(global::System.Func<object> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(object value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<object> ThenGet(params object[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<object> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -637,69 +231,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsBusyInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsBusyInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsBusyInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsBusyInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsBusyInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsBusyInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -724,69 +260,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsValidInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsValidInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsValidInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsValidInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsValidInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsValidInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -811,69 +289,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSelfValidInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsSelfValidInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsSelfValidInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsSelfValidInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsSelfValidInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsSelfValidInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -898,69 +318,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Get(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Get(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public PropertyMessagesInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public PropertyMessagesInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>
-		{
-			private readonly PropertyMessagesInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(PropertyMessagesInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(params global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>
-		{
-			private readonly PropertyMessagesInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(PropertyMessagesInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(params global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -985,69 +347,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsChildInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsChildInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsChildInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsChildInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsChildInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsChildInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1072,69 +376,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsModifiedInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsModifiedInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1159,69 +405,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSelfModifiedInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsSelfModifiedInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsSelfModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsSelfModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsSelfModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsSelfModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1246,69 +434,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsMarkedModifiedInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsMarkedModifiedInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsMarkedModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsMarkedModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsMarkedModifiedInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsMarkedModifiedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1333,69 +463,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSavableInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsSavableInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsSavableInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsSavableInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsSavableInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsSavableInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1420,69 +492,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsDeletedInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsDeletedInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsDeletedInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsDeletedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsDeletedInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsDeletedInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1507,69 +521,11 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_source = null;
 		}
 
-		/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(global::System.Func<bool> callback)
-		{
-			_getSequence = null; _getSequenceIndex = 0;
-			_isGetVerifiable = false; _getVerifiableTimes = null;
-			_get = callback;
-			var builder = new PropertyGetBuilderImpl(this);
-			_getTracking = builder;
-			return builder;
-		}
-
-		/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>
-		public new global::KnockOff.IPropertyGetBuilder<bool> Get(bool value) => Get(() => value);
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsNewInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public IsNewInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		private sealed class PropertyGetBuilderImpl : PropertyGetBuilderBase, global::KnockOff.IPropertyGetBuilder<bool>
-		{
-			private readonly IsNewInterceptor _typedInterceptor;
-
-			public PropertyGetBuilderImpl(IsNewInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
-			{
-				ThenGetBase(callback);
-				return new PropertyGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values)
-			{
-				if (values.Length == 0) { ThenGetBase(() => default!); return new PropertyGetSequenceImpl(_typedInterceptor); }
-				var seq = ThenGet(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-				return seq;
-			}
-
-			public global::KnockOff.IPropertyGetBuilder<bool> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();
-			global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		private sealed class PropertyGetSequenceImpl : PropertyGetSequenceBase, global::KnockOff.IPropertyGetSequence<bool>
-		{
-			private readonly IsNewInterceptor _typedInterceptor;
-
-			public PropertyGetSequenceImpl(IsNewInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
-
-			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(params bool[] values) { foreach (var v in values) ThenGet(v); return this; }
-
-			public global::KnockOff.IPropertyGetSequence<bool> Verifiable() { VerifiableBase(); return this; }
-		}
 
 	}
 
@@ -1607,7 +563,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_getSequence = null; _getSequenceIndex = 0;
 			_isGetVerifiable = false; _getVerifiableTimes = null;
 			_get = callback;
-			var builder = new IndexerGetBuilderImpl(this);
+			var builder = new IndexerGetBuilderBase(this);
 			_getTracking = builder;
 			return builder;
 		}
@@ -1618,15 +574,15 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			_setSequence = null; _setSequenceIndex = 0;
 			_isSetVerifiable = false; _setVerifiableTimes = null;
 			_set = callback;
-			var builder = new IndexerSetBuilderImpl(this);
+			var builder = new IndexerSetBuilderBase(this);
 			_setTracking = builder;
 			return builder;
 		}
 
 		/// <summary>Configures predicate-based key matching. Returns builder for Returns()/Get()/Set().</summary>
-		public IndexerWhenBuilder When(global::System.Func<int, bool> predicate)
+		public IndexerWhenBuilderBase When(global::System.Func<int, bool> predicate)
 		{
-			return new IndexerWhenBuilder(this, predicate);
+			return new IndexerWhenBuilderBase(this, predicate);
 		}
 
 		/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
@@ -1634,134 +590,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 
 		/// <summary>Marks this indexer for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>
 		public new IndexerInterceptor Verifiable(global::KnockOff.Called times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
-
-		/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		public sealed class IndexerGetBuilderImpl : IndexerGetBuilderBase, global::KnockOff.IIndexerGetBuilder<int, object?>
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerGetBuilderImpl(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IIndexerGetSequence<int, object?> ThenGet(global::System.Func<int, object?> callback)
-			{
-				ThenGetBase(callback);
-				return new IndexerGetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IIndexerGetBuilder<int, object?> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IIndexerGetTracking<int> global::KnockOff.IIndexerGetTracking<int>.Verifiable() => Verifiable();
-			global::KnockOff.IIndexerGetTracking<int> global::KnockOff.IIndexerGetTracking<int>.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenGet chaining.</summary>
-		public sealed class IndexerGetSequenceImpl : IndexerGetSequenceBase, global::KnockOff.IIndexerGetSequence<int, object?>
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerGetSequenceImpl(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IIndexerGetSequence<int, object?> ThenGet(global::System.Func<int, object?> callback) { ThenGetBase(callback); return this; }
-
-			public global::KnockOff.IIndexerGetSequence<int, object?> Verifiable() { VerifiableBase(); return this; }
-		}
-
-		/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-		public sealed class IndexerSetBuilderImpl : IndexerSetBuilderBase, global::KnockOff.IIndexerSetBuilder<int, object?>
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerSetBuilderImpl(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IIndexerSetSequence<int, object?> ThenSet(global::System.Action<int, object?> callback)
-			{
-				ThenSetBase(callback);
-				return new IndexerSetSequenceImpl(_typedInterceptor);
-			}
-
-			public global::KnockOff.IIndexerSetBuilder<int, object?> Verifiable() { VerifiableBase(); return this; }
-			global::KnockOff.IIndexerSetTracking<int, object?> global::KnockOff.IIndexerSetTracking<int, object?>.Verifiable() => Verifiable();
-			global::KnockOff.IIndexerSetTracking<int, object?> global::KnockOff.IIndexerSetTracking<int, object?>.Verifiable(global::KnockOff.Called times) => Verifiable();
-		}
-
-		/// <summary>Sequence implementation for ThenSet chaining.</summary>
-		public sealed class IndexerSetSequenceImpl : IndexerSetSequenceBase, global::KnockOff.IIndexerSetSequence<int, object?>
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerSetSequenceImpl(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public global::KnockOff.IIndexerSetSequence<int, object?> ThenSet(global::System.Action<int, object?> callback) { ThenSetBase(callback); return this; }
-
-			public global::KnockOff.IIndexerSetSequence<int, object?> Verifiable() { VerifiableBase(); return this; }
-		}
-
-		/// <summary>Builder for indexer When matchers. Captures predicate, routes Returns()/Get() to getter chain and Set() to setter chain.</summary>
-		public sealed class IndexerWhenBuilder : IndexerWhenBuilderBase
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerWhenBuilder(IndexerInterceptor interceptor, global::System.Func<int, bool> predicate) : base(interceptor, predicate) { _typedInterceptor = interceptor; }
-
-			/// <summary>Configures the return value when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>
-			public IndexerGetWhenChain Returns(object? value)
-			{
-				ReturnsBase(value);
-				return new IndexerGetWhenChain(_typedInterceptor);
-			}
-
-			/// <summary>Configures a callback when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>
-			public IndexerGetWhenChain Get(global::System.Func<int, object?> callback)
-			{
-				GetBase(callback);
-				return new IndexerGetWhenChain(_typedInterceptor);
-			}
-
-			/// <summary>Configures a callback when predicate matches (setter chain). Returns chain for ThenWhen/ThenNone.</summary>
-			public IndexerSetWhenChain Set(global::System.Action<int, object?> callback)
-			{
-				SetBase(callback);
-				return new IndexerSetWhenChain(_typedInterceptor);
-			}
-
-		}
-
-		/// <summary>Getter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>
-		public sealed class IndexerGetWhenChain : IndexerGetWhenChainBase
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerGetWhenChain(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public IndexerWhenBuilder ThenWhen(global::System.Func<int, bool> predicate)
-			{
-				return new IndexerWhenBuilder(_typedInterceptor, predicate);
-			}
-
-			public IndexerGetWhenChain Verifiable()
-			{
-				VerifiableBase();
-				return this;
-			}
-		}
-
-		/// <summary>Setter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>
-		public sealed class IndexerSetWhenChain : IndexerSetWhenChainBase
-		{
-			private readonly IndexerInterceptor _typedInterceptor;
-
-			public IndexerSetWhenChain(IndexerInterceptor interceptor) : base(interceptor) { _typedInterceptor = interceptor; }
-
-			public IndexerWhenBuilder ThenWhen(global::System.Func<int, bool> predicate)
-			{
-				return new IndexerWhenBuilder(_typedInterceptor, predicate);
-			}
-
-			public IndexerSetWhenChain Verifiable()
-			{
-				VerifiableBase();
-				return this;
-			}
-		}
 
 	}
 
@@ -1815,7 +643,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 		}
 
 		/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>
-		public MethodSequenceImpl Return(int first, params int[] rest)
+		public ReturnMethodSequenceBase Return(int first, params int[] rest)
 		{
 			var builder = Return((_) => first);
 			if (rest.Length == 0)
@@ -1825,7 +653,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			var seq = builder.ThenReturn(rest[0]);
 			for (int i = 1; i < rest.Length; i++)
 			{
-				seq = seq.ThenReturn(rest[i]);
+				seq.ThenReturn(rest[i]);
 			}
 			return seq;
 		}
@@ -1885,25 +713,22 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArg = default!; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(AddDelegate callback)
+			public ReturnMethodSequenceBase ThenReturn(AddDelegate callback)
 			{
-				ThenReturnBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenReturnBase(callback);
 			}
 
 			/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(int value) => ThenReturn((_) => value);
+			public ReturnMethodSequenceBase ThenReturn(int value) => ThenReturn((_) => value);
 
 			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params int[] values)
+			public ReturnMethodSequenceBase ThenReturn(params int[] values)
 			{
-				if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }
+				if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }
 				var seq = ThenReturn(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenReturn(values[i]);
+				for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);
 				return seq;
 			}
-
-			private AddDelegate CreateValueDelegate(int value) => _typedInterceptor.CreateValueDelegate(value);
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
 			public MethodCallBuilderImpl Verifiable() { VerifiableBase(); return this; }
@@ -1919,39 +744,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodReturnBuilder<AddDelegate, object?> global::KnockOff.IMethodReturnBuilder<AddDelegate, object?>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodReturnBuilder<AddDelegate, object?> global::KnockOff.IMethodReturnBuilder<AddDelegate, object?>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodReturnSequence<AddDelegate> global::KnockOff.IMethodReturnBuilder<AddDelegate, object?>.ThenReturn(AddDelegate callback) => ThenReturn(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenReturn chaining.</summary>
-		public sealed class MethodSequenceImpl : ReturnMethodSequenceBase, global::KnockOff.IMethodReturnSequence<AddDelegate>
-		{
-			private readonly AddInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(AddInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(AddDelegate callback) { ThenReturnBase(callback); return this; }
-
-			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(int value) => ThenReturn((_) => value);
-
-			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params int[] values)
-			{
-				foreach (var value in values) ThenReturn(value);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodReturnSequence<AddDelegate> global::KnockOff.IMethodReturnSequence<AddDelegate>.ThenReturn(AddDelegate callback) => ThenReturn(callback);
-			global::KnockOff.IMethodReturnSequence<AddDelegate> global::KnockOff.IMethodReturnSequence<AddDelegate>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>
@@ -2056,10 +848,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() => base.Reset();
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
+			public MethodSequenceBase ThenCall(global::System.Action callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -2074,34 +865,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action>
-		{
-			private readonly ClearInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(ClearInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -2156,7 +919,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 		}
 
 		/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>
-		public MethodSequenceImpl Return(bool first, params bool[] rest)
+		public ReturnMethodSequenceBase Return(bool first, params bool[] rest)
 		{
 			var builder = Return((_) => first);
 			if (rest.Length == 0)
@@ -2166,7 +929,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			var seq = builder.ThenReturn(rest[0]);
 			for (int i = 1; i < rest.Length; i++)
 			{
-				seq = seq.ThenReturn(rest[i]);
+				seq.ThenReturn(rest[i]);
 			}
 			return seq;
 		}
@@ -2226,25 +989,22 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArg = default!; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(ContainsDelegate callback)
+			public ReturnMethodSequenceBase ThenReturn(ContainsDelegate callback)
 			{
-				ThenReturnBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenReturnBase(callback);
 			}
 
 			/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(bool value) => ThenReturn((_) => value);
+			public ReturnMethodSequenceBase ThenReturn(bool value) => ThenReturn((_) => value);
 
 			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params bool[] values)
+			public ReturnMethodSequenceBase ThenReturn(params bool[] values)
 			{
-				if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }
+				if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }
 				var seq = ThenReturn(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenReturn(values[i]);
+				for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);
 				return seq;
 			}
-
-			private ContainsDelegate CreateValueDelegate(bool value) => _typedInterceptor.CreateValueDelegate(value);
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
 			public MethodCallBuilderImpl Verifiable() { VerifiableBase(); return this; }
@@ -2260,39 +1020,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodReturnBuilder<ContainsDelegate, object?> global::KnockOff.IMethodReturnBuilder<ContainsDelegate, object?>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodReturnBuilder<ContainsDelegate, object?> global::KnockOff.IMethodReturnBuilder<ContainsDelegate, object?>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodReturnSequence<ContainsDelegate> global::KnockOff.IMethodReturnBuilder<ContainsDelegate, object?>.ThenReturn(ContainsDelegate callback) => ThenReturn(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenReturn chaining.</summary>
-		public sealed class MethodSequenceImpl : ReturnMethodSequenceBase, global::KnockOff.IMethodReturnSequence<ContainsDelegate>
-		{
-			private readonly ContainsInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(ContainsInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(ContainsDelegate callback) { ThenReturnBase(callback); return this; }
-
-			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(bool value) => ThenReturn((_) => value);
-
-			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params bool[] values)
-			{
-				foreach (var value in values) ThenReturn(value);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodReturnSequence<ContainsDelegate> global::KnockOff.IMethodReturnSequence<ContainsDelegate>.ThenReturn(ContainsDelegate callback) => ThenReturn(callback);
-			global::KnockOff.IMethodReturnSequence<ContainsDelegate> global::KnockOff.IMethodReturnSequence<ContainsDelegate>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>
@@ -2392,7 +1119,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 		}
 
 		/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>
-		public MethodSequenceImpl Return(int first, params int[] rest)
+		public ReturnMethodSequenceBase Return(int first, params int[] rest)
 		{
 			var builder = Return((_) => first);
 			if (rest.Length == 0)
@@ -2402,7 +1129,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			var seq = builder.ThenReturn(rest[0]);
 			for (int i = 1; i < rest.Length; i++)
 			{
-				seq = seq.ThenReturn(rest[i]);
+				seq.ThenReturn(rest[i]);
 			}
 			return seq;
 		}
@@ -2462,25 +1189,22 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArg = default!; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(IndexOfDelegate callback)
+			public ReturnMethodSequenceBase ThenReturn(IndexOfDelegate callback)
 			{
-				ThenReturnBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenReturnBase(callback);
 			}
 
 			/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(int value) => ThenReturn((_) => value);
+			public ReturnMethodSequenceBase ThenReturn(int value) => ThenReturn((_) => value);
 
 			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params int[] values)
+			public ReturnMethodSequenceBase ThenReturn(params int[] values)
 			{
-				if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }
+				if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }
 				var seq = ThenReturn(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenReturn(values[i]);
+				for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);
 				return seq;
 			}
-
-			private IndexOfDelegate CreateValueDelegate(int value) => _typedInterceptor.CreateValueDelegate(value);
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
 			public MethodCallBuilderImpl Verifiable() { VerifiableBase(); return this; }
@@ -2496,39 +1220,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodReturnBuilder<IndexOfDelegate, object?> global::KnockOff.IMethodReturnBuilder<IndexOfDelegate, object?>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodReturnBuilder<IndexOfDelegate, object?> global::KnockOff.IMethodReturnBuilder<IndexOfDelegate, object?>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodReturnSequence<IndexOfDelegate> global::KnockOff.IMethodReturnBuilder<IndexOfDelegate, object?>.ThenReturn(IndexOfDelegate callback) => ThenReturn(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenReturn chaining.</summary>
-		public sealed class MethodSequenceImpl : ReturnMethodSequenceBase, global::KnockOff.IMethodReturnSequence<IndexOfDelegate>
-		{
-			private readonly IndexOfInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(IndexOfInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(IndexOfDelegate callback) { ThenReturnBase(callback); return this; }
-
-			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(int value) => ThenReturn((_) => value);
-
-			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params int[] values)
-			{
-				foreach (var value in values) ThenReturn(value);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodReturnSequence<IndexOfDelegate> global::KnockOff.IMethodReturnSequence<IndexOfDelegate>.ThenReturn(IndexOfDelegate callback) => ThenReturn(callback);
-			global::KnockOff.IMethodReturnSequence<IndexOfDelegate> global::KnockOff.IMethodReturnSequence<IndexOfDelegate>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>
@@ -2672,10 +1363,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArgs = default; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<int, object?> callback)
+			public MethodSequenceBase ThenCall(global::System.Action<int, object?> callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -2692,34 +1382,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilderArgs<global::System.Action<int, object?>, (int? index, object? @value)> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<int, object?>, (int? index, object? @value)>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilderArgs<global::System.Action<int, object?>, (int? index, object? @value)> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<int, object?>, (int? index, object? @value)>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<int, object?>, (int? index, object? @value)>.ThenCall(global::System.Action<int, object?> callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>>
-		{
-			private readonly InsertInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(InsertInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<int, object?> callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>> global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>>.ThenCall(global::System.Action<int, object?> callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>> global::KnockOff.IMethodCallSequence<global::System.Action<int, object?>>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>
@@ -2869,10 +1531,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArg = default!; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<object?> callback)
+			public MethodSequenceBase ThenCall(global::System.Action<object?> callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -2889,34 +1550,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilder<global::System.Action<object?>, object?> global::KnockOff.IMethodCallBuilder<global::System.Action<object?>, object?>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilder<global::System.Action<object?>, object?> global::KnockOff.IMethodCallBuilder<global::System.Action<object?>, object?>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action<object?>> global::KnockOff.IMethodCallBuilder<global::System.Action<object?>, object?>.ThenCall(global::System.Action<object?> callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action<object?>>
-		{
-			private readonly RemoveInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(RemoveInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<object?> callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action<object?>> global::KnockOff.IMethodCallSequence<global::System.Action<object?>>.ThenCall(global::System.Action<object?> callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action<object?>> global::KnockOff.IMethodCallSequence<global::System.Action<object?>>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>
@@ -3066,10 +1699,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArg = default!; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<int> callback)
+			public MethodSequenceBase ThenCall(global::System.Action<int> callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -3086,34 +1718,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilder<global::System.Action<int>, int> global::KnockOff.IMethodCallBuilder<global::System.Action<int>, int>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilder<global::System.Action<int>, int> global::KnockOff.IMethodCallBuilder<global::System.Action<int>, int>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action<int>> global::KnockOff.IMethodCallBuilder<global::System.Action<int>, int>.ThenCall(global::System.Action<int> callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action<int>>
-		{
-			private readonly RemoveAtInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(RemoveAtInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<int> callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action<int>> global::KnockOff.IMethodCallSequence<global::System.Action<int>>.ThenCall(global::System.Action<int> callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action<int>> global::KnockOff.IMethodCallSequence<global::System.Action<int>>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>
@@ -3264,10 +1868,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() { base.Reset(); _lastArgs = default; }
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<global::System.Array, int> callback)
+			public MethodSequenceBase ThenCall(global::System.Action<global::System.Array, int> callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -3284,34 +1887,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilderArgs<global::System.Action<global::System.Array, int>, (global::System.Array? array, int? index)> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<global::System.Array, int>, (global::System.Array? array, int? index)>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilderArgs<global::System.Action<global::System.Array, int>, (global::System.Array? array, int? index)> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<global::System.Array, int>, (global::System.Array? array, int? index)>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>> global::KnockOff.IMethodCallBuilderArgs<global::System.Action<global::System.Array, int>, (global::System.Array? array, int? index)>.ThenCall(global::System.Action<global::System.Array, int> callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>>
-		{
-			private readonly CopyToInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(CopyToInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action<global::System.Array, int> callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>> global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>>.ThenCall(global::System.Action<global::System.Array, int> callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>> global::KnockOff.IMethodCallSequence<global::System.Action<global::System.Array, int>>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>
@@ -3401,7 +1976,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 		}
 
 		/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>
-		public MethodSequenceImpl Return(global::System.Collections.IEnumerator first, params global::System.Collections.IEnumerator[] rest)
+		public ReturnMethodSequenceBase Return(global::System.Collections.IEnumerator first, params global::System.Collections.IEnumerator[] rest)
 		{
 			var builder = Return(() => first);
 			if (rest.Length == 0)
@@ -3411,7 +1986,7 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			var seq = builder.ThenReturn(rest[0]);
 			for (int i = 1; i < rest.Length; i++)
 			{
-				seq = seq.ThenReturn(rest[i]);
+				seq.ThenReturn(rest[i]);
 			}
 			return seq;
 		}
@@ -3453,25 +2028,22 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() => base.Reset();
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(GetEnumeratorDelegate callback)
+			public ReturnMethodSequenceBase ThenReturn(GetEnumeratorDelegate callback)
 			{
-				ThenReturnBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenReturnBase(callback);
 			}
 
 			/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenReturn(global::System.Collections.IEnumerator value) => ThenReturn(() => value);
+			public ReturnMethodSequenceBase ThenReturn(global::System.Collections.IEnumerator value) => ThenReturn(() => value);
 
 			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params global::System.Collections.IEnumerator[] values)
+			public ReturnMethodSequenceBase ThenReturn(params global::System.Collections.IEnumerator[] values)
 			{
-				if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }
+				if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }
 				var seq = ThenReturn(values[0]);
-				for (int i = 1; i < values.Length; i++) seq = seq.ThenReturn(values[i]);
+				for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);
 				return seq;
 			}
-
-			private GetEnumeratorDelegate CreateValueDelegate(global::System.Collections.IEnumerator value) => _typedInterceptor.CreateValueDelegate(value);
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
 			public MethodCallBuilderImpl Verifiable() { VerifiableBase(); return this; }
@@ -3485,39 +2057,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodReturnBuilder<GetEnumeratorDelegate> global::KnockOff.IMethodReturnBuilder<GetEnumeratorDelegate>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodReturnBuilder<GetEnumeratorDelegate> global::KnockOff.IMethodReturnBuilder<GetEnumeratorDelegate>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate> global::KnockOff.IMethodReturnBuilder<GetEnumeratorDelegate>.ThenReturn(GetEnumeratorDelegate callback) => ThenReturn(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenReturn chaining.</summary>
-		public sealed class MethodSequenceImpl : ReturnMethodSequenceBase, global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate>
-		{
-			private readonly GetEnumeratorInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(GetEnumeratorInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(GetEnumeratorDelegate callback) { ThenReturnBase(callback); return this; }
-
-			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
-			public MethodSequenceImpl ThenReturn(global::System.Collections.IEnumerator value) => ThenReturn(() => value);
-
-			/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
-			public MethodSequenceImpl ThenReturn(params global::System.Collections.IEnumerator[] values)
-			{
-				foreach (var value in values) ThenReturn(value);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate> global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate>.ThenReturn(GetEnumeratorDelegate callback) => ThenReturn(callback);
-			global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate> global::KnockOff.IMethodReturnSequence<GetEnumeratorDelegate>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -5456,10 +3995,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() => base.Reset();
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
+			public MethodSequenceBase ThenCall(global::System.Action callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -5474,34 +4012,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action>
-		{
-			private readonly ClearAllMessagesInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(ClearAllMessagesInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -5561,10 +4071,9 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			public override void Reset() => base.Reset();
 
 			/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
+			public MethodSequenceBase ThenCall(global::System.Action callback)
 			{
-				ThenCallBase(callback);
-				return new MethodSequenceImpl(_typedInterceptor);
+				return ThenCallBase(callback);
 			}
 
 			/// <summary>Marks for verification by Stub.Verify().</summary>
@@ -5579,34 +4088,6 @@ partial class EntityListBaseStub : EntityListBaseStubBase, global::Neatoo.IEntit
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable() => Verifiable();
 			global::KnockOff.IMethodCallBuilder<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.Verifiable(global::KnockOff.Called times) => Verifiable(times);
 			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallBuilder<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		public sealed class MethodSequenceImpl : MethodSequenceBase, global::KnockOff.IMethodCallSequence<global::System.Action>
-		{
-			private readonly ClearSelfMessagesInterceptor _typedInterceptor;
-
-			public MethodSequenceImpl(ClearSelfMessagesInterceptor interceptor) : base(interceptor)
-			{
-				_typedInterceptor = interceptor;
-			}
-
-			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public MethodSequenceImpl ThenCall(global::System.Action callback)
-			{
-				var tracking = new MethodCallBuilderImpl(_typedInterceptor);
-				AddToSequence(callback, tracking);
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify().</summary>
-			public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }
-
-			protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);
-
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.ThenCall(global::System.Action callback) => ThenCall(callback);
-			global::KnockOff.IMethodCallSequence<global::System.Action> global::KnockOff.IMethodCallSequence<global::System.Action>.Verifiable() => Verifiable();
-			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}

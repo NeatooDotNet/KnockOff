@@ -402,7 +402,7 @@ public abstract class MethodInterceptorBase<TDelegate, TArgs, TReturn> : VoidMet
             ElevateToSequenceBase();
             var nextBuilder = CreateNextReturnBuilder();
             _interceptor._sequence!.Add((callback, nextBuilder));
-            return new ReturnMethodSequenceBase(_interceptor);
+            return new ReturnMethodSequenceBase(_interceptor, CreateNextReturnBuilder);
         }
 
         /// <summary>Elevates to sequence mode and adds a value.</summary>
@@ -424,30 +424,45 @@ public abstract class MethodInterceptorBase<TDelegate, TArgs, TReturn> : VoidMet
     // Inner class: ReturnMethodSequenceBase (non-void)
     // ========================================================================
 
-    /// <summary>Sequence for non-void methods.</summary>
-    public class ReturnMethodSequenceBase : MethodSequenceBase
+    /// <summary>Sequence for non-void methods. Implements IMethodReturnSequence directly.</summary>
+    public class ReturnMethodSequenceBase : IMethodReturnSequence<TDelegate>, IMethodReturnSequence, IMethodSequence
     {
-        private new readonly MethodInterceptorBase<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly MethodInterceptorBase<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly Func<ReturnMethodCallBuilderBase>? _returnBuilderFactory;
 
         public ReturnMethodSequenceBase(MethodInterceptorBase<TDelegate, TArgs, TReturn> interceptor)
-            : base(interceptor)
         {
             _interceptor = interceptor;
         }
 
-        /// <summary>Adds another callback to the sequence.</summary>
-        protected ReturnMethodSequenceBase ThenReturnBase(TDelegate callback)
+        public ReturnMethodSequenceBase(MethodInterceptorBase<TDelegate, TArgs, TReturn> interceptor, Func<ReturnMethodCallBuilderBase> returnBuilderFactory)
         {
-            var tracking = CreateNextReturnBuilder();
+            _interceptor = interceptor;
+            _returnBuilderFactory = returnBuilderFactory;
+        }
+
+        /// <summary>Adds another callback to the sequence.</summary>
+        public ReturnMethodSequenceBase ThenReturn(TDelegate callback)
+        {
+            var tracking = _returnBuilderFactory != null ? _returnBuilderFactory() : CreateNextReturnBuilder();
             _interceptor._sequence!.Add((callback, tracking));
             return this;
         }
 
         /// <summary>Adds a value to the sequence.</summary>
-        protected ReturnMethodSequenceBase ThenReturnValueBase(TReturn value)
+        public ReturnMethodSequenceBase ThenReturn(TReturn value)
         {
-            return ThenReturnBase(_interceptor.CreateValueDelegate(value));
+            return ThenReturn(_interceptor.CreateValueDelegate(value));
         }
+
+        /// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
+#pragma warning disable CA1062 // Validate arguments of public methods
+        public ReturnMethodSequenceBase ThenReturn(params TReturn[] values)
+        {
+            foreach (var value in values) ThenReturn(value);
+            return this;
+        }
+#pragma warning restore CA1062
 
         /// <summary>Creates a new return builder for sequence entries.</summary>
         protected virtual ReturnMethodCallBuilderBase CreateNextReturnBuilder()
@@ -455,7 +470,37 @@ public abstract class MethodInterceptorBase<TDelegate, TArgs, TReturn> : VoidMet
             return new ReturnMethodCallBuilderBase(_interceptor);
         }
 
-        protected override MethodCallBuilderBase CreateNextBuilder() => CreateNextReturnBuilder();
+        /// <summary>Verifies the entire sequence was executed.</summary>
+        public void Verify()
+        {
+            if (_interceptor._sequence == null) return;
+            var sequenceLength = _interceptor._sequence.Count;
+            var completedCount = _interceptor._sequenceIndex;
+            if (completedCount < sequenceLength)
+                throw new VerificationException(VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
+        }
+
+        /// <summary>Resets all tracking in the sequence.</summary>
+        public void Reset() => _interceptor.Reset();
+
+        /// <summary>Marks this sequence for verification by Stub.Verify().</summary>
+        public ReturnMethodSequenceBase Verifiable()
+        {
+            _interceptor._isVerifiable = true;
+            _interceptor._verifiableTimes = null;
+            return this;
+        }
+
+        /// <summary>Terminates sequence with default instead of repeating last value.</summary>
+        public void ThenDefault()
+        {
+            _interceptor._repeatLastValue = false;
+        }
+
+        // Explicit interface implementations for covariant return types
+        IMethodReturnSequence<TDelegate> IMethodReturnSequence<TDelegate>.ThenReturn(TDelegate callback) => ThenReturn(callback);
+        IMethodReturnSequence<TDelegate> IMethodReturnSequence<TDelegate>.Verifiable() => Verifiable();
+        IMethodSequence IMethodSequence.Verifiable() => Verifiable();
     }
 
     /// <summary>Creates a delegate that ignores its args and returns the given value. Must be overridden.</summary>

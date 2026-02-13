@@ -3,7 +3,7 @@
 **Status:** In Progress
 **Priority:** Medium
 **Created:** 2026-02-13
-**Last Updated:** 2026-02-13
+**Last Updated:** 2026-02-13 (generic inner classes plan added)
 
 ---
 
@@ -33,6 +33,7 @@ Approach validated through exploratory research analyzing all interceptor types 
 
 - [Interceptor Base Class Prototype](../plans/interceptor-base-class-prototype.md) -- Validate that interceptor logic can be moved into pre-compiled generic base classes
 - [Interceptor Base Class Generator Changes](../plans/interceptor-base-class-generator.md) -- Modify the KnockOff generator to emit code using validated base classes
+- [Generic Inner Classes](../plans/generic-inner-classes.md) -- Make base class inner classes implement library interfaces directly, eliminating generated thin subclasses
 
 ---
 

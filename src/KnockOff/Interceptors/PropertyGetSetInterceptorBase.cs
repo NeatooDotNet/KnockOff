@@ -47,7 +47,7 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
     // --- Public Set configuration API ---
 
     /// <summary>Configures the setter to invoke the given callback.</summary>
-    public PropertySetBuilderBase Set(Action<TValue> callback)
+    public IPropertySetBuilder<TValue> Set(Action<TValue> callback)
     {
         _setSequence = null; _setSequenceIndex = 0;
         _isSetVerifiable = false; _setVerifiableTimes = null;
@@ -282,7 +282,7 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
     // Inner class: PropertySetBuilderBase
     // ========================================================================
 
-    public class PropertySetBuilderBase
+    public class PropertySetBuilderBase : IPropertySetBuilder<TValue>, IPropertySetTracking<TValue>
     {
         protected readonly PropertyGetSetInterceptorBase<TValue> _interceptor;
 
@@ -300,13 +300,13 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
         public void Reset() { _callCount = 0; _lastValue = default!; }
 
         public void Verify() => Verify(Called.AtLeastOnce);
-        public void Verify(Called times)
+        public void Verify(Called called)
         {
-            if (!times.Validate(_callCount))
-                throw new VerificationException(new VerificationFailure("property setter", times, _callCount));
+            if (!called.Validate(_callCount))
+                throw new VerificationException(new VerificationFailure("property setter", called, _callCount));
         }
 
-        protected PropertySetSequenceBase ThenSetBase(Action<TValue> callback)
+        public IPropertySetSequence<TValue> ThenSet(Action<TValue> callback)
         {
             if (_interceptor._setSequence == null)
             {
@@ -323,24 +323,30 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
 
         protected virtual PropertySetBuilderBase CreateNextBuilder() => new PropertySetBuilderBase(_interceptor);
 
-        public void VerifiableBase()
+        public PropertySetBuilderBase Verifiable()
         {
             _interceptor._isSetVerifiable = true;
             _interceptor._setVerifiableTimes = null;
+            return this;
         }
 
-        public void VerifiableBase(Called times)
+        public PropertySetBuilderBase Verifiable(Called called)
         {
             _interceptor._isSetVerifiable = true;
-            _interceptor._setVerifiableTimes = times;
+            _interceptor._setVerifiableTimes = called;
+            return this;
         }
+
+        IPropertySetBuilder<TValue> IPropertySetBuilder<TValue>.Verifiable() => (IPropertySetBuilder<TValue>)Verifiable();
+        IPropertySetTracking<TValue> IPropertySetTracking<TValue>.Verifiable() => (IPropertySetTracking<TValue>)Verifiable();
+        IPropertySetTracking<TValue> IPropertySetTracking<TValue>.Verifiable(Called called) => (IPropertySetTracking<TValue>)Verifiable(called);
     }
 
     // ========================================================================
     // Inner class: PropertySetSequenceBase
     // ========================================================================
 
-    public class PropertySetSequenceBase
+    public class PropertySetSequenceBase : IPropertySetSequence<TValue>
     {
         protected readonly PropertyGetSetInterceptorBase<TValue> _interceptor;
 
@@ -349,7 +355,7 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
             _interceptor = interceptor;
         }
 
-        protected PropertySetSequenceBase ThenSetBase(Action<TValue> callback)
+        public IPropertySetSequence<TValue> ThenSet(Action<TValue> callback)
         {
             var tracking = new PropertySetBuilderBase(_interceptor);
             _interceptor._setSequence!.Add((callback, tracking));
@@ -367,10 +373,11 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
 
         public void Reset() => _interceptor.Reset();
 
-        public void VerifiableBase()
+        public IPropertySetSequence<TValue> Verifiable()
         {
             _interceptor._isSetVerifiable = true;
             _interceptor._setVerifiableTimes = null;
+            return this;
         }
 
         public void ThenDefault()

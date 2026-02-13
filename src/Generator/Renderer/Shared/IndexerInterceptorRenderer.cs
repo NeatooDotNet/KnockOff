@@ -418,6 +418,7 @@ internal static class IndexerInterceptorRenderer
 		w.Line();
 
 		// Typed Get() method returning IIndexerGetBuilder<TKey, TValue>
+		// Base class inner classes now implement the interfaces directly, so we use IndexerGetBuilderBase
 		if (model.HasGetter)
 		{
 			w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
@@ -427,7 +428,7 @@ internal static class IndexerInterceptorRenderer
 				w.Line("_getSequence = null; _getSequenceIndex = 0;");
 				w.Line("_isGetVerifiable = false; _getVerifiableTimes = null;");
 				w.Line("_get = callback;");
-				w.Line("var builder = new IndexerGetBuilderImpl(this);");
+				w.Line("var builder = new IndexerGetBuilderBase(this);");
 				w.Line("_getTracking = builder;");
 				w.Line("return builder;");
 			}
@@ -435,6 +436,7 @@ internal static class IndexerInterceptorRenderer
 		}
 
 		// Typed Set() method returning IIndexerSetBuilder<TKey, TValue>
+		// Base class inner classes now implement the interfaces directly, so we use IndexerSetBuilderBase
 		if (model.HasSetter)
 		{
 			w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
@@ -444,19 +446,19 @@ internal static class IndexerInterceptorRenderer
 				w.Line("_setSequence = null; _setSequenceIndex = 0;");
 				w.Line("_isSetVerifiable = false; _setVerifiableTimes = null;");
 				w.Line("_set = callback;");
-				w.Line("var builder = new IndexerSetBuilderImpl(this);");
+				w.Line("var builder = new IndexerSetBuilderBase(this);");
 				w.Line("_setTracking = builder;");
 				w.Line("return builder;");
 			}
 			w.Line();
 		}
 
-		// When() entry point
+		// When() entry point -- uses base class IndexerWhenBuilderBase directly (no thin subclass needed)
 		w.Line($"/// <summary>Configures predicate-based key matching. Returns builder for Returns()/Get()/Set().</summary>");
-		w.Line($"public IndexerWhenBuilder When(global::System.Func<{keyType}, bool> predicate)");
+		w.Line($"public IndexerWhenBuilderBase When(global::System.Func<{keyType}, bool> predicate)");
 		using (w.Braces())
 		{
-			w.Line("return new IndexerWhenBuilder(this, predicate);");
+			w.Line("return new IndexerWhenBuilderBase(this, predicate);");
 		}
 		w.Line();
 
@@ -479,303 +481,8 @@ internal static class IndexerInterceptorRenderer
 		}
 		w.Line();
 
-		// Thin inner classes
-		if (model.HasGetter)
-		{
-			RenderBaseClassIndexerGetBuilderImpl(w, model, fullInterceptorClassName);
-			RenderBaseClassIndexerGetSequenceImpl(w, model, fullInterceptorClassName);
-		}
-		if (model.HasSetter)
-		{
-			RenderBaseClassIndexerSetBuilderImpl(w, model, fullInterceptorClassName);
-			RenderBaseClassIndexerSetSequenceImpl(w, model, fullInterceptorClassName);
-		}
-		RenderBaseClassIndexerWhenBuilder(w, model, fullInterceptorClassName);
-		if (model.HasGetter)
-		{
-			RenderBaseClassIndexerGetWhenChain(w, model, fullInterceptorClassName);
-		}
-		if (model.HasSetter)
-		{
-			RenderBaseClassIndexerSetWhenChain(w, model, fullInterceptorClassName);
-		}
-	}
-
-	/// <summary>
-	/// Renders thin IndexerGetBuilderImpl that extends IndexerGetBuilderBase and implements IIndexerGetBuilder&lt;TKey, TValue&gt;.
-	/// </summary>
-	private static void RenderBaseClassIndexerGetBuilderImpl(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-		var valueType = model.ValueType;
-
-		w.Line($"/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
-		w.Line($"public sealed class IndexerGetBuilderImpl : IndexerGetBuilderBase, global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}>");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerGetBuilderImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenGet(callback)
-			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{keyType}, {valueType}> callback)");
-			using (w.Braces())
-			{
-				w.Line("ThenGetBase(callback);");
-				w.Line("return new IndexerGetSequenceImpl(_typedInterceptor);");
-			}
-			w.Line();
-
-			// Verifiable
-			w.Line($"public global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
-			w.Line($"global::KnockOff.IIndexerGetTracking<{keyType}> global::KnockOff.IIndexerGetTracking<{keyType}>.Verifiable() => Verifiable();");
-			w.Line($"global::KnockOff.IIndexerGetTracking<{keyType}> global::KnockOff.IIndexerGetTracking<{keyType}>.Verifiable(global::KnockOff.Called times) => Verifiable();");
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerGetSequenceImpl that extends IndexerGetSequenceBase and implements IIndexerGetSequence&lt;TKey, TValue&gt;.
-	/// </summary>
-	private static void RenderBaseClassIndexerGetSequenceImpl(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-		var valueType = model.ValueType;
-
-		w.Line($"/// <summary>Sequence implementation for ThenGet chaining.</summary>");
-		w.Line($"public sealed class IndexerGetSequenceImpl : IndexerGetSequenceBase, global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}>");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerGetSequenceImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenGet(callback)
-			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{keyType}, {valueType}> callback) {{ ThenGetBase(callback); return this; }}");
-			w.Line();
-
-			// Verifiable
-			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerSetBuilderImpl that extends IndexerSetBuilderBase and implements IIndexerSetBuilder&lt;TKey, TValue&gt;.
-	/// </summary>
-	private static void RenderBaseClassIndexerSetBuilderImpl(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-		var valueType = model.ValueType;
-
-		w.Line($"/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
-		w.Line($"public sealed class IndexerSetBuilderImpl : IndexerSetBuilderBase, global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}>");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerSetBuilderImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenSet(callback)
-			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{keyType}, {valueType}> callback)");
-			using (w.Braces())
-			{
-				w.Line("ThenSetBase(callback);");
-				w.Line("return new IndexerSetSequenceImpl(_typedInterceptor);");
-			}
-			w.Line();
-
-			// Verifiable
-			w.Line($"public global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
-			w.Line($"global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}>.Verifiable() => Verifiable();");
-			w.Line($"global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}>.Verifiable(global::KnockOff.Called times) => Verifiable();");
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerSetSequenceImpl that extends IndexerSetSequenceBase and implements IIndexerSetSequence&lt;TKey, TValue&gt;.
-	/// </summary>
-	private static void RenderBaseClassIndexerSetSequenceImpl(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-		var valueType = model.ValueType;
-
-		w.Line($"/// <summary>Sequence implementation for ThenSet chaining.</summary>");
-		w.Line($"public sealed class IndexerSetSequenceImpl : IndexerSetSequenceBase, global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}>");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerSetSequenceImpl({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenSet(callback)
-			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{keyType}, {valueType}> callback) {{ ThenSetBase(callback); return this; }}");
-			w.Line();
-
-			// Verifiable
-			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> Verifiable() {{ VerifiableBase(); return this; }}");
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerWhenBuilder that extends IndexerWhenBuilderBase.
-	/// Routes Returns()/Get() to getter chain and Set() to setter chain.
-	/// </summary>
-	private static void RenderBaseClassIndexerWhenBuilder(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-		var valueType = model.ValueType;
-
-		w.Line($"/// <summary>Builder for indexer When matchers. Captures predicate, routes Returns()/Get() to getter chain and Set() to setter chain.</summary>");
-		w.Line($"public sealed class IndexerWhenBuilder : IndexerWhenBuilderBase");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerWhenBuilder({interceptorClassName} interceptor, global::System.Func<{keyType}, bool> predicate) : base(interceptor, predicate) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// Returns(value)
-			if (model.HasGetter)
-			{
-				w.Line($"/// <summary>Configures the return value when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>");
-				w.Line($"public IndexerGetWhenChain Returns({valueType} value)");
-				using (w.Braces())
-				{
-					w.Line("ReturnsBase(value);");
-					w.Line("return new IndexerGetWhenChain(_typedInterceptor);");
-				}
-				w.Line();
-
-				// Get(callback)
-				w.Line($"/// <summary>Configures a callback when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>");
-				w.Line($"public IndexerGetWhenChain Get(global::System.Func<{keyType}, {valueType}> callback)");
-				using (w.Braces())
-				{
-					w.Line("GetBase(callback);");
-					w.Line("return new IndexerGetWhenChain(_typedInterceptor);");
-				}
-				w.Line();
-			}
-
-			// Set(callback)
-			if (model.HasSetter)
-			{
-				w.Line($"/// <summary>Configures a callback when predicate matches (setter chain). Returns chain for ThenWhen/ThenNone.</summary>");
-				w.Line($"public IndexerSetWhenChain Set(global::System.Action<{keyType}, {valueType}> callback)");
-				using (w.Braces())
-				{
-					w.Line("SetBase(callback);");
-					w.Line("return new IndexerSetWhenChain(_typedInterceptor);");
-				}
-				w.Line();
-			}
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerGetWhenChain that extends IndexerGetWhenChainBase.
-	/// </summary>
-	private static void RenderBaseClassIndexerGetWhenChain(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-
-		w.Line($"/// <summary>Getter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>");
-		w.Line($"public sealed class IndexerGetWhenChain : IndexerGetWhenChainBase");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerGetWhenChain({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenWhen(predicate)
-			w.Line($"public IndexerWhenBuilder ThenWhen(global::System.Func<{keyType}, bool> predicate)");
-			using (w.Braces())
-			{
-				w.Line("return new IndexerWhenBuilder(_typedInterceptor, predicate);");
-			}
-			w.Line();
-
-			// Verifiable()
-			w.Line("public IndexerGetWhenChain Verifiable()");
-			using (w.Braces())
-			{
-				w.Line("VerifiableBase();");
-				w.Line("return this;");
-			}
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders thin IndexerSetWhenChain that extends IndexerSetWhenChainBase.
-	/// </summary>
-	private static void RenderBaseClassIndexerSetWhenChain(
-		CodeWriter w,
-		UnifiedIndexerInterceptorModel model,
-		string interceptorClassName)
-	{
-		var keyType = model.KeyType;
-
-		w.Line($"/// <summary>Setter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>");
-		w.Line($"public sealed class IndexerSetWhenChain : IndexerSetWhenChainBase");
-		using (w.Braces())
-		{
-			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
-			w.Line();
-
-			w.Line($"public IndexerSetWhenChain({interceptorClassName} interceptor) : base(interceptor) {{ _typedInterceptor = interceptor; }}");
-			w.Line();
-
-			// ThenWhen(predicate)
-			w.Line($"public IndexerWhenBuilder ThenWhen(global::System.Func<{keyType}, bool> predicate)");
-			using (w.Braces())
-			{
-				w.Line("return new IndexerWhenBuilder(_typedInterceptor, predicate);");
-			}
-			w.Line();
-
-			// Verifiable()
-			w.Line("public IndexerSetWhenChain Verifiable()");
-			using (w.Braces())
-			{
-				w.Line("VerifiableBase();");
-				w.Line("return this;");
-			}
-		}
-		w.Line();
+		// No thin inner classes needed -- base class inner classes implement interfaces directly
+		// and When chain base classes have final typed methods
 	}
 
 	#endregion

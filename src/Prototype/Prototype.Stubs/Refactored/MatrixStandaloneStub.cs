@@ -199,181 +199,36 @@ public partial class MatrixStandaloneStub : MatrixStandaloneStubBase, IMatrix, I
         // PerKey access with unpacked params
         public PerKeyBuilder this[int row, int col] => GetOrCreatePerKeyBuilder((row, col));
 
-        // Get API
+        // Get API -- base class inner classes now implement interfaces directly
         public IIndexerGetBuilder<(int row, int col), double> Get(Func<(int row, int col), double> callback)
         {
             _getSequence = null; _getSequenceIndex = 0;
             _isGetVerifiable = false; _getVerifiableTimes = null;
             _get = callback;
-            var builder = new IndexerGetBuilderImpl(this);
+            var builder = new IndexerGetBuilderBase(this);
             _getTracking = builder;
             return builder;
         }
 
-        // Set API
+        // Set API -- base class inner classes now implement interfaces directly
         public IIndexerSetBuilder<(int row, int col), double> Set(Action<(int row, int col), double> callback)
         {
             _setSequence = null; _setSequenceIndex = 0;
             _isSetVerifiable = false; _setVerifiableTimes = null;
             _set = callback;
-            var builder = new IndexerSetBuilderImpl(this);
+            var builder = new IndexerSetBuilderBase(this);
             _setTracking = builder;
             return builder;
         }
 
-        // When API
-        public IndexerWhenBuilder When(Func<(int row, int col), bool> predicate)
+        // When API -- base class When chain classes have final typed methods, no thin subclass needed
+        public IndexerWhenBuilderBase When(Func<(int row, int col), bool> predicate)
         {
-            return new IndexerWhenBuilder(this, predicate);
+            return new IndexerWhenBuilderBase(this, predicate);
         }
 
-        // Inner classes
-        public sealed class IndexerGetBuilderImpl : IndexerGetBuilderBase, IIndexerGetBuilder<(int row, int col), double>
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerGetBuilderImpl(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IIndexerGetSequence<(int row, int col), double> ThenGet(Func<(int row, int col), double> callback)
-            {
-                ThenGetBase(callback);
-                return new IndexerGetSequenceImpl(_typedInterceptor);
-            }
-
-            public IIndexerGetBuilder<(int row, int col), double> Verifiable() { VerifiableBase(); return this; }
-            IIndexerGetTracking<(int row, int col)> IIndexerGetTracking<(int row, int col)>.Verifiable() => Verifiable();
-            IIndexerGetTracking<(int row, int col)> IIndexerGetTracking<(int row, int col)>.Verifiable(Called times) => Verifiable();
-        }
-
-        public sealed class IndexerGetSequenceImpl : IndexerGetSequenceBase, IIndexerGetSequence<(int row, int col), double>
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerGetSequenceImpl(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IIndexerGetSequence<(int row, int col), double> ThenGet(Func<(int row, int col), double> callback)
-            {
-                ThenGetBase(callback);
-                return this;
-            }
-
-            public IIndexerGetSequence<(int row, int col), double> Verifiable() { VerifiableBase(); return this; }
-        }
-
-        public sealed class IndexerSetBuilderImpl : IndexerSetBuilderBase, IIndexerSetBuilder<(int row, int col), double>
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerSetBuilderImpl(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IIndexerSetSequence<(int row, int col), double> ThenSet(Action<(int row, int col), double> callback)
-            {
-                ThenSetBase(callback);
-                return new IndexerSetSequenceImpl(_typedInterceptor);
-            }
-
-            public IIndexerSetBuilder<(int row, int col), double> Verifiable() { VerifiableBase(); return this; }
-            IIndexerSetTracking<(int row, int col), double> IIndexerSetTracking<(int row, int col), double>.Verifiable() => Verifiable();
-            IIndexerSetTracking<(int row, int col), double> IIndexerSetTracking<(int row, int col), double>.Verifiable(Called times) => Verifiable();
-        }
-
-        public sealed class IndexerSetSequenceImpl : IndexerSetSequenceBase, IIndexerSetSequence<(int row, int col), double>
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerSetSequenceImpl(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IIndexerSetSequence<(int row, int col), double> ThenSet(Action<(int row, int col), double> callback)
-            {
-                ThenSetBase(callback);
-                return this;
-            }
-
-            public IIndexerSetSequence<(int row, int col), double> Verifiable() { VerifiableBase(); return this; }
-        }
-
-        public sealed class IndexerWhenBuilder : IndexerWhenBuilderBase
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerWhenBuilder(IndexerInterceptor interceptor, Func<(int row, int col), bool> predicate)
-                : base(interceptor, predicate)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IndexerGetWhenChain Returns(double value)
-            {
-                var chain = ReturnsBase(value);
-                return new IndexerGetWhenChain(_typedInterceptor);
-            }
-
-            public IndexerGetWhenChain Get(Func<(int row, int col), double> callback)
-            {
-                GetBase(callback);
-                return new IndexerGetWhenChain(_typedInterceptor);
-            }
-
-            public IndexerSetWhenChain Set(Action<(int row, int col), double> callback)
-            {
-                SetBase(callback);
-                return new IndexerSetWhenChain(_typedInterceptor);
-            }
-        }
-
-        public sealed class IndexerGetWhenChain : IndexerGetWhenChainBase
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerGetWhenChain(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IndexerWhenBuilder ThenWhen(Func<(int row, int col), bool> predicate)
-            {
-                return new IndexerWhenBuilder(_typedInterceptor, predicate);
-            }
-
-            public IndexerGetWhenChain Verifiable()
-            {
-                VerifiableBase();
-                return this;
-            }
-        }
-
-        public sealed class IndexerSetWhenChain : IndexerSetWhenChainBase
-        {
-            private readonly IndexerInterceptor _typedInterceptor;
-
-            public IndexerSetWhenChain(IndexerInterceptor interceptor) : base(interceptor)
-            {
-                _typedInterceptor = interceptor;
-            }
-
-            public IndexerWhenBuilder ThenWhen(Func<(int row, int col), bool> predicate)
-            {
-                return new IndexerWhenBuilder(_typedInterceptor, predicate);
-            }
-
-            public IndexerSetWhenChain Verifiable()
-            {
-                VerifiableBase();
-                return this;
-            }
-        }
+        // No thin inner classes needed -- base class inner classes implement interfaces directly
+        // and When chain base classes have final typed methods
     }
 
     // ========================================================================

@@ -519,7 +519,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
     // ========================================================================
 
     /// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public class IndexerGetBuilderBase
+    public class IndexerGetBuilderBase : IIndexerGetBuilder<TKey, TValue>, IIndexerGetTracking<TKey>
     {
         protected readonly IndexerGetSetInterceptorBase<TKey, TValue> _interceptor;
         private TKey _lastKey = default!;
@@ -540,14 +540,14 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public void Verify() => Verify(Called.AtLeastOnce);
 
         /// <summary>Verifies call count satisfies the Called constraint.</summary>
-        public void Verify(Called times)
+        public void Verify(Called called)
         {
-            if (!times.Validate(_callCount))
-                throw new VerificationException(new VerificationFailure("indexer getter", times, _callCount));
+            if (!called.Validate(_callCount))
+                throw new VerificationException(new VerificationFailure("indexer getter", called, _callCount));
         }
 
         /// <summary>Elevates to sequence mode and adds another getter callback.</summary>
-        protected IndexerGetSequenceBase ThenGetBase(Func<TKey, TValue> callback)
+        public IIndexerGetSequence<TKey, TValue> ThenGet(Func<TKey, TValue> callback)
         {
             if (_interceptor._getSequence == null)
             {
@@ -563,11 +563,24 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Marks for verification by Stub.Verify().</summary>
-        public void VerifiableBase()
+        public IndexerGetBuilderBase Verifiable()
         {
             _interceptor._isGetVerifiable = true;
             _interceptor._getVerifiableTimes = null;
+            return this;
         }
+
+        /// <summary>Marks for verification by Stub.Verify() with Called constraint.</summary>
+        public IndexerGetBuilderBase Verifiable(Called called)
+        {
+            _interceptor._isGetVerifiable = true;
+            _interceptor._getVerifiableTimes = called;
+            return this;
+        }
+
+        IIndexerGetBuilder<TKey, TValue> IIndexerGetBuilder<TKey, TValue>.Verifiable() => (IIndexerGetBuilder<TKey, TValue>)Verifiable();
+        IIndexerGetTracking<TKey> IIndexerGetTracking<TKey>.Verifiable() => (IIndexerGetTracking<TKey>)Verifiable();
+        IIndexerGetTracking<TKey> IIndexerGetTracking<TKey>.Verifiable(Called called) => (IIndexerGetTracking<TKey>)Verifiable(called);
     }
 
     // ========================================================================
@@ -575,14 +588,14 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
     // ========================================================================
 
     /// <summary>Sequence implementation for ThenGet chaining.</summary>
-    public class IndexerGetSequenceBase
+    public class IndexerGetSequenceBase : IIndexerGetSequence<TKey, TValue>
     {
         protected readonly IndexerGetSetInterceptorBase<TKey, TValue> _interceptor;
 
         public IndexerGetSequenceBase(IndexerGetSetInterceptorBase<TKey, TValue> interceptor) => _interceptor = interceptor;
 
         /// <summary>Adds another getter callback to the sequence.</summary>
-        protected IndexerGetSequenceBase ThenGetBase(Func<TKey, TValue> callback)
+        public IIndexerGetSequence<TKey, TValue> ThenGet(Func<TKey, TValue> callback)
         {
             var tracking = new IndexerGetBuilderBase(_interceptor);
             _interceptor._getSequence!.Add((callback, tracking));
@@ -603,10 +616,11 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public void Reset() => _interceptor.Reset();
 
         /// <summary>Marks this sequence for verification by Stub.Verify().</summary>
-        public void VerifiableBase()
+        public IIndexerGetSequence<TKey, TValue> Verifiable()
         {
             _interceptor._isGetVerifiable = true;
             _interceptor._getVerifiableTimes = null;
+            return this;
         }
 
         /// <summary>Terminates sequence with default(T) after exhaustion instead of repeating last value.</summary>
@@ -621,7 +635,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
     // ========================================================================
 
     /// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public class IndexerSetBuilderBase
+    public class IndexerSetBuilderBase : IIndexerSetBuilder<TKey, TValue>, IIndexerSetTracking<TKey, TValue>
     {
         protected readonly IndexerGetSetInterceptorBase<TKey, TValue> _interceptor;
         private (TKey Key, TValue Value)? _lastEntry;
@@ -642,14 +656,14 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public void Verify() => Verify(Called.AtLeastOnce);
 
         /// <summary>Verifies call count satisfies the Called constraint.</summary>
-        public void Verify(Called times)
+        public void Verify(Called called)
         {
-            if (!times.Validate(_callCount))
-                throw new VerificationException(new VerificationFailure("indexer setter", times, _callCount));
+            if (!called.Validate(_callCount))
+                throw new VerificationException(new VerificationFailure("indexer setter", called, _callCount));
         }
 
         /// <summary>Elevates to sequence mode and adds another setter callback.</summary>
-        protected IndexerSetSequenceBase ThenSetBase(Action<TKey, TValue> callback)
+        public IIndexerSetSequence<TKey, TValue> ThenSet(Action<TKey, TValue> callback)
         {
             if (_interceptor._setSequence == null)
             {
@@ -665,11 +679,24 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Marks for verification by Stub.Verify().</summary>
-        public void VerifiableBase()
+        public IndexerSetBuilderBase Verifiable()
         {
             _interceptor._isSetVerifiable = true;
             _interceptor._setVerifiableTimes = null;
+            return this;
         }
+
+        /// <summary>Marks for verification by Stub.Verify() with Called constraint.</summary>
+        public IndexerSetBuilderBase Verifiable(Called called)
+        {
+            _interceptor._isSetVerifiable = true;
+            _interceptor._setVerifiableTimes = called;
+            return this;
+        }
+
+        IIndexerSetBuilder<TKey, TValue> IIndexerSetBuilder<TKey, TValue>.Verifiable() => (IIndexerSetBuilder<TKey, TValue>)Verifiable();
+        IIndexerSetTracking<TKey, TValue> IIndexerSetTracking<TKey, TValue>.Verifiable() => (IIndexerSetTracking<TKey, TValue>)Verifiable();
+        IIndexerSetTracking<TKey, TValue> IIndexerSetTracking<TKey, TValue>.Verifiable(Called called) => (IIndexerSetTracking<TKey, TValue>)Verifiable(called);
     }
 
     // ========================================================================
@@ -677,14 +704,14 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
     // ========================================================================
 
     /// <summary>Sequence implementation for ThenSet chaining.</summary>
-    public class IndexerSetSequenceBase
+    public class IndexerSetSequenceBase : IIndexerSetSequence<TKey, TValue>
     {
         protected readonly IndexerGetSetInterceptorBase<TKey, TValue> _interceptor;
 
         public IndexerSetSequenceBase(IndexerGetSetInterceptorBase<TKey, TValue> interceptor) => _interceptor = interceptor;
 
         /// <summary>Adds another setter callback to the sequence.</summary>
-        protected IndexerSetSequenceBase ThenSetBase(Action<TKey, TValue> callback)
+        public IIndexerSetSequence<TKey, TValue> ThenSet(Action<TKey, TValue> callback)
         {
             var tracking = new IndexerSetBuilderBase(_interceptor);
             _interceptor._setSequence!.Add((callback, tracking));
@@ -705,10 +732,11 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public void Reset() => _interceptor.Reset();
 
         /// <summary>Marks this sequence for verification by Stub.Verify().</summary>
-        public void VerifiableBase()
+        public IIndexerSetSequence<TKey, TValue> Verifiable()
         {
             _interceptor._isSetVerifiable = true;
             _interceptor._setVerifiableTimes = null;
+            return this;
         }
 
         /// <summary>Terminates sequence after exhaustion instead of repeating last callback.</summary>
@@ -828,7 +856,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Configures the return value when predicate matches (getter chain).</summary>
-        public IndexerGetWhenChainBase ReturnsBase(TValue value)
+        public IndexerGetWhenChainBase Returns(TValue value)
         {
             _interceptor._whenGetChain ??= new List<IndexerGetWhenMatcherBase>();
             _interceptor._whenGetChain.Add(new IndexerGetWhenMatcherValue(_predicate, value));
@@ -836,7 +864,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Configures a callback when predicate matches (getter chain).</summary>
-        public IndexerGetWhenChainBase GetBase(Func<TKey, TValue> callback)
+        public IndexerGetWhenChainBase Get(Func<TKey, TValue> callback)
         {
             _interceptor._whenGetChain ??= new List<IndexerGetWhenMatcherBase>();
             _interceptor._whenGetChain.Add(new IndexerGetWhenMatcherCallback(_predicate, callback));
@@ -844,7 +872,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Configures a callback when predicate matches (setter chain).</summary>
-        public IndexerSetWhenChainBase SetBase(Action<TKey, TValue> callback)
+        public IndexerSetWhenChainBase Set(Action<TKey, TValue> callback)
         {
             _interceptor._whenSetChain ??= new List<IndexerSetWhenMatcherBase>();
             _interceptor._whenSetChain.Add(new IndexerSetWhenMatcherCallback(_predicate, callback));
@@ -864,7 +892,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public IndexerGetWhenChainBase(IndexerGetSetInterceptorBase<TKey, TValue> interceptor) => _interceptor = interceptor;
 
         /// <summary>Adds another predicate matcher to the getter When chain.</summary>
-        public IndexerWhenBuilderBase ThenWhenBase(Func<TKey, bool> predicate)
+        public IndexerWhenBuilderBase ThenWhen(Func<TKey, bool> predicate)
         {
             return new IndexerWhenBuilderBase(_interceptor, predicate);
         }
@@ -896,7 +924,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Marks this getter When chain for verification by Stub.Verify().</summary>
-        public IndexerGetWhenChainBase VerifiableBase()
+        public IndexerGetWhenChainBase Verifiable()
         {
             _interceptor._whenGetVerifiable = true;
             return this;
@@ -915,7 +943,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         public IndexerSetWhenChainBase(IndexerGetSetInterceptorBase<TKey, TValue> interceptor) => _interceptor = interceptor;
 
         /// <summary>Adds another predicate matcher to the setter When chain.</summary>
-        public IndexerWhenBuilderBase ThenWhenBase(Func<TKey, bool> predicate)
+        public IndexerWhenBuilderBase ThenWhen(Func<TKey, bool> predicate)
         {
             return new IndexerWhenBuilderBase(_interceptor, predicate);
         }
@@ -947,7 +975,7 @@ public abstract class IndexerGetSetInterceptorBase<TKey, TValue>
         }
 
         /// <summary>Marks this setter When chain for verification by Stub.Verify().</summary>
-        public IndexerSetWhenChainBase VerifiableBase()
+        public IndexerSetWhenChainBase Verifiable()
         {
             _interceptor._whenSetVerifiable = true;
             return this;
