@@ -648,3 +648,39 @@ public partial class RefReturnServiceBaseKnockOff
 }
 
 #endregion
+
+#region Default Interface Method Test Types
+
+public interface IDefaultMethodPolygon
+{
+	int NumberOfSides { get; }
+	int SideLength { get; }
+
+	double GetPerimeter() => this.SideLength * this.NumberOfSides;
+}
+
+public interface IDefaultPropertyPolygon
+{
+	int NumberOfSides { get; }
+	int SideLength { get; }
+
+	double Perimeter => this.SideLength * this.NumberOfSides;
+}
+
+public interface IDefaultIndexerPolygon
+{
+	int SideLength { get; }
+
+	double this[int numberOfSides] => this.SideLength * numberOfSides;
+}
+
+[KnockOff]
+public partial class DefaultMethodPolygonKnockOff : IDefaultMethodPolygon { }
+
+[KnockOff]
+public partial class DefaultPropertyPolygonKnockOff : IDefaultPropertyPolygon { }
+
+[KnockOff]
+public partial class DefaultIndexerPolygonKnockOff : IDefaultIndexerPolygon { }
+
+#endregion
