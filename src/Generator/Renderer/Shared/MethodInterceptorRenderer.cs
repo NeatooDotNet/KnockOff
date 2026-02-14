@@ -26,21 +26,77 @@ internal static class MethodInterceptorRenderer
 	{
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
-		var classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
+
+		// Determine emission mode for single-signature methods
+		var useBaseClass = false;
+		if (model.Overloads.Count == 0)
+		{
+			var hasRefOrOut = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+			var (_, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
+			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(model.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+			useBaseClass = !hasRefOrOut && !isAsyncWithInnerType && !isVoidAsync && !model.IsRefReturn;
+		}
+
+		string classDecl;
+		if (useBaseClass)
+		{
+			var delegateType = model.CallDelegateType.TrimEnd('?');
+			var tArgs = ComputeTArgsType(model.Parameters);
+			// Custom delegates are nested types inside the interceptor class.
+			// In the base class list, they must be qualified with the interceptor class name
+			// because nested types are not in scope in the class header.
+			var qualifiedDelegateType = model.NeedsCustomDelegate
+				? $"{model.InterceptorClassName}{typeParams}.{delegateType}"
+				: delegateType;
+			string baseClassName;
+			if (model.IsVoid)
+			{
+				baseClassName = $"global::KnockOff.Interceptors.VoidMethodInterceptorBase<{qualifiedDelegateType}, {tArgs}>";
+			}
+			else
+			{
+				baseClassName = $"global::KnockOff.Interceptors.MethodInterceptorBase<{qualifiedDelegateType}, {tArgs}, {model.ReturnType}>";
+			}
+			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams} : {baseClassName}{constraints}";
+		}
+		else
+		{
+			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
+		}
 
 		w.Line($"/// <summary>Tracks and configures behavior for {model.MethodName}.</summary>");
 		using (w.Block(classDecl))
 		{
-			if (model.Overloads.Count == 0)
-			{
-				RenderSingleSignatureContent(w, model, options);
-			}
-			else
+			if (model.Overloads.Count > 0)
 			{
 				RenderOverloadGroupContent(w, model, options);
 			}
+			else if (useBaseClass)
+			{
+				RenderBaseClassContent(w, model, options);
+			}
+			else
+			{
+				RenderSingleSignatureContent(w, model, options);
+			}
 		}
 		w.Line();
+	}
+
+	/// <summary>
+	/// Computes the TArgs type parameter for the base class.
+	/// 0 params -> Unit, 1 param -> the param type, 2+ params -> named ValueTuple.
+	/// </summary>
+	private static string ComputeTArgsType(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return "global::KnockOff.Unit";
+		if (parameters.Count == 1)
+			return parameters.GetArray()![0].Type;
+		// Named ValueTuple: (T1 name1, T2 name2, ...)
+		return "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
 	}
 
 	#region Single-Signature Interceptor
@@ -383,6 +439,1108 @@ internal static class MethodInterceptorRenderer
 			RenderVoidWhenMatcherClasses(w, model.Parameters, delegateType, null);
 			RenderVoidWhenChainImpl(w, fullInterceptorClassName, model.Parameters, delegateType, null);
 		}
+	}
+
+	#endregion
+
+	#region Base Class Mode Interceptor
+
+	/// <summary>
+	/// Renders a thin interceptor that inherits from MethodInterceptorBase or VoidMethodInterceptorBase.
+	/// Only emitted for single-signature methods without ref/out, async simplified, or ref return.
+	/// </summary>
+	private static void RenderBaseClassContent(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		InterceptorRenderOptions options)
+	{
+		var delegateType = model.CallDelegateType.TrimEnd('?');
+		var tArgs = ComputeTArgsType(model.Parameters);
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// Source field for Source(T) feature
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no callback is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
+		// Custom delegate if needed
+		if (model.NeedsCustomDelegate && model.CustomDelegateSignature != null)
+		{
+			w.Line($"/// <summary>Delegate for {model.MethodName}.</summary>");
+			w.Line(model.CustomDelegateSignature);
+			w.Line();
+		}
+
+		// Constructor
+		w.Line($"public {model.InterceptorClassName}() : base(\"{model.MethodName}\") {{ }}");
+		w.Line();
+
+		// Abstract overrides
+		if (model.IsVoid)
+		{
+			// InvokeVoidDelegate
+			RenderBaseClassInvokeVoidDelegate(w, delegateType, tArgs, model.Parameters);
+		}
+		else
+		{
+			// InvokeDelegate
+			RenderBaseClassInvokeDelegate(w, delegateType, tArgs, model.ReturnType, model.Parameters);
+			// CreateValueDelegate
+			RenderBaseClassCreateValueDelegate(w, delegateType, model.ReturnType, model.Parameters);
+		}
+		// RecordArgs
+		RenderBaseClassRecordArgs(w, tArgs, model.TrackableParameters);
+		// RecordUnconfiguredArgs
+		RenderBaseClassRecordUnconfiguredArgs(w, tArgs, model.LastArgType, model.LastArgsType, model.TrackableParameters);
+		w.Line();
+
+		// Unconfigured last arg/args fields + LastArg/LastArgs property using FindLastArgInTracking
+		RenderBaseClassUnconfiguredArgFields(w, model.LastArgType, model.LastArgsType, model.TrackableParameters, model.IsVoid);
+
+		// Return/Call entry points using SetupReturn helpers
+		RenderBaseClassEntryPoints(w, model, delegateType, fullInterceptorClassName);
+
+		// When entry points
+		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0;
+		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0;
+		if (canHaveWhenChain)
+		{
+			RenderBaseClassWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs);
+		}
+		if (canHaveVoidWhenChain)
+		{
+			RenderBaseClassVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs);
+		}
+
+		// Thin Invoke method
+		RenderBaseClassInvokeMethod(w, model, options, tArgs);
+
+		// Reset override
+		RenderBaseClassResetMethod(w, model.LastArgType, model.LastArgsType,
+			hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
+
+		// Thin inner classes (builder only -- sequence is handled by base class)
+		RenderBaseClassMethodCallBuilderImpl(w, model, fullInterceptorClassName, delegateType, tArgs);
+
+		if (canHaveWhenChain)
+		{
+			RenderBaseClassWhenBuilder(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs);
+			RenderBaseClassWhenChain(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, tArgs);
+		}
+		if (canHaveVoidWhenChain)
+		{
+			RenderBaseClassVoidWhenChain(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs);
+		}
+	}
+
+	// --- Base class abstract overrides ---
+
+	private static void RenderBaseClassInvokeDelegate(CodeWriter w, string delegateType, string tArgs, string returnType, EquatableArray<ParameterModel> parameters)
+	{
+		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs);
+		w.Line($"protected override {returnType} InvokeDelegate({delegateType} del, {tArgs} args) => del({callArgs});");
+	}
+
+	private static void RenderBaseClassInvokeVoidDelegate(CodeWriter w, string delegateType, string tArgs, EquatableArray<ParameterModel> parameters)
+	{
+		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs);
+		w.Line($"protected override void InvokeVoidDelegate({delegateType} del, {tArgs} args) => del({callArgs});");
+	}
+
+	private static void RenderBaseClassCreateValueDelegate(CodeWriter w, string delegateType, string returnType, EquatableArray<ParameterModel> parameters)
+	{
+		var discards = BuildDiscardLambdaPrefix(parameters.Count);
+		w.Line($"protected override {delegateType} CreateValueDelegate({returnType} value) => {discards} => value;");
+	}
+
+	private static void RenderBaseClassRecordArgs(CodeWriter w, string tArgs, EquatableArray<ParameterModel> trackableParams)
+	{
+		if (trackableParams.Count == 0)
+		{
+			// No args to record, but we need the override
+			w.Line($"protected override void RecordArgs({tArgs} args, MethodCallBuilderBase tracking) {{ }}");
+		}
+		else
+		{
+			w.Line($"protected override void RecordArgs({tArgs} args, MethodCallBuilderBase tracking)");
+			using (w.Braces())
+			{
+				w.Line("if (tracking is MethodCallBuilderImpl impl) impl.RecordArg(args);");
+			}
+		}
+	}
+
+	private static void RenderBaseClassRecordUnconfiguredArgs(CodeWriter w, string tArgs, string? lastArgType, string? lastArgsType, EquatableArray<ParameterModel> trackableParams)
+	{
+		if (lastArgType != null && trackableParams.Count == 1)
+		{
+			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) => _unconfiguredLastArg = args;");
+		}
+		else if (lastArgsType != null && trackableParams.Count > 1)
+		{
+			// Multi-param: store as nullable tuple
+			var tupleParts = string.Join(", ", trackableParams.Select(p => $"args.{p.EscapedName}"));
+			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) => _unconfiguredLastArgs = ({tupleParts});");
+		}
+		else
+		{
+			// 0 params
+			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) {{ }}");
+		}
+	}
+
+	/// <summary>
+	/// Builds the delegate call args from TArgs. For single param: "args", for multi-param: "args.a, args.b".
+	/// </summary>
+	private static string BuildBaseClassDelegateCallArgs(EquatableArray<ParameterModel> parameters, string tArgs)
+	{
+		if (parameters.Count == 0)
+			return ""; // Action with no params -- delegate takes no args
+		if (parameters.Count == 1)
+			return "args";
+		return string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+	}
+
+	// --- Unconfigured arg fields and LastArg/LastArgs properties ---
+
+	private static void RenderBaseClassUnconfiguredArgFields(CodeWriter w, string? lastArgType, string? lastArgsType, EquatableArray<ParameterModel> trackableParams, bool isVoid)
+	{
+		// Manual cast approach for LastArg/LastArgs: FindLastArgInTracking doesn't work for value types
+		// because TResult? doesn't become Nullable<T> without a struct constraint.
+		// Non-void interceptors check _returnValueTracking first (from MethodInterceptorBase).
+		// Void interceptors only have _callTracking and _sequence (from VoidMethodInterceptorBase).
+
+		if (lastArgType != null && trackableParams.Count == 1)
+		{
+			var nullableType = lastArgType.EndsWith("?") ? lastArgType : $"{lastArgType}?";
+			w.Line($"private {nullableType} _unconfiguredLastArg;");
+			w.Line();
+
+			w.Line($"/// <summary>Last argument from the most recently called registration.</summary>");
+			w.Line($"public {nullableType} LastArg");
+			using (w.Braces())
+			{
+				w.Line("get");
+				using (w.Braces())
+				{
+					if (!isVoid)
+						w.Line("if ((_returnValueTracking?._callCount ?? 0) > 0 && _returnValueTracking is MethodCallBuilderImpl rvb) return rvb.LastArg;");
+					w.Line("if ((_callTracking?._callCount ?? 0) > 0 && _callTracking is MethodCallBuilderImpl cb) return cb.LastArg;");
+					w.Line("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0 && _sequence[i].Tracking is MethodCallBuilderImpl sb) return sb.LastArg;");
+					w.Line("return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;");
+				}
+			}
+			w.Line();
+		}
+		else if (lastArgsType != null && trackableParams.Count > 1)
+		{
+			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
+			w.Line($"private {nullableType} _unconfiguredLastArgs;");
+			w.Line();
+
+			w.Line($"/// <summary>Last arguments from the most recently called registration.</summary>");
+			w.Line($"public {nullableType} LastArgs");
+			using (w.Braces())
+			{
+				w.Line("get");
+				using (w.Braces())
+				{
+					if (!isVoid)
+						w.Line("if ((_returnValueTracking?._callCount ?? 0) > 0 && _returnValueTracking is MethodCallBuilderImpl rvb) return rvb.LastArgs;");
+					w.Line("if ((_callTracking?._callCount ?? 0) > 0 && _callTracking is MethodCallBuilderImpl cb) return cb.LastArgs;");
+					w.Line("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0 && _sequence[i].Tracking is MethodCallBuilderImpl sb) return sb.LastArgs;");
+					w.Line("return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;");
+				}
+			}
+			w.Line();
+		}
+	}
+
+	// --- Return/Call entry points ---
+
+	private static void RenderBaseClassEntryPoints(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		string delegateType,
+		string fullInterceptorClassName)
+	{
+		var entryPointName = model.IsVoid ? "Call" : "Return";
+		var hasValueOverload = !model.IsVoid;
+
+		// Return(callback) / Call(callback)
+		w.Line($"/// <summary>Configures callback that repeats indefinitely. Returns builder for sequence chaining.</summary>");
+		w.Line($"public MethodCallBuilderImpl {entryPointName}({delegateType} callback)");
+		using (w.Braces())
+		{
+			w.Line("var builder = new MethodCallBuilderImpl(this);");
+			if (model.IsVoid)
+				w.Line("SetupCallback(callback, builder);");
+			else
+				w.Line("SetupReturnCallback(callback, builder);");
+			w.Line("return builder;");
+		}
+		w.Line();
+
+		// Return(value) for non-void
+		if (hasValueOverload)
+		{
+			var (valueStorageType, _, _) = GetAsyncTypeInfo(model.ReturnType);
+			w.Line($"/// <summary>Configures return value that repeats indefinitely. Returns builder for sequence chaining.</summary>");
+			w.Line($"public MethodCallBuilderImpl Return({valueStorageType} value)");
+			using (w.Braces())
+			{
+				w.Line("var builder = new MethodCallBuilderImpl(this);");
+				w.Line("SetupReturnValue(value, builder);");
+				w.Line("return builder;");
+			}
+			w.Line();
+
+			// Return(first, params rest) - creates sequence from multiple values
+			var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+			w.Line($"/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>");
+			w.Line($"public ReturnMethodSequenceBase Return({valueStorageType} first, params {valueStorageType}[] rest)");
+			using (w.Braces())
+			{
+				w.Line($"var builder = Return({discardPrefix} => first);");
+				w.Line("if (rest.Length == 0)");
+				using (w.Braces())
+				{
+					w.Line("return builder.ThenReturn(first);");
+				}
+				w.Line("var seq = builder.ThenReturn(rest[0]);");
+				w.Line("for (int i = 1; i < rest.Length; i++)");
+				using (w.Braces())
+				{
+					w.Line("seq.ThenReturn(rest[i]);");
+				}
+				w.Line("return seq;");
+			}
+			w.Line();
+		}
+	}
+
+	// --- When entry points (base class mode) ---
+
+	private static void RenderBaseClassWhenEntryPoints(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string tArgs)
+	{
+		if (parameters.Count == 0) return;
+
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		// When() value overload - exact value matching
+		w.Line($"/// <summary>Configures parameter-specific matching with exact values. Returns builder for Return().</summary>");
+		w.Line($"public WhenBuilder When({paramTypeList})");
+		using (w.Braces())
+		{
+			w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+			// Build predicate that bridges individual params to TArgs predicate
+			if (parameters.Count == 1)
+			{
+				var p = parameters.GetArray()![0];
+				w.Line($"return new WhenBuilder(this, (_arg0) => global::System.Object.Equals(_arg0, {p.EscapedName}));");
+			}
+			else
+			{
+				// Multi-param: (args) => object.Equals(args.name1, name1) && ...
+				var predicateBody = string.Join(" && ", parameters.Select(p => $"global::System.Object.Equals(args.{p.EscapedName}, {p.EscapedName})"));
+				w.Line($"return new WhenBuilder(this, (args) => {predicateBody});");
+			}
+		}
+		w.Line();
+
+		// When() predicate overload
+		if (parameters.Count == 1)
+		{
+			var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+			w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>");
+			w.Line($"public WhenBuilder When({predicateType} predicate)");
+			using (w.Braces())
+			{
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				w.Line("return new WhenBuilder(this, predicate);");
+			}
+			w.Line();
+		}
+		else
+		{
+			// Multi-param predicate: Func<T1, T2, bool> -> need to bridge to Func<TArgs, bool>
+			var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+			var predicateType = $"global::System.Func<{paramTypes}, bool>";
+			w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>");
+			w.Line($"public WhenBuilder When({predicateType} predicate)");
+			using (w.Braces())
+			{
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+				w.Line($"return new WhenBuilder(this, (args) => predicate({tupleAccess}));");
+			}
+			w.Line();
+		}
+	}
+
+	private static void RenderBaseClassVoidWhenEntryPoints(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string delegateType,
+		string tArgs)
+	{
+		if (parameters.Count == 0) return;
+
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		// When() value overload
+		w.Line($"/// <summary>Configures parameter-specific matching with exact values for void method. Returns chain directly.</summary>");
+		w.Line($"public VoidWhenChain When({paramTypeList})");
+		using (w.Braces())
+		{
+			w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+			if (parameters.Count == 1)
+			{
+				var p = parameters.GetArray()![0];
+				w.Line($"var matcher = new VoidWhenMatcherPredicateBase((_arg0) => global::System.Object.Equals(_arg0, {p.EscapedName}));");
+			}
+			else
+			{
+				var predicateBody = string.Join(" && ", parameters.Select(p => $"global::System.Object.Equals(args.{p.EscapedName}, {p.EscapedName})"));
+				w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => {predicateBody});");
+			}
+			w.Line("_whenChain.Add(matcher);");
+			w.Line("return new VoidWhenChain(this, matcher);");
+		}
+		w.Line();
+
+		// When() predicate overload
+		if (parameters.Count == 1)
+		{
+			var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+			w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
+			w.Line($"public VoidWhenChain When({predicateType} predicate)");
+			using (w.Braces())
+			{
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				w.Line("var matcher = new VoidWhenMatcherPredicateBase(predicate);");
+				w.Line("_whenChain.Add(matcher);");
+				w.Line("return new VoidWhenChain(this, matcher);");
+			}
+			w.Line();
+		}
+		else
+		{
+			var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+			var predicateType = $"global::System.Func<{paramTypes}, bool>";
+			w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
+			w.Line($"public VoidWhenChain When({predicateType} predicate)");
+			using (w.Braces())
+			{
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+				w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => predicate({tupleAccess}));");
+				w.Line("_whenChain.Add(matcher);");
+				w.Line("return new VoidWhenChain(this, matcher);");
+			}
+			w.Line();
+		}
+	}
+
+	// --- Thin Invoke method (base class mode) ---
+
+	private static void RenderBaseClassInvokeMethod(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		InterceptorRenderOptions options,
+		string tArgs)
+	{
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
+		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
+		var returnType = model.IsVoid ? "void" : model.ReturnType;
+
+		w.Line($"/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>");
+		w.Line($"internal {returnType} Invoke({invokeParams})");
+		using (w.Braces())
+		{
+			// Build the args value for the priority chain
+			string argsExpr;
+			if (model.Parameters.Count == 0)
+				argsExpr = "default";
+			else if (model.Parameters.Count == 1)
+				argsExpr = model.Parameters.GetArray()![0].EscapedName;
+			else
+				argsExpr = "(" + string.Join(", ", model.Parameters.Select(p => p.EscapedName)) + ")";
+
+			if (model.Parameters.Count > 1)
+			{
+				w.Line($"var args = {argsExpr};");
+				argsExpr = "args";
+			}
+
+			// Run priority chain
+			if (model.IsVoid)
+			{
+				w.Line($"if (RunVoidPriorityChain({argsExpr})) return;");
+			}
+			else
+			{
+				w.Line($"var (handled, result) = RunPriorityChain({argsExpr});");
+				w.Line("if (handled) return result;");
+			}
+
+			// Unconfigured tail
+			w.Line("_unconfiguredCallCount++;");
+			w.Line($"RecordUnconfiguredArgs({argsExpr});");
+
+			// Sequence exhausted repeat
+			if (model.IsVoid)
+			{
+				w.Line($"if (HandleSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr})) return;");
+			}
+			else
+			{
+				w.Line($"var (seqHandled, seqResult) = HandleNonVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr});");
+				w.Line("if (seqHandled) return seqResult;");
+			}
+
+			// Final fallback: Stub Override > Source > Strict > Default
+			if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
+			{
+				var stubOverrideCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
+				if (model.IsVoid)
+				{
+					w.Line($"{methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
+					w.Line("return;");
+				}
+				else
+				{
+					w.Line($"return {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
+				}
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					if (model.IsVoid)
+					{
+						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					}
+					else
+					{
+						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					}
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+				if (model.IsVoid)
+					w.Line("return;");
+				else if (model.ThrowsOnDefault)
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via Return or Call.\");");
+				else
+				{
+					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
+					w.Line($"return {defaultExpr};");
+				}
+			}
+		}
+		w.Line();
+	}
+
+	// --- Reset override (base class mode) ---
+
+	private static void RenderBaseClassResetMethod(CodeWriter w, string? lastArgType, string? lastArgsType, bool hasSourceField)
+	{
+		w.Line("/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>");
+		w.Line("public override void Reset()");
+		using (w.Braces())
+		{
+			w.Line("base.Reset();");
+			if (lastArgType != null)
+				w.Line("_unconfiguredLastArg = default;");
+			if (lastArgsType != null)
+				w.Line("_unconfiguredLastArgs = default;");
+			if (hasSourceField)
+				w.Line("_source = null;");
+		}
+		w.Line();
+	}
+
+	// --- Thin inner classes (base class mode) ---
+
+	private static void RenderBaseClassMethodCallBuilderImpl(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		string interceptorClassName,
+		string delegateType,
+		string tArgs)
+	{
+		var trackableParams = model.TrackableParameters;
+		var lastArgType = model.LastArgType;
+		var lastArgsType = model.LastArgsType;
+
+		string baseClass;
+		if (model.IsVoid)
+		{
+			baseClass = "MethodCallBuilderBase";
+		}
+		else
+		{
+			baseClass = "ReturnMethodCallBuilderBase";
+		}
+
+		w.Line($"/// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"public sealed class MethodCallBuilderImpl : {baseClass}, {model.BuilderInterface}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+
+			// LastArg/LastArgs storage
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				w.Line($"private {param.Type} _lastArg = default!;");
+			}
+			else if (trackableParams.Count > 1)
+			{
+				// Builder field uses non-nullable tuple (nullable elements, but the tuple itself is not nullable)
+				// This matches inline mode where builder LastArgs is non-nullable
+				w.Line($"private {lastArgsType} _lastArgs;");
+			}
+			w.Line();
+
+			// Constructor
+			w.Line($"public MethodCallBuilderImpl({interceptorClassName} interceptor) : base(interceptor)");
+			using (w.Braces())
+			{
+				w.Line("_typedInterceptor = interceptor;");
+			}
+			w.Line();
+
+			// LastArg/LastArgs property (non-nullable on builder, matching inline mode)
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				w.Line($"public {param.Type} LastArg => _lastArg;");
+			}
+			else if (trackableParams.Count > 1)
+			{
+				w.Line($"public {lastArgsType} LastArgs => _lastArgs;");
+			}
+
+			// RecordArg method
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				w.Line($"public void RecordArg({tArgs} args) => _lastArg = args;");
+			}
+			else if (trackableParams.Count > 1)
+			{
+				// Store as nullable tuple from TArgs
+				var tupleParts = string.Join(", ", trackableParams.Select(p => $"args.{p.EscapedName}"));
+				w.Line($"public void RecordArg({tArgs} args) => _lastArgs = ({tupleParts});");
+			}
+			w.Line();
+
+			// Reset
+			if (trackableParams.Count == 0)
+				w.Line("public override void Reset() => base.Reset();");
+			else if (trackableParams.Count == 1)
+				w.Line("public override void Reset() { base.Reset(); _lastArg = default!; }");
+			else
+				w.Line("public override void Reset() { base.Reset(); _lastArgs = default; }");
+			w.Line();
+
+			// ThenReturn / ThenCall
+			var thenChainName = model.IsVoid ? "ThenCall" : "ThenReturn";
+			w.Line($"/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>");
+			if (model.IsVoid)
+			{
+				w.Line($"public MethodSequenceBase {thenChainName}({delegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line("return ThenCallBase(callback);");
+				}
+			}
+			else
+			{
+				w.Line($"public ReturnMethodSequenceBase {thenChainName}({delegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line("return ThenReturnBase(callback);");
+				}
+			}
+			w.Line();
+
+			// ThenReturn(value) for non-void
+			if (!model.IsVoid)
+			{
+				var (valueType, _, _) = GetAsyncTypeInfo(model.ReturnType);
+				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+				w.Line($"/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>");
+				w.Line($"public ReturnMethodSequenceBase ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
+				w.Line();
+
+				// ThenReturn(params values)
+				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+				w.Line($"public ReturnMethodSequenceBase ThenReturn(params {valueType}[] values)");
+				using (w.Braces())
+				{
+					w.Line("if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }");
+					w.Line("var seq = ThenReturn(values[0]);");
+					w.Line("for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);");
+					w.Line("return seq;");
+				}
+				w.Line();
+			}
+
+			// Verifiable
+			w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+			w.Line("public MethodCallBuilderImpl Verifiable() { VerifiableBase(); return this; }");
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Called constraint.</summary>");
+			w.Line("public MethodCallBuilderImpl Verifiable(global::KnockOff.Called times) { VerifiableBase(times); return this; }");
+			w.Line();
+
+			// CreateNextBuilder / CreateNextReturnBuilder override
+			if (model.IsVoid)
+			{
+				w.Line("protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);");
+			}
+			else
+			{
+				w.Line("protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);");
+			}
+			w.Line();
+
+			// Explicit interface implementations for IMethodTracking hierarchy
+			w.Line("global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();");
+			w.Line("global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				w.Line($"global::KnockOff.IMethodTracking<{param.Type}> global::KnockOff.IMethodTracking<{param.Type}>.Verifiable() => Verifiable();");
+				w.Line($"global::KnockOff.IMethodTracking<{param.Type}> global::KnockOff.IMethodTracking<{param.Type}>.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
+			}
+			else if (trackableParams.Count > 1)
+			{
+				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable() => Verifiable();");
+				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
+			}
+
+			// Explicit interface implementation for Verifiable on the builder interface (return type must match)
+			w.Line($"{model.BuilderInterface} {model.BuilderInterface}.Verifiable() => Verifiable();");
+			w.Line($"{model.BuilderInterface} {model.BuilderInterface}.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
+
+			// Explicit interface implementation for ThenReturn/ThenCall (interface requires sequence interface return)
+			if (model.IsVoid)
+			{
+				w.Line($"global::KnockOff.IMethodCallSequence<{delegateType}> {model.BuilderInterface}.ThenCall({delegateType} callback) => ThenCall(callback);");
+			}
+			else
+			{
+				w.Line($"global::KnockOff.IMethodReturnSequence<{delegateType}> {model.BuilderInterface}.ThenReturn({delegateType} callback) => ThenReturn(callback);");
+			}
+		}
+		w.Line();
+	}
+
+	private static void RenderBaseClassMethodSequenceImpl(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		string interceptorClassName,
+		string delegateType,
+		string tArgs)
+	{
+		var thenChainName = model.IsVoid ? "ThenCall" : "ThenReturn";
+		string baseClass;
+		string sequenceInterface;
+		if (model.IsVoid)
+		{
+			baseClass = "MethodSequenceBase";
+			sequenceInterface = $"global::KnockOff.IMethodCallSequence<{delegateType}>";
+		}
+		else
+		{
+			baseClass = "ReturnMethodSequenceBase";
+			sequenceInterface = $"global::KnockOff.IMethodReturnSequence<{delegateType}>";
+		}
+
+		w.Line($"/// <summary>Sequence implementation for {thenChainName} chaining.</summary>");
+		w.Line($"public sealed class MethodSequenceImpl : {baseClass}, {sequenceInterface}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+
+			w.Line($"public MethodSequenceImpl({interceptorClassName} interceptor) : base(interceptor)");
+			using (w.Braces())
+			{
+				w.Line("_typedInterceptor = interceptor;");
+			}
+			w.Line();
+
+			// ThenReturn / ThenCall
+			w.Line($"/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>");
+			if (model.IsVoid)
+			{
+				w.Line($"public MethodSequenceImpl ThenCall({delegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line("var tracking = new MethodCallBuilderImpl(_typedInterceptor);");
+					w.Line("AddToSequence(callback, tracking);");
+					w.Line("return this;");
+				}
+			}
+			else
+			{
+				w.Line($"public MethodSequenceImpl ThenReturn({delegateType} callback) {{ ThenReturnBase(callback); return this; }}");
+			}
+			w.Line();
+
+			// ThenReturn(value) for non-void
+			if (!model.IsVoid)
+			{
+				var (valueType, _, _) = GetAsyncTypeInfo(model.ReturnType);
+				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+				w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
+				w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
+				w.Line();
+
+				// ThenReturn(params values)
+				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+				w.Line($"public MethodSequenceImpl ThenReturn(params {valueType}[] values)");
+				using (w.Braces())
+				{
+					w.Line("foreach (var value in values) ThenReturn(value);");
+					w.Line("return this;");
+				}
+				w.Line();
+			}
+
+			// Verifiable
+			w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+			w.Line("public MethodSequenceImpl Verifiable() { VerifiableBase(); return this; }");
+			w.Line();
+
+			// CreateNextBuilder / CreateNextReturnBuilder override
+			if (model.IsVoid)
+			{
+				w.Line("protected override MethodCallBuilderBase CreateNextBuilder() => new MethodCallBuilderImpl(_typedInterceptor);");
+			}
+			else
+			{
+				w.Line("protected override ReturnMethodCallBuilderBase CreateNextReturnBuilder() => new MethodCallBuilderImpl(_typedInterceptor);");
+			}
+			w.Line();
+
+			// Explicit interface implementations for sequence interface
+			if (model.IsVoid)
+			{
+				w.Line($"global::KnockOff.IMethodCallSequence<{delegateType}> global::KnockOff.IMethodCallSequence<{delegateType}>.ThenCall({delegateType} callback) => ThenCall(callback);");
+				w.Line($"global::KnockOff.IMethodCallSequence<{delegateType}> global::KnockOff.IMethodCallSequence<{delegateType}>.Verifiable() => Verifiable();");
+			}
+			else
+			{
+				w.Line($"global::KnockOff.IMethodReturnSequence<{delegateType}> global::KnockOff.IMethodReturnSequence<{delegateType}>.ThenReturn({delegateType} callback) => ThenReturn(callback);");
+				w.Line($"global::KnockOff.IMethodReturnSequence<{delegateType}> global::KnockOff.IMethodReturnSequence<{delegateType}>.Verifiable() => Verifiable();");
+			}
+			w.Line("global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();");
+		}
+		w.Line();
+	}
+
+	// --- Thin WhenBuilder/WhenChain/VoidWhenChain (base class mode) ---
+
+	private static void RenderBaseClassWhenBuilder(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string tArgs)
+	{
+		// Check if this is an async method (Task<T> or ValueTask<T>)
+		var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(returnType);
+		var isAsync = isTaskT || isValueTaskT;
+
+		w.Line($"/// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>");
+		w.Line($"public sealed class WhenBuilder : WhenBuilderBase");
+		using (w.Braces())
+		{
+			w.Line($"public WhenBuilder({interceptorClassName} interceptor, global::System.Func<{tArgs}, bool> predicate) : base(interceptor, predicate) {{ }}");
+			w.Line();
+
+			// Return(value) - calls ReturnBase which handles the When chain
+			if (isAsync)
+			{
+				// Async: Return accepts unwrapped type and wraps
+				w.Line($"/// <summary>Configures the return value. Auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+				w.Line($"public WhenChain Return({innerType} value)");
+				using (w.Braces())
+				{
+					if (isTaskT)
+						w.Line($"ReturnBase(global::System.Threading.Tasks.Task.FromResult(value));");
+					else
+						w.Line($"ReturnBase(new global::System.Threading.Tasks.ValueTask<{innerType}>(value));");
+					w.Line($"return new WhenChain(({interceptorClassName})_interceptor);");
+				}
+			}
+			else
+			{
+				w.Line($"public WhenChain Return({returnType} value)");
+				using (w.Braces())
+				{
+					w.Line("ReturnBase(value);");
+					w.Line($"return new WhenChain(({interceptorClassName})_interceptor);");
+				}
+			}
+		}
+		w.Line();
+	}
+
+	private static void RenderBaseClassWhenChain(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string delegateType,
+		string tArgs)
+	{
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		w.Line($"/// <summary>When chain implementation with ThenWhen, ThenCall, ThenNone, verification support.</summary>");
+		w.Line($"public sealed class WhenChain : WhenChainBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line();
+			w.Line($"public WhenChain({interceptorClassName} interceptor) : base(interceptor)");
+			using (w.Braces())
+			{
+				w.Line("_typedInterceptor = interceptor;");
+			}
+			w.Line();
+
+			// ThenWhen with values
+			if (parameters.Count > 0)
+			{
+				w.Line($"/// <summary>Adds another matcher with exact value matching.</summary>");
+				w.Line($"public WhenBuilder ThenWhen({paramTypeList})");
+				using (w.Braces())
+				{
+					if (parameters.Count == 1)
+					{
+						var p = parameters.GetArray()![0];
+						w.Line($"return new WhenBuilder(_typedInterceptor, (_arg0) => global::System.Object.Equals(_arg0, {p.EscapedName}));");
+					}
+					else
+					{
+						var predicateBody = string.Join(" && ", parameters.Select(p => $"global::System.Object.Equals(args.{p.EscapedName}, {p.EscapedName})"));
+						w.Line($"return new WhenBuilder(_typedInterceptor, (args) => {predicateBody});");
+					}
+				}
+				w.Line();
+
+				// ThenWhen with predicate
+				if (parameters.Count == 1)
+				{
+					var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+					w.Line($"public WhenBuilder ThenWhen({predicateType} predicate) => new WhenBuilder(_typedInterceptor, predicate);");
+					w.Line();
+				}
+				else
+				{
+					var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+					var predicateType = $"global::System.Func<{paramTypes}, bool>";
+					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+					w.Line($"public WhenBuilder ThenWhen({predicateType} predicate)");
+					using (w.Braces())
+					{
+						var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+						w.Line($"return new WhenBuilder(_typedInterceptor, (args) => predicate({tupleAccess}));");
+					}
+					w.Line();
+				}
+			}
+
+			// ThenCall - terminal with callback
+			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
+			w.Line($"public WhenChain ThenCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				if (parameters.Count == 1)
+				{
+					w.Line("ThenCallBase((args) => callback(args));");
+				}
+				else if (parameters.Count == 0)
+				{
+					w.Line("ThenCallBase((args) => callback());");
+				}
+				else
+				{
+					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+					w.Line($"ThenCallBase((args) => callback({callArgs}));");
+				}
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenNone
+			w.Line($"/// <summary>Closes chain with no matcher.</summary>");
+			w.Line("public new WhenChain ThenNone() { base.ThenNone(); return this; }");
+			w.Line();
+
+			// Verifiable
+			w.Line("/// <summary>Marks this When chain for verification by Stub.Verify().</summary>");
+			w.Line("public WhenChain Verifiable() { VerifiableBase(); return this; }");
+		}
+		w.Line();
+	}
+
+	private static void RenderBaseClassVoidWhenChain(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string delegateType,
+		string tArgs)
+	{
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		w.Line($"/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>");
+		w.Line($"public sealed class VoidWhenChain : VoidWhenChainBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _typedInterceptor;");
+			w.Line("private readonly VoidWhenMatcherPredicateBase? _typedMatcher;");
+			w.Line();
+
+			w.Line($"public VoidWhenChain({interceptorClassName} interceptor, VoidWhenMatcherBase matcher) : base(interceptor, matcher)");
+			using (w.Braces())
+			{
+				w.Line("_typedInterceptor = interceptor;");
+				w.Line("_typedMatcher = matcher as VoidWhenMatcherPredicateBase;");
+			}
+			w.Line();
+
+			// Call - sets callback on current matcher
+			w.Line($"/// <summary>Sets an optional callback to invoke when this matcher matches.</summary>");
+			w.Line($"public VoidWhenChain Call({delegateType} callback)");
+			using (w.Braces())
+			{
+				if (parameters.Count == 1)
+				{
+					w.Line("_typedMatcher?.SetCallback(callback);");
+				}
+				else if (parameters.Count == 0)
+				{
+					w.Line("_typedMatcher?.SetCallback((_) => callback());");
+				}
+				else
+				{
+					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+					w.Line($"_typedMatcher?.SetCallback((args) => callback({callArgs}));");
+				}
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenWhen with values
+			if (parameters.Count > 0)
+			{
+				w.Line($"/// <summary>Adds another matcher with exact value matching.</summary>");
+				w.Line($"public VoidWhenChain ThenWhen({paramTypeList})");
+				using (w.Braces())
+				{
+					w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+					if (parameters.Count == 1)
+					{
+						var p = parameters.GetArray()![0];
+						w.Line($"var matcher = new VoidWhenMatcherPredicateBase((_arg0) => global::System.Object.Equals(_arg0, {p.EscapedName}));");
+					}
+					else
+					{
+						var predicateBody = string.Join(" && ", parameters.Select(p => $"global::System.Object.Equals(args.{p.EscapedName}, {p.EscapedName})"));
+						w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => {predicateBody});");
+					}
+					w.Line("_typedInterceptor._whenChain.Add(matcher);");
+					w.Line("return new VoidWhenChain(_typedInterceptor, matcher);");
+				}
+				w.Line();
+
+				// ThenWhen with predicate
+				if (parameters.Count == 1)
+				{
+					var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+					w.Line($"public VoidWhenChain ThenWhen({predicateType} predicate)");
+					using (w.Braces())
+					{
+						w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+						w.Line("var matcher = new VoidWhenMatcherPredicateBase(predicate);");
+						w.Line("_typedInterceptor._whenChain.Add(matcher);");
+						w.Line("return new VoidWhenChain(_typedInterceptor, matcher);");
+					}
+					w.Line();
+				}
+				else
+				{
+					var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+					var predicateType = $"global::System.Func<{paramTypes}, bool>";
+					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+					w.Line($"public VoidWhenChain ThenWhen({predicateType} predicate)");
+					using (w.Braces())
+					{
+						w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+						var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+						w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => predicate({tupleAccess}));");
+						w.Line("_typedInterceptor._whenChain.Add(matcher);");
+						w.Line("return new VoidWhenChain(_typedInterceptor, matcher);");
+					}
+					w.Line();
+				}
+			}
+
+			// ThenCall - terminal with callback
+			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
+			w.Line($"public VoidWhenChain ThenCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				if (parameters.Count == 1)
+				{
+					w.Line("_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase(callback));");
+				}
+				else if (parameters.Count == 0)
+				{
+					w.Line("_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase((_) => callback()));");
+				}
+				else
+				{
+					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+					w.Line($"_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase((args) => callback({callArgs})));");
+				}
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenNone
+			w.Line("/// <summary>Closes chain with no matcher.</summary>");
+			w.Line("public new VoidWhenChain ThenNone() { base.ThenNone(); return this; }");
+			w.Line();
+
+			// Verifiable
+			w.Line("/// <summary>Marks this When chain for verification by Stub.Verify().</summary>");
+			w.Line("public VoidWhenChain Verifiable() { VerifiableBase(); return this; }");
+		}
+		w.Line();
 	}
 
 	#endregion

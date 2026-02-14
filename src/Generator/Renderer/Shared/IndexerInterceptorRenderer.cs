@@ -49,12 +49,35 @@ internal static class IndexerInterceptorRenderer
 		var interceptorClassName = first.InterceptorClassName;
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
-		var classDecl = $"public sealed class {interceptorClassName}{typeParams}{constraints}";
 		var fullInterceptorClassName = interceptorClassName + typeParams;
+
+		// Determine emission mode: base class mode for single-key, single-param indexers without init-only or ref return.
+		// Multi-param indexers (KeyExpression starts with "(") stay inline because the calling convention
+		// (InvokeGet(strict, a, b)) is incompatible with the base class (InvokeGet(strict, TKey key)).
+		var isMultiParam = first.KeyExpression.StartsWith("(");
+		var useBaseClass = !isMulti && !isMultiParam && !models.Any(m => m.IsInitOnly) && !models.Any(m => m.IsRefReturn);
+
+		string classDecl;
+		if (useBaseClass)
+		{
+			var keyType = first.KeyType;
+			var valueType = first.ValueType;
+			classDecl = $"public sealed class {interceptorClassName}{typeParams} : global::KnockOff.Interceptors.IndexerGetSetInterceptorBase<{keyType}, {valueType}>{constraints}";
+		}
+		else
+		{
+			classDecl = $"public sealed class {interceptorClassName}{typeParams}{constraints}";
+		}
 
 		w.Line($"/// <summary>Tracks and configures behavior for indexer.</summary>");
 		using (w.Block(classDecl))
 		{
+			if (useBaseClass)
+			{
+				RenderBaseClassContent(w, first, options, fullInterceptorClassName, allSourceInterfaces);
+			}
+			else
+			{
 			// Source fields for Source(T) feature - one per declaring interface
 			// Uses allSourceInterfaces (computed before dedup) to handle diamond inheritance.
 			foreach (var iface in allSourceInterfaces)
@@ -317,9 +340,152 @@ internal static class IndexerInterceptorRenderer
 					RenderIndexerSetWhenChain(w, model, fullInterceptorClassName, friendlyName, suffix);
 				}
 			}
+			} // end else (inline mode)
 		}
 		w.Line();
 	}
+
+	#region Base Class Mode: Single-Key Indexers
+
+	/// <summary>
+	/// Renders a thin interceptor that inherits from IndexerGetSetInterceptorBase&lt;TKey, TValue&gt;.
+	/// Only emitted for single-key indexers without init-only or ref return.
+	/// </summary>
+	private static void RenderBaseClassContent(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		IndexerInterceptorRenderOptions options,
+		string fullInterceptorClassName,
+		List<string> allSourceInterfaces)
+	{
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var indexerName = model.IndexerName;
+
+		// Source fields for Source(T) feature - one per declaring interface
+		foreach (var iface in allSourceInterfaces)
+		{
+			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
+			w.Line($"internal {iface}? _source;");
+			w.Line();
+		}
+
+		// No constructor needed -- base class has default parameterless constructor
+
+
+		// Abstract override: InvokeGetUnconfigured (always required by base class)
+		// For single-param indexers (the only ones using base class mode), the key IS the param.
+		w.Line($"protected override {valueType} InvokeGetUnconfigured(bool strict, {keyType} key)");
+		using (w.Braces())
+		{
+			if (model.HasGetter && !string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) return src[key];");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{indexerName}\");");
+			w.Line($"return {model.DefaultExpression};");
+		}
+		w.Line();
+
+		// Abstract override: InvokeSetUnconfigured (always required by base class)
+		w.Line($"protected override void InvokeSetUnconfigured(bool strict, {keyType} key, {valueType} value)");
+		using (w.Braces())
+		{
+			if (model.HasSetter && !string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line($"if (_source is {{ }} src) {{ src[key] = value; return; }}");
+			}
+			w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{indexerName}\");");
+		}
+		w.Line();
+
+		// Reset override (base.Reset() + clear source)
+		w.Line("public override void Reset()");
+		using (w.Braces())
+		{
+			w.Line("base.Reset();");
+			if (allSourceInterfaces.Count > 0)
+			{
+				w.Line("_source = null;");
+			}
+		}
+		w.Line();
+
+		// Typed indexer accessor: this[params] -> GetOrCreatePerKeyBuilder(keyExpr)
+		// No "new" keyword needed -- base class has GetOrCreatePerKeyBuilder(TKey) method, not an indexer.
+		w.Line($"/// <summary>Gets or creates a per-key builder for the specified key.</summary>");
+		w.Line($"public PerKeyBuilder this[{model.ParameterSignature}] => GetOrCreatePerKeyBuilder({model.KeyExpression});");
+		w.Line();
+
+		// Typed Get() method returning IIndexerGetBuilder<TKey, TValue>
+		// Base class inner classes now implement the interfaces directly, so we use IndexerGetBuilderBase
+		if (model.HasGetter)
+		{
+			w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+			w.Line($"public global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}> Get(global::System.Func<{keyType}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("_getSequence = null; _getSequenceIndex = 0;");
+				w.Line("_isGetVerifiable = false; _getVerifiableTimes = null;");
+				w.Line("_get = callback;");
+				w.Line("var builder = new IndexerGetBuilderBase(this);");
+				w.Line("_getTracking = builder;");
+				w.Line("return builder;");
+			}
+			w.Line();
+		}
+
+		// Typed Set() method returning IIndexerSetBuilder<TKey, TValue>
+		// Base class inner classes now implement the interfaces directly, so we use IndexerSetBuilderBase
+		if (model.HasSetter)
+		{
+			w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+			w.Line($"public global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}> Set(global::System.Action<{keyType}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("_setSequence = null; _setSequenceIndex = 0;");
+				w.Line("_isSetVerifiable = false; _setVerifiableTimes = null;");
+				w.Line("_set = callback;");
+				w.Line("var builder = new IndexerSetBuilderBase(this);");
+				w.Line("_setTracking = builder;");
+				w.Line("return builder;");
+			}
+			w.Line();
+		}
+
+		// When() entry point -- uses base class IndexerWhenBuilderBase directly (no thin subclass needed)
+		w.Line($"/// <summary>Configures predicate-based key matching. Returns builder for Returns()/Get()/Set().</summary>");
+		w.Line($"public IndexerWhenBuilderBase When(global::System.Func<{keyType}, bool> predicate)");
+		using (w.Braces())
+		{
+			w.Line("return new IndexerWhenBuilderBase(this, predicate);");
+		}
+		w.Line();
+
+		// Verifiable fluent methods (marks both get and set as verifiable)
+		// Uses "new" to intentionally hide base class Verifiable() which returns the base type
+		w.Line($"/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+		{
+			var parts = new List<string>();
+			if (model.HasGetter) parts.Add("_isGetVerifiable = true; _getVerifiableTimes = null;");
+			if (model.HasSetter) parts.Add("_isSetVerifiable = true; _setVerifiableTimes = null;");
+			w.Line($"public new {fullInterceptorClassName} Verifiable() {{ {string.Join(" ", parts)} return this; }}");
+		}
+		w.Line();
+		w.Line($"/// <summary>Marks this indexer for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		{
+			var parts = new List<string>();
+			if (model.HasGetter) parts.Add("_isGetVerifiable = true; _getVerifiableTimes = times;");
+			if (model.HasSetter) parts.Add("_isSetVerifiable = true; _setVerifiableTimes = times;");
+			w.Line($"public new {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ {string.Join(" ", parts)} return this; }}");
+		}
+		w.Line();
+
+		// No thin inner classes needed -- base class inner classes implement interfaces directly
+		// and When chain base classes have final typed methods
+	}
+
+	#endregion
 
 	#region TotalCount Properties
 

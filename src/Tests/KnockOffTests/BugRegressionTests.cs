@@ -91,6 +91,94 @@ public class BugRegressionTests
 	}
 
 	#endregion
+
+	#region Bug: Property/Indexer Verifiable(Called times) discards the times parameter
+
+	// The explicit interface implementation for IPropertyGetTracking.Verifiable(Called times)
+	// and IPropertySetTracking<T>.Verifiable(Called times) delegates to the parameterless
+	// Verifiable(), silently discarding the Called constraint. This means marking a property
+	// builder as Verifiable(Called.Exactly(3)) actually uses Called.AtLeastOnce.
+	//
+	// Same bug exists in IIndexerGetTracking<TKey>.Verifiable(Called times)
+	// and IIndexerSetTracking<TKey, TValue>.Verifiable(Called times).
+	//
+	// Root cause: Generated EII lines like:
+	//   IPropertyGetTracking IPropertyGetTracking.Verifiable(Called times) => Verifiable();
+	// should be:
+	//   IPropertyGetTracking IPropertyGetTracking.Verifiable(Called times) => Verifiable(times);
+	//
+	// Affected renderers: PropertyInterceptorRenderer (lines 684, 758, 1544, 1631),
+	//                     IndexerInterceptorRenderer (lines 537, 606, 1827, 1921)
+
+	[Fact(Skip = "Known bug: Verifiable(Called times) discards times parameter")]
+	public void PropertyGetBuilder_Verifiable_CalledConstraint_IsApplied()
+	{
+		var stub = new SampleKnockOff();
+		ISampleService service = stub;
+
+		// Mark getter as verifiable with Called.Exactly(3)
+		stub.Name.Get(() => "test").Verifiable(Called.Exactly(3));
+
+		// Call only once — should NOT satisfy Exactly(3)
+		_ = service.Name;
+
+		// Stub.Verify() should throw because 1 != 3
+		// BUG: Does not throw because Called.Exactly(3) is silently discarded,
+		// defaulting to Called.AtLeastOnce which is satisfied by 1 call.
+		Assert.Throws<VerificationException>(() => stub.Verify());
+	}
+
+	[Fact(Skip = "Known bug: Verifiable(Called times) discards times parameter")]
+	public void PropertySetBuilder_Verifiable_CalledConstraint_IsApplied()
+	{
+		var stub = new SampleKnockOff();
+		ISampleService service = stub;
+
+		// Mark setter as verifiable with Called.Exactly(3)
+		stub.Name.Set(v => { }).Verifiable(Called.Exactly(3));
+
+		// Call only once
+		service.Name = "test";
+
+		// Should throw because 1 != 3
+		Assert.Throws<VerificationException>(() => stub.Verify());
+	}
+
+	[Fact(Skip = "Known bug: Verifiable(Called times) discards times parameter")]
+	public void IndexerGetBuilder_Verifiable_CalledConstraint_IsApplied()
+	{
+		var stub = new SimpleIndexerKnockOff();
+		ISimpleIndexer store = stub;
+
+		// Mark getter as verifiable with Called.Exactly(3)
+		stub.Indexer.Get(key => 42).Verifiable(Called.Exactly(3));
+
+		// Call only once
+		_ = store["foo"];
+
+		// CheckVerification should return a failure because 1 != 3
+		var failure = stub.Indexer.CheckVerification();
+		Assert.NotNull(failure);
+	}
+
+	[Fact(Skip = "Known bug: Verifiable(Called times) discards times parameter")]
+	public void IndexerSetBuilder_Verifiable_CalledConstraint_IsApplied()
+	{
+		var stub = new SimpleIndexerKnockOff();
+		ISimpleIndexer store = stub;
+
+		// Mark setter as verifiable with Called.Exactly(3)
+		stub.Indexer.Set((key, value) => { }).Verifiable(Called.Exactly(3));
+
+		// Call only once
+		store["foo"] = 99;
+
+		// CheckVerification should return a failure because 1 != 3
+		var failure = stub.Indexer.CheckVerification();
+		Assert.NotNull(failure);
+	}
+
+	#endregion
 }
 
 #region Bug regression test types
