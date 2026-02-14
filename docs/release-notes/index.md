@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.49.0](v0.49.0.md) | 2026-02-13 | Eliminate generated thin subclasses, fix Verifiable(Called times) bug |
 | [v0.47.0](v0.47.0.md) | 2026-02-09 | **Breaking:** Major indexer API redesign — per-key builders, When(predicate), per-key verification |
 | [v0.46.0](v0.46.0.md) | 2026-02-09 | Fix 7 generator bugs: multi-param indexers, init-only indexers, multi-arity generics |
 | [v0.43.0](v0.43.0.md) | 2026-02-08 | Ref return support for methods, properties, and indexers |
