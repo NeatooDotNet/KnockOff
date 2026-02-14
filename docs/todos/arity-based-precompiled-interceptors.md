@@ -135,12 +135,18 @@ Named `When`/`ThenWhen` parameters can be added later via thin generated subclas
 
 ### Edge Case Fallbacks (continue using current generated-class approach)
 
+Only genuinely rare cases fall back to the old approach:
+
 - `ref`/`out` parameters (already inline mode today)
 - `ref` returns (already inline mode today)
-- Methods with >8 parameters (rare)
-- Overloaded method groups (already inline mode today)
-- Void async (`Task`/`ValueTask` return without inner type - already inline mode today)
-- Async `Task<T>`/`ValueTask<T>` (already inline mode today)
+- Methods with >8 parameters (extremely rare)
+
+**Not fallbacks** (handled by pre-compiled types):
+- Async `Task<T>`/`ValueTask<T>` → `AsyncMethodInterceptorN` with simplified and full-async Return overloads
+- Async `Task`/`ValueTask` → `AsyncVoidMethodInterceptorN`
+- Overloaded methods → thin compositor class (1 generated type, zero inner classes)
+- Stub overrides → `SetFallback` delegate in constructor
+- Source delegation → `SetSourceFallback` delegate
 
 ## Scope
 
@@ -176,11 +182,19 @@ Named `When`/`ThenWhen` parameters can be added later via thin generated subclas
 
 ---
 
+## Plans
+
+- [Arity-Based Pre-compiled Interceptors](../plans/arity-based-precompiled-interceptors.md) -- Full design: type families, async handling, overload compositors, stub overrides, before/after examples
+
+---
+
 ## Phases
 
 ### Phase 1: Library - Pre-compiled Type Families
 - Create `MethodInterceptor0<TReturn>` through `MethodInterceptor8<T1,...,T8,TReturn>`
 - Create `VoidMethodInterceptor0` through `VoidMethodInterceptor8<T1,...,T8>`
+- Create `AsyncMethodInterceptor0<TReturn>` through `AsyncMethodInterceptor8<T1,...,T8,TReturn>`
+- Create `AsyncVoidMethodInterceptor0` through `AsyncVoidMethodInterceptor8<T1,...,T8>`
 - Make property interceptor base classes concrete (non-abstract) with delegate fields
 - Make indexer interceptor base class concrete with delegate fields
 - Pre-compiled builder, WhenBuilder, WhenChain inner classes for each arity
