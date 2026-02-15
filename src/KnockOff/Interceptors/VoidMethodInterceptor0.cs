@@ -442,22 +442,42 @@ public sealed class VoidMethodInterceptor0
     {
         private readonly VoidMethodInterceptor0 _interceptor;
         private readonly Func<bool> _predicate;
+        private int _matcherIndex = -1;
 
         internal VoidWhenBuilder0(VoidMethodInterceptor0 interceptor, Func<bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
+            // Register matcher immediately so Invoke() can track calls before Call() is configured
+            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
+            var matcher = new VoidWhenMatcherPredicate(_predicate);
+            _interceptor._whenChain.Add(matcher);
+            _matcherIndex = _interceptor._whenChain.Count - 1;
         }
 
         /// <summary>Configures the callback for this When match.</summary>
         public VoidWhenChain0 Call(Action callback)
         {
-            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
-            var matcher = new VoidWhenMatcherPredicate(_predicate);
-            matcher.SetCallback(callback);
-            _interceptor._whenChain.Add(matcher);
-            var matcherIndex = _interceptor._whenChain.Count - 1;
-            return new VoidWhenChain0(_interceptor, matcherIndex);
+            // Matcher already registered in constructor - just set the callback
+            ((VoidWhenMatcherPredicate)_interceptor._whenChain![_matcherIndex]).SetCallback(callback);
+            return new VoidWhenChain0(_interceptor, _matcherIndex);
+        }
+
+        /// <summary>Adds a terminal callback matcher to the chain (When-then-ThenCall pattern).</summary>
+        public VoidWhenChain0 ThenCall(Action callback)
+        {
+            // Matcher already registered in constructor - add the terminal callback
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall(callback));
+            return new VoidWhenChain0(_interceptor, _matcherIndex);
+        }
+
+        /// <summary>Verifies this specific When matcher was called the expected number of times (When-as-tracker pattern).</summary>
+        public void Verify(Called times)
+        {
+            if (_interceptor._whenChain == null || _matcherIndex >= _interceptor._whenChain.Count) return;
+            var callCount = _interceptor._whenChain[_matcherIndex].CallCount;
+            if (!times.Validate(callCount))
+                throw new VerificationException(new VerificationFailure("When matcher", times, callCount));
         }
     }
 

@@ -28,48 +28,95 @@ internal static class ClassRenderer
         var indent3 = indent + "\t\t\t";
         var indent4 = indent + "\t\t\t\t";
 
+        // Track which interceptors use pre-compiled mode vs generated classes
+        var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
+        var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
+        var renderedInterceptorClasses = new HashSet<string>();
+
         // Render interceptor classes
         // For class stubs, use IncludeStrictParameter=true so the Impl class can pass _stub.Strict
         foreach (var prop in cls.Properties)
         {
-            var unifiedModel = ToUnifiedPropertyModel(prop);
-            var options = new PropertyInterceptorRenderOptions(
-                BaseIndent: 2,
-                IncludeStrictParameter: true,
-                StrictAccessExpression: "strict",
-                InterceptorTypeParameters: prop.TypeParameterList,
-                InterceptorConstraints: prop.ConstraintClauses);
-            w.SetIndent(2);
-            PropertyInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+            if (renderedInterceptorClasses.Add(prop.InterceptorClassName))
+            {
+                var unifiedModel = ToUnifiedPropertyModel(prop);
+                if (PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel))
+                {
+                    preCompiledInterceptors[prop.PropertyName] = PreCompiledInterceptorRenderer.GetPropertyInterceptorType(unifiedModel);
+                }
+                else
+                {
+                    var options = new PropertyInterceptorRenderOptions(
+                        BaseIndent: 2,
+                        IncludeStrictParameter: true,
+                        StrictAccessExpression: "strict",
+                        InterceptorTypeParameters: prop.TypeParameterList,
+                        InterceptorConstraints: prop.ConstraintClauses);
+                    w.SetIndent(2);
+                    PropertyInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+                }
+            }
         }
 
         // Group indexers by interceptor class name and render as a single multi-indexer interceptor
         var indexersByClass = cls.Indexers.GroupBy(i => i.InterceptorClassName);
         foreach (var group in indexersByClass)
         {
-            var firstIndexer = group.First();
-            var options = new IndexerInterceptorRenderOptions(
-                BaseIndent: 2,
-                IncludeStrictParameter: true,
-                StrictAccessExpression: "strict",
-                InterceptorTypeParameters: firstIndexer.TypeParameterList,
-                InterceptorConstraints: firstIndexer.ConstraintClauses);
-            w.SetIndent(2);
-            var unifiedModels = group.Select(i => ToUnifiedIndexerModel(i)).ToList();
-            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModels, options);
+            if (renderedInterceptorClasses.Add(group.Key))
+            {
+                var firstIndexer = group.First();
+                var unifiedModels = group.Select(i => ToUnifiedIndexerModel(i)).ToList();
+                if (PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModels))
+                {
+                    preCompiledInterceptors[firstIndexer.IndexerName] = PreCompiledInterceptorRenderer.GetIndexerInterceptorType(unifiedModels[0]);
+                }
+                else
+                {
+                    var options = new IndexerInterceptorRenderOptions(
+                        BaseIndent: 2,
+                        IncludeStrictParameter: true,
+                        StrictAccessExpression: "strict",
+                        InterceptorTypeParameters: firstIndexer.TypeParameterList,
+                        InterceptorConstraints: firstIndexer.ConstraintClauses);
+                    w.SetIndent(2);
+                    IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModels, options);
+                }
+            }
         }
 
         // Use shared MethodInterceptorRenderer for method interceptors
         foreach (var method in cls.Methods)
         {
-            var options = new InterceptorRenderOptions(
-                BaseIndent: 2,
-                IncludeStrictParameter: true,
-                StrictAccessExpression: "strict",
-                InterceptorTypeParameters: cls.TypeParameterList,
-                InterceptorConstraints: cls.ConstraintClauses);
-            w.SetIndent(2);
-            MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
+            if (renderedInterceptorClasses.Add(method.InterceptorClassName))
+            {
+                if (PreCompiledInterceptorRenderer.CanUsePreCompiled(method))
+                {
+                    preCompiledInterceptors[method.MethodName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(method);
+                }
+                else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
+                {
+                    var options = new InterceptorRenderOptions(
+                        BaseIndent: 2,
+                        IncludeStrictParameter: true,
+                        StrictAccessExpression: "strict",
+                        InterceptorTypeParameters: cls.TypeParameterList,
+                        InterceptorConstraints: cls.ConstraintClauses);
+                    w.SetIndent(2);
+                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options);
+                    compositorGroups[method.MethodName] = method;
+                }
+                else
+                {
+                    var options = new InterceptorRenderOptions(
+                        BaseIndent: 2,
+                        IncludeStrictParameter: true,
+                        StrictAccessExpression: "strict",
+                        InterceptorTypeParameters: cls.TypeParameterList,
+                        InterceptorConstraints: cls.ConstraintClauses);
+                    w.SetIndent(2);
+                    MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
+                }
+            }
         }
 
         // Render generic method handler interceptor classes (Of<T>() pattern)
@@ -98,7 +145,18 @@ internal static class ClassRenderer
         {
             var newKeyword = interceptorProp.NeedsNewKeyword ? "new " : "";
             w.Line($"{indent1}/// <summary>{interceptorProp.Description}</summary>");
-            w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
+            if (preCompiledInterceptors.TryGetValue(interceptorProp.PropertyName, out var preCompiledType))
+            {
+                w.Line($"{indent1}public {newKeyword}{preCompiledType} {interceptorProp.PropertyName} {{ get; }} = new(\"{interceptorProp.PropertyName}\");");
+            }
+            else if (compositorGroups.ContainsKey(interceptorProp.PropertyName))
+            {
+                w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
+            }
+            else
+            {
+                w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
+            }
         }
         w.Line();
 
@@ -128,7 +186,7 @@ internal static class ClassRenderer
         RenderClassVerifyMethods(w, cls, indent1, indent2);
 
         // Nested Impl class
-        RenderImplClass(w, cls, indent1, indent2, indent3, indent4);
+        RenderImplClass(w, cls, indent1, indent2, indent3, indent4, preCompiledInterceptors, compositorGroups);
 
         w.Line($"{indent}}}");
         w.Line();
@@ -630,7 +688,15 @@ internal static class ClassRenderer
 
     #region Impl Class Rendering
 
-    private static void RenderImplClass(CodeWriter w, InlineClassStubModel cls, string indent, string indent1, string indent2, string indent3)
+    private static void RenderImplClass(
+        CodeWriter w,
+        InlineClassStubModel cls,
+        string indent,
+        string indent1,
+        string indent2,
+        string indent3,
+        Dictionary<string, string> preCompiledInterceptors,
+        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
     {
         var stubClassName = cls.StubClassName + cls.TypeParameterList;
 
@@ -696,7 +762,7 @@ internal static class ClassRenderer
         // Method overrides
         foreach (var method in cls.ImplMethods)
         {
-            RenderImplMethodOverride(w, method, indent1, indent2);
+            RenderImplMethodOverride(w, method, indent1, indent2, preCompiledInterceptors, compositorGroups);
         }
 
         // Event overrides
@@ -923,13 +989,22 @@ internal static class ClassRenderer
         w.Line();
     }
 
-    private static void RenderImplMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
+    private static void RenderImplMethodOverride(
+        CodeWriter w,
+        InlineClassImplMethodModel method,
+        string indent,
+        string indent1,
+        Dictionary<string, string> preCompiledInterceptors,
+        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
     {
         if (method.IsGenericMethod)
         {
             RenderImplGenericMethodOverride(w, method, indent, indent1);
             return;
         }
+
+        var isPreCompiled = preCompiledInterceptors.ContainsKey(method.HandlerName);
+        var isCompositor = compositorGroups.ContainsKey(method.HandlerName);
 
         if (method.DoesNotReturn)
         {
@@ -943,6 +1018,7 @@ internal static class ClassRenderer
         if (method.IsRefReturn)
         {
             // Ref return method override - uses InvokeRef + _refReturnBacking pattern
+            // Note: ref return methods always fall back to generated interceptor classes (never pre-compiled)
             var invokeRefMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
                 ? "InvokeRef"
                 : $"InvokeRef{method.InvokeSuffix}";
@@ -1011,19 +1087,28 @@ internal static class ClassRenderer
             w.Line($"{indent1}}}");
             w.Line();
 
-            // Both single-signature and multi-overload interceptors use the shared MethodInterceptorRenderer
-            // which generates Invoke/Invoke_{suffix} methods that handle everything internally.
-            // For class stubs:
-            // - Abstract methods: always use Invoke (no base to fall back to)
-            // - Virtual methods: call Invoke, but check if it actually handled the call and fall back to base if not
-
             // Determine the invoke method name
             var invokeMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
                 ? "Invoke"
                 : $"Invoke{method.InvokeSuffix}";
 
             // Build invoke arguments: strict, then method parameters
-            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+            // For pre-compiled interceptors, strip ref/in prefixes
+            var rawInputArgs = method.InputArgumentList;
+            var cleanInputArgs = (isPreCompiled || isCompositor) ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
+
+            // Determine if ValueTask wrapping is needed (only for pre-compiled/compositor)
+            var needsValueTaskWrap = false;
+            var needsVoidValueTaskWrap = false;
+            if (isPreCompiled)
+            {
+                var (_, _, isAsyncValueTaskT) = PreCompiledInterceptorRenderer.GetAsyncTypeInfoPublic(method.ReturnType);
+                var (_, isVoidValueTask) = PreCompiledInterceptorRenderer.GetVoidAsyncInfoPublic(method.ReturnType);
+                needsValueTaskWrap = isAsyncValueTaskT;
+                needsVoidValueTaskWrap = isVoidValueTask;
+            }
+            // Compositors already handle ValueTask wrapping in their Invoke methods
 
             if (method.IsAbstract)
             {
@@ -1031,6 +1116,14 @@ internal static class ClassRenderer
                 if (method.IsVoid)
                 {
                     w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                }
+                else if (needsVoidValueTaskWrap)
+                {
+                    w.Line($"{indent1}return new global::System.Threading.Tasks.ValueTask(_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs}));");
+                }
+                else if (needsValueTaskWrap)
+                {
+                    w.Line($"{indent1}return new {method.ReturnType}(_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs}));");
                 }
                 else
                 {
@@ -1040,8 +1133,6 @@ internal static class ClassRenderer
             else
             {
                 // Virtual methods: track whether a real handler handled the call
-                // The shared interceptor tracks unconfigured calls via UnconfiguredCallCount
-                // If this counter increments during Invoke, nothing handled the call -> use base
                 w.Line($"{indent1}var unconfiguredBefore = _stub.{method.HandlerName}.UnconfiguredCallCount;");
                 if (method.IsVoid)
                 {
@@ -1050,6 +1141,24 @@ internal static class ClassRenderer
                     w.Line($"{indent1}{{");
                     w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
                     w.Line($"{indent1}}}");
+                }
+                else if (needsVoidValueTaskWrap)
+                {
+                    w.Line($"{indent1}var result = new global::System.Threading.Tasks.ValueTask(_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs}));");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                    w.Line($"{indent1}return result;");
+                }
+                else if (needsValueTaskWrap)
+                {
+                    w.Line($"{indent1}var result = new {method.ReturnType}(_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs}));");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                    w.Line($"{indent1}return result;");
                 }
                 else
                 {
@@ -1067,6 +1176,31 @@ internal static class ClassRenderer
         if (method.DoesNotReturn)
             w.Line("#pragma warning restore CS8763");
         w.Line();
+    }
+
+    /// <summary>
+    /// Strips ref/in/out prefixes from an argument list string.
+    /// Pre-compiled interceptors use plain parameters, not ref/in/out.
+    /// </summary>
+    private static string StripRefPrefixes(string argumentList)
+    {
+        if (string.IsNullOrEmpty(argumentList))
+            return argumentList;
+
+        var args = argumentList.Split(',');
+        var cleanArgs = new List<string>();
+        foreach (var arg in args)
+        {
+            var trimmed = arg.Trim();
+            if (trimmed.StartsWith("in "))
+                trimmed = trimmed.Substring(3);
+            else if (trimmed.StartsWith("ref "))
+                trimmed = trimmed.Substring(4);
+            else if (trimmed.StartsWith("out "))
+                trimmed = trimmed.Substring(4);
+            cleanArgs.Add(trimmed);
+        }
+        return string.Join(", ", cleanArgs);
     }
 
     /// <summary>

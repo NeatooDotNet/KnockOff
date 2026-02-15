@@ -55,7 +55,7 @@ service.Process("item2", 200, false);
 var processArgs = processTracking.LastArgs;
 // Verify method was called twice (throws if not)
 processTracking.Verify(Called.Exactly(2));
-Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");
+Console.WriteLine($"  Last call: ({processArgs.Item1}, {processArgs.Item2}, {processArgs.Item3})");
 Console.WriteLine();
 
 // Test interface access via implicit cast

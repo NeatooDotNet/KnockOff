@@ -46,9 +46,19 @@ public sealed class MethodInterceptor0<TReturn>
     private Func<TReturn>? _fallback;
     private Func<TReturn>? _sourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TReturn>? _defaultFactory;
+
     public MethodInterceptor0(string memberName)
     {
         _memberName = memberName;
+    }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public MethodInterceptor0(string memberName, Func<TReturn> defaultFactory)
+    {
+        _memberName = memberName;
+        _defaultFactory = defaultFactory;
     }
 
     /// <summary>Count of calls not handled by any configured behavior.</summary>
@@ -146,6 +156,9 @@ public sealed class MethodInterceptor0<TReturn>
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
         return default!;
     }
 

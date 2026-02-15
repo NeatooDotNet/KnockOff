@@ -6,6 +6,7 @@ namespace KnockOff.Interceptors;
 /// <summary>
 /// Concrete indexer interceptor with delegate-based fallback.
 /// Directly instantiable as a field: <c>public IndexerGetSetInterceptor&lt;string, int&gt; Indexer { get; } = new();</c>
+/// Provides top-level Get(), Set(), When(), and per-key access via indexer.
 /// </summary>
 /// <typeparam name="TKey">The indexer key type.</typeparam>
 /// <typeparam name="TValue">The indexer value type.</typeparam>
@@ -17,13 +18,72 @@ public class IndexerGetSetInterceptor<TKey, TValue> : IndexerGetSetInterceptorBa
     private Action<TKey, TValue>? _setFallback;
     private Action<TKey, TValue>? _setSourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TValue>? _defaultFactory;
+
     public IndexerGetSetInterceptor(string memberName) : base()
     {
         _memberName = memberName;
     }
 
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public IndexerGetSetInterceptor(string memberName, Func<TValue> defaultFactory) : base()
+    {
+        _memberName = memberName;
+        _defaultFactory = defaultFactory;
+    }
+
     // Store member name since IndexerGetSetInterceptorBase doesn't have a constructor that takes it
     private readonly string _memberName;
+
+    // ========================================================================
+    // Per-key indexer access
+    // ========================================================================
+
+    /// <summary>Gets or creates a per-key builder for the specified key. Enables stub.Indexer["key"].Returns(value) syntax.</summary>
+    public PerKeyBuilder this[TKey key] => GetOrCreatePerKeyBuilder(key);
+
+    // ========================================================================
+    // Top-level Get/Set/When
+    // ========================================================================
+
+    /// <summary>Configures a callback for getter invocations. Returns builder for ThenGet chaining.</summary>
+    public IndexerGetBuilderBase Get(Func<TKey, TValue> callback)
+    {
+        _getSequence = null; _getSequenceIndex = 0;
+        _isGetVerifiable = false; _getVerifiableTimes = null;
+        _get = callback;
+        var builder = new IndexerGetBuilderBase(this);
+        _getTracking = builder;
+        return builder;
+    }
+
+    /// <summary>Configures a callback for setter invocations. Returns builder for ThenSet chaining.</summary>
+    public IndexerSetBuilderBase Set(Action<TKey, TValue> callback)
+    {
+        _setSequence = null; _setSequenceIndex = 0;
+        _isSetVerifiable = false; _setVerifiableTimes = null;
+        _set = callback;
+        var builder = new IndexerSetBuilderBase(this);
+        _setTracking = builder;
+        return builder;
+    }
+
+    /// <summary>Configures parameter-specific matching with exact key. Returns When builder for Returns/Get/Set.</summary>
+    public IndexerWhenBuilderBase When(TKey key)
+    {
+        return new IndexerWhenBuilderBase(this, k => object.Equals(k, key));
+    }
+
+    /// <summary>Configures parameter-specific matching with predicate. Returns When builder for Returns/Get/Set.</summary>
+    public IndexerWhenBuilderBase When(Func<TKey, bool> predicate)
+    {
+        return new IndexerWhenBuilderBase(this, predicate);
+    }
+
+    // ========================================================================
+    // Fallback/Source delegation
+    // ========================================================================
 
     /// <summary>Sets the get fallback delegate for stub overrides.</summary>
     public void SetGetFallback(Func<TKey, TValue>? fallback) => _getFallback = fallback;
@@ -62,6 +122,10 @@ public class IndexerGetSetInterceptor<TKey, TValue> : IndexerGetSetInterceptorBa
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
+
         return default!;
     }
 

@@ -352,7 +352,7 @@ public class MethodConfigTests
 
         // Async methods - auto-wrapped, no Task.FromResult needed
         stub.GetUserAsync.Return((id) => new User { Id = id });  // Returns Task<User>
-        stub.SaveAsync.Return((user) => { });  // Returns Task.CompletedTask
+        stub.SaveAsync.Call((user) => { });  // Returns Task.CompletedTask
         #endregion
 
         ISvc svc = stub;

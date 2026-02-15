@@ -98,7 +98,7 @@ public partial class InlineStubTests
         #endregion
 
         stub.Verify();
-        Assert.Equal("user@example.com", args.to);
+        Assert.Equal("user@example.com", args.Item1);
     }
 }
 

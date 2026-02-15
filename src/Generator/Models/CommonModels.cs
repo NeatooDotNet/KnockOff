@@ -40,7 +40,12 @@ internal sealed record KnockOffTypeInfo(
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff(Strict = true)].
 	/// </summary>
-	bool Strict = false) : IEquatable<KnockOffTypeInfo>;
+	bool Strict = false,
+	/// <summary>
+	/// When true, the user's partial class declaration uses a primary constructor (parameter list).
+	/// Generated constructors must include `: this()` initializer.
+	/// </summary>
+	bool HasPrimaryConstructor = false) : IEquatable<KnockOffTypeInfo>;
 
 /// <summary>
 /// Represents a containing type (for nested class support).

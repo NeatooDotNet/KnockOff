@@ -37,7 +37,7 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
     private Called? _verifiableTimes;
 
     private int _unconfiguredCallCount;
-        private (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)? _unconfiguredLastArgs;
+        private (T1, T2, T3, T4, T5, T6, T7, T8)? _unconfiguredLastArgs;
 
     private Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>? _fallback;
     private Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>? _sourceFallback;
@@ -66,7 +66,7 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
 
     public bool IsConfigured => _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
-    public (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)? LastArgs
+    public (T1, T2, T3, T4, T5, T6, T7, T8)? LastArgs
     {
         get
         {
@@ -275,15 +275,15 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
         public override bool IsTerminal => true;
     }
 
-    public sealed class MethodCallBuilder8 : IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>
+    public sealed class MethodCallBuilder8 : IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)>
     {
         private readonly AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8> _interceptor;
         internal int _callCount;
-        private (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?) _lastArgs;
+        private (T1, T2, T3, T4, T5, T6, T7, T8) _lastArgs;
 
         internal MethodCallBuilder8(AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8> interceptor) => _interceptor = interceptor;
 
-        public (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?) LastArgs => _lastArgs;
+        public (T1, T2, T3, T4, T5, T6, T7, T8) LastArgs => _lastArgs;
 
         internal void RecordCall(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
         {
@@ -330,13 +330,13 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
             }
         }
 
-        IMethodCallSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.ThenCall(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> callback) => ThenCall(callback);
+        IMethodCallSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)>.ThenCall(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> callback) => ThenCall(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable(Called called) => Verifiable(called);
-        IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable() => Verifiable();
-        IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable(Called called) => Verifiable(called);
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)> IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable() => Verifiable();
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)> IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable(Called called) => Verifiable(called);
+        IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable() => Verifiable();
+        IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)> IMethodCallBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>, (T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable(Called called) => Verifiable(called);
     }
 
     public sealed class MethodSequence8 : IMethodCallSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task>>, IMethodCallSequence, IMethodSequence
@@ -373,6 +373,7 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
     {
         private readonly AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8> _interceptor;
         private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, bool> _predicate;
+        private int _matcherIndex = -1;
         internal VoidWhenBuilder8(AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8> interceptor, Func<T1, T2, T3, T4, T5, T6, T7, T8, bool> predicate) { _interceptor = interceptor; _predicate = predicate; }
 
         public VoidWhenChain8 Call(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> asyncCallback)
@@ -381,11 +382,40 @@ public sealed class AsyncVoidMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8>
             var matcher = new VoidWhenMatcherPredicate(_predicate);
             matcher.SetCallback(asyncCallback);
             _interceptor._whenChain.Add(matcher);
-            var matcherIndex = _interceptor._whenChain.Count - 1;
-            return new VoidWhenChain8(_interceptor, matcherIndex);
+            _matcherIndex = _interceptor._whenChain.Count - 1;
+            return new VoidWhenChain8(_interceptor, _matcherIndex);
         }
 
         public VoidWhenChain8 Call(Action<T1, T2, T3, T4, T5, T6, T7, T8> callback) => Call((T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8) => { callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); return Task.CompletedTask; });
+
+        public VoidWhenChain8 ThenCall(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> asyncCallback)
+        {
+            EnsureRegistered();
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall(asyncCallback));
+            return new VoidWhenChain8(_interceptor, _matcherIndex);
+        }
+
+        public VoidWhenChain8 ThenCall(Action<T1, T2, T3, T4, T5, T6, T7, T8> callback) => ThenCall((T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8) => { callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); return Task.CompletedTask; });
+
+        public void Verify(Called times)
+        {
+            EnsureRegistered();
+            if (_interceptor._whenChain == null || _matcherIndex >= _interceptor._whenChain.Count) return;
+            var callCount = _interceptor._whenChain[_matcherIndex].CallCount;
+            if (!times.Validate(callCount))
+                throw new VerificationException(new VerificationFailure("When matcher", times, callCount));
+        }
+
+        private void EnsureRegistered()
+        {
+            if (_matcherIndex < 0)
+            {
+                _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
+                var matcher = new VoidWhenMatcherPredicate(_predicate);
+                _interceptor._whenChain.Add(matcher);
+                _matcherIndex = _interceptor._whenChain.Count - 1;
+            }
+        }
     }
 
     public sealed class VoidWhenChain8

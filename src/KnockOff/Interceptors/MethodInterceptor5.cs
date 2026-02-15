@@ -46,15 +46,25 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
 
     // Unconfigured tracking
     private int _unconfiguredCallCount;
-    private (T1?, T2?, T3?, T4?, T5?)? _unconfiguredLastArgs;
+    private (T1, T2, T3, T4, T5)? _unconfiguredLastArgs;
 
     // Fallback delegates
     private Func<T1, T2, T3, T4, T5, TReturn>? _fallback;
     private Func<T1, T2, T3, T4, T5, TReturn>? _sourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TReturn>? _defaultFactory;
+
     public MethodInterceptor5(string memberName)
     {
         _memberName = memberName;
+    }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public MethodInterceptor5(string memberName, Func<TReturn> defaultFactory)
+    {
+        _memberName = memberName;
+        _defaultFactory = defaultFactory;
     }
 
     /// <summary>Count of calls not handled by any configured behavior.</summary>
@@ -82,7 +92,7 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
     public bool IsConfigured => _hasReturnValue || _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
     /// <summary>Last arguments from the most recently called registration.</summary>
-    public (T1?, T2?, T3?, T4?, T5?)? LastArgs
+    public (T1, T2, T3, T4, T5)? LastArgs
     {
         get
         {
@@ -170,6 +180,9 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
         return default!;
     }
 
@@ -375,11 +388,11 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
     // ========================================================================
 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public sealed class MethodCallBuilder5 : IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)>
+    public sealed class MethodCallBuilder5 : IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)>
     {
         private readonly MethodInterceptor5<T1, T2, T3, T4, T5, TReturn> _interceptor;
         internal int _callCount;
-        private (T1?, T2?, T3?, T4?, T5?) _lastArgs;
+        private (T1, T2, T3, T4, T5) _lastArgs;
 
         internal MethodCallBuilder5(MethodInterceptor5<T1, T2, T3, T4, T5, TReturn> interceptor)
         {
@@ -387,7 +400,7 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
         }
 
         /// <summary>Last arguments passed to this callback.</summary>
-        public (T1?, T2?, T3?, T4?, T5?) LastArgs => _lastArgs;
+        public (T1, T2, T3, T4, T5) LastArgs => _lastArgs;
 
         internal void RecordCall(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
@@ -481,13 +494,13 @@ public sealed class MethodInterceptor5<T1, T2, T3, T4, T5, TReturn>
         }
 
         // Explicit interface implementations
-        IMethodReturnSequence<Func<T1, T2, T3, T4, T5, TReturn>> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)>.ThenReturn(Func<T1, T2, T3, T4, T5, TReturn> callback) => ThenReturn(callback);
+        IMethodReturnSequence<Func<T1, T2, T3, T4, T5, TReturn>> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)>.ThenReturn(Func<T1, T2, T3, T4, T5, TReturn> callback) => ThenReturn(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?)>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?)>.Verifiable(Called called) => Verifiable(called);
-        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)>.Verifiable() => Verifiable();
-        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1?, T2?, T3?, T4?, T5?)>.Verifiable(Called called) => Verifiable(called);
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5)> IMethodTrackingArgs<(T1, T2, T3, T4, T5)>.Verifiable() => Verifiable();
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5)> IMethodTrackingArgs<(T1, T2, T3, T4, T5)>.Verifiable(Called called) => Verifiable(called);
+        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)>.Verifiable() => Verifiable();
+        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, TReturn>, (T1, T2, T3, T4, T5)>.Verifiable(Called called) => Verifiable(called);
     }
 
     // ========================================================================

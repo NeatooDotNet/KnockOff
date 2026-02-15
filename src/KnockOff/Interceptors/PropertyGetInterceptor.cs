@@ -13,7 +13,16 @@ public class PropertyGetInterceptor<TValue> : PropertyGetInterceptorBase<TValue>
     private Func<TValue>? _fallback;
     private Func<TValue>? _sourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TValue>? _defaultFactory;
+
     public PropertyGetInterceptor(string memberName) : base(memberName) { }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public PropertyGetInterceptor(string memberName, Func<TValue> defaultFactory) : base(memberName)
+    {
+        _defaultFactory = defaultFactory;
+    }
 
     /// <summary>Sets the fallback delegate for stub overrides.</summary>
     public void SetFallback(Func<TValue>? fallback) => _fallback = fallback;
@@ -32,6 +41,10 @@ public class PropertyGetInterceptor<TValue> : PropertyGetInterceptorBase<TValue>
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
+
         return default!;
     }
 }

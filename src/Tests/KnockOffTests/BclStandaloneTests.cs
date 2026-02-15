@@ -64,7 +64,7 @@ public class BclStandaloneTests
     public async Task AsyncDisposableKnockOff_DisposeAsync_TracksInvocation()
     {
         var knockOff = new AsyncDisposableKnockOff();
-        var tracking = knockOff.DisposeAsync.Return(() => default);
+        var tracking = knockOff.DisposeAsync.Call(() => { });
         IAsyncDisposable disposable = knockOff;
 
         await disposable.DisposeAsync();
@@ -78,10 +78,9 @@ public class BclStandaloneTests
     {
         var knockOff = new AsyncDisposableKnockOff();
         var disposed = false;
-        knockOff.DisposeAsync.Return(() =>
+        knockOff.DisposeAsync.Call(() =>
         {
             disposed = true;
-            return default;
         });
         IAsyncDisposable disposable = knockOff;
 

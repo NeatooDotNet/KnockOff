@@ -396,8 +396,8 @@ public class MethodOverloadTests
         // Single-param overload can be inferred
         var tracking1 = stub.Format.Return((input) => input.ToUpper());
         // Two-param overloads need explicit delegate types because (input, x) is ambiguous
-        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)((input, uppercase) => uppercase ? input.ToUpper() : input));
-        var tracking3 = stub.Format.Return((OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Int32_String)((input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))));
+        var tracking2 = stub.Format.Return((Func<string, bool, string>)((input, uppercase) => uppercase ? input.ToUpper() : input));
+        var tracking3 = stub.Format.Return((Func<string, int, string>)((input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))));
 
         IOverloadTestService svc = stub;
 
@@ -416,7 +416,7 @@ public class MethodOverloadTests
         var stub = new OverloadTestKnockOff();
 
         var tracking1 = stub.Format.Return((input) => "1");
-        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)((input, uppercase) => "2"));
+        var tracking2 = stub.Format.Return((Func<string, bool, string>)((input, uppercase) => "2"));
 
         IOverloadTestService svc = stub;
 

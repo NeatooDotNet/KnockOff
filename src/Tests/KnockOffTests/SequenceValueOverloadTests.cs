@@ -417,7 +417,7 @@ public partial class SequenceValueOverloadTests
 		IValueTaskMethodService service = knockOff;
 
 		// ThenReturns for ValueTask<T> methods auto-wraps with new ValueTask<T>(value)
-		knockOff.GetValueAsync.Return(() => new ValueTask<string>("first"))
+		knockOff.GetValueAsync.Return("first")
 			.ThenReturn("second")
 			.ThenReturn("third");
 
@@ -966,11 +966,10 @@ public partial class SequenceValueOverloadTests
 
 		var callLog = new List<string>();
 
-		// Return(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// Call(Action) followed by ThenCall(Func<Task>) -- tests sequence with mixed callback types
 		// The simplified callback is Action (void), auto-wrapped to return Task.CompletedTask
-		// Note: Task-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
-		knockOff.DoWorkAsync.Return(() => { callLog.Add("first"); })
-			.ThenReturn(() => { callLog.Add("second"); return Task.CompletedTask; });
+		knockOff.DoWorkAsync.Call(() => { callLog.Add("first"); })
+			.ThenCall(() => { callLog.Add("second"); return Task.CompletedTask; });
 
 		await service.DoWorkAsync();
 		await service.DoWorkAsync();
@@ -986,11 +985,10 @@ public partial class SequenceValueOverloadTests
 
 		var callLog = new List<string>();
 
-		// Return(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
-		// The simplified callback is Action (void), auto-wrapped to return default(ValueTask)
-		// Note: ValueTask-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
-		knockOff.DoWorkValueTaskAsync.Return(() => { callLog.Add("first"); })
-			.ThenReturn(() => { callLog.Add("second"); return default(ValueTask); });
+		// Call(Action) followed by ThenCall(Action) -- tests sequence with simplified callbacks
+		// ValueTask void methods use AsyncVoidMethodInterceptor which provides Call/ThenCall
+		knockOff.DoWorkValueTaskAsync.Call(() => { callLog.Add("first"); })
+			.ThenCall(() => { callLog.Add("second"); });
 
 		await service.DoWorkValueTaskAsync();
 		await service.DoWorkValueTaskAsync();

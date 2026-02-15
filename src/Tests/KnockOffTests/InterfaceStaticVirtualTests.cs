@@ -14,7 +14,8 @@ public class InterfaceStaticVirtualTests
 		var stub = new StaticVirtualInlineTest.Stubs.IHaveStaticVirtuals();
 		IHaveStaticVirtuals service = stub;
 
-		var result = service.InstanceLift();
+		// InstanceLift() returns string (non-nullable) - throws when not configured (smart defaults)
+		Assert.Throws<InvalidOperationException>(() => service.InstanceLift());
 
 		stub.InstanceLift.Verify(Called.Once);
 	}

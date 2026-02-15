@@ -366,19 +366,40 @@ public sealed class AsyncVoidMethodInterceptor1<T1>
     {
         private readonly AsyncVoidMethodInterceptor1<T1> _interceptor;
         private readonly Func<T1, bool> _predicate;
-        internal VoidWhenBuilder1(AsyncVoidMethodInterceptor1<T1> interceptor, Func<T1, bool> predicate) { _interceptor = interceptor; _predicate = predicate; }
+        private int _matcherIndex = -1;
+        internal VoidWhenBuilder1(AsyncVoidMethodInterceptor1<T1> interceptor, Func<T1, bool> predicate)
+        {
+            _interceptor = interceptor;
+            _predicate = predicate;
+            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
+            var matcher = new VoidWhenMatcherPredicate(_predicate);
+            _interceptor._whenChain.Add(matcher);
+            _matcherIndex = _interceptor._whenChain.Count - 1;
+        }
 
         public VoidWhenChain1 Call(Func<T1, Task> asyncCallback)
         {
-            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
-            var matcher = new VoidWhenMatcherPredicate(_predicate);
-            matcher.SetCallback(asyncCallback);
-            _interceptor._whenChain.Add(matcher);
-            var matcherIndex = _interceptor._whenChain.Count - 1;
-            return new VoidWhenChain1(_interceptor, matcherIndex);
+            ((VoidWhenMatcherPredicate)_interceptor._whenChain![_matcherIndex]).SetCallback(asyncCallback);
+            return new VoidWhenChain1(_interceptor, _matcherIndex);
         }
 
         public VoidWhenChain1 Call(Action<T1> callback) => Call((T1 arg1) => { callback(arg1); return Task.CompletedTask; });
+
+        public VoidWhenChain1 ThenCall(Func<T1, Task> asyncCallback)
+        {
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall(asyncCallback));
+            return new VoidWhenChain1(_interceptor, _matcherIndex);
+        }
+
+        public VoidWhenChain1 ThenCall(Action<T1> callback) => ThenCall((T1 arg1) => { callback(arg1); return Task.CompletedTask; });
+
+        public void Verify(Called times)
+        {
+            if (_interceptor._whenChain == null || _matcherIndex >= _interceptor._whenChain.Count) return;
+            var callCount = _interceptor._whenChain[_matcherIndex].CallCount;
+            if (!times.Validate(callCount))
+                throw new VerificationException(new VerificationFailure("When matcher", times, callCount));
+        }
     }
 
     public sealed class VoidWhenChain1

@@ -43,14 +43,24 @@ public sealed class AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TRet
     private Called? _verifiableTimes;
 
     private int _unconfiguredCallCount;
-        private (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)? _unconfiguredLastArgs;
+        private (T1, T2, T3, T4, T5, T6, T7, T8)? _unconfiguredLastArgs;
 
     private Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>? _fallback;
     private Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>? _sourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TReturn>? _defaultFactory;
+
     public AsyncMethodInterceptor8(string memberName)
     {
         _memberName = memberName;
+    }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public AsyncMethodInterceptor8(string memberName, Func<TReturn> defaultFactory)
+    {
+        _memberName = memberName;
+        _defaultFactory = defaultFactory;
     }
 
     public int UnconfiguredCallCount => _unconfiguredCallCount;
@@ -75,7 +85,7 @@ public sealed class AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TRet
     public bool IsConfigured => _hasReturnValue || _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
     /// <summary>Last arguments from the most recently called registration.</summary>
-    public (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)? LastArgs
+    public (T1, T2, T3, T4, T5, T6, T7, T8)? LastArgs
     {
         get
         {
@@ -151,6 +161,9 @@ public sealed class AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TRet
         if (_fallback != null) return await _fallback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8).ConfigureAwait(false);
         if (_sourceFallback != null) return await _sourceFallback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8).ConfigureAwait(false);
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
         return default!;
     }
 
@@ -311,16 +324,16 @@ public sealed class AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TRet
         public override bool IsTerminal => true;
     }
 
-    public sealed class MethodCallBuilder8 : IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>
+    public sealed class MethodCallBuilder8 : IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)>
     {
         private readonly AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TReturn> _interceptor;
         internal int _callCount;
-        private (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?) _lastArgs;
+        private (T1, T2, T3, T4, T5, T6, T7, T8) _lastArgs;
 
         internal MethodCallBuilder8(AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TReturn> interceptor) => _interceptor = interceptor;
 
         /// <summary>Last arguments passed to this callback.</summary>
-        public (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?) LastArgs => _lastArgs;
+        public (T1, T2, T3, T4, T5, T6, T7, T8) LastArgs => _lastArgs;
 
         internal void RecordCall(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
         {
@@ -384,13 +397,13 @@ public sealed class AsyncMethodInterceptor8<T1, T2, T3, T4, T5, T6, T7, T8, TRet
             }
         }
 
-        IMethodReturnSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.ThenReturn(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>> callback) => ThenReturn(callback);
+        IMethodReturnSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)>.ThenReturn(Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>> callback) => ThenReturn(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodTrackingArgs<(T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable(Called called) => Verifiable(called);
-        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable() => Verifiable();
-        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?)>.Verifiable(Called called) => Verifiable(called);
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)> IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable() => Verifiable();
+        IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)> IMethodTrackingArgs<(T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable(Called called) => Verifiable(called);
+        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable() => Verifiable();
+        IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)> IMethodReturnBuilderArgs<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>, (T1, T2, T3, T4, T5, T6, T7, T8)>.Verifiable(Called called) => Verifiable(called);
     }
 
     public sealed class MethodSequence8 : IMethodReturnSequence<Func<T1, T2, T3, T4, T5, T6, T7, T8, Task<TReturn>>>, IMethodReturnSequence, IMethodSequence

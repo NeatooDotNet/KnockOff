@@ -342,7 +342,7 @@ public class CompleteMethodExampleTests
         Assert.True(result);
         stub.Verify();
         Assert.Equal(1, getTracking.LastArg);
-        Assert.Equal("new@test.com", saveTracking.LastArg.Email);
+        Assert.Equal("new@test.com", saveTracking.LastArg!.Email);
     }
 }
 

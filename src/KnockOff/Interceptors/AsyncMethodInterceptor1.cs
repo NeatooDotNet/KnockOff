@@ -41,9 +41,19 @@ public sealed class AsyncMethodInterceptor1<T1, TReturn>
     private Func<T1, Task<TReturn>>? _fallback;
     private Func<T1, Task<TReturn>>? _sourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TReturn>? _defaultFactory;
+
     public AsyncMethodInterceptor1(string memberName)
     {
         _memberName = memberName;
+    }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public AsyncMethodInterceptor1(string memberName, Func<TReturn> defaultFactory)
+    {
+        _memberName = memberName;
+        _defaultFactory = defaultFactory;
     }
 
     public int UnconfiguredCallCount => _unconfiguredCallCount;
@@ -144,6 +154,9 @@ public sealed class AsyncMethodInterceptor1<T1, TReturn>
         if (_fallback != null) return await _fallback(arg1).ConfigureAwait(false);
         if (_sourceFallback != null) return await _sourceFallback(arg1).ConfigureAwait(false);
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
         return default!;
     }
 

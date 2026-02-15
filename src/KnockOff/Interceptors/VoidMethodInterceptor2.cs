@@ -37,7 +37,7 @@ public sealed class VoidMethodInterceptor2<T1, T2>
 
     // Unconfigured tracking
     private int _unconfiguredCallCount;
-    private (T1?, T2?)? _unconfiguredLastArgs;
+    private (T1, T2)? _unconfiguredLastArgs;
 
     // Fallback delegates
     private Action<T1, T2>? _fallback;
@@ -71,7 +71,7 @@ public sealed class VoidMethodInterceptor2<T1, T2>
     public bool IsConfigured => _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
     /// <summary>Last arguments from the most recently called registration.</summary>
-    public (T1?, T2?)? LastArgs
+    public (T1, T2)? LastArgs
     {
         get
         {
@@ -326,11 +326,11 @@ public sealed class VoidMethodInterceptor2<T1, T2>
     // ========================================================================
 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public sealed class MethodCallBuilder2 : IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)>
+    public sealed class MethodCallBuilder2 : IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)>
     {
         private readonly VoidMethodInterceptor2<T1, T2> _interceptor;
         internal int _callCount;
-        private (T1?, T2?) _lastArgs;
+        private (T1, T2) _lastArgs;
 
         internal MethodCallBuilder2(VoidMethodInterceptor2<T1, T2> interceptor)
         {
@@ -338,7 +338,7 @@ public sealed class VoidMethodInterceptor2<T1, T2>
         }
 
         /// <summary>Last arguments passed to this callback.</summary>
-        public (T1?, T2?) LastArgs => _lastArgs;
+        public (T1, T2) LastArgs => _lastArgs;
 
         internal void RecordCall(T1 arg1, T2 arg2)
         {
@@ -404,13 +404,13 @@ public sealed class VoidMethodInterceptor2<T1, T2>
         }
 
         // Explicit interface implementations
-        IMethodCallSequence<Action<T1, T2>> IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)>.ThenCall(Action<T1, T2> callback) => ThenCall(callback);
+        IMethodCallSequence<Action<T1, T2>> IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)>.ThenCall(Action<T1, T2> callback) => ThenCall(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<(T1?, T2?)> IMethodTrackingArgs<(T1?, T2?)>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<(T1?, T2?)> IMethodTrackingArgs<(T1?, T2?)>.Verifiable(Called called) => Verifiable(called);
-        IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)> IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)>.Verifiable() => Verifiable();
-        IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)> IMethodCallBuilderArgs<Action<T1, T2>, (T1?, T2?)>.Verifiable(Called called) => Verifiable(called);
+        IMethodTrackingArgs<(T1, T2)> IMethodTrackingArgs<(T1, T2)>.Verifiable() => Verifiable();
+        IMethodTrackingArgs<(T1, T2)> IMethodTrackingArgs<(T1, T2)>.Verifiable(Called called) => Verifiable(called);
+        IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)> IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)>.Verifiable() => Verifiable();
+        IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)> IMethodCallBuilderArgs<Action<T1, T2>, (T1, T2)>.Verifiable(Called called) => Verifiable(called);
     }
 
     // ========================================================================
@@ -477,22 +477,44 @@ public sealed class VoidMethodInterceptor2<T1, T2>
     {
         private readonly VoidMethodInterceptor2<T1, T2> _interceptor;
         private readonly Func<T1, T2, bool> _predicate;
+        private int _matcherIndex = -1;
 
         internal VoidWhenBuilder2(VoidMethodInterceptor2<T1, T2> interceptor, Func<T1, T2, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
+            // Register matcher immediately so Invoke() can track calls before Call() is configured
+            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
+            var matcher = new VoidWhenMatcherPredicate(_predicate);
+            _interceptor._whenChain.Add(matcher);
+            _matcherIndex = _interceptor._whenChain.Count - 1;
         }
 
         /// <summary>Configures the callback for this When match. The matcher triggers on match but invokes this callback.</summary>
         public VoidWhenChain2 Call(Action<T1, T2> callback)
         {
-            _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
-            var matcher = new VoidWhenMatcherPredicate(_predicate);
-            matcher.SetCallback(callback);
-            _interceptor._whenChain.Add(matcher);
-            var matcherIndex = _interceptor._whenChain.Count - 1;
-            return new VoidWhenChain2(_interceptor, matcherIndex);
+            // Matcher already registered in constructor - just set the callback
+            ((VoidWhenMatcherPredicate)_interceptor._whenChain![_matcherIndex]).SetCallback(callback);
+            return new VoidWhenChain2(_interceptor, _matcherIndex);
+        }
+
+        /// <summary>Adds a terminal callback matcher to the chain (When-then-ThenCall pattern).</summary>
+        public VoidWhenChain2 ThenCall(Action<T1, T2> callback)
+        {
+            // Matcher already registered in constructor - add the terminal callback
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall(callback));
+            return new VoidWhenChain2(_interceptor, _matcherIndex);
+        }
+
+        /// <summary>Verifies this specific When matcher was called the expected number of times (When-as-tracker pattern).</summary>
+        public void Verify(Called times)
+        {
+            if (_interceptor._whenChain == null || _matcherIndex >= _interceptor._whenChain.Count) return;
+            var callCount = _interceptor._whenChain[_matcherIndex].CallCount;
+            if (!times.Validate(callCount))
+            {
+                throw new VerificationException(new VerificationFailure("When matcher", times, callCount));
+            }
         }
     }
 

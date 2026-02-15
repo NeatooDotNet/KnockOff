@@ -16,7 +16,16 @@ public class PropertyGetSetInterceptor<TValue> : PropertyGetSetInterceptorBase<T
     private Action<TValue>? _setFallback;
     private Action<TValue>? _setSourceFallback;
 
+    // Smart default factory (for NewInstance/ThrowException strategies)
+    private readonly Func<TValue>? _defaultFactory;
+
     public PropertyGetSetInterceptor(string memberName) : base(memberName) { }
+
+    /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
+    public PropertyGetSetInterceptor(string memberName, Func<TValue> defaultFactory) : base(memberName)
+    {
+        _defaultFactory = defaultFactory;
+    }
 
     /// <summary>Sets the get fallback delegate for stub overrides.</summary>
     public void SetGetFallback(Func<TValue>? fallback) => _getFallback = fallback;
@@ -55,6 +64,10 @@ public class PropertyGetSetInterceptor<TValue> : PropertyGetSetInterceptorBase<T
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
+
+        // Smart default (NewInstance or ThrowException)
+        if (_defaultFactory != null) return _defaultFactory();
+
         return default!;
     }
 
@@ -67,8 +80,8 @@ public class PropertyGetSetInterceptor<TValue> : PropertyGetSetInterceptorBase<T
         // Source fallback
         if (_setSourceFallback != null) { _setSourceFallback(value); return; }
 
-        // Strict mode -- for get+set properties, unconfigured set stores round-trip value
-        // (handled by base class after this returns), so don't throw for strict on set.
-        // The base class will store the value for round-trip.
+        // Strict mode
+        if (strict) throw StubException.NotConfigured("", _memberName);
+        // If not strict, base class stores round-trip value after this returns.
     }
 }

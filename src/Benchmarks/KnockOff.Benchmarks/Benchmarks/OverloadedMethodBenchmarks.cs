@@ -111,8 +111,8 @@ public class OverloadedMethodVerificationBenchmarks
     private OverloadedServiceStub _knockOffStub = null!;
 #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private IMethodTracking<int> _processIntTracking = null!;
-    private IMethodTracking<string> _processStringTracking = null!;
-    private IMethodTrackingArgs<(int? a, int? b)> _processTwoArgsTracking = null!;
+    private IMethodTracking<string?> _processStringTracking = null!;
+    private IMethodTrackingArgs<(int, int)> _processTwoArgsTracking = null!;
 #pragma warning restore CA1859
 
     [GlobalSetup]

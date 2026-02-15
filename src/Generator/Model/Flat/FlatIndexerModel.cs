@@ -13,6 +13,10 @@ internal sealed record FlatIndexerModel(
     string ReturnType,
     string NullableReturnType,
     string DefaultExpression,
+    /// <summary>The default value strategy for the indexer value type.</summary>
+    DefaultValueStrategy DefaultStrategy,
+    /// <summary>Concrete type when DefaultStrategy is NewInstance and value type is an interface.</summary>
+    string? ConcreteTypeForNew,
     string KeyType,
     string KeyParamName,
     /// <summary>Ref kind prefix for the key parameter (e.g., "in " for in parameters).</summary>

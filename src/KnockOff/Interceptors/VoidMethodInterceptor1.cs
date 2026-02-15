@@ -476,22 +476,36 @@ public sealed class VoidMethodInterceptor1<T1>
     {
         private readonly VoidMethodInterceptor1<T1> _interceptor;
         private readonly Func<T1, bool> _predicate;
+        private int _matcherIndex = -1;
 
         internal VoidWhenBuilder1(VoidMethodInterceptor1<T1> interceptor, Func<T1, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
-        }
-
-        /// <summary>Configures the callback for this When match.</summary>
-        public VoidWhenChain1 Call(Action<T1> callback)
-        {
             _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
             var matcher = new VoidWhenMatcherPredicate(_predicate);
-            matcher.SetCallback(callback);
             _interceptor._whenChain.Add(matcher);
-            var matcherIndex = _interceptor._whenChain.Count - 1;
-            return new VoidWhenChain1(_interceptor, matcherIndex);
+            _matcherIndex = _interceptor._whenChain.Count - 1;
+        }
+
+        public VoidWhenChain1 Call(Action<T1> callback)
+        {
+            ((VoidWhenMatcherPredicate)_interceptor._whenChain![_matcherIndex]).SetCallback(callback);
+            return new VoidWhenChain1(_interceptor, _matcherIndex);
+        }
+
+        public VoidWhenChain1 ThenCall(Action<T1> callback)
+        {
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall(callback));
+            return new VoidWhenChain1(_interceptor, _matcherIndex);
+        }
+
+        public void Verify(Called times)
+        {
+            if (_interceptor._whenChain == null || _matcherIndex >= _interceptor._whenChain.Count) return;
+            var callCount = _interceptor._whenChain[_matcherIndex].CallCount;
+            if (!times.Validate(callCount))
+                throw new VerificationException(new VerificationFailure("When matcher", times, callCount));
         }
     }
 
