@@ -62,9 +62,12 @@ internal static class InlineRenderer
         }
 
         // Render interface stubs
+        // Track emitted compositor delegate names across all stubs to avoid CS0102
+        // when multiple stubs share a base interface with overloaded methods
+        var emittedCompositorDelegates = new HashSet<string>();
         foreach (var ifaceStub in unit.InterfaceStubs)
         {
-            RenderInterfaceStub(w, ifaceStub);
+            RenderInterfaceStub(w, ifaceStub, emittedCompositorDelegates);
         }
 
         // Render delegate stubs
@@ -76,7 +79,7 @@ internal static class InlineRenderer
         // Render class stubs
         foreach (var classStub in unit.ClassStubs)
         {
-            RenderClassStub(w, classStub);
+            RenderClassStub(w, classStub, emittedCompositorDelegates);
         }
 
         w.Line("\t}"); // Close Stubs class
@@ -100,7 +103,7 @@ internal static class InlineRenderer
 
     #region Interface Stub Rendering
 
-    private static void RenderInterfaceStub(CodeWriter w, InlineInterfaceStubModel iface)
+    private static void RenderInterfaceStub(CodeWriter w, InlineInterfaceStubModel iface, HashSet<string> emittedCompositorDelegates)
     {
         // Use shared renderers for property and indexer interceptors
         var typeParams = FormatTypeParameterList(iface.TypeParameters);
@@ -200,7 +203,7 @@ internal static class InlineRenderer
                         StrictAccessExpression: "strict",
                         InterceptorTypeParameters: methodTypeParams,
                         InterceptorConstraints: methodConstraints);
-                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options);
+                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options, emittedCompositorDelegates);
                     compositorGroups[method.MethodName] = method;
                 }
                 else
@@ -1418,10 +1421,10 @@ internal static class InlineRenderer
 
     #region Class Stub Rendering
 
-    private static void RenderClassStub(CodeWriter w, InlineClassStubModel cls)
+    private static void RenderClassStub(CodeWriter w, InlineClassStubModel cls, HashSet<string> emittedCompositorDelegates)
     {
         // Delegate to ClassRenderer for full rendering
-        ClassRenderer.Render(w, cls, baseIndent: 2);
+        ClassRenderer.Render(w, cls, baseIndent: 2, emittedCompositorDelegates: emittedCompositorDelegates);
     }
 
     #endregion
