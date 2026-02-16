@@ -73,7 +73,7 @@ IPricingService pricing = stub;
 pricing.RecordSale("widget", 3);
 
 // Tuple destructuring with named fields
-var (product, quantity) = tracking.LastArgs;
+var (product, quantity) = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 

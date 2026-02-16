@@ -112,7 +112,7 @@ Access the last call's argument using `LastArg`:
 <!-- snippet: methods-capture-single -->
 ```cs
 // LastArg captures the most recent call's argument
-int capturedId = tracking.LastArgs;
+int capturedId = tracking.LastArg;
 ```
 <!-- endSnippet -->
 
@@ -123,7 +123,7 @@ Access arguments using the `LastArgs` named tuple:
 <!-- snippet: methods-capture-multiple -->
 ```cs
 // LastArgs is a named tuple with all parameters
-var (username, password) = tracking.LastArgs;
+var (username, password) = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 

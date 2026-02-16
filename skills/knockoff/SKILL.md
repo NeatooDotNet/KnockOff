@@ -363,12 +363,12 @@ Called constraints: `Called.Never`, `Called.Once`, `Called.AtLeastOnce`, `Called
 // Single parameter - LastArg
 var getTracking = stub.GetUser.Return((id) => new User { Id = id });
 service.GetUser(42);
-Assert.Equal(42, getTracking.LastArgs);
+Assert.Equal(42, getTracking.LastArg);
 
 // Multiple parameters - LastArgs tuple
 var updateTracking = stub.Update.Call((id, name) => { });
 service.Update(1, "Alice");
-var (id, name) = updateTracking.LastArgs;
+var (id, name) = updateTracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 

@@ -657,7 +657,7 @@ IApiMethodRepo repo = stub;
 repo.GetById(42);
 
 // Access LastArg on the tracking object, not the interceptor
-Assert.Equal(42, getTracking.LastArgs);
+Assert.Equal(42, getTracking.LastArg);
 
 // Both support verification
 stub.GetById.Verify(Called.Once);      // Interceptor verification

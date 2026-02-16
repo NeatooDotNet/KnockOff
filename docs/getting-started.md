@@ -113,7 +113,7 @@ IEmailSvc emailService = stub;
 emailService.Send("user@example.com", "Welcome", "Hello!");
 
 // Access captured arguments from the tracking object
-var args = tracking.LastArgs;
+var args = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 
