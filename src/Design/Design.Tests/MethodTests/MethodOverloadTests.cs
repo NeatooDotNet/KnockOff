@@ -56,7 +56,7 @@ public class MethodOverloadTests
 
         // Specific matches
         stub.Format.When("special").Return("SPECIAL-1");
-        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
+        stub.Format.When(("special", new FormatOptions(Uppercase: true))).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -95,7 +95,7 @@ public class MethodOverloadTests
         formatter.Format("c", new FormatOptions());
 
         tracking1.Verify(Called.Exactly(2));
-        Assert.Equal("b", tracking1.LastArg);
+        Assert.Equal("b", tracking1.LastArgs);
 
         tracking2.Verify(Called.Once);
         Assert.Equal(("c", new FormatOptions()), tracking2.LastArgs);
@@ -161,8 +161,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.TransformAsync.Return((input) => $"[{input}]");
-        var tracking2 = stub.TransformAsync.Return((input, ct) => $"[{input}:ct]");
+        var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
+        var tracking2 = stub.TransformAsync.Return(((string input, CancellationToken cancellationToken) args) => $"[{args.input}:ct]");
 
         IFormatter formatter = stub;
 

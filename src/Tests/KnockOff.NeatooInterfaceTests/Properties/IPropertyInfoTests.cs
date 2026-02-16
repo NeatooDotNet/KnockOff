@@ -296,7 +296,7 @@ public partial class IPropertyInfoListTests
 
         list.GetPropertyInfo("TestProperty");
 
-        Assert.Equal("TestProperty", stub.GetPropertyInfo.LastArg);
+        Assert.Equal("TestProperty", stub.GetPropertyInfo.LastArgs);
     }
 
     [Fact]

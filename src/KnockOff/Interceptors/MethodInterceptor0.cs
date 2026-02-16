@@ -12,7 +12,7 @@ namespace KnockOff.Interceptors;
 /// All behavioral logic (Return, When, sequences, verification, builders) is pre-compiled.
 /// </summary>
 /// <typeparam name="TReturn">The return type.</typeparam>
-public sealed class MethodInterceptor0<TReturn>
+public sealed class MethodInterceptor0<TReturn> : IInterceptor
 {
     private readonly string _memberName;
 

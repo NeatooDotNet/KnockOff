@@ -387,7 +387,7 @@ public class ArgumentCaptureNSubTests
         var stub = new CompareCalculatorStub();
         #region readme-argmatch-knockoff-when
         // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-        stub.Add.When((a, b) => a > 0).Return(100).ThenCall((a, b) => a + b);
+        stub.Add.When(args => args.a > 0).Return(100).ThenCall((a, b) => a + b);
         #endregion
 
         ICalculator calc = stub;
@@ -407,8 +407,8 @@ public class ArgumentCaptureNSubTests
         #endregion
 
         #region readme-argmatch-knockoff-specific
-        stub.Add.When(1, 2).Return(100);
-        stub.Add.When(3, 4).Return(200);
+        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When((3, 4)).Return(200);
         #endregion
 
         Assert.Equal(100, calc.Add(1, 2));

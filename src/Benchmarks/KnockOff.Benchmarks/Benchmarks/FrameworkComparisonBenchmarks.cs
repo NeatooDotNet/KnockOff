@@ -145,7 +145,7 @@ public class FrameworkComparisonBenchmarks
         // Assert
         getByIdTracking.Verify(Called.Once);
         cache.Set.Of<FcBenchProduct>().Verify(Called.Once);
-        _ = logInfoTracking.LastArg?.Contains("Cache miss");
+        _ = logInfoTracking.LastArgs?.Contains("Cache miss");
 
         return result;
     }

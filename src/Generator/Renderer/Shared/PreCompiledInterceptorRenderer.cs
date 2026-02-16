@@ -86,13 +86,116 @@ internal static class PreCompiledInterceptorRenderer
 	// ========================================================================
 
 	/// <summary>
-	/// Gets the fully qualified pre-compiled interceptor type for a method.
-	/// Determines the correct type family (sync/void/async/async-void) and arity.
+	/// Computes the TArgs type for TTuple interceptors.
+	/// 1 param -> raw type, 2+ params -> named ValueTuple.
 	/// </summary>
-	public static string GetMethodInterceptorType(UnifiedMethodInterceptorModel model)
+	private static string ComputeTArgsType(IEnumerable<ParameterModel> parameters)
+	{
+		var paramList = parameters.ToList();
+		if (paramList.Count == 1)
+			return paramList[0].Type;
+		// Named ValueTuple: (T1 name1, T2 name2, ...)
+		return "(" + string.Join(", ", paramList.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+	}
+
+	/// <summary>
+	/// Computes the delegate type name for a method.
+	/// Follows the convention: {MethodName}Delegate.
+	/// </summary>
+	public static string ComputeDelegateTypeName(string methodName)
+	{
+		return $"{methodName}Delegate";
+	}
+
+	/// <summary>
+	/// Builds the delegate type declaration for a method.
+	/// Returns the full declaration string (e.g., "public delegate int AddDelegate(int a, int b);").
+	/// For async methods, the delegate returns Task/Task&lt;T&gt; (the interceptor's stored delegate type).
+	/// For ValueTask/ValueTask&lt;T&gt; methods, the delegate returns Task/Task&lt;T&gt;.
+	/// Optional delegateBaseName overrides methodName for the delegate name (useful when interceptor name differs from method name).
+	/// </summary>
+	public static string BuildDelegateDeclaration(string methodName, IEnumerable<ParameterModel> parameters, string returnType, bool isVoid, string? delegateBaseName = null)
+	{
+		var delegateName = ComputeDelegateTypeName(delegateBaseName ?? methodName);
+		var paramDecls = string.Join(", ", parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+
+		// Determine the delegate return type
+		string returnTypeStr;
+		if (isVoid)
+		{
+			returnTypeStr = "void";
+		}
+		else
+		{
+			var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(returnType);
+
+			if (isVoidTask || isVoidValueTask)
+			{
+				// Async void: delegate returns Task
+				returnTypeStr = "global::System.Threading.Tasks.Task";
+			}
+			else if (isAsyncTaskT || isAsyncValueTaskT)
+			{
+				// Async with return: delegate returns Task<TReturn>
+				returnTypeStr = $"global::System.Threading.Tasks.Task<{innerType}>";
+			}
+			else
+			{
+				// Sync: use the raw return type
+				returnTypeStr = returnType;
+			}
+		}
+
+		return $"public delegate {returnTypeStr} {delegateName}({paramDecls});";
+	}
+
+	/// <summary>
+	/// Builds the delegate type declaration for an overload signature.
+	/// Uses the overload's DelegateName (which is already suffixed for uniqueness).
+	/// Returns the full declaration string.
+	/// </summary>
+	public static string BuildOverloadDelegateDeclaration(MethodOverloadSignature overload)
+	{
+		var paramDecls = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+
+		// For async interceptors, the delegate must return the async type (Task<T>/Task),
+		// not the inner type. Determine the actual delegate return type.
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+
+		string returnTypeStr;
+		if (overload.IsVoid)
+		{
+			returnTypeStr = "void";
+		}
+		else if (isVoidTask || isVoidValueTask)
+		{
+			// Async void: delegate returns Task (the interceptor's stored delegate type)
+			returnTypeStr = "global::System.Threading.Tasks.Task";
+		}
+		else if (isAsyncTaskT || isAsyncValueTaskT)
+		{
+			// Async with return: delegate returns Task<TReturn>
+			returnTypeStr = $"global::System.Threading.Tasks.Task<{innerType}>";
+		}
+		else
+		{
+			returnTypeStr = overload.ReturnType;
+		}
+
+		return $"public delegate {returnTypeStr} {overload.DelegateName}({paramDecls});";
+	}
+
+	/// <summary>
+	/// Gets the fully qualified pre-compiled interceptor type for a method.
+	/// Determines the correct type family (sync/void/async/async-void).
+	/// For 0 params, returns arity-0 types. For 1+ params, returns TTuple types.
+	/// </summary>
+	public static string GetMethodInterceptorType(UnifiedMethodInterceptorModel model, string? delegateBaseName = null)
 	{
 		var paramCount = model.Parameters.Count;
-		var paramTypes = string.Join(", ", model.Parameters.Select(p => p.Type));
+		var nameForDelegate = delegateBaseName ?? model.MethodName;
 
 		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
 		var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
@@ -101,31 +204,38 @@ internal static class PreCompiledInterceptorRenderer
 
 		if (model.IsVoid)
 		{
-			// void -> VoidMethodInterceptorN<T1,...,TN>
 			if (paramCount == 0)
 				return "global::KnockOff.Interceptors.VoidMethodInterceptor0";
-			return $"global::KnockOff.Interceptors.VoidMethodInterceptor{paramCount}<{paramTypes}>";
+			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var tArgs = ComputeTArgsType(model.Parameters);
+			return $"global::KnockOff.Interceptors.VoidMethodInterceptor<{delegateType}, {tArgs}>";
 		}
 
 		if (isVoidAsync)
 		{
-			// Task/ValueTask -> AsyncVoidMethodInterceptorN<T1,...,TN>
 			if (paramCount == 0)
 				return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
-			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor{paramCount}<{paramTypes}>";
+			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var tArgs = ComputeTArgsType(model.Parameters);
+			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{delegateType}, {tArgs}>";
 		}
 
 		if (isAsyncWithInnerType)
 		{
-			// Task<T>/ValueTask<T> -> AsyncMethodInterceptorN<T1,...,TN,TReturn>
-			var allTypeArgs = paramCount > 0 ? $"{paramTypes}, {innerType}" : innerType;
-			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor{paramCount}<{allTypeArgs}>";
+			if (paramCount == 0)
+				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
+			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var tArgs = ComputeTArgsType(model.Parameters);
+			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{delegateType}, {tArgs}, {innerType}>";
 		}
 
-		// Non-void sync -> MethodInterceptorN<T1,...,TN,TReturn>
+		// Non-void sync
 		{
-			var allTypeArgs = paramCount > 0 ? $"{paramTypes}, {model.ReturnType}" : model.ReturnType;
-			return $"global::KnockOff.Interceptors.MethodInterceptor{paramCount}<{allTypeArgs}>";
+			if (paramCount == 0)
+				return $"global::KnockOff.Interceptors.MethodInterceptor0<{model.ReturnType}>";
+			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var tArgs = ComputeTArgsType(model.Parameters);
+			return $"global::KnockOff.Interceptors.MethodInterceptor<{delegateType}, {tArgs}, {model.ReturnType}>";
 		}
 	}
 
@@ -155,7 +265,8 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Generates the interface implementation body for a pre-compiled method interceptor.
-	/// Returns the full statement (e.g., "return Add.Invoke(Strict, a, b);").
+	/// Returns the full statement (e.g., "return Add.Invoke(Strict, (a, b));").
+	/// For 0 params: no args. For 1 param: raw value. For 2+ params: tuple literal.
 	/// </summary>
 	public static string GetMethodInvokeExpression(
 		string interceptorName,
@@ -164,9 +275,8 @@ internal static class PreCompiledInterceptorRenderer
 		IEnumerable<ParameterModel> parameters,
 		string strictExpression)
 	{
-		var paramArgs = parameters.Any()
-			? ", " + string.Join(", ", parameters.Select(p => p.EscapedName))
-			: "";
+		var paramList = parameters.ToList();
+		var paramArgs = FormatInvokeArgs(paramList);
 
 		var (_, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
 		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(returnType);
@@ -178,30 +288,60 @@ internal static class PreCompiledInterceptorRenderer
 
 		if (isVoidTask)
 		{
-			// Task -> direct return of Task from AsyncVoidMethodInterceptorN.Invoke
+			// Task -> direct return of Task from AsyncVoidMethodInterceptor.Invoke
 			return $"return {interceptorName}.Invoke({strictExpression}{paramArgs});";
 		}
 
 		if (isVoidValueTask)
 		{
-			// ValueTask -> wrap the Task from AsyncVoidMethodInterceptorN.Invoke
+			// ValueTask -> wrap the Task from AsyncVoidMethodInterceptor.Invoke
 			return $"return new global::System.Threading.Tasks.ValueTask({interceptorName}.Invoke({strictExpression}{paramArgs}));";
 		}
 
 		if (isAsyncTaskT)
 		{
-			// Task<T> -> direct return of Task<T> from AsyncMethodInterceptorN.Invoke
+			// Task<T> -> direct return of Task<T> from AsyncMethodInterceptor.Invoke
 			return $"return {interceptorName}.Invoke({strictExpression}{paramArgs});";
 		}
 
 		if (isAsyncValueTaskT)
 		{
-			// ValueTask<T> -> wrap the Task<T> from AsyncMethodInterceptorN.Invoke
+			// ValueTask<T> -> wrap the Task<T> from AsyncMethodInterceptor.Invoke
 			return $"return new {returnType}({interceptorName}.Invoke({strictExpression}{paramArgs}));";
 		}
 
 		// Sync non-void
 		return $"return {interceptorName}.Invoke({strictExpression}{paramArgs});";
+	}
+
+	/// <summary>
+	/// Formats the invoke arguments for TTuple interceptors.
+	/// 0 params: empty string. 1 param: ", paramName". 2+ params: ", (a, b, c)".
+	/// </summary>
+	private static string FormatInvokeArgs(List<ParameterModel> paramList)
+	{
+		if (paramList.Count == 0)
+			return "";
+		if (paramList.Count == 1)
+			return $", {paramList[0].EscapedName}";
+		// 2+ params: wrap in tuple literal
+		return ", (" + string.Join(", ", paramList.Select(p => p.EscapedName)) + ")";
+	}
+
+	/// <summary>
+	/// Wraps a cleaned argument list string for TTuple Invoke calls.
+	/// For 0 args (empty string): returns "". For 1 arg (no commas): returns ", arg".
+	/// For 2+ args: returns ", (arg1, arg2, ...)".
+	/// </summary>
+	public static string WrapInvokeArgs(string cleanArgs)
+	{
+		if (string.IsNullOrEmpty(cleanArgs))
+			return "";
+		// Count commas to determine param count
+		if (!cleanArgs.Contains(','))
+			return $", {cleanArgs}";
+		// 2+ params: wrap in tuple literal
+		return $", ({cleanArgs})";
 	}
 
 	// ========================================================================
@@ -210,7 +350,9 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Generates the SetSourceFallback call for a pre-compiled method interceptor.
-	/// Uses method groups where possible; falls back to lambdas when needed.
+	/// For TTuple types (1+ params), always uses lambdas since SetSourceFallback takes TDelegate.
+	/// For zero-param types, uses method groups where possible.
+	/// Optional delegateBaseName overrides methodName for delegate type naming.
 	/// </summary>
 	public static string GetMethodSourceFallbackExpression(
 		string interceptorName,
@@ -219,18 +361,25 @@ internal static class PreCompiledInterceptorRenderer
 		IEnumerable<ParameterModel> parameters,
 		string returnType,
 		bool isVoid,
-		string? declaringInterface = null)
+		string? declaringInterface = null,
+		string? delegateBaseName = null)
 	{
 		var paramList = parameters.ToList();
 		var paramTypes = paramList.Select(p => p.Type).ToList();
 
-		// Check if we need a wrapping lambda instead of a method group.
-		// Lambdas are needed for:
-		// 1. ValueTask/ValueTask<T> returns - SetSourceFallback expects Task/Task<T>-based delegates
-		// 2. `in` parameters - method groups with `in` params don't match Action/Func delegates
-		// 3. Diamond inheritance disambiguation - need to cast to specific interface
-		var (innerType, _, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
-		var (_, isVoidValueTask) = GetVoidAsyncInfo(returnType);
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(returnType);
+
+		// TTuple types (1+ params): SetSourceFallback takes TDelegate (generated delegate type).
+		// Always use lambdas — the lambda's parameter types match the generated delegate.
+		if (paramList.Count > 0)
+		{
+			return GetMethodSourceFallbackLambdaExpression(
+				interceptorName, methodName, sourceParamName, paramList, paramTypes,
+				returnType, isVoid, innerType, isAsyncValueTaskT, isVoidValueTask, declaringInterface, delegateBaseName);
+		}
+
+		// Zero-param methods: delegate type is Action/Func (unchanged from arity-0 types)
 		var hasInParams = paramList.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.In);
 		var needsLambda = isAsyncValueTaskT || isVoidValueTask || hasInParams || declaringInterface != null;
 
@@ -242,8 +391,6 @@ internal static class PreCompiledInterceptorRenderer
 		}
 
 		// Use explicit delegate construction to avoid "target-typed conditional expression" errors.
-		// Method groups and lambdas in ternary with null cause CS1503/CS0121.
-		// Using `new DelegateType(methodGroup)` provides an explicit type for the ternary.
 		var delegateType = GetDelegateType(paramTypes, returnType, isVoid);
 
 		return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? new {delegateType}({sourceParamName}.{methodName}) : null);";
@@ -264,11 +411,16 @@ internal static class PreCompiledInterceptorRenderer
 		string innerType,
 		bool isAsyncValueTaskT,
 		bool isVoidValueTask,
-		string? declaringInterface)
+		string? declaringInterface,
+		string? delegateBaseName = null)
 	{
-		// Build lambda parameter list (simple names, no types)
+		// Build lambda parameter list
+		// If any parameter has 'in' ref kind, we need typed parameters in the lambda
+		var hasInParams = paramList.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.In);
 		var lambdaParams = paramList.Count > 0
-			? string.Join(", ", paramList.Select(p => p.EscapedName))
+			? hasInParams
+				? string.Join(", ", paramList.Select(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.In ? $"in {p.Type} {p.EscapedName}" : p.EscapedName))
+				: string.Join(", ", paramList.Select(p => p.EscapedName))
 			: "";
 
 		// Build the source invocation with optional interface cast
@@ -280,6 +432,9 @@ internal static class PreCompiledInterceptorRenderer
 			: "";
 		var invocation = $"{sourceExpr}.{methodName}({argList})";
 
+		// For TTuple types (1+ params), cast the lambda to the delegate type to help target-typed conditional
+		var delegateTypeName = paramList.Count > 0 ? ComputeDelegateTypeName(delegateBaseName ?? methodName) : null;
+
 		// Determine the lambda body based on return type
 		if (isVoidValueTask)
 		{
@@ -288,6 +443,8 @@ internal static class PreCompiledInterceptorRenderer
 			var asyncLambda = paramList.Count > 0
 				? $"async ({lambdaParams}) => await {invocation}"
 				: $"async () => await {invocation}";
+			if (delegateTypeName != null)
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? ({delegateTypeName})(({asyncLambda})) : null);";
 			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? {asyncLambda} : null);";
 		}
 		else if (isAsyncValueTaskT)
@@ -297,6 +454,8 @@ internal static class PreCompiledInterceptorRenderer
 			var asyncLambda = paramList.Count > 0
 				? $"async ({lambdaParams}) => await {invocation}"
 				: $"async () => await {invocation}";
+			if (delegateTypeName != null)
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? ({delegateTypeName})(({asyncLambda})) : null);";
 			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? {asyncLambda} : null);";
 		}
 		else if (isVoid)
@@ -305,6 +464,8 @@ internal static class PreCompiledInterceptorRenderer
 			var lambdaExpr = paramList.Count > 0
 				? $"({lambdaParams}) => {invocation}"
 				: $"() => {invocation}";
+			if (delegateTypeName != null)
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? ({delegateTypeName})({lambdaExpr}) : null);";
 			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? {lambdaExpr} : null);";
 		}
 		else
@@ -313,6 +474,8 @@ internal static class PreCompiledInterceptorRenderer
 			var lambdaExpr = paramList.Count > 0
 				? $"({lambdaParams}) => {invocation}"
 				: $"() => {invocation}";
+			if (delegateTypeName != null)
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? ({delegateTypeName})({lambdaExpr}) : null);";
 			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? {lambdaExpr} : null);";
 		}
 	}
@@ -381,9 +544,9 @@ internal static class PreCompiledInterceptorRenderer
 	}
 
 	/// <summary>
-	/// Generates a null-clearing SetSourceFallback call with proper cast to avoid ambiguity for async interceptors.
-	/// For async method interceptors, both SetSourceFallback(Func&lt;..., Task&lt;T&gt;&gt;?) and SetSourceFallback(Func&lt;..., T&gt;?)
-	/// accept null, causing CS0121. This generates a cast to the async form.
+	/// Generates a null-clearing SetSourceFallback call.
+	/// For TTuple types (1+ params), SetSourceFallback takes TDelegate? (single overload), so null is unambiguous.
+	/// For zero-param async interceptors, cast null to the async delegate type to disambiguate overloads.
 	/// </summary>
 	public static string GetMethodSourceFallbackClearExpression(
 		string interceptorName,
@@ -392,6 +555,15 @@ internal static class PreCompiledInterceptorRenderer
 		bool isVoid)
 	{
 		var paramList = parameters.ToList();
+
+		// TTuple types (1+ params): SetSourceFallback takes TDelegate? (single overload).
+		// null is unambiguous.
+		if (paramList.Count > 0)
+		{
+			return $"{interceptorName}.SetSourceFallback(null);";
+		}
+
+		// Zero-param types: check for async ambiguity
 		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
 		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(returnType);
 		var isAsync = isAsyncTaskT || isAsyncValueTaskT || isVoidTask || isVoidValueTask;
@@ -402,26 +574,15 @@ internal static class PreCompiledInterceptorRenderer
 			return $"{interceptorName}.SetSourceFallback(null);";
 		}
 
-		// Async methods: cast null to the async delegate type to disambiguate
-		var paramTypes = paramList.Select(p => p.Type).ToList();
+		// Zero-param async methods: cast null to the async delegate type to disambiguate
 		if (isVoidTask || isVoidValueTask)
 		{
-			// Async void: Func<T1,...,TN, Task>
-			string funcType;
-			if (paramList.Count == 0)
-				funcType = "global::System.Func<global::System.Threading.Tasks.Task>";
-			else
-				funcType = $"global::System.Func<{string.Join(", ", paramTypes)}, global::System.Threading.Tasks.Task>";
+			string funcType = "global::System.Func<global::System.Threading.Tasks.Task>";
 			return $"{interceptorName}.SetSourceFallback(({funcType}?)null);";
 		}
 		else
 		{
-			// Async with return: Func<T1,...,TN, Task<TReturn>>
-			string funcType;
-			if (paramList.Count == 0)
-				funcType = $"global::System.Func<global::System.Threading.Tasks.Task<{innerType}>>";
-			else
-				funcType = $"global::System.Func<{string.Join(", ", paramTypes)}, global::System.Threading.Tasks.Task<{innerType}>>";
+			string funcType = $"global::System.Func<global::System.Threading.Tasks.Task<{innerType}>>";
 			return $"{interceptorName}.SetSourceFallback(({funcType}?)null);";
 		}
 	}
@@ -433,6 +594,9 @@ internal static class PreCompiledInterceptorRenderer
 	/// <summary>
 	/// Generates a SetFallback call for wiring a stub override method to a pre-compiled interceptor.
 	/// Used in constructor generation for stub override patterns.
+	/// For TTuple types (1+ params), SetFallback takes TDelegate.
+	/// Method groups implicitly convert to the generated delegate type.
+	/// For ValueTask returns, a wrapping async lambda is needed.
 	/// </summary>
 	public static string GetStubOverrideFallbackExpression(
 		string interceptorName,
@@ -441,7 +605,7 @@ internal static class PreCompiledInterceptorRenderer
 		IEnumerable<ParameterModel>? parameters = null)
 	{
 		// For ValueTask/ValueTask<T> returns, the stub override method returns ValueTask
-		// but SetFallback expects Func<..., Task<T>> or Func<..., T>.
+		// but SetFallback expects a delegate returning Task<T> or Task.
 		// We need a wrapping async lambda to convert.
 		var (_, _, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
 		var (_, isVoidValueTask) = GetVoidAsyncInfo(returnType);
@@ -462,6 +626,7 @@ internal static class PreCompiledInterceptorRenderer
 			return $"{interceptorName}.SetFallback({asyncLambda});";
 		}
 
+		// Method groups implicitly convert to both Func<>/Action<> and generated delegate types
 		return $"{interceptorName}.SetFallback({stubOverrideName});";
 	}
 
@@ -512,11 +677,12 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Gets the pre-compiled interceptor type for a single overload signature.
+	/// For 0 params, returns arity-0 types. For 1+ params, returns TTuple types
+	/// using the overload's DelegateName.
 	/// </summary>
 	public static string GetOverloadInterceptorType(MethodOverloadSignature overload)
 	{
 		var paramCount = overload.Parameters.Count;
-		var paramTypes = string.Join(", ", overload.Parameters.Select(p => p.Type));
 
 		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 		var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
@@ -526,30 +692,38 @@ internal static class PreCompiledInterceptorRenderer
 		if (overload.IsVoid)
 		{
 			if (paramCount == 0) return "global::KnockOff.Interceptors.VoidMethodInterceptor0";
-			return $"global::KnockOff.Interceptors.VoidMethodInterceptor{paramCount}<{paramTypes}>";
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			return $"global::KnockOff.Interceptors.VoidMethodInterceptor<{overload.DelegateName}, {tArgs}>";
 		}
 
 		if (isVoidAsync)
 		{
 			if (paramCount == 0) return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
-			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor{paramCount}<{paramTypes}>";
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{overload.DelegateName}, {tArgs}>";
 		}
 
 		if (isAsyncWithInnerType)
 		{
-			var allTypeArgs = paramCount > 0 ? $"{paramTypes}, {innerType}" : innerType;
-			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor{paramCount}<{allTypeArgs}>";
+			if (paramCount == 0)
+				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{overload.DelegateName}, {tArgs}, {innerType}>";
 		}
 
 		{
-			var allTypeArgs = paramCount > 0 ? $"{paramTypes}, {overload.ReturnType}" : overload.ReturnType;
-			return $"global::KnockOff.Interceptors.MethodInterceptor{paramCount}<{allTypeArgs}>";
+			if (paramCount == 0)
+				return $"global::KnockOff.Interceptors.MethodInterceptor0<{overload.ReturnType}>";
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			return $"global::KnockOff.Interceptors.MethodInterceptor<{overload.DelegateName}, {tArgs}, {overload.ReturnType}>";
 		}
 	}
 
 	/// <summary>
 	/// Renders a thin overload compositor class containing pre-compiled interceptor fields.
-	/// The compositor delegates Return/Call/When/Verify to the appropriate inner interceptor.
+	/// Emits delegate declarations, slot interface implementations, explicit interface property
+	/// implementations, and IReadOnlyList&lt;IInterceptor&gt; Interceptors property.
+	/// Also generates forwarding methods for Return/Call/When/Verify.
 	/// </summary>
 	public static void RenderOverloadCompositorClass(
 		CodeWriter w,
@@ -558,10 +732,52 @@ internal static class PreCompiledInterceptorRenderer
 	{
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
+		var hasTypeParams = !string.IsNullOrEmpty(typeParams);
+
+		// For non-generic compositors, emit delegate declarations outside the class
+		// so they're accessible at the stub level (e.g., StubClass.FormatDelegate_String_String).
+		// For generic compositors, delegates reference type params (e.g., T) that are only
+		// in scope inside the compositor class, so they must be emitted inside.
+		if (!hasTypeParams)
+		{
+			for (int i = 0; i < model.Overloads.Count; i++)
+			{
+				var overload = model.Overloads.GetArray()![i];
+				if (overload.Parameters.Count > 0)
+				{
+					w.Line(BuildOverloadDelegateDeclaration(overload));
+				}
+			}
+		}
+
+		// Build slot interface list for the class declaration.
+		// Skip slot interfaces for generic compositors because delegate types
+		// (nested inside the class) are not resolvable in the base type list.
+		var interfaceList = "";
+		if (!hasTypeParams)
+		{
+			var slotInterfaces = BuildSlotInterfaceList(model);
+			if (slotInterfaces.Count > 0)
+				interfaceList = " : " + string.Join(", ", slotInterfaces);
+		}
 
 		w.Line($"/// <summary>Compositor for overloaded {model.MethodName}. Delegates to per-signature interceptors.</summary>");
-		using (w.Block($"public sealed class {model.InterceptorClassName}{typeParams}{constraints}"))
+		using (w.Block($"public sealed class {model.InterceptorClassName}{typeParams}{interfaceList}{constraints}"))
 		{
+			// For generic compositors, emit delegate declarations inside the class
+			// where type parameters are in scope.
+			if (hasTypeParams)
+			{
+				for (int i = 0; i < model.Overloads.Count; i++)
+				{
+					var overload = model.Overloads.GetArray()![i];
+					if (overload.Parameters.Count > 0)
+					{
+						w.Line(BuildOverloadDelegateDeclaration(overload));
+					}
+				}
+			}
+
 			// Inner interceptor fields
 			for (int i = 0; i < model.Overloads.Count; i++)
 			{
@@ -569,6 +785,17 @@ internal static class PreCompiledInterceptorRenderer
 				var fieldType = GetOverloadInterceptorType(overload);
 				w.Line($"internal {fieldType} _ov{i + 1} = new(\"{model.MethodName}\");");
 			}
+			w.Line();
+
+			// Explicit interface property implementations for slot interfaces
+			// (only for non-generic compositors that have slot interfaces)
+			if (!hasTypeParams)
+				RenderSlotInterfacePropertyImplementations(w, model);
+
+			// IReadOnlyList<IInterceptor> Interceptors property
+			var interceptorList = string.Join(", ", Enumerable.Range(1, model.Overloads.Count).Select(i => $"_ov{i}"));
+			w.Line("/// <summary>All interceptors in this compositor for collection-based verification/reset.</summary>");
+			w.Line($"public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Interceptors.IInterceptor> Interceptors => new global::KnockOff.Interceptors.IInterceptor[] {{ {interceptorList} }};");
 			w.Line();
 
 			// Invoke methods for interface implementation routing (suffixed by signature)
@@ -695,6 +922,111 @@ internal static class PreCompiledInterceptorRenderer
 		w.Line();
 	}
 
+	/// <summary>
+	/// Builds the list of slot interface implementations for a compositor class declaration.
+	/// Each 1+ param overload gets a slot interface based on its family (void/non-void/async-void/async-non-void).
+	/// </summary>
+	private static List<string> BuildSlotInterfaceList(UnifiedMethodInterceptorModel model)
+	{
+		var interfaces = new List<string>();
+
+		// Track slot number per family
+		var voidSlot = 0;
+		var methodSlot = 0;
+		var asyncVoidSlot = 0;
+		var asyncMethodSlot = 0;
+
+		for (int i = 0; i < model.Overloads.Count; i++)
+		{
+			var overload = model.Overloads.GetArray()![i];
+			if (overload.Parameters.Count == 0) continue; // Zero-param overloads don't use slots
+
+			var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+
+			var tArgs = ComputeTArgsType(overload.Parameters);
+
+			if (overload.IsVoid)
+			{
+				voidSlot++;
+				interfaces.Add($"global::KnockOff.Interceptors.IVoidOverloadSlot{voidSlot}<{overload.DelegateName}, {tArgs}>");
+			}
+			else if (isVoidAsync)
+			{
+				asyncVoidSlot++;
+				interfaces.Add($"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {tArgs}>");
+			}
+			else if (isAsyncWithInnerType)
+			{
+				asyncMethodSlot++;
+				interfaces.Add($"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {tArgs}, {innerType}>");
+			}
+			else
+			{
+				methodSlot++;
+				interfaces.Add($"global::KnockOff.Interceptors.IMethodOverloadSlot{methodSlot}<{overload.DelegateName}, {tArgs}, {overload.ReturnType}>");
+			}
+		}
+
+		return interfaces;
+	}
+
+	/// <summary>
+	/// Renders explicit interface property implementations for slot interfaces.
+	/// Each 1+ param overload gets an explicit property forwarding to its _ovN field.
+	/// </summary>
+	private static void RenderSlotInterfacePropertyImplementations(CodeWriter w, UnifiedMethodInterceptorModel model)
+	{
+		// Track slot number per family
+		var voidSlot = 0;
+		var methodSlot = 0;
+		var asyncVoidSlot = 0;
+		var asyncMethodSlot = 0;
+
+		for (int i = 0; i < model.Overloads.Count; i++)
+		{
+			var overload = model.Overloads.GetArray()![i];
+			if (overload.Parameters.Count == 0) continue;
+
+			var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+
+			var fieldType = GetOverloadInterceptorType(overload);
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			var fieldIndex = i + 1;
+
+			if (overload.IsVoid)
+			{
+				voidSlot++;
+				var ifaceType = $"global::KnockOff.Interceptors.IVoidOverloadSlot{voidSlot}<{overload.DelegateName}, {tArgs}>";
+				w.Line($"{fieldType} {ifaceType}.VoidSlot{voidSlot}Interceptor => _ov{fieldIndex};");
+			}
+			else if (isVoidAsync)
+			{
+				asyncVoidSlot++;
+				var ifaceType = $"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {tArgs}>";
+				w.Line($"{fieldType} {ifaceType}.AsyncVoidSlot{asyncVoidSlot}Interceptor => _ov{fieldIndex};");
+			}
+			else if (isAsyncWithInnerType)
+			{
+				asyncMethodSlot++;
+				var ifaceType = $"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {tArgs}, {innerType}>";
+				w.Line($"{fieldType} {ifaceType}.AsyncMethodSlot{asyncMethodSlot}Interceptor => _ov{fieldIndex};");
+			}
+			else
+			{
+				methodSlot++;
+				var ifaceType = $"global::KnockOff.Interceptors.IMethodOverloadSlot{methodSlot}<{overload.DelegateName}, {tArgs}, {overload.ReturnType}>";
+				w.Line($"{fieldType} {ifaceType}.MethodSlot{methodSlot}Interceptor => _ov{fieldIndex};");
+			}
+		}
+		w.Line();
+	}
+
 	private static void RenderOverloadReturnMethod(CodeWriter w, MethodOverloadSignature overload, int overloadIndex)
 	{
 		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
@@ -702,60 +1034,79 @@ internal static class PreCompiledInterceptorRenderer
 		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 		var isVoidAsync = isVoidTask || isVoidValueTask;
 
-		var paramTypes = string.Join(", ", overload.Parameters.Select(p => p.Type));
+		var paramCount = overload.Parameters.Count;
 		var builderReturnType = GetCallBuilderType(overload);
 
 		if (overload.IsVoid || isVoidAsync)
 		{
-			// Void: Call(Action<T1,...,TN>) or Call(Func<T1,...,TN,Task>)
+			// Void/async-void: Call(TDelegate) for 1+ params, Call(Action/Func) for 0 params
 			string callbackType;
-			if (isVoidAsync)
+			if (paramCount == 0)
 			{
-				if (overload.Parameters.Count == 0)
-					callbackType = "global::System.Func<global::System.Threading.Tasks.Task>";
-				else
-					callbackType = $"global::System.Func<{paramTypes}, global::System.Threading.Tasks.Task>";
+				callbackType = isVoidAsync
+					? "global::System.Func<global::System.Threading.Tasks.Task>"
+					: "global::System.Action";
 			}
 			else
 			{
-				if (overload.Parameters.Count == 0)
-					callbackType = "global::System.Action";
-				else
-					callbackType = $"global::System.Action<{paramTypes}>";
+				// TTuple: Call takes TDelegate (the generated delegate type)
+				callbackType = overload.DelegateName;
 			}
-			w.Line($"/// <summary>Configures callback for {overload.Parameters.Count}-param overload.</summary>");
+			w.Line($"/// <summary>Configures callback for {paramCount}-param overload.</summary>");
 			w.Line($"public {builderReturnType} Call({callbackType} callback) => _ov{overloadIndex}.Call(callback);");
 			w.Line();
+
+			// For async-void TTuple types, also expose Call(Action<TArgs>) simplified overload
+			if (isVoidAsync && paramCount > 0)
+			{
+				var tArgs = ComputeTArgsType(overload.Parameters);
+				var simplifiedType = $"global::System.Action<{tArgs}>";
+				w.Line($"/// <summary>Configures simplified sync callback for {paramCount}-param async void overload.</summary>");
+				w.Line($"public {builderReturnType} Call({simplifiedType} callback) => _ov{overloadIndex}.Call(callback);");
+				w.Line();
+			}
 		}
 		else
 		{
-			// Non-void: Return(Func<T1,...,TN,TReturn>)
-			string returnType;
-			if (isAsyncWithInnerType)
+			// Non-void: Return(TDelegate) for 1+ params, Return(Func<>) for 0 params
+			if (paramCount == 0)
 			{
-				// For async, expose both simplified and full callback
-				var simplifiedType = overload.Parameters.Count > 0
-					? $"global::System.Func<{paramTypes}, {innerType}>"
-					: $"global::System.Func<{innerType}>";
-				w.Line($"/// <summary>Configures simplified callback for {overload.Parameters.Count}-param async overload.</summary>");
-				w.Line($"public {builderReturnType} Return({simplifiedType} callback) => _ov{overloadIndex}.Return(callback);");
-				w.Line();
+				if (isAsyncWithInnerType)
+				{
+					var simplifiedType = $"global::System.Func<{innerType}>";
+					w.Line($"/// <summary>Configures simplified callback for 0-param async overload.</summary>");
+					w.Line($"public {builderReturnType} Return({simplifiedType} callback) => _ov{overloadIndex}.Return(callback);");
+					w.Line();
 
-				var asyncType = overload.Parameters.Count > 0
-					? $"global::System.Func<{paramTypes}, global::System.Threading.Tasks.Task<{innerType}>>"
-					: $"global::System.Func<global::System.Threading.Tasks.Task<{innerType}>>";
-				w.Line($"/// <summary>Configures async callback for {overload.Parameters.Count}-param async overload.</summary>");
-				w.Line($"public {builderReturnType} Return({asyncType} asyncCallback) => _ov{overloadIndex}.Return(asyncCallback);");
-				w.Line();
+					var asyncType = $"global::System.Func<global::System.Threading.Tasks.Task<{innerType}>>";
+					w.Line($"/// <summary>Configures async callback for 0-param async overload.</summary>");
+					w.Line($"public {builderReturnType} Return({asyncType} asyncCallback) => _ov{overloadIndex}.Return(asyncCallback);");
+					w.Line();
+				}
+				else
+				{
+					var returnType = $"global::System.Func<{overload.ReturnType}>";
+					w.Line($"/// <summary>Configures callback for 0-param overload.</summary>");
+					w.Line($"public {builderReturnType} Return({returnType} callback) => _ov{overloadIndex}.Return(callback);");
+					w.Line();
+				}
 			}
 			else
 			{
-				returnType = overload.Parameters.Count > 0
-					? $"global::System.Func<{paramTypes}, {overload.ReturnType}>"
-					: $"global::System.Func<{overload.ReturnType}>";
-				w.Line($"/// <summary>Configures callback for {overload.Parameters.Count}-param overload.</summary>");
-				w.Line($"public {builderReturnType} Return({returnType} callback) => _ov{overloadIndex}.Return(callback);");
+				// TTuple: Return takes TDelegate
+				w.Line($"/// <summary>Configures callback for {paramCount}-param overload.</summary>");
+				w.Line($"public {builderReturnType} Return({overload.DelegateName} callback) => _ov{overloadIndex}.Return(callback);");
 				w.Line();
+
+				if (isAsyncWithInnerType)
+				{
+					// Also expose simplified sync overload: Return(Func<TArgs, TReturn>)
+					var tArgs = ComputeTArgsType(overload.Parameters);
+					var simplifiedType = $"global::System.Func<{tArgs}, {innerType}>";
+					w.Line($"/// <summary>Configures simplified sync callback for {paramCount}-param async overload.</summary>");
+					w.Line($"public {builderReturnType} Return({simplifiedType} callback) => _ov{overloadIndex}.Return(callback);");
+					w.Line();
+				}
 			}
 		}
 	}
@@ -774,29 +1125,35 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Renders a When method that calls When on all matching overload indices.
-	/// Used when multiple overloads share the same parameter types (e.g., ISet.Add(string)->bool and ICollection.Add(string)->void).
+	/// For TTuple types (1+ params), When takes TArgs (raw type for 1 param, tuple for 2+).
+	/// Used when multiple overloads share the same parameter types.
 	/// </summary>
 	private static void RenderOverloadWhenMethodDeduplicated(CodeWriter w, MethodOverloadSignature overload, List<int> matchingIndices)
 	{
-		var paramDecls = string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.EscapedName}"));
-		var paramArgs = string.Join(", ", overload.Parameters.Select(p => p.EscapedName));
+		var paramCount = overload.Parameters.Count;
 		var whenReturnType = GetWhenBuilderType(overload);
 
-		w.Line($"/// <summary>When matcher for {overload.Parameters.Count}-param overload.</summary>");
+		if (paramCount == 0) return; // No When for zero-param overloads
+
+		// TTuple: When takes TArgs. For 1 param, it's the raw type. For 2+, it's a named ValueTuple.
+		var tArgs = ComputeTArgsType(overload.Parameters);
+		var paramName = paramCount == 1 ? overload.Parameters.GetArray()![0].EscapedName : "args";
+
+		w.Line($"/// <summary>When matcher for {paramCount}-param overload.</summary>");
 		if (matchingIndices.Count == 1)
 		{
-			w.Line($"public {whenReturnType} When({paramDecls}) => _ov{matchingIndices[0]}.When({paramArgs});");
+			w.Line($"public {whenReturnType} When({tArgs} {paramName}) => _ov{matchingIndices[0]}.When({paramName});");
 		}
 		else
 		{
 			// When multiple overloads share params, call When on all but return the first one's builder
-			using (w.Block($"public {whenReturnType} When({paramDecls})"))
+			using (w.Block($"public {whenReturnType} When({tArgs} {paramName})"))
 			{
 				for (int i = 1; i < matchingIndices.Count; i++)
 				{
-					w.Line($"_ov{matchingIndices[i]}.When({paramArgs});");
+					w.Line($"_ov{matchingIndices[i]}.When({paramName});");
 				}
-				w.Line($"return _ov{matchingIndices[0]}.When({paramArgs});");
+				w.Line($"return _ov{matchingIndices[0]}.When({paramName});");
 			}
 		}
 		w.Line();
@@ -804,15 +1161,19 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Renders a predicate-based When method that calls When on all matching overload indices.
-	/// Generates When(Func&lt;T1,...,TN,bool&gt; predicate) overloads for lambda-based matching.
+	/// For TTuple types (1+ params), predicate takes Func&lt;TArgs, bool&gt;.
 	/// </summary>
 	private static void RenderOverloadWhenPredicateMethodDeduplicated(CodeWriter w, MethodOverloadSignature overload, List<int> matchingIndices)
 	{
-		var paramTypes = string.Join(", ", overload.Parameters.Select(p => p.Type));
-		var predicateType = $"global::System.Func<{paramTypes}, bool>";
+		var paramCount = overload.Parameters.Count;
+		if (paramCount == 0) return; // No predicate When for zero-param overloads
+
+		// TTuple: predicate takes Func<TArgs, bool>
+		var tArgs = ComputeTArgsType(overload.Parameters);
+		var predicateType = $"global::System.Func<{tArgs}, bool>";
 		var whenReturnType = GetWhenBuilderType(overload);
 
-		w.Line($"/// <summary>Predicate-based When matcher for {overload.Parameters.Count}-param overload.</summary>");
+		w.Line($"/// <summary>Predicate-based When matcher for {paramCount}-param overload.</summary>");
 		if (matchingIndices.Count == 1)
 		{
 			w.Line($"public {whenReturnType} When({predicateType} predicate) => _ov{matchingIndices[0]}.When(predicate);");
@@ -835,6 +1196,7 @@ internal static class PreCompiledInterceptorRenderer
 	/// <summary>
 	/// Renders an Invoke method for a specific overload within the compositor.
 	/// The suffix matches the signature suffix used by the method implementation to route calls.
+	/// For TTuple types (1+ params), wraps args in tuple literal for Invoke.
 	/// Handles async wrapping (ValueTask from Task) as needed.
 	/// </summary>
 	private static void RenderOverloadInvokeMethod(
@@ -846,44 +1208,58 @@ internal static class PreCompiledInterceptorRenderer
 		var suffix = overload.SignatureSuffix;
 		var strictParam = options.IncludeStrictParameter ? "bool strict" : "";
 		var strictArg = options.IncludeStrictParameter ? options.StrictAccessExpression : "";
-		var paramDecls = overload.Parameters.Count > 0
-			? (options.IncludeStrictParameter ? ", " : "") + string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.EscapedName}"))
-			: "";
-		var paramArgs = overload.Parameters.Count > 0
-			? ", " + string.Join(", ", overload.Parameters.Select(p => p.EscapedName))
-			: "";
+
+		// For TTuple types (1+ params), the compositor Invoke method accepts TArgs directly
+		// 0 params: no additional param
+		// 1 param: single param (e.g., "string name")
+		// 2+ params: TArgs tuple param (e.g., "(string a, int b) args")
+		string paramDecls;
+		string invokeArgs;
+		if (overload.Parameters.Count == 0)
+		{
+			paramDecls = "";
+			invokeArgs = "";
+		}
+		else if (overload.Parameters.Count == 1)
+		{
+			var p = overload.Parameters.First();
+			paramDecls = (options.IncludeStrictParameter ? ", " : "") + $"{p.Type} {p.EscapedName}";
+			invokeArgs = $", {p.EscapedName}";
+		}
+		else
+		{
+			// 2+ params: accept as TArgs tuple
+			var tArgs = ComputeTArgsType(overload.Parameters);
+			paramDecls = (options.IncludeStrictParameter ? ", " : "") + $"{tArgs} args";
+			invokeArgs = ", args";
+		}
 
 		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 
 		if (overload.IsVoid)
 		{
-			w.Line($"internal void Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{paramArgs});");
+			w.Line($"internal void Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{invokeArgs});");
 		}
 		else if (isVoidTask)
 		{
-			// Task -> direct delegation
-			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{paramArgs});");
+			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{invokeArgs});");
 		}
 		else if (isVoidValueTask)
 		{
-			// ValueTask -> wrap Task from AsyncVoidMethodInterceptorN
-			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => new global::System.Threading.Tasks.ValueTask(_ov{overloadIndex}.Invoke({strictArg}{paramArgs}));");
+			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => new global::System.Threading.Tasks.ValueTask(_ov{overloadIndex}.Invoke({strictArg}{invokeArgs}));");
 		}
 		else if (isAsyncTaskT)
 		{
-			// Task<T> -> direct delegation
-			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{paramArgs});");
+			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{invokeArgs});");
 		}
 		else if (isAsyncValueTaskT)
 		{
-			// ValueTask<T> -> wrap Task<T> from AsyncMethodInterceptorN
-			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => new {overload.ReturnType}(_ov{overloadIndex}.Invoke({strictArg}{paramArgs}));");
+			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => new {overload.ReturnType}(_ov{overloadIndex}.Invoke({strictArg}{invokeArgs}));");
 		}
 		else
 		{
-			// Sync non-void -> direct delegation
-			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{paramArgs});");
+			w.Line($"internal {overload.ReturnType} Invoke_{suffix}({strictParam}{paramDecls}) => _ov{overloadIndex}.Invoke({strictArg}{invokeArgs});");
 		}
 		w.Line();
 	}
@@ -894,16 +1270,20 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Gets the fully-qualified MethodCallBuilder type returned by Return()/Call() on the pre-compiled interceptor.
+	/// Zero-param types retain arity suffix (MethodCallBuilder0). TTuple types (1+ params) use unsuffixed names.
 	/// </summary>
 	public static string GetCallBuilderType(MethodOverloadSignature overload)
 	{
 		var interceptorType = GetOverloadInterceptorType(overload);
 		var paramCount = overload.Parameters.Count;
-		return $"{interceptorType}.MethodCallBuilder{paramCount}";
+		if (paramCount == 0)
+			return $"{interceptorType}.MethodCallBuilder0";
+		return $"{interceptorType}.MethodCallBuilder";
 	}
 
 	/// <summary>
 	/// Gets the fully-qualified WhenBuilder type returned by When() on the pre-compiled interceptor.
+	/// Zero-param types retain arity suffix. TTuple types (1+ params) use unsuffixed names.
 	/// </summary>
 	public static string GetWhenBuilderType(MethodOverloadSignature overload)
 	{
@@ -915,12 +1295,18 @@ internal static class PreCompiledInterceptorRenderer
 		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 		var isVoidAsync = isVoidTask || isVoidValueTask;
 
-		// Void and async-void interceptors use VoidWhenBuilderN
+		// Void and async-void interceptors use VoidWhenBuilder (no suffix for 1+, suffix for 0)
 		if (overload.IsVoid || isVoidAsync)
-			return $"{interceptorType}.VoidWhenBuilder{paramCount}";
+		{
+			if (paramCount == 0)
+				return $"{interceptorType}.VoidWhenBuilder0";
+			return $"{interceptorType}.VoidWhenBuilder";
+		}
 
-		// Non-void (sync and async non-void) use WhenBuilderN
-		return $"{interceptorType}.WhenBuilder{paramCount}";
+		// Non-void (sync and async non-void) use WhenBuilder (no suffix for 1+, suffix for 0)
+		if (paramCount == 0)
+			return $"{interceptorType}.WhenBuilder0";
+		return $"{interceptorType}.WhenBuilder";
 	}
 
 	// ========================================================================

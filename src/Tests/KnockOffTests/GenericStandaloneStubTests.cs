@@ -65,7 +65,7 @@ public class GenericStandaloneStubTests
 		repo.Save(user);
 
 		// Assert
-		Assert.Same(user, tracking.LastArg);
+		Assert.Same(user, tracking.LastArgs);
 	}
 
 	#endregion
@@ -168,7 +168,7 @@ public class GenericStandaloneStubTests
 		// Assert
 		Assert.Equal(42, result);
 		tracking.Verify(Called.Once);
-		Assert.Equal("answer", tracking.LastArg);
+		Assert.Equal("answer", tracking.LastArgs);
 	}
 
 	[Fact]
@@ -201,7 +201,7 @@ public class GenericStandaloneStubTests
 
 		// Assert
 		tracking.Verify(Called.Once);
-		Assert.Same(user, tracking.LastArg);
+		Assert.Same(user, tracking.LastArgs);
 	}
 
 	[Fact]

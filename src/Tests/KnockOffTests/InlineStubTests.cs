@@ -59,7 +59,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		service.GetValue(42);
 
-		Assert.Equal(42, stub.GetValue.LastArg);
+		Assert.Equal(42, stub.GetValue.LastArgs);
 	}
 
 	[Fact]
@@ -102,7 +102,7 @@ public class InlineStubTests
 		stub.GetValue.Verify(Called.Never);
 		stub.GetValue.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Equal(default, stub.GetValue.LastArg);
+		Assert.Equal(default, stub.GetValue.LastArgs);
 	}
 
 	[Fact]
@@ -122,7 +122,7 @@ public class InlineStubTests
 
 		serviceStub.DoSomething.Verify();
 		loggerStub.Log.Verify();
-		Assert.Equal("test", loggerStub.Log.LastArg);
+		Assert.Equal("test", loggerStub.Log.LastArgs);
 	}
 
 #if NET9_0_OR_GREATER
@@ -675,9 +675,9 @@ public class GenericCollisionTests
 		intList.Add(42);
 
 		stringStub.Add.Verify();
-		Assert.Equal("hello", stringStub.Add.LastArg);
+		Assert.Equal("hello", stringStub.Add.LastArgs);
 		intStub.Add.Verify();
-		Assert.Equal(42, intStub.Add.LastArg);
+		Assert.Equal(42, intStub.Add.LastArgs);
 	}
 
 	[Fact]
@@ -800,7 +800,7 @@ public class ClassStubTests
 
 		stub.Object.Calculate(42);
 
-		Assert.Equal(42, stub.Calculate.LastArg);
+		Assert.Equal(42, stub.Calculate.LastArgs);
 	}
 
 	[Fact]
@@ -832,9 +832,8 @@ public class ClassStubTests
 
 		stub.Object.Format("Test", 123);
 
-		Assert.NotNull(stub.Format.LastArgs);
-		Assert.Equal("Test", stub.Format.LastArgs.Value.Item1);
-		Assert.Equal(123, stub.Format.LastArgs.Value.Item2);
+		Assert.Equal("Test", stub.Format.LastArgs!.input);
+		Assert.Equal(123, stub.Format.LastArgs!.count);
 	}
 
 	[Fact]
@@ -851,7 +850,7 @@ public class ClassStubTests
 		stub.Calculate.Verify(Called.Never);
 		stub.Calculate.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Equal(default, stub.Calculate.LastArg);
+		Assert.Equal(default, stub.Calculate.LastArgs);
 	}
 
 	[Fact]
@@ -943,7 +942,7 @@ public class AbstractClassStubTests
 		var result = stub.Object.Execute("SELECT 1");
 
 		Assert.Equal(0, result); // default(int)
-		Assert.Equal("SELECT 1", stub.Execute.LastArg);
+		Assert.Equal("SELECT 1", stub.Execute.LastArgs);
 	}
 
 	[Fact]

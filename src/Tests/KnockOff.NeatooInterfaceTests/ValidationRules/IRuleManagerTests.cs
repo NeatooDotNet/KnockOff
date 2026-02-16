@@ -91,7 +91,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         CancellationToken? capturedToken = null;
 
-        stub.RunRules.Call((Func<string, CancellationToken?, Task>)((prop, token) =>
+        stub.RunRules.Call((Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             capturedToken = token;
             return Task.CompletedTask;
@@ -129,6 +129,7 @@ public partial class IRuleManagerTests
         stub.RunRule.Call((rule, token) =>
         {
             capturedRule = rule;
+            return Task.CompletedTask;
         });
 
         var ruleStub = new RuleStubForManager();

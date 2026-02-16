@@ -11,7 +11,7 @@ namespace KnockOff.Interceptors;
 /// Replaces generated interceptor classes by parameterizing on individual argument types.
 /// All behavioral logic (Call, When, sequences, verification, builders) is pre-compiled.
 /// </summary>
-public sealed class VoidMethodInterceptor0
+public sealed class VoidMethodInterceptor0 : IInterceptor
 {
     private readonly string _memberName;
 

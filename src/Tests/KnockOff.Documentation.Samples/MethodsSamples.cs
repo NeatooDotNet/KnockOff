@@ -237,7 +237,7 @@ public class ArgumentCaptureTests
 
         #region methods-capture-single
         // LastArg captures the most recent call's argument
-        int capturedId = tracking.LastArg;
+        int capturedId = tracking.LastArgs;
         #endregion
 
         Assert.Equal(42, capturedId);
@@ -341,8 +341,8 @@ public class CompleteMethodExampleTests
 
         Assert.True(result);
         stub.Verify();
-        Assert.Equal(1, getTracking.LastArg);
-        Assert.Equal("new@test.com", saveTracking.LastArg!.Email);
+        Assert.Equal(1, getTracking.LastArgs);
+        Assert.Equal("new@test.com", saveTracking.LastArgs!.Email);
     }
 }
 

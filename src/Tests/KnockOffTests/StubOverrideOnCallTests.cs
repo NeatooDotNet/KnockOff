@@ -189,7 +189,7 @@ public class StubOverrideOnCallTests
         service.GetValue(7);
 
         // Assert - LastArg still tracks even with OnCall
-        Assert.Equal(7, stub.GetValue.LastArg);
+        Assert.Equal(7, stub.GetValue.LastArgs);
     }
 
     [Fact]

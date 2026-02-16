@@ -62,6 +62,7 @@ internal static class StandaloneClassRenderer
 
         // Track which interceptors use pre-compiled mode vs generated classes
         var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
+        var preCompiledDelegateDecls = new Dictionary<string, string>(); // interceptorName -> delegate declaration
         var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
         var renderedInterceptorClasses = new HashSet<string>();
 
@@ -129,6 +130,11 @@ internal static class StandaloneClassRenderer
                 if (!hasStubOverride && PreCompiledInterceptorRenderer.CanUsePreCompiled(method))
                 {
                     preCompiledInterceptors[method.MethodName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(method);
+                    if (method.Parameters.Count > 0)
+                    {
+                        preCompiledDelegateDecls[method.MethodName] = PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
+                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
+                    }
                 }
                 else if (!hasStubOverride && PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
                 {
@@ -187,6 +193,11 @@ internal static class StandaloneClassRenderer
         foreach (var interceptorProp in unit.InterceptorProperties)
         {
             var newKeyword = interceptorProp.NeedsNewKeyword ? "new " : "";
+            // Emit delegate declaration for TTuple types (1+ params)
+            if (preCompiledDelegateDecls.TryGetValue(interceptorProp.PropertyName, out var delegateDecl))
+            {
+                w.Line($"{indent1}{delegateDecl}");
+            }
             w.Line($"{indent1}/// <summary>{interceptorProp.Description}</summary>");
             if (preCompiledInterceptors.TryGetValue(interceptorProp.PropertyName, out var preCompiledType))
             {
@@ -1096,10 +1107,20 @@ internal static class StandaloneClassRenderer
                 w.Line();
 
                 // Build invoke arguments: strict, then method parameters
-                // For pre-compiled interceptors, strip ref/in prefixes
+                // For pre-compiled interceptors, strip ref/in prefixes and wrap for TTuple
                 var rawInputArgs = method.InputArgumentList;
                 var cleanInputArgs = (isPreCompiled || isCompositor) ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
-                var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
+                string invokeArgs;
+                if (isPreCompiled || isCompositor)
+                {
+                    // TTuple types: wrap 2+ params in tuple literal for Invoke(bool strict, TArgs args)
+                    var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanInputArgs);
+                    invokeArgs = "_stub.Strict" + wrappedArgs;
+                }
+                else
+                {
+                    invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
+                }
 
                 // Determine if ValueTask wrapping is needed (only for pre-compiled)
                 var needsValueTaskWrap = false;

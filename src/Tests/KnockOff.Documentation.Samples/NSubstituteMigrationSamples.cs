@@ -614,7 +614,7 @@ public class ReceivedWithArgsKnockOffTests
         #region nsub-migration-received-args-knockoff
         // KnockOff: Inspect captured arguments or use LastArg
         Assert.Contains(42, calledIds);
-        Assert.Equal(99, stub.GetUser.LastArg);
+        Assert.Equal(99, stub.GetUser.LastArgs);
         #endregion
     }
 }

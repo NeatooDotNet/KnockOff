@@ -145,7 +145,7 @@ public class KnockOffTypeSafetyTests
 
         // (string firstName, string lastName) — both parameters are named and typed
         // No ambiguity: each parameter is a separate lambda argument
-        stub.Validate.When((firstName, lastName) => firstName.Length > 0).Return(true);
+        stub.Validate.When(args => args.firstName.Length > 0).Return(true);
 
         ITypeSafeValidator validator = stub;
         Assert.True(validator.Validate("Jane", "Doe"));

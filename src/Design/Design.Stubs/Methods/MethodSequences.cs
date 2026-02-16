@@ -510,7 +510,7 @@ public partial class MethodSequencesDemo
             .ThenReturn((a, b) => 2);
 
         // Specific argument match (higher priority)
-        stub.Add.When(99, 99).Return(9999);
+        stub.Add.When((99, 99)).Return(9999);
 
         ICalculator calc = stub;
 

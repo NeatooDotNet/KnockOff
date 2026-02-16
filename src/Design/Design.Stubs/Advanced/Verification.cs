@@ -283,8 +283,8 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var chain = stub.Add.When(1, 2).Return(10)
-            .ThenWhen(3, 4).Return(20)
+        var chain = stub.Add.When((1, 2)).Return(10)
+            .ThenWhen((3, 4)).Return(20)
             .ThenCall((a, b) => 999); // Terminal
 
         ICalculator calc = stub;

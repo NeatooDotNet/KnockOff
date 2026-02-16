@@ -40,7 +40,7 @@ public class OpenGenericInlineStubTests
 
 		stub.Add.Verify(Called.Exactly(2));
 		stub.Add.Verify();
-		Assert.Equal("another", stub.Add.LastArg);
+		Assert.Equal("another", stub.Add.LastArgs);
 	}
 
 	[Fact]
@@ -82,8 +82,8 @@ public class OpenGenericInlineStubTests
 
 		stringStub.Add.Verify(Called.Once);
 		intStub.Add.Verify(Called.Once);
-		Assert.Equal("test", stringStub.Add.LastArg);
-		Assert.Equal(42, intStub.Add.LastArg);
+		Assert.Equal("test", stringStub.Add.LastArgs);
+		Assert.Equal(42, intStub.Add.LastArgs);
 	}
 
 	#endregion

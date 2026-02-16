@@ -640,7 +640,7 @@ public class ArgumentCaptureTests
         // Single parameter - LastArg
         var getTracking = stub.GetUser.Return((id) => new User { Id = id });
         service.GetUser(42);
-        Assert.Equal(42, getTracking.LastArg);
+        Assert.Equal(42, getTracking.LastArgs);
 
         // Multiple parameters - LastArgs tuple
         var updateTracking = stub.Update.Call((id, name) => { });
@@ -758,7 +758,7 @@ public class StubOverrideTests
         repo.GetById(42);
 
         stub.GetById.Verify(Called.Once);
-        Assert.Equal(42, stub.GetById.LastArg);
+        Assert.Equal(42, stub.GetById.LastArgs);
         #endregion
     }
 
@@ -779,7 +779,7 @@ public class StubOverrideTests
         repo.GetById(2);  // Still uses Returns callback
         #endregion
 
-        Assert.Equal(2, stub.GetById.LastArg);
+        Assert.Equal(2, stub.GetById.LastArgs);
     }
 }
 

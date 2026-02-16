@@ -122,7 +122,7 @@ public class WhenSolutionTests
 
         #region when-solution-match-then-respond
         // With When(): match arguments, then configure response
-        stub.Calculate.When(5, 10).Return(50);
+        stub.Calculate.When((5, 10)).Return(50);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -143,8 +143,8 @@ public class WhenBasicReturnMethodTests
 
         #region when-basic-value-matching
         // Configure different returns for different argument values
-        stub.Add.When(1, 2).Return(100);
-        stub.Add.When(3, 4).Return(200);
+        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When((3, 4)).Return(200);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -164,7 +164,7 @@ public class WhenBasicReturnMethodTests
 
         #region when-basic-predicate-matching
         // Match based on condition
-        stub.Add.When((a, b) => a > 10).Return(999);
+        stub.Add.When(args => args.a > 10).Return(999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -205,7 +205,7 @@ public class WhenVoidMethodTests
 
         #region when-void-tracking-only
         // When() alone tracks parameter-specific calls
-        var chain = stub.Process.When(1, 2);
+        var chain = stub.Process.When((1, 2));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -224,7 +224,7 @@ public class WhenVoidMethodTests
         var calls = new List<(int, int)>();
         #region when-void-with-callback
         // Call() adds callback for side effects
-        stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+        stub.Process.When((1, 2)).Call((a, b) => calls.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -242,7 +242,7 @@ public class WhenVoidMethodTests
         var matched = new List<(int, int)>();
         #region when-void-predicate
         // Predicate matching works the same for void methods
-        stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
+        stub.Process.When(args => args.a > 10).Call((a, b) => matched.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -268,9 +268,9 @@ public class WhenChainingTests
         #region when-chaining-thenwhen
         // Chain matchers with ThenWhen()
         stub.Add
-            .When(1, 2).Return(100)
-            .ThenWhen(3, 4).Return(200)
-            .ThenWhen((a, b) => a > 100).Return(999);
+            .When((1, 2)).Return(100)
+            .ThenWhen((3, 4)).Return(200)
+            .ThenWhen(args => args.a > 100).Return(999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -295,9 +295,9 @@ public class WhenChainingTests
 
         #region when-multiple-calls
         // Multiple When() calls build the same chain
-        stub.Add.When(1, 2).Return(100);
-        stub.Add.When(2, 3).Return(200);
-        stub.Add.When(3, 4).Return(300);
+        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When((2, 3)).Return(200);
+        stub.Add.When((3, 4)).Return(300);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -323,7 +323,7 @@ public class WhenTerminalTests
         #region when-thencall-terminal
         // ThenCall() is an unconditional terminal matcher
         stub.Add
-            .When(1, 2).Return(100)
+            .When((1, 2)).Return(100)
             .ThenCall((a, b) => a + b);
         #endregion
 
@@ -344,7 +344,7 @@ public class WhenTerminalTests
 
         #region when-thennone-exhaust
         // ThenNone() closes the chain and falls through
-        stub.Add.When(1, 2).Return(100).ThenNone();
+        stub.Add.When((1, 2)).Return(100).ThenNone();
         stub.Add.Return(999);
         #endregion
 
@@ -372,7 +372,7 @@ public class WhenFallbackTests
 
         #region when-fallback-returns
         // When() falls through to Return() when no match
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         stub.Add.Return(999);
         #endregion
 
@@ -389,7 +389,7 @@ public class WhenFallbackTests
 
         #region when-fallback-oncall
         // When() falls through to Return() when no match
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         stub.Add.Return((a, b) => a * b);
         #endregion
 
@@ -407,7 +407,7 @@ public class WhenFallbackTests
         #region when-fallback-none-nonstrict
         // Non-strict mode: unmatched calls return default
         stub.Strict = false;
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -424,7 +424,7 @@ public class WhenFallbackTests
         #region when-fallback-none-strict
         // Strict mode: unmatched calls throw
         stub.Strict = true;
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -450,7 +450,7 @@ public class WhenPriorityTests
         stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
 
         // When() has higher priority
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -478,7 +478,7 @@ public class WhenVerificationTests
         #region when-verification-complete
         // Chain with ThenCall terminal
         var chain = stub.Add
-            .When(1, 2).Return(100)
+            .When((1, 2)).Return(100)
             .ThenCall((a, b) => 999);
         #endregion
 
@@ -502,8 +502,8 @@ public class WhenVerificationTests
         #region when-verification-incomplete
         // Chain with multiple matchers
         var chain = stub.Add
-            .When(1, 2).Return(100)
-            .ThenWhen(2, 3).Return(200);
+            .When((1, 2)).Return(100)
+            .ThenWhen((2, 3)).Return(200);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -523,7 +523,7 @@ public class WhenVerificationTests
         #region when-verifiable-batch
         // Mark chain for batch verification
         stub.Add
-            .When(1, 2).Return(100)
+            .When((1, 2)).Return(100)
             .ThenCall((a, b) => 999)
             .Verifiable();
         #endregion
@@ -543,7 +543,7 @@ public class WhenVerificationTests
 
         #region when-void-verify-times
         // Track specific parameter combination
-        var chain = stub.Process.When(1, 2);
+        var chain = stub.Process.When((1, 2));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -570,7 +570,7 @@ public class WhenResetTests
         #region when-reset-chain
         // Chain tracks position - Reset() restarts from beginning
         var chain = stub.Add
-            .When(1, 2).Return(100)
+            .When((1, 2)).Return(100)
             .ThenCall((a, b) => 999);
         #endregion
 
@@ -595,7 +595,7 @@ public class WhenResetTests
         #region when-reset-interceptor
         // Interceptor Reset() also resets When chain
         stub.Add
-            .When(1, 2).Return(100)
+            .When((1, 2)).Return(100)
             .ThenCall((a, b) => 999);
         #endregion
 
@@ -761,8 +761,8 @@ public class WhenRefValueTests
         var stub = new WhenCalculatorStub();
 
         #region when-chains-ref-value
-        stub.Add.When(1, 2).Return(100)
-            .ThenWhen(5, 5).Return(500);
+        stub.Add.When((1, 2)).Return(100)
+            .ThenWhen((5, 5)).Return(500);
 
         IWhenCalculator calc = stub;
         calc.Add(1, 2);  // 100 (matched)
@@ -780,7 +780,7 @@ public class WhenRefValueTests
 
         #region when-chains-ref-predicate
         // Range check
-        stub.Add.When((a, b) => a > 0 && b > 0).Return(42);
+        stub.Add.When(args => args.a > 0 && args.b > 0).Return(42);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -797,9 +797,9 @@ public class WhenRefChainingTests
 
         #region when-chains-ref-thenwhen
         stub.Add
-            .When(1, 1).Return(1)
-            .ThenWhen(2, 2).Return(2)
-            .ThenWhen(3, 3).Return(3);
+            .When((1, 1)).Return(1)
+            .ThenWhen((2, 2)).Return(2)
+            .ThenWhen((3, 3)).Return(3);
 
         IWhenCalculator calc = stub;
         calc.Add(1, 1); // 1
@@ -841,7 +841,7 @@ public class WhenRefVoidTests
         var warnings = new List<string>();
 
         #region when-chains-ref-void-call
-        stub.Process.When(1, 2).Call((a, b) => errors.Add($"{a},{b}"));
+        stub.Process.When((1, 2)).Call((a, b) => errors.Add($"{a},{b}"));
         #endregion
 
         IWhenProcessor p = stub;
@@ -856,8 +856,8 @@ public class WhenRefVoidTests
 
         #region when-chains-ref-thencall
         stub.Add
-            .When(1, 2).Return(100)
-            .ThenWhen(3, 4).Return(200)
+            .When((1, 2)).Return(100)
+            .ThenWhen((3, 4)).Return(200)
             .ThenCall((a, b) => a + b);  // Fallback for unmatched
 
         IWhenCalculator calc = stub;
@@ -879,7 +879,7 @@ public class WhenRefPriorityTests
 
         #region when-chains-ref-priority
         stub.Add.Return(0);                     // Default for unmatched
-        stub.Add.When(1, 2).Return(100);        // Specific match
+        stub.Add.When((1, 2)).Return(100);        // Specific match
 
         IWhenCalculator calc = stub;
         calc.Add(1, 2); // 100 (When matched)
@@ -918,8 +918,8 @@ public class WhenRefVerifyTests
         var stub = new WhenCalculatorStub();
 
         #region when-chains-ref-verifiable
-        stub.Add.When(1, 2).Return(100).Verifiable();
-        stub.Add.When(5, 5).Return(500).Verifiable();
+        stub.Add.When((1, 2)).Return(100).Verifiable();
+        stub.Add.When((5, 5)).Return(500).Verifiable();
         #endregion
 
         IWhenCalculator calc = stub;
@@ -934,8 +934,8 @@ public class WhenRefVerifyTests
         var stub = new WhenCalculatorStub();
 
         #region when-chains-ref-chain-verify
-        var chain = stub.Add.When(1, 2).Return(10)
-            .ThenWhen(3, 4).Return(20)
+        var chain = stub.Add.When((1, 2)).Return(10)
+            .ThenWhen((3, 4)).Return(20)
             .ThenCall((a, b) => 999);
 
         IWhenCalculator calc = stub;
@@ -961,10 +961,10 @@ public class WhenChainApiTests
 
         #region when-chain-return-method-api
         // When() returns IWhenBuilder, which requires .Return() to complete
-        var chain = stub.Calculate.When(5, 10).Return(50);
+        var chain = stub.Calculate.When((5, 10)).Return(50);
 
         // chain is IWhenChain - can continue chaining or verify
-        chain.ThenWhen(1, 2).Return(100);
+        chain.ThenWhen((1, 2)).Return(100);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -980,7 +980,7 @@ public class WhenChainApiTests
         var called = false;
         #region when-chain-void-method-api
         // Void methods: When() returns IVoidWhenChain directly
-        var chain = stub.Process.When(1, 2);
+        var chain = stub.Process.When((1, 2));
 
         // .Call() is optional - adds callback for side effects
         chain.Call((a, b) => called = true);

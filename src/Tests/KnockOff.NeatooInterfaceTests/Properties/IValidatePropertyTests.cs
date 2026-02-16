@@ -182,7 +182,7 @@ public partial class IValidatePropertyTests
 
         await property.SetValue("CapturedValue");
 
-        Assert.Equal("CapturedValue", stub.SetValue.LastArg);
+        Assert.Equal("CapturedValue", stub.SetValue.LastArgs);
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public partial class IValidatePropertyTests
         property.AddMarkedBusy(12345);
 
         stub.AddMarkedBusy.Verify();
-        Assert.Equal(12345L, stub.AddMarkedBusy.LastArg);
+        Assert.Equal(12345L, stub.AddMarkedBusy.LastArgs);
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public partial class IValidatePropertyTests
         property.RemoveMarkedBusy(12345);
 
         stub.RemoveMarkedBusy.Verify();
-        Assert.Equal(12345L, stub.RemoveMarkedBusy.LastArg);
+        Assert.Equal(12345L, stub.RemoveMarkedBusy.LastArgs);
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public partial class IValidatePropertyTests
         property.LoadValue("LoadedValue");
 
         stub.LoadValue.Verify();
-        Assert.Equal("LoadedValue", stub.LoadValue.LastArg);
+        Assert.Equal("LoadedValue", stub.LoadValue.LastArgs);
     }
 
     [Fact]

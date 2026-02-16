@@ -121,7 +121,7 @@ public partial class IRuleTests
         await rule.RunRule(validateStub, cts.Token);
 
         // Verify arguments were captured
-        Assert.NotNull(stub.RunRule.LastArgs);
+        stub.RunRule.Verify(Called.Once);
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public partial class IRuleTests
 
         rule.OnRuleAdded(ruleManagerStub, 42);
 
-        Assert.NotNull(stub.OnRuleAdded.LastArgs);
+        stub.OnRuleAdded.Verify(Called.Once);
     }
 
     #endregion

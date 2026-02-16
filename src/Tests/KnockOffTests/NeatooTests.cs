@@ -322,8 +322,8 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithPropertyName_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        // RunRules is overloaded - disambiguate via Func type
-        var tracking = stub.RunRules.Call((Func<string, CancellationToken?, Task>)((propertyName, token) => Task.CompletedTask));
+        // RunRules is overloaded - disambiguate via generated delegate type
+        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propertyName, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
@@ -336,8 +336,8 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithFlag_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        // RunRules is overloaded - disambiguate via Func type
-        var tracking = stub.RunRules.Call((Func<RunRulesFlag, CancellationToken?, Task>)((flag, token) => Task.CompletedTask));
+        // RunRules is overloaded - disambiguate via generated delegate type
+        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((flag, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
@@ -380,7 +380,7 @@ public class ValidateBaseStandaloneTests
         _ = validate.GetProperty("Age");
 
         tracking.Verify();
-        Assert.Equal("Age", tracking.LastArg);
+        Assert.Equal("Age", tracking.LastArgs);
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public partial class InlineValidateBaseTests
         _ = validate.GetProperty("TestProp");
 
         stub.GetProperty.Verify();
-        Assert.Equal("TestProp", stub.GetProperty.LastArg);
+        Assert.Equal("TestProp", stub.GetProperty.LastArgs);
     }
 
     [Fact]
@@ -535,7 +535,7 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Call((Func<string, CancellationToken?, Task>)((prop, token) =>
+        stub.RunRules.Call((InlineValidateBaseTests.Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;

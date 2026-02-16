@@ -110,7 +110,7 @@ public class StubOverrideFallbackTests
 
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
-        Assert.Equal(1, stub.GetUserById.LastArg);
+        Assert.Equal(1, stub.GetUserById.LastArgs);
     }
 }
 
@@ -193,7 +193,7 @@ public class StubOverrideVerificationTests
 
         // Tracking works whether using Return or stub override
         stub.IsActive.Verify(Called.Once);
-        Assert.Equal(42, stub.IsActive.LastArg);
+        Assert.Equal(42, stub.IsActive.LastArgs);
         #endregion
     }
 }
@@ -347,7 +347,7 @@ public class StubOverrideInterceptorApiExampleTests
 
         // Full tracking works - counts all calls regardless of configuration
         stub.GetById.Verify(Called.Exactly(2));
-        Assert.Equal(2, stub.GetById.LastArg);
+        Assert.Equal(2, stub.GetById.LastArgs);
 
         // Returns for constant values (auto-wraps for async)
         stub.GetById.Return(new User { Id = 99 });
@@ -393,7 +393,7 @@ public class StubOverrideStandalonePatternTests
         repo.GetById(42);
 
         stub.GetById.Verify(Called.Once);
-        Assert.Equal(42, stub.GetById.LastArg);
+        Assert.Equal(42, stub.GetById.LastArgs);
         #endregion
     }
 
@@ -414,7 +414,7 @@ public class StubOverrideStandalonePatternTests
         repo.GetById(2);  // Still uses Return callback (not reset to stub override)
         #endregion
 
-        Assert.Equal(2, stub.GetById.LastArg);
+        Assert.Equal(2, stub.GetById.LastArgs);
     }
 }
 
@@ -625,6 +625,6 @@ public class CompleteStubOverrideExampleTests
         repository.GetUserById(3);
 
         stub.GetUserById.Verify(Called.Exactly(3));
-        Assert.Equal(3, stub.GetUserById.LastArg);
+        Assert.Equal(3, stub.GetUserById.LastArgs);
     }
 }

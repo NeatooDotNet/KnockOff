@@ -448,7 +448,7 @@ public class SourceRefBasicTests
 
         #region source-delegation-ref-priority
         stub.Source(realCalculator);
-        stub.Divide.When(10, 2).Return(5);
+        stub.Divide.When((10, 2)).Return(5);
 
         ISourceCalc calc = stub;
         calc.Divide(10, 2);  // 5 (When chain matched)

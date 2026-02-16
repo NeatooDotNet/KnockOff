@@ -106,7 +106,7 @@ public class MethodInterceptionTests
         stub.GetData.Verify(Called.Exactly(2));
 
         // Access call history
-        Assert.Equal(2, stub.GetData.LastArg);
+        Assert.Equal(2, stub.GetData.LastArgs);
     }
 }
 
@@ -275,9 +275,9 @@ public class WhenChainsTests
         #region matrix-when-chains
         // Chain multiple conditions (sequential - each consumed once)
         stub.Add
-            .When(1, 2).Return(100)
-            .ThenWhen(3, 4).Return(200)
-            .ThenWhen((a, b) => a < 0).Return(0);
+            .When((1, 2)).Return(100)
+            .ThenWhen((3, 4)).Return(200)
+            .ThenWhen(args => args.a < 0).Return(0);
 
         // Fallback for non-matching calls or after chain is consumed
         stub.Add.Return(42);

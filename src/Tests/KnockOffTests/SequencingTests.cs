@@ -269,10 +269,10 @@ public class SequencingTests
 
         ISequenceTestService svc = stub;
         svc.GetMessage("Alice");
-        Assert.Equal("Alice", tracking.LastArg);
+        Assert.Equal("Alice", tracking.LastArgs);
 
         svc.GetMessage("Bob");
-        Assert.Equal("Bob", tracking.LastArg);
+        Assert.Equal("Bob", tracking.LastArgs);
     }
 }
 
@@ -396,8 +396,8 @@ public class MethodOverloadTests
         // Single-param overload can be inferred
         var tracking1 = stub.Format.Return((input) => input.ToUpper());
         // Two-param overloads need explicit delegate types because (input, x) is ambiguous
-        var tracking2 = stub.Format.Return((Func<string, bool, string>)((input, uppercase) => uppercase ? input.ToUpper() : input));
-        var tracking3 = stub.Format.Return((Func<string, int, string>)((input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))));
+        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Boolean_String)((input, uppercase) => uppercase ? input.ToUpper() : input));
+        var tracking3 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Int32_String)((input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))));
 
         IOverloadTestService svc = stub;
 
@@ -416,7 +416,7 @@ public class MethodOverloadTests
         var stub = new OverloadTestKnockOff();
 
         var tracking1 = stub.Format.Return((input) => "1");
-        var tracking2 = stub.Format.Return((Func<string, bool, string>)((input, uppercase) => "2"));
+        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Boolean_String)((input, uppercase) => "2"));
 
         IOverloadTestService svc = stub;
 
@@ -425,7 +425,7 @@ public class MethodOverloadTests
         svc.Format("c", true);
 
         tracking1.Verify(Called.Exactly(2));
-        Assert.Equal("b", tracking1.LastArg);
+        Assert.Equal("b", tracking1.LastArgs);
 
         tracking2.Verify(Called.Once);
         Assert.Equal(("c", true), tracking2.LastArgs);

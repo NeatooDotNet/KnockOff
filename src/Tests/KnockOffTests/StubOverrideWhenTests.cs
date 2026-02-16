@@ -334,7 +334,7 @@ public class StubOverrideWhenTests
         service.Process("user-value");  // Stub override fallback
 
         // Assert - LastArg tracks most recent call
-        Assert.Equal("user-value", stub.Process.LastArg);
+        Assert.Equal("user-value", stub.Process.LastArgs);
     }
 
     #endregion
@@ -346,8 +346,8 @@ public class StubOverrideWhenTests
     {
         // Arrange
         var stub = new WhenStubOverrideStub();
-        stub.Calculate.When(0, 0).Return(0);
-        stub.Calculate.When((a, b) => a < 0 && b < 0).Return(-1);
+        stub.Calculate.When((0, 0)).Return(0);
+        stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);
 
         // Act
         IWhenStubOverrideTest service = stub;
@@ -446,7 +446,7 @@ public class StubOverrideWhenTests
     {
         // Arrange - Format2 (two-param overload) has no stub override
         var stub = new OverloadedStubOverrideStub();
-        stub.Format2.When("hello", true).Return("[WHEN UPPER]");
+        stub.Format2.When(("hello", true)).Return("[WHEN UPPER]");
         stub.Format2.Return("[DEFAULT]");
 
         // Act
@@ -465,7 +465,7 @@ public class StubOverrideWhenTests
         // Arrange - Configure When on both overloads independently
         var stub = new OverloadedStubOverrideStub();
         stub.Format.When("special").Return("[WHEN1]");
-        stub.Format2.When("special", true).Return("[WHEN2]");
+        stub.Format2.When(("special", true)).Return("[WHEN2]");
         stub.Format2.Return("[DEFAULT2]");
 
         // Act

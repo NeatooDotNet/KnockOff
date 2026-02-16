@@ -31,27 +31,22 @@ public partial class WhenMatchingDemo
     //
     // GENERATOR BEHAVIOR: When() generates a WhenBuilder specific to the method:
     //
-    //   public class AddInterceptor
+    //   public sealed class MethodInterceptor<TDelegate, TArgs, TReturn>
     //   {
-    //       private List<AddWhenChain>? _whenChains;
-    //
-    //       public AddWhenBuilder When(int a, int b)
-    //       {
-    //           // Creates a When chain that matches these specific values
-    //           return new AddWhenBuilder(this, args => args.a == a && args.b == b);
-    //       }
+    //       // TArgs is (int a, int b) for Add(int a, int b)
+    //       public WhenBuilder When(TArgs args) { ... }  // Value equality
+    //       public WhenBuilder When(Func<TArgs, bool> predicate) { ... }  // Predicate
     //   }
     //
-    //   public class AddWhenBuilder : IWhenBuilder<Func<int, int, int>, int>
+    //   public sealed class WhenBuilder
     //   {
-    //       public AddWhenChain Returns(int value) { ... }
-    //       public AddWhenChain Returns(Func<int, int, int> callback) { ... }
+    //       public WhenChain Return(TReturn value) { ... }
     //   }
     //
-    //   public class AddWhenChain : IWhenChain<Func<int, int, int>, int>
+    //   public sealed class WhenChain
     //   {
-    //       public AddWhenBuilder ThenWhen(int a, int b) { ... }
-    //       public AddWhenBuilder ThenWhen(Func<int, int, bool> predicate) { ... }
+    //       public WhenBuilder ThenWhen(TArgs args) { ... }
+    //       public WhenBuilder ThenWhen(Func<TArgs, bool> predicate) { ... }
     //   }
     //
     // DESIGN DECISION: Method-specific WhenBuilder/WhenChain classes are needed
@@ -67,8 +62,8 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Specific matches take precedence
-        stub.Add.When(1, 2).Return(100);
-        stub.Add.When(5, 5).Return(500);
+        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When((5, 5)).Return(500);
 
         ICalculator calc = stub;
 
@@ -84,16 +79,14 @@ public partial class WhenMatchingDemo
     // matching logic. The predicate receives the arguments and returns bool.
     //
     // This is useful for:
-    // - Range checks: When((a, b) => a > 0 && b > 0)
+    // - Range checks: When(args => args.a > 0 && args.b > 0)
     // - Pattern matching: When((s) => s.StartsWith("prefix"))
     // - Complex conditions that can't be expressed with equality
     //
-    // GENERATOR BEHAVIOR: The predicate version creates a custom matcher:
+    // GENERATOR BEHAVIOR: The predicate version uses Func<TArgs, bool>:
     //
-    //   public AddWhenBuilder When(Func<int, int, bool> predicate)
-    //   {
-    //       return new AddWhenBuilder(this, args => predicate(args.a, args.b));
-    //   }
+    //   public WhenBuilder When(Func<TArgs, bool> predicate) { ... }
+    //   // For Add(int a, int b): When(Func<(int a, int b), bool> predicate)
     // =========================================================================
 
     public void When_PredicateForComplexMatching()
@@ -103,10 +96,10 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Match when both arguments are positive
-        stub.Add.When((a, b) => a > 0 && b > 0).Return(42);
+        stub.Add.When(args => args.a > 0 && args.b > 0).Return(42);
 
         // Match when either argument is negative
-        stub.Add.When((a, b) => a < 0 || b < 0).Return(-1);
+        stub.Add.When(args => args.a < 0 || args.b < 0).Return(-1);
 
         ICalculator calc = stub;
 
@@ -137,7 +130,7 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // When() uses Returns() for the match result
-        stub.Add.When(10, 10).Return(100);
+        stub.Add.When((10, 10)).Return(100);
 
         // For dynamic behavior on ALL calls:
         // stub.Add.Return((a, b) => a * b);
@@ -156,18 +149,18 @@ public partial class WhenMatchingDemo
     //
     // GENERATOR BEHAVIOR: ThenWhen() returns a new WhenBuilder:
     //
-    //   public class AddWhenChain
+    //   public sealed class WhenChain
     //   {
-    //       public AddWhenBuilder ThenWhen(int a, int b) { ... }
-    //       public AddWhenBuilder ThenWhen(Func<int, int, bool> predicate) { ... }
+    //       public WhenBuilder ThenWhen(TArgs args) { ... }
+    //       public WhenBuilder ThenWhen(Func<TArgs, bool> predicate) { ... }
     //   }
     //
     // DID NOT DO THIS: Require separate When() calls for each matcher
     //
     // REJECTED PATTERN:
-    //   stub.Add.When(1, 1).Return(1);
-    //   stub.Add.When(2, 2).Return(2);
-    //   stub.Add.When(3, 3).Return(3);
+    //   stub.Add.When((1, 1)).Return(1);
+    //   stub.Add.When((2, 2)).Return(2);
+    //   stub.Add.When((3, 3)).Return(3);
     //
     // WHY ThenWhen EXISTS: While separate When() calls work fine, ThenWhen()
     // allows building related matchers as a logical group. This can be
@@ -182,9 +175,9 @@ public partial class WhenMatchingDemo
 
         // Chain of related matchers
         stub.Add
-            .When(1, 1).Return(1)
-            .ThenWhen(2, 2).Return(2)
-            .ThenWhen(3, 3).Return(3);
+            .When((1, 1)).Return(1)
+            .ThenWhen((2, 2)).Return(2)
+            .ThenWhen((3, 3)).Return(3);
 
         ICalculator calc = stub;
 
@@ -240,8 +233,8 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Order matters! First match wins.
-        stub.Add.When((a, b) => a > 0).Return(100);  // Added first
-        stub.Add.When(5, 5).Return(500);              // Added second
+        stub.Add.When(args => args.a > 0).Return(100);  // Added first
+        stub.Add.When((5, 5)).Return(500);              // Added second
 
         ICalculator calc = stub;
 
@@ -303,8 +296,8 @@ public partial class WhenMatchingDemo
         var stub = new Stubs.ICalculator();
 
         // Mark When chains for batch verification
-        stub.Add.When(1, 2).Return(100).Verifiable();
-        stub.Add.When(5, 5).Return(500).Verifiable();
+        stub.Add.When((1, 2)).Return(100).Verifiable();
+        stub.Add.When((5, 5)).Return(500).Verifiable();
 
         ICalculator calc = stub;
 
@@ -343,25 +336,13 @@ public partial class WhenMatchingDemo
     //
     // Each method generates its own WhenBuilder and WhenChain classes because:
     //
-    // 1. ThenWhen(a, b) needs the exact parameter types (int, int) not generic T
-    // 2. Returns(value) needs the exact return type
-    // 3. Returns(callback) needs the exact delegate type Func<params, return>
+    // With the TTuple approach, When/ThenWhen are pre-compiled on the
+    // interceptor class itself. TArgs is the tuple type (e.g., (int a, int b)),
+    // so When() and ThenWhen() accept tuples directly:
     //
-    // DID NOT DO THIS: Share generic When classes across methods
+    //   stub.Add.When((1, 2)).Return(100);   // Tuple value matching
+    //   stub.Add.When(args => args.a > 0).Return(42);  // Predicate matching
     //
-    // REJECTED PATTERN:
-    //   public class GenericWhenChain<TArgs, TReturn>
-    //   {
-    //       public GenericWhenBuilder<TArgs, TReturn> ThenWhen(TArgs args);
-    //   }
-    //
-    // WHY NOT: ThenWhen(TArgs) would receive a tuple, losing individual
-    // parameter names and making the API awkward:
-    //
-    //   stub.Add.When((1, 2)).Return(100);  // Awkward tuple syntax
-    //   stub.Add.When(1, 2).Return(100);    // Natural separate args
-    //
-    // Per-method classes allow natural argument syntax at the cost of more
-    // generated code.
+    // Named tuple fields (args.a, args.b) provide natural access in predicates.
     // =========================================================================
 }

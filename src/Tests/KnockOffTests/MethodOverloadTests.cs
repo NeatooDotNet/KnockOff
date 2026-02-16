@@ -53,7 +53,7 @@ public class MethodOverloadTests
         svc.Format("c", true);
 
         tracking1.Verify(Called.Exactly(2));
-        Assert.Equal("b", tracking1.LastArg);
+        Assert.Equal("b", tracking1.LastArgs);
 
         tracking2.Verify(Called.Once);
         Assert.Equal(("c", true), tracking2.LastArgs);

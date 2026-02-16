@@ -273,7 +273,7 @@ public class MethodValueOverloadTests
 		var result = repo.GetById(42);
 
 		Assert.Same(mockUser, result);
-		Assert.Equal(42, tracking.LastArg);
+		Assert.Equal(42, tracking.LastArgs);
 	}
 
 	[Fact]

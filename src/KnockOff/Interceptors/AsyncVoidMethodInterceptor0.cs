@@ -10,7 +10,7 @@ namespace KnockOff.Interceptors;
 /// Pre-compiled async interceptor for void methods with 0 parameters.
 /// Handles Task and ValueTask interface methods (no inner return type).
 /// </summary>
-public sealed class AsyncVoidMethodInterceptor0
+public sealed class AsyncVoidMethodInterceptor0 : IInterceptor
 {
     private readonly string _memberName;
 

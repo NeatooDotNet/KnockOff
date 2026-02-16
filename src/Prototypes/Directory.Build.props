@@ -1,0 +1,7 @@
+<Project>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<NoWarn>CA1861;CA1865;CA1510;IDE0021;IDE0022;IDE0023;IDE1006;CA1050;CA1822</NoWarn>
+	</PropertyGroup>
+</Project>

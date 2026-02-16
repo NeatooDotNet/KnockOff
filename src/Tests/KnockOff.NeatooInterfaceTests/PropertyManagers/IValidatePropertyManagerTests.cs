@@ -152,7 +152,7 @@ public partial class IValidatePropertyManagerTests
         manager.GetProperty("Name");
 
         stub.GetProperty.Verify();
-        Assert.Equal("Name", stub.GetProperty.LastArg);
+        Assert.Equal("Name", stub.GetProperty.LastArgs);
     }
 
     [Fact]

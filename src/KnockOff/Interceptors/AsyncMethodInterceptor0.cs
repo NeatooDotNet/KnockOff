@@ -12,7 +12,7 @@ namespace KnockOff.Interceptors;
 /// Handles Task&lt;TReturn&gt; and ValueTask&lt;TReturn&gt; interface methods.
 /// </summary>
 /// <typeparam name="TReturn">The inner return type (e.g., int for Task&lt;int&gt;).</typeparam>
-public sealed class AsyncMethodInterceptor0<TReturn>
+public sealed class AsyncMethodInterceptor0<TReturn> : IInterceptor
 {
     private readonly string _memberName;
 

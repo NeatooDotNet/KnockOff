@@ -68,7 +68,7 @@ public class BasicTests
 		Assert.Equal(84, result);
 		knockOff.GetValue.Verify(Called.Once);
 
-		int lastArg = knockOff.GetValue.LastArg!;
+		int lastArg = knockOff.GetValue.LastArgs!;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -98,7 +98,7 @@ public class BasicTests
 		service.GetValue(3);
 
 		knockOff.GetValue.Verify(Called.Exactly(3));
-		Assert.Equal(3, knockOff.GetValue.LastArg); // Last call was GetValue(3)
+		Assert.Equal(3, knockOff.GetValue.LastArgs); // Last call was GetValue(3)
 	}
 
 	[Fact]

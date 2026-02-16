@@ -135,7 +135,8 @@ internal static class FlatRenderer
 					if (PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel))
 					{
 						// Pre-compiled: record the type, skip class generation
-						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel);
+						// Pass interceptor name for delegate naming (unique when overloaded methods get separate interceptors)
+						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel, group.InterceptorName);
 					}
 					else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(unifiedModel))
 					{
@@ -170,7 +171,8 @@ internal static class FlatRenderer
 					if (!unit.HasPrimaryConstructor && PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel))
 					{
 						// Pre-compiled: record the type, skip class generation
-						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel);
+						// Pass interceptor name for delegate naming (unique when overloaded methods get separate interceptors)
+						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel, group.InterceptorName);
 					}
 					else
 					{
@@ -1550,6 +1552,13 @@ internal static class FlatRenderer
 			var newKeyword = method.NeedsNewKeyword ? "new " : "";
 			if (preCompiledInterceptors.TryGetValue(method.InterceptorName, out var preCompiledType))
 			{
+				// Emit delegate declaration for TTuple types (1+ params)
+				// Use InterceptorName for delegate naming (unique when overloaded methods get separate interceptors)
+				if (method.Parameters.Count > 0)
+				{
+					w.Line(PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
+						method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid, method.InterceptorName));
+				}
 				var factory = PreCompiledInterceptorRenderer.GetMethodSmartDefaultFactory(
 					method.ReturnType, method.IsVoid, method.DefaultStrategy, method.ConcreteTypeForNew, method.MethodName);
 				var ctorArgs = PreCompiledInterceptorRenderer.GetFieldConstructorArgs(method.MethodName, factory);
@@ -1824,7 +1833,8 @@ internal static class FlatRenderer
 											methodInfo.Value.Parameters,
 											methodInfo.Value.ReturnType,
 											methodInfo.Value.IsVoid,
-											disambigInterface));
+											disambigInterface,
+											mapping.InterceptorName));
 									}
 									break;
 								case SourceMemberKind.Property:
@@ -2343,9 +2353,21 @@ internal static class FlatRenderer
 		using (w.Braces())
 		{
 			// Build invoke args (includes Strict, no stub parameter)
-			var invokeArgs = method.Parameters.Count > 0
-				? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "Strict";
+			// For compositor methods (isMultiOverload), the Invoke_* methods now accept TTuple args,
+			// so 2+ params must be wrapped in a tuple literal.
+			string invokeArgs;
+			if (isMultiOverload && method.Parameters.Count > 0)
+			{
+				var cleanArgs = string.Join(", ", method.Parameters.Select(p => p.EscapedName));
+				var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);
+				invokeArgs = "Strict" + wrappedArgs;
+			}
+			else
+			{
+				invokeArgs = method.Parameters.Count > 0
+					? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+					: "Strict";
+			}
 
 			if (method.IsRefReturn)
 			{

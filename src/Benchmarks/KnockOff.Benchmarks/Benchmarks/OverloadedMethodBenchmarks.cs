@@ -112,7 +112,7 @@ public class OverloadedMethodVerificationBenchmarks
 #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private IMethodTracking<int> _processIntTracking = null!;
     private IMethodTracking<string?> _processStringTracking = null!;
-    private IMethodTrackingArgs<(int, int)> _processTwoArgsTracking = null!;
+    private IMethodTracking<(int, int)> _processTwoArgsTracking = null!;
 #pragma warning restore CA1859
 
     [GlobalSetup]
@@ -150,6 +150,6 @@ public class OverloadedMethodVerificationBenchmarks
         _processStringTracking.Verify();
         _ = _processStringTracking.LastArg == "test";
         _processTwoArgsTracking.Verify();
-        _ = _processTwoArgsTracking.LastArgs == (1, 2);
+        _ = _processTwoArgsTracking.LastArg == (1, 2);
     }
 }

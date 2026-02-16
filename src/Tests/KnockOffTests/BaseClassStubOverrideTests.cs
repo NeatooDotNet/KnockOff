@@ -300,7 +300,7 @@ public class BaseClassStubOverrideTests
         // Assert - tracking still works even with stub overrides
         stub.GetValue.Verify(Called.Exactly(3));
         stub.DoSomething.Verify(Called.Once);
-        Assert.Equal(3, stub.GetValue.LastArg);
+        Assert.Equal(3, stub.GetValue.LastArgs);
     }
 
     [Fact]

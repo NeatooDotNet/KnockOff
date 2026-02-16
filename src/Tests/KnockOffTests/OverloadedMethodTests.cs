@@ -40,7 +40,7 @@ public class OverloadedMethodTests
 		service.Process("second");
 
 		// Single param uses LastArg
-		Assert.Equal("second", tracking.LastArg);
+		Assert.Equal("second", tracking.LastArgs);
 		tracking.Verify(Called.Exactly(2));
 	}
 
@@ -93,7 +93,7 @@ public class OverloadedMethodTests
 
 		// Each tracking object tracks its own overload
 		tracking1.Verify(Called.Exactly(2));
-		Assert.Equal("b", tracking1.LastArg); // Last call to this overload
+		Assert.Equal("b", tracking1.LastArgs); // Last call to this overload
 
 		tracking2.Verify(Called.Once);
 		Assert.Equal(("c", 1), tracking2.LastArgs);
@@ -170,7 +170,7 @@ public class OverloadedMethodTests
 		tracking2.Verify(Called.Once);
 
 		// LastArg for single param overload
-		Assert.Equal(1, tracking1.LastArg);
+		Assert.Equal(1, tracking1.LastArgs);
 
 		// LastArgs for two param overload
 		var lastArgs = tracking2.LastArgs;
@@ -216,7 +216,7 @@ public class OverloadedMethodTests
 
 		// Single param overload
 		tracking1.Verify(Called.Once);
-		Assert.Equal(5, tracking1.LastArg);
+		Assert.Equal(5, tracking1.LastArgs);
 
 		// Two param overload
 		tracking2.Verify(Called.Once);

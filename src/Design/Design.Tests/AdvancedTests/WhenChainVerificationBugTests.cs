@@ -78,7 +78,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher and mark verifiable
-        stub.Add.When(1, 2).Return(100).Verifiable();
+        stub.Add.When((1, 2)).Return(100).Verifiable();
 
         ICalculator calc = stub;
 
@@ -110,7 +110,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher
-        var chain = stub.Add.When(1, 2).Return(100);
+        var chain = stub.Add.When((1, 2)).Return(100);
 
         ICalculator calc = stub;
 
@@ -145,8 +145,8 @@ public class WhenChainVerificationBugTests
 
         // Chain with two non-terminal matchers (no terminal at end)
         var chain = stub.Add
-            .When(1, 2).Return(10)
-            .ThenWhen(3, 4).Return(20);
+            .When((1, 2)).Return(10)
+            .ThenWhen((3, 4)).Return(20);
 
         ICalculator calc = stub;
 
@@ -178,7 +178,7 @@ public class WhenChainVerificationBugTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        var chain = stub.Add.When(1, 2).Return(100);
+        var chain = stub.Add.When((1, 2)).Return(100);
 
         ICalculator calc = stub;
 
@@ -211,7 +211,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a When chain (making it "configured" for VerifyAll)
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
 
         ICalculator calc = stub;
 
@@ -240,7 +240,7 @@ public class WhenChainVerificationBugTests
 
         // Chain ending with terminal matcher (ThenCall)
         var chain = stub.Add
-            .When(1, 2).Return(10)
+            .When((1, 2)).Return(10)
             .ThenCall((a, b) => a + b);
 
         ICalculator calc = stub;
@@ -294,7 +294,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Add.When(1, 2).Return(100);
+        stub.Add.When((1, 2)).Return(100);
         // Configure Returns as fallback for non-matching args
         stub.Add.Return(0);
 

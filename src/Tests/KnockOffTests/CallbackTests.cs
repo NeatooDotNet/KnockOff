@@ -35,7 +35,7 @@ public class CallbackTests
 
 		// Stub override returns input * 2
 		Assert.Equal(10, result);
-		Assert.Equal(5, knockOff.GetValue.LastArg);
+		Assert.Equal(5, knockOff.GetValue.LastArgs);
 		knockOff.GetValue.Verify(Called.Once);
 	}
 
@@ -150,7 +150,7 @@ public class CallbackTests
 
 		// Stub override returns input * 3
 		Assert.Equal(21, result);
-		Assert.Equal(7, knockOff.GetValueAsync.LastArg);
+		Assert.Equal(7, knockOff.GetValueAsync.LastArgs);
 	}
 
 	[Fact]
@@ -169,7 +169,7 @@ public class CallbackTests
 		var result = repo.GetById(42);
 
 		Assert.Same(mockUser, result);
-		Assert.Equal(42, tracking.LastArg);
+		Assert.Equal(42, tracking.LastArgs);
 	}
 
 	[Fact]

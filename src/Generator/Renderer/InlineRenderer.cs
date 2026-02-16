@@ -108,6 +108,7 @@ internal static class InlineRenderer
 
         // Track which interceptors use pre-compiled mode vs generated classes
         var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
+        var preCompiledDelegateDecls = new Dictionary<string, string>(); // interceptorName -> delegate declaration
         var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
         var renderedInterceptorClasses = new HashSet<string>();
 
@@ -179,6 +180,12 @@ internal static class InlineRenderer
                 if (PreCompiledInterceptorRenderer.CanUsePreCompiled(method))
                 {
                     preCompiledInterceptors[method.MethodName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(method);
+                    // Track delegate declaration for TTuple types (1+ params)
+                    if (method.Parameters.Count > 0)
+                    {
+                        preCompiledDelegateDecls[method.MethodName] = PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
+                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
+                    }
                 }
                 else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
                 {
@@ -264,6 +271,11 @@ internal static class InlineRenderer
         foreach (var interceptorProp in iface.InterceptorProperties)
         {
             var newKeyword = interceptorProp.NeedsNewKeyword ? "new " : "";
+            // Emit delegate declaration for TTuple types (1+ params)
+            if (preCompiledDelegateDecls.TryGetValue(interceptorProp.PropertyName, out var delegateDecl))
+            {
+                w.Line($"\t\t\t{delegateDecl}");
+            }
             w.Line($"\t\t\t/// <summary>{interceptorProp.Description}</summary>");
             if (preCompiledInterceptors.TryGetValue(interceptorProp.PropertyName, out var preCompiledType))
             {
@@ -1158,9 +1170,11 @@ internal static class InlineRenderer
             // Pre-compiled interceptor: use GetMethodInvokeExpression for proper ValueTask wrapping
             // Strip ref/in prefixes from argument list (pre-compiled interceptors use plain parameters)
             var cleanArgs = StripRefPrefixes(impl.ArgumentList);
-            var invokeArgs = string.IsNullOrEmpty(cleanArgs)
+            // TTuple types: wrap 2+ params in tuple literal for Invoke(bool strict, TArgs args)
+            var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);
+            var invokeArgs = string.IsNullOrEmpty(wrappedArgs)
                 ? "Strict"
-                : $"Strict, {cleanArgs}";
+                : $"Strict{wrappedArgs}";
 
             // Detect ValueTask wrapping needs
             var (_, _, isAsyncValueTaskT) = PreCompiledInterceptorRenderer.GetAsyncTypeInfoPublic(impl.ReturnType);
@@ -1189,9 +1203,11 @@ internal static class InlineRenderer
             // Compositor Invoke methods already handle ValueTask wrapping,
             // so NO additional wrapping is needed here.
             var cleanArgs = StripRefPrefixes(impl.ArgumentList);
-            var invokeArgs = string.IsNullOrEmpty(cleanArgs)
+            // TTuple types: wrap 2+ params in tuple literal for Invoke(bool strict, TArgs args)
+            var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);
+            var invokeArgs = string.IsNullOrEmpty(wrappedArgs)
                 ? "Strict"
-                : $"Strict, {cleanArgs}";
+                : $"Strict{wrappedArgs}";
 
             if (impl.IsVoid)
                 w.Line($"\t\t\t\t{impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
@@ -1557,7 +1573,8 @@ internal static class InlineRenderer
             {
                 var expr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackExpression(
                     interceptorName, method.MethodName, "source",
-                    method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
+                    method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid,
+                    delegateBaseName: interceptorName);
                 w.Line($"\t\t\t\t{expr}");
             }
         }
