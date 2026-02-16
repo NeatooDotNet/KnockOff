@@ -177,7 +177,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		User? savedUser = null;
-		stub.SaveAsync.Call((User user) => { savedUser = user; return Task.CompletedTask; });
+		stub.SaveAsync.Call((User user) => { savedUser = user; });
 
 		var user = new User { Id = 1, Name = "Test" };
 		await service.SaveAsync(user);
@@ -199,7 +199,6 @@ public partial class OverloadGroupAsyncCallbackTests
 		{
 			savedUser = user;
 			tokenPassed = !ct.IsCancellationRequested;
-			return Task.CompletedTask;
 		});
 
 		using var cts = new CancellationTokenSource();
@@ -218,8 +217,8 @@ public partial class OverloadGroupAsyncCallbackTests
 
 		var calls = new List<string>();
 
-		stub.SaveAsync.Call((User user) => { calls.Add("single"); return Task.CompletedTask; });
-		stub.SaveAsync.Call((User user, CancellationToken ct) => { calls.Add("withToken"); return Task.CompletedTask; });
+		stub.SaveAsync.Call((User user) => { calls.Add("single"); });
+		stub.SaveAsync.Call((User user, CancellationToken ct) => { calls.Add("withToken"); });
 
 		await service.SaveAsync(new User { Id = 1 });
 		using var cts = new CancellationTokenSource();
@@ -241,7 +240,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		string? loggedMessage = null;
-		stub.LogAsync.Call((string message) => { loggedMessage = message; return Task.CompletedTask; });
+		stub.LogAsync.Call((string message) => { loggedMessage = message; });
 
 		await service.LogAsync("Hello");
 
@@ -261,7 +260,6 @@ public partial class OverloadGroupAsyncCallbackTests
 		{
 			loggedMessage = message;
 			loggedLevel = level;
-			return Task.CompletedTask;
 		});
 
 		await service.LogAsync("Warning", 2);
@@ -460,7 +458,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		User? savedUser = null;
-		stub.SaveAsync.Call((User user) => { savedUser = user; return Task.CompletedTask; });
+		stub.SaveAsync.Call((User user) => { savedUser = user; });
 
 		await service.SaveAsync(new User { Id = 99 });
 
