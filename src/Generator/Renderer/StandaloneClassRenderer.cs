@@ -63,6 +63,7 @@ internal static class StandaloneClassRenderer
         // Track which interceptors use pre-compiled mode vs generated classes
         var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
         var preCompiledDelegateDecls = new Dictionary<string, string>(); // interceptorName -> delegate declaration
+        var preCompiledSyncDelegateDecls = new Dictionary<string, string>(); // interceptorName -> sync delegate declaration
         var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
         var renderedInterceptorClasses = new HashSet<string>();
 
@@ -134,6 +135,10 @@ internal static class StandaloneClassRenderer
                     {
                         preCompiledDelegateDecls[method.MethodName] = PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
                             method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
+                        var syncDecl = PreCompiledInterceptorRenderer.BuildSyncDelegateDeclaration(
+                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
+                        if (syncDecl != null)
+                            preCompiledSyncDelegateDecls[method.MethodName] = syncDecl;
                     }
                 }
                 else if (!hasStubOverride && PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
@@ -197,6 +202,11 @@ internal static class StandaloneClassRenderer
             if (preCompiledDelegateDecls.TryGetValue(interceptorProp.PropertyName, out var delegateDecl))
             {
                 w.Line($"{indent1}{delegateDecl}");
+            }
+            // Emit sync delegate declaration for async TTuple types
+            if (preCompiledSyncDelegateDecls.TryGetValue(interceptorProp.PropertyName, out var syncDelegateDecl))
+            {
+                w.Line($"{indent1}{syncDelegateDecl}");
             }
             w.Line($"{indent1}/// <summary>{interceptorProp.Description}</summary>");
             if (preCompiledInterceptors.TryGetValue(interceptorProp.PropertyName, out var preCompiledType))

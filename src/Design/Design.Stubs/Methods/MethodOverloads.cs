@@ -276,14 +276,14 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        // Configure async overload without cancellation (type param to disambiguate from tuple overload)
+        // Configure async overload without cancellation (natural params via TSyncDelegate)
         var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
 
-        // Configure async overload with cancellation (typed tuple param for TTuple overload)
-        var tracking2 = stub.TransformAsync.Return(((string input, CancellationToken cancellationToken) args) =>
+        // Configure async overload with cancellation (natural params via TSyncDelegate)
+        var tracking2 = stub.TransformAsync.Return((input, cancellationToken) =>
         {
-            args.cancellationToken.ThrowIfCancellationRequested();
-            return $"[{args.input}:ct]";
+            cancellationToken.ThrowIfCancellationRequested();
+            return $"[{input}:ct]";
         });
 
         IFormatter formatter = stub;

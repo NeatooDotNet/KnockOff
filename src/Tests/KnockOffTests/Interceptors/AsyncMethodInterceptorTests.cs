@@ -2,10 +2,14 @@ using KnockOff.Interceptors;
 
 namespace KnockOff.Tests.Interceptors;
 
-// Test delegates for AsyncMethodInterceptor<TDelegate, TArgs, TReturn>
-// These return Task<TReturn> since they represent async non-void methods.
+// Test delegates for AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn>
+// Async delegates return Task<TReturn> since they represent async non-void methods.
 delegate Task<int> AsyncProcessIntDelegate(int x);
 delegate Task<int> AsyncAddDelegate(int a, string b);
+
+// Sync delegate equivalents for TSyncDelegate type parameter.
+delegate int SyncProcessIntDelegate(int x);
+delegate int SyncAddDelegate(int a, string b);
 
 /// <summary>
 /// Tests for AsyncMethodInterceptor&lt;TDelegate, TArgs, TReturn&gt; TTuple interceptor type.
@@ -21,7 +25,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithValue_ReturnsTaskFromResultOnInvoke()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         var result = await interceptor.Invoke(false, 0);
@@ -32,7 +36,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithValue_TwoParam_ReturnsTaskFromResultOnInvoke()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         interceptor.Return(99);
 
         var result = await interceptor.Invoke(false, (1, "hello"));
@@ -47,7 +51,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithAsyncDelegate_InvokesDelegateViaExpressionTree()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate callback = async (int x) => { await Task.Yield(); return x * 2; };
         interceptor.Return(callback);
 
@@ -59,7 +63,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithAsyncDelegate_TwoParam_InvokesDelegateViaExpressionTree()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         AsyncAddDelegate callback = async (int a, string b) => { await Task.Yield(); return a + b.Length; };
         interceptor.Return(callback);
 
@@ -75,7 +79,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithSyncCallback_WrapsInTaskFromResult()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return((int x) => x * 3);
 
         var result = await interceptor.Invoke(false, 7);
@@ -86,8 +90,8 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_WithSyncCallback_TwoParam_WrapsInTaskFromResult()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
-        interceptor.Return((args) => args.a + args.b.Length);
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
+        interceptor.Return((a, b) => a + b.Length);
 
         var result = await interceptor.Invoke(false, (10, "hi"));
 
@@ -101,7 +105,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ExactMatch_SingleParam_ReturnsConfiguredValue()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(5).Return(50);
 
         var result = await interceptor.Invoke(false, 5);
@@ -112,7 +116,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ExactMatch_TwoParam_ReturnsConfiguredValue()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         interceptor.When((1, "hello")).Return(42);
 
         var result = await interceptor.Invoke(false, (1, "hello"));
@@ -123,7 +127,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_NoMatch_ReturnsDefault()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(5).Return(50);
 
         // First call matches, advances chain head. Second call doesn't match 5, hits unconfigured.
@@ -140,7 +144,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_Predicate_SingleParam_ReturnsConfiguredValue()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(x => x > 10).Return(100);
 
         var result = await interceptor.Invoke(false, 15);
@@ -151,7 +155,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_Predicate_TwoParam_ReturnsConfiguredValue()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         interceptor.When(args => args.a > 5 && args.b.Length > 2).Return(999);
 
         var result = await interceptor.Invoke(false, (10, "hello"));
@@ -166,7 +170,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_Sequence_ReturnsValuesInOrder()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(1, 2, 3);
 
         var r1 = await interceptor.Invoke(false, 0);
@@ -181,7 +185,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_Sequence_RepeatsLastValueByDefault()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(1, 2);
 
         await interceptor.Invoke(false, 0); // 1
@@ -194,7 +198,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(1, 2).ThenDefault();
 
         await interceptor.Invoke(false, 0); // 1
@@ -207,7 +211,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_ThenReturn_BuildsSequenceWithDelegates()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate first = async (int x) => { await Task.Yield(); return x; };
         AsyncProcessIntDelegate second = async (int x) => { await Task.Yield(); return x * 10; };
         interceptor.Return(first).ThenReturn(second);
@@ -222,7 +226,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Return_ThenReturn_BuildsSequenceWithSyncCallbacks()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return((int x) => x).ThenReturn((int x) => x * 10);
 
         var r1 = await interceptor.Invoke(false, 5);
@@ -239,7 +243,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task LastArgs_SingleParam_RecordsArgsAfterInvoke()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(0);
 
         await interceptor.Invoke(false, 42);
@@ -250,7 +254,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task LastArgs_TwoParam_RecordsTupleArgsAfterInvoke()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         interceptor.Return(0);
 
         await interceptor.Invoke(false, (10, "world"));
@@ -261,7 +265,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task LastArgs_Unconfigured_RecordsArgsForUnconfiguredCalls()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
 
         await interceptor.Invoke(false, 99);
 
@@ -275,7 +279,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task SetFallback_InvokeUsesFallbackWhenUnconfigured()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate fallback = async (int x) => { await Task.Yield(); return x + 100; };
         interceptor.SetFallback(fallback);
 
@@ -287,7 +291,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task SetFallback_TwoParam_InvokeUsesFallback()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, (int a, string b), int>("Add");
+        var interceptor = new AsyncMethodInterceptor<AsyncAddDelegate, SyncAddDelegate, (int a, string b), int>("Add");
         AsyncAddDelegate fallback = async (int a, string b) => { await Task.Yield(); return a * b.Length; };
         interceptor.SetFallback(fallback);
 
@@ -299,7 +303,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task SetSourceFallback_InvokesSourceFallbackWhenUnconfigured()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate sourceFallback = async (int x) => { await Task.Yield(); return x * 3; };
         interceptor.SetSourceFallback(sourceFallback);
 
@@ -311,7 +315,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task SetFallback_TakesPrecedenceOverSourceFallback()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate fallback = async (int x) => { await Task.Yield(); return 100; };
         AsyncProcessIntDelegate sourceFallback = async (int x) => { await Task.Yield(); return 200; };
         interceptor.SetFallback(fallback);
@@ -329,7 +333,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void Verify_ThrowsWhenNotCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         Assert.Throws<VerificationException>(() => interceptor.Verify());
@@ -338,7 +342,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Verify_PassesWhenCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         await interceptor.Invoke(false, 0);
@@ -349,7 +353,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void Verifiable_CheckVerification_ReturnsFailureWhenNotCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42).Verifiable();
 
         var failure = interceptor.CheckVerification();
@@ -360,7 +364,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Verifiable_CheckVerification_ReturnsNullWhenCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42).Verifiable();
 
         await interceptor.Invoke(false, 0);
@@ -373,7 +377,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void CheckVerificationAll_ReturnsNullWhenNotConfigured()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
 
         var failure = interceptor.CheckVerificationAll();
 
@@ -383,7 +387,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void CheckVerificationAll_ReturnsFailureWhenConfiguredButNotCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         var failure = interceptor.CheckVerificationAll();
@@ -398,7 +402,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Invoke_StrictMode_ThrowsWhenUnconfigured()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
 
         await Assert.ThrowsAsync<StubException>(() => interceptor.Invoke(true, 0));
     }
@@ -406,7 +410,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Invoke_StrictMode_SequenceExhausted_Throws()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(1, 2);
 
         await interceptor.Invoke(true, 0); // 1
@@ -421,7 +425,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task Reset_ClearsTrackingState()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         await interceptor.Invoke(false, 5);
@@ -440,7 +444,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task DefaultFactory_UsedWhenUnconfiguredAndNotStrict()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process", () => 999);
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process", () => 999);
 
         var result = await interceptor.Invoke(false, 0);
 
@@ -454,7 +458,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task TotalCallCount_IncludesAllCalls()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         await interceptor.Invoke(false, 0);
@@ -466,7 +470,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task UnconfiguredCallCount_OnlyCountsUnconfiguredCalls()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
 
         await interceptor.Invoke(false, 0);
         await interceptor.Invoke(false, 0);
@@ -481,7 +485,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void IsConfigured_FalseByDefault()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
 
         Assert.False(interceptor.IsConfigured);
     }
@@ -489,7 +493,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void IsConfigured_TrueAfterReturn()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.Return(42);
 
         Assert.True(interceptor.IsConfigured);
@@ -502,7 +506,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ThenWhen_ChainsMultipleMatchers()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(1).Return(10)
                    .ThenWhen(2).Return(20);
 
@@ -520,7 +524,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ThenCall_TerminalMatcher_WithDelegate()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate callback = async (int x) => { await Task.Yield(); return x * 100; };
         interceptor.When(1).Return(10)
                    .ThenCall(callback);
@@ -535,7 +539,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ThenCall_TerminalMatcher_WithSyncCallback()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(1).Return(10)
                    .ThenCall((int x) => x * 100);
 
@@ -553,7 +557,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task When_ThenNone_AdvancesChainPastTerminal()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         interceptor.When(1).Return(10)
                    .ThenNone();
 
@@ -571,7 +575,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task MethodCallBuilder_TracksLastArgs()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         var builder = interceptor.Return(42);
 
         await interceptor.Invoke(false, 7);
@@ -582,7 +586,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public void MethodCallBuilder_Verify_ThrowsWhenNotCalled()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         var builder = interceptor.Return(42);
 
         Assert.Throws<VerificationException>(() => builder.Verify());
@@ -591,7 +595,7 @@ public class AsyncMethodInterceptorTests
     [Fact]
     public async Task MethodCallBuilder_Verify_PassesAfterCall()
     {
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         var builder = interceptor.Return(42);
 
         await interceptor.Invoke(false, 0);
@@ -607,7 +611,7 @@ public class AsyncMethodInterceptorTests
     public async Task Invoke_ConfigureAwaitFalse_DoesNotDeadlock()
     {
         // Verify that ConfigureAwait(false) is used throughout by running in a sync context
-        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, int, int>("Process");
+        var interceptor = new AsyncMethodInterceptor<AsyncProcessIntDelegate, SyncProcessIntDelegate, int, int>("Process");
         AsyncProcessIntDelegate callback = async (int x) =>
         {
             await Task.Delay(1).ConfigureAwait(false);

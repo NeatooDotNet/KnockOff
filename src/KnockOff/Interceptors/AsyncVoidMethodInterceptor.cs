@@ -15,13 +15,20 @@ namespace KnockOff.Interceptors;
 /// Expression trees bridge between TDelegate invocation and TArgs matching.
 /// </summary>
 /// <typeparam name="TDelegate">The generated delegate type for async void callbacks (returns Task).</typeparam>
+/// <typeparam name="TSyncDelegate">The generated delegate type for simplified sync callbacks (returns void).</typeparam>
 /// <typeparam name="TArgs">The argument type: raw type for 1 param, ValueTuple for 2+ params.</typeparam>
-public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where TDelegate : Delegate
+public sealed class AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> : IInterceptor
+    where TDelegate : Delegate
+    where TSyncDelegate : Delegate
 {
     // Static expression tree invoker -- compiled once per closed generic type combo
     // Bridges TDelegate invocation: (del, args) => del(args.Item1, args.Item2, ...) : Task
     private static readonly Func<TDelegate, TArgs, Task> s_asyncVoidInvoker
         = DelegateInvokerFactory.BuildAsyncVoidInvoker<TDelegate, TArgs>();
+
+    // Static sync void invoker for TSyncDelegate callback bridging
+    private static readonly Action<TSyncDelegate, TArgs> s_syncVoidInvoker
+        = DelegateInvokerFactory.BuildVoidInvoker<TSyncDelegate, TArgs>();
 
     private readonly string _memberName;
 
@@ -179,13 +186,13 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
         return builder;
     }
 
-    /// <summary>Configures simplified sync callback. Wraps in Task.CompletedTask pattern.</summary>
-    public MethodCallBuilder Call(Action<TArgs> callback)
+    /// <summary>Configures simplified sync callback via TSyncDelegate. Wraps in Task.CompletedTask pattern.</summary>
+    public MethodCallBuilder Call(TSyncDelegate syncCallback)
     {
         var builder = new MethodCallBuilder(this);
         _sequence = null; _sequenceIndex = 0;
         _isVerifiable = false; _verifiableTimes = null;
-        _call = (args) => { callback(args); return Task.CompletedTask; };
+        _call = (args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; };
         _callTracking = builder;
         return builder;
     }
@@ -333,11 +340,11 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
     public sealed class MethodCallBuilder : IMethodCallBuilder<TDelegate, TArgs?>
     {
-        private readonly AsyncVoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> _interceptor;
         internal int _callCount;
         private TArgs? _lastArgs;
 
-        internal MethodCallBuilder(AsyncVoidMethodInterceptor<TDelegate, TArgs> interceptor)
+        internal MethodCallBuilder(AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -377,12 +384,12 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
             return new MethodSequence(_interceptor);
         }
 
-        /// <summary>Elevates to sequence and adds simplified sync callback.</summary>
-        public MethodSequence ThenCall(Action<TArgs> callback)
+        /// <summary>Elevates to sequence and adds simplified sync callback via TSyncDelegate.</summary>
+        public MethodSequence ThenCall(TSyncDelegate syncCallback)
         {
             ElevateToSequence();
             var nextBuilder = new MethodCallBuilder(_interceptor);
-            Func<TArgs, Task> wrapped = (args) => { callback(args); return Task.CompletedTask; };
+            Func<TArgs, Task> wrapped = (args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; };
             _interceptor._sequence!.Add((wrapped, nextBuilder));
             return new MethodSequence(_interceptor);
         }
@@ -434,9 +441,9 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
     /// <summary>Sequence for async void methods. Supports ThenCall chaining.</summary>
     public sealed class MethodSequence : IMethodCallSequence<TDelegate>, IMethodCallSequence, IMethodSequence
     {
-        private readonly AsyncVoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> _interceptor;
 
-        internal MethodSequence(AsyncVoidMethodInterceptor<TDelegate, TArgs> interceptor)
+        internal MethodSequence(AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -449,11 +456,11 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
             return this;
         }
 
-        /// <summary>Adds simplified sync callback to the sequence.</summary>
-        public MethodSequence ThenCall(Action<TArgs> callback)
+        /// <summary>Adds simplified sync callback via TSyncDelegate to the sequence.</summary>
+        public MethodSequence ThenCall(TSyncDelegate syncCallback)
         {
             var tracking = new MethodCallBuilder(_interceptor);
-            Func<TArgs, Task> wrapped = (args) => { callback(args); return Task.CompletedTask; };
+            Func<TArgs, Task> wrapped = (args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; };
             _interceptor._sequence!.Add((wrapped, tracking));
             return this;
         }
@@ -493,11 +500,11 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
     /// <summary>Builder for When matchers on async void methods. Captures predicate, awaits Call().</summary>
     public sealed class VoidWhenBuilder
     {
-        private readonly AsyncVoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> _interceptor;
         private readonly Func<TArgs, bool> _predicate;
         private int _matcherIndex = -1;
 
-        internal VoidWhenBuilder(AsyncVoidMethodInterceptor<TDelegate, TArgs> interceptor, Func<TArgs, bool> predicate)
+        internal VoidWhenBuilder(AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> interceptor, Func<TArgs, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
@@ -515,11 +522,11 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
             return new VoidWhenChain(_interceptor, _matcherIndex);
         }
 
-        /// <summary>Configures simplified sync callback for this When match.</summary>
-        public VoidWhenChain Call(Action<TArgs> callback)
+        /// <summary>Configures simplified sync callback via TSyncDelegate for this When match.</summary>
+        public VoidWhenChain Call(TSyncDelegate syncCallback)
         {
             ((VoidWhenMatcherPredicate)_interceptor._whenChain![_matcherIndex])
-                .SetCallback((args) => { callback(args); return Task.CompletedTask; });
+                .SetCallback((args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; });
             return new VoidWhenChain(_interceptor, _matcherIndex);
         }
 
@@ -530,10 +537,10 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
             return new VoidWhenChain(_interceptor, _matcherIndex);
         }
 
-        /// <summary>Adds an unconditional sync callback as terminal matcher.</summary>
-        public VoidWhenChain ThenCall(Action<TArgs> callback)
+        /// <summary>Adds an unconditional sync callback via TSyncDelegate as terminal matcher.</summary>
+        public VoidWhenChain ThenCall(TSyncDelegate syncCallback)
         {
-            _interceptor._whenChain!.Add(new VoidWhenMatcherCall((args) => { callback(args); return Task.CompletedTask; }));
+            _interceptor._whenChain!.Add(new VoidWhenMatcherCall((args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; }));
             return new VoidWhenChain(_interceptor, _matcherIndex);
         }
 
@@ -554,10 +561,10 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
     /// <summary>Void When chain with ThenWhen, ThenCall, ThenNone, verification support.</summary>
     public sealed class VoidWhenChain
     {
-        private readonly AsyncVoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> _interceptor;
         private readonly int _currentMatcherIndex;
 
-        internal VoidWhenChain(AsyncVoidMethodInterceptor<TDelegate, TArgs> interceptor, int currentMatcherIndex)
+        internal VoidWhenChain(AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs> interceptor, int currentMatcherIndex)
         {
             _interceptor = interceptor;
             _currentMatcherIndex = currentMatcherIndex;
@@ -583,11 +590,11 @@ public sealed class AsyncVoidMethodInterceptor<TDelegate, TArgs> : IInterceptor 
             return this;
         }
 
-        /// <summary>Adds an unconditional sync callback as terminal matcher.</summary>
-        public VoidWhenChain ThenCall(Action<TArgs> callback)
+        /// <summary>Adds an unconditional sync callback via TSyncDelegate as terminal matcher.</summary>
+        public VoidWhenChain ThenCall(TSyncDelegate syncCallback)
         {
             _interceptor._whenChain ??= new List<VoidWhenMatcherBase>();
-            _interceptor._whenChain.Add(new VoidWhenMatcherCall((args) => { callback(args); return Task.CompletedTask; }));
+            _interceptor._whenChain.Add(new VoidWhenMatcherCall((args) => { s_syncVoidInvoker(syncCallback, args); return Task.CompletedTask; }));
             return this;
         }
 

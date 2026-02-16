@@ -108,6 +108,95 @@ internal static class PreCompiledInterceptorRenderer
 	}
 
 	/// <summary>
+	/// Computes the sync delegate type name for an async method.
+	/// Follows the convention: {MethodName}SyncDelegate.
+	/// </summary>
+	public static string ComputeSyncDelegateTypeName(string methodName)
+	{
+		return $"{methodName}SyncDelegate";
+	}
+
+	/// <summary>
+	/// Builds the sync delegate type declaration for an async method with 1+ params.
+	/// Returns null if the method is not async or has 0 params.
+	/// The sync delegate has the same parameters as the async delegate but returns
+	/// the inner type (TReturn) instead of Task&lt;TReturn&gt;, or void instead of Task.
+	/// </summary>
+	public static string? BuildSyncDelegateDeclaration(string methodName, IEnumerable<ParameterModel> parameters, string returnType, bool isVoid, string? delegateBaseName = null)
+	{
+		var paramList = parameters.ToList();
+		if (paramList.Count == 0) return null;
+
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(returnType);
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(returnType);
+		var isAsync = isAsyncTaskT || isAsyncValueTaskT || isVoidTask || isVoidValueTask;
+
+		if (!isAsync) return null;
+
+		var syncDelegateName = ComputeSyncDelegateTypeName(delegateBaseName ?? methodName);
+		var paramDecls = string.Join(", ", paramList.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+
+		string syncReturnType;
+		if (isVoid || isVoidTask || isVoidValueTask)
+			syncReturnType = "void";
+		else
+			syncReturnType = innerType;
+
+		return $"public delegate {syncReturnType} {syncDelegateName}({paramDecls});";
+	}
+
+	/// <summary>
+	/// Builds the sync delegate type declaration for an overload signature.
+	/// Returns null if the overload is not async or has 0 params.
+	/// </summary>
+	public static string? BuildOverloadSyncDelegateDeclaration(MethodOverloadSignature overload)
+	{
+		if (overload.Parameters.Count == 0) return null;
+
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+		var isAsync = isAsyncTaskT || isAsyncValueTaskT || isVoidTask || isVoidValueTask;
+
+		if (!isAsync) return null;
+
+		// Derive the sync delegate name from the overload's DelegateName
+		// DelegateName is e.g. "TransformAsync_String_CancellationTokenDelegate"
+		// We need "TransformAsync_String_CancellationTokenSyncDelegate"
+		var syncDelegateName = overload.DelegateName.EndsWith("Delegate")
+			? overload.DelegateName.Substring(0, overload.DelegateName.Length - "Delegate".Length) + "SyncDelegate"
+			: overload.DelegateName + "Sync";
+
+		var paramDecls = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+
+		string syncReturnType;
+		if (overload.IsVoid || isVoidTask || isVoidValueTask)
+			syncReturnType = "void";
+		else
+			syncReturnType = innerType;
+
+		return $"public delegate {syncReturnType} {syncDelegateName}({paramDecls});";
+	}
+
+	/// <summary>
+	/// Computes the sync delegate name for an overload, derived from the overload's DelegateName.
+	/// Returns null if the overload is not async or has 0 params.
+	/// </summary>
+	public static string? ComputeOverloadSyncDelegateName(MethodOverloadSignature overload)
+	{
+		if (overload.Parameters.Count == 0) return null;
+
+		var (_, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+		var isAsync = isAsyncTaskT || isAsyncValueTaskT || isVoidTask || isVoidValueTask;
+
+		if (!isAsync) return null;
+
+		return overload.DelegateName.EndsWith("Delegate")
+			? overload.DelegateName.Substring(0, overload.DelegateName.Length - "Delegate".Length) + "SyncDelegate"
+			: overload.DelegateName + "Sync";
+	}
+
+	/// <summary>
 	/// Builds the delegate type declaration for a method.
 	/// Returns the full declaration string (e.g., "public delegate int AddDelegate(int a, int b);").
 	/// For async methods, the delegate returns Task/Task&lt;T&gt; (the interceptor's stored delegate type).
@@ -216,8 +305,9 @@ internal static class PreCompiledInterceptorRenderer
 			if (paramCount == 0)
 				return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var syncDelegateType = ComputeSyncDelegateTypeName(nameForDelegate);
 			var tArgs = ComputeTArgsType(model.Parameters);
-			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{delegateType}, {tArgs}>";
+			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{delegateType}, {syncDelegateType}, {tArgs}>";
 		}
 
 		if (isAsyncWithInnerType)
@@ -225,8 +315,9 @@ internal static class PreCompiledInterceptorRenderer
 			if (paramCount == 0)
 				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			var syncDelegateType = ComputeSyncDelegateTypeName(nameForDelegate);
 			var tArgs = ComputeTArgsType(model.Parameters);
-			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{delegateType}, {tArgs}, {innerType}>";
+			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{delegateType}, {syncDelegateType}, {tArgs}, {innerType}>";
 		}
 
 		// Non-void sync
@@ -700,7 +791,8 @@ internal static class PreCompiledInterceptorRenderer
 		{
 			if (paramCount == 0) return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
 			var tArgs = ComputeTArgsType(overload.Parameters);
-			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{overload.DelegateName}, {tArgs}>";
+			var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{overload.DelegateName}, {syncDelegateName}, {tArgs}>";
 		}
 
 		if (isAsyncWithInnerType)
@@ -708,7 +800,8 @@ internal static class PreCompiledInterceptorRenderer
 			if (paramCount == 0)
 				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
 			var tArgs = ComputeTArgsType(overload.Parameters);
-			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{overload.DelegateName}, {tArgs}, {innerType}>";
+			var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{overload.DelegateName}, {syncDelegateName}, {tArgs}, {innerType}>";
 		}
 
 		{
@@ -746,6 +839,9 @@ internal static class PreCompiledInterceptorRenderer
 				if (overload.Parameters.Count > 0)
 				{
 					w.Line(BuildOverloadDelegateDeclaration(overload));
+					var syncDecl = BuildOverloadSyncDelegateDeclaration(overload);
+					if (syncDecl != null)
+						w.Line(syncDecl);
 				}
 			}
 		}
@@ -774,6 +870,9 @@ internal static class PreCompiledInterceptorRenderer
 					if (overload.Parameters.Count > 0)
 					{
 						w.Line(BuildOverloadDelegateDeclaration(overload));
+						var syncDecl = BuildOverloadSyncDelegateDeclaration(overload);
+						if (syncDecl != null)
+							w.Line(syncDecl);
 					}
 				}
 			}
@@ -956,12 +1055,14 @@ internal static class PreCompiledInterceptorRenderer
 			else if (isVoidAsync)
 			{
 				asyncVoidSlot++;
-				interfaces.Add($"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {tArgs}>");
+				var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+				interfaces.Add($"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {syncDelegateName}, {tArgs}>");
 			}
 			else if (isAsyncWithInnerType)
 			{
 				asyncMethodSlot++;
-				interfaces.Add($"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {tArgs}, {innerType}>");
+				var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+				interfaces.Add($"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {syncDelegateName}, {tArgs}, {innerType}>");
 			}
 			else
 			{
@@ -1008,13 +1109,15 @@ internal static class PreCompiledInterceptorRenderer
 			else if (isVoidAsync)
 			{
 				asyncVoidSlot++;
-				var ifaceType = $"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {tArgs}>";
+				var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+				var ifaceType = $"global::KnockOff.Interceptors.IAsyncVoidOverloadSlot{asyncVoidSlot}<{overload.DelegateName}, {syncDelegateName}, {tArgs}>";
 				w.Line($"{fieldType} {ifaceType}.AsyncVoidSlot{asyncVoidSlot}Interceptor => _ov{fieldIndex};");
 			}
 			else if (isAsyncWithInnerType)
 			{
 				asyncMethodSlot++;
-				var ifaceType = $"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {tArgs}, {innerType}>";
+				var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+				var ifaceType = $"global::KnockOff.Interceptors.IAsyncMethodOverloadSlot{asyncMethodSlot}<{overload.DelegateName}, {syncDelegateName}, {tArgs}, {innerType}>";
 				w.Line($"{fieldType} {ifaceType}.AsyncMethodSlot{asyncMethodSlot}Interceptor => _ov{fieldIndex};");
 			}
 			else
@@ -1056,13 +1159,12 @@ internal static class PreCompiledInterceptorRenderer
 			w.Line($"public {builderReturnType} Call({callbackType} callback) => _ov{overloadIndex}.Call(callback);");
 			w.Line();
 
-			// For async-void TTuple types, also expose Call(Action<TArgs>) simplified overload
+			// For async-void TTuple types, also expose Call(TSyncDelegate) simplified overload
 			if (isVoidAsync && paramCount > 0)
 			{
-				var tArgs = ComputeTArgsType(overload.Parameters);
-				var simplifiedType = $"global::System.Action<{tArgs}>";
+				var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
 				w.Line($"/// <summary>Configures simplified sync callback for {paramCount}-param async void overload.</summary>");
-				w.Line($"public {builderReturnType} Call({simplifiedType} callback) => _ov{overloadIndex}.Call(callback);");
+				w.Line($"public {builderReturnType} Call({syncDelegateName} callback) => _ov{overloadIndex}.Call(callback);");
 				w.Line();
 			}
 		}
@@ -1100,11 +1202,10 @@ internal static class PreCompiledInterceptorRenderer
 
 				if (isAsyncWithInnerType)
 				{
-					// Also expose simplified sync overload: Return(Func<TArgs, TReturn>)
-					var tArgs = ComputeTArgsType(overload.Parameters);
-					var simplifiedType = $"global::System.Func<{tArgs}, {innerType}>";
+					// Also expose simplified sync overload: Return(TSyncDelegate)
+					var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
 					w.Line($"/// <summary>Configures simplified sync callback for {paramCount}-param async overload.</summary>");
-					w.Line($"public {builderReturnType} Return({simplifiedType} callback) => _ov{overloadIndex}.Return(callback);");
+					w.Line($"public {builderReturnType} Return({syncDelegateName} callback) => _ov{overloadIndex}.Return(callback);");
 					w.Line();
 				}
 			}

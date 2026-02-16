@@ -49,6 +49,7 @@ By never converting TDelegate to `Func<>`, ref/out parameters become naturally s
 ## Plans
 
 - [TTuple Interceptors Plan](../plans/ttuple-interceptors.md)
+- [TSyncDelegate Type Parameter](../plans/tsync-delegate.md)
 
 ---
 
@@ -61,6 +62,7 @@ By never converting TDelegate to `Func<>`, ref/out parameters become naturally s
 - [x] Verify all tests pass
 - [x] Benchmark build time vs v0.49.0 and v0.50.0
 - [x] Verify IntelliSense in Design projects
+- [x] TSyncDelegate for async simplified callbacks (architect-developer review loop + implementation)
 
 ---
 

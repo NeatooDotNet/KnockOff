@@ -2,13 +2,17 @@ using KnockOff.Interceptors;
 
 namespace KnockOff.Tests.Interceptors;
 
-// Test delegates for AsyncVoidMethodInterceptor<TDelegate, TArgs>
-// These return Task since they represent async void methods.
+// Test delegates for AsyncVoidMethodInterceptor<TDelegate, TSyncDelegate, TArgs>
+// Async delegates return Task since they represent async void methods.
 delegate Task AsyncVoidProcessDelegate(int x);
 delegate Task AsyncVoidExecuteDelegate(int count, string name);
 
+// Sync delegate equivalents for TSyncDelegate type parameter
+delegate void SyncVoidProcessDelegate(int x);
+delegate void SyncVoidExecuteDelegate(int count, string name);
+
 /// <summary>
-/// Tests for AsyncVoidMethodInterceptor&lt;TDelegate, TArgs&gt; TTuple interceptor type.
+/// Tests for AsyncVoidMethodInterceptor&lt;TDelegate, TSyncDelegate, TArgs&gt; TTuple interceptor type.
 /// Verifies all behavioral features: Call overloads, When, sequences, verification, fallbacks.
 /// Tests both 1-param (raw type TArgs) and 2-param (ValueTuple TArgs) cases.
 /// </summary>
@@ -21,7 +25,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_WithAsyncDelegate_InvokesDelegateViaExpressionTree()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); captured = x; };
         interceptor.Call(callback);
@@ -34,7 +38,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_WithAsyncDelegate_TwoParam_InvokesDelegateViaExpressionTree()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         int capturedCount = 0;
         string capturedName = "";
         AsyncVoidExecuteDelegate callback = async (int count, string name) =>
@@ -58,7 +62,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_WithSyncCallback_WrapsInTaskCompletedTask()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         interceptor.Call((int x) => captured = x);
 
@@ -70,9 +74,9 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_WithSyncCallback_TwoParam_WrapsInTaskCompletedTask()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         int capturedCount = 0;
-        interceptor.Call((args) => capturedCount = args.count * args.name.Length);
+        interceptor.Call((count, name) => capturedCount = count * name.Length);
 
         await interceptor.Invoke(false, (3, "hello"));
 
@@ -86,7 +90,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_ExactMatch_SingleParam_InvokesCallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); captured = x; };
         interceptor.When(5).Call(callback);
@@ -99,7 +103,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_ExactMatch_TwoParam_InvokesCallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         int capturedCount = 0;
         AsyncVoidExecuteDelegate callback = async (int count, string name) => { await Task.Yield(); capturedCount = count; };
         interceptor.When((3, "hello")).Call(callback);
@@ -116,7 +120,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_Predicate_SingleParam_InvokesCallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); captured = x; };
         interceptor.When(x => x > 10).Call(callback);
@@ -129,7 +133,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_Predicate_TwoParam_InvokesCallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         int capturedCount = 0;
         AsyncVoidExecuteDelegate callback = async (int count, string name) => { await Task.Yield(); capturedCount = count; };
         interceptor.When(args => args.count > 5 && args.name.Length > 2).Call(callback);
@@ -146,7 +150,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_SyncCallback_SingleParam_InvokesCallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         interceptor.When(5).Call((int x) => captured = x);
 
@@ -162,7 +166,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_ThenCall_SequencesAsyncCallbacks()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate first = async (int x) => { await Task.Yield(); calls.Add(x * 1); };
         AsyncVoidProcessDelegate second = async (int x) => { await Task.Yield(); calls.Add(x * 10); };
@@ -177,7 +181,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Call_ThenCall_WithSyncCallback_SequencesCallbacks()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate first = async (int x) => { await Task.Yield(); calls.Add(x); };
         interceptor.Call(first).ThenCall((int x) => calls.Add(x * 10));
@@ -191,7 +195,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Sequence_RepeatsLastCallbackByDefault()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate first = async (int x) => { await Task.Yield(); calls.Add(1); };
         AsyncVoidProcessDelegate second = async (int x) => { await Task.Yield(); calls.Add(2); };
@@ -207,7 +211,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Sequence_ThenDefault_StopsRepeating()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate first = async (int x) => { await Task.Yield(); calls.Add(1); };
         AsyncVoidProcessDelegate second = async (int x) => { await Task.Yield(); calls.Add(2); };
@@ -227,7 +231,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task LastArgs_SingleParam_RecordsArgsAfterInvoke()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -239,7 +243,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task LastArgs_TwoParam_RecordsTupleArgsAfterInvoke()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         AsyncVoidExecuteDelegate callback = async (int count, string name) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -251,7 +255,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task LastArgs_Unconfigured_RecordsArgsForUnconfiguredCalls()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
 
         await interceptor.Invoke(false, 99);
 
@@ -265,7 +269,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task SetFallback_InvokeUsesFallbackWhenUnconfigured()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate fallback = async (int x) => { await Task.Yield(); captured = x + 100; };
         interceptor.SetFallback(fallback);
@@ -278,7 +282,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task SetSourceFallback_InvokesSourceFallbackWhenUnconfigured()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate sourceFallback = async (int x) => { await Task.Yield(); captured = x * 3; };
         interceptor.SetSourceFallback(sourceFallback);
@@ -291,7 +295,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task SetFallback_TakesPrecedenceOverSourceFallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate fallback = async (int x) => { await Task.Yield(); captured = 100; };
         AsyncVoidProcessDelegate sourceFallback = async (int x) => { await Task.Yield(); captured = 200; };
@@ -306,7 +310,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task SetFallback_TwoParam_InvokeUsesFallback()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, (int count, string name)>("Execute");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidExecuteDelegate, SyncVoidExecuteDelegate, (int count, string name)>("Execute");
         int capturedCount = 0;
         AsyncVoidExecuteDelegate fallback = async (int count, string name) => { await Task.Yield(); capturedCount = count * name.Length; };
         interceptor.SetFallback(fallback);
@@ -323,7 +327,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void Verify_ThrowsWhenNotCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -333,7 +337,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Verify_PassesWhenCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -345,7 +349,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void Verifiable_CheckVerification_ReturnsFailureWhenNotCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback).Verifiable();
 
@@ -357,7 +361,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Verifiable_CheckVerification_ReturnsNullWhenCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback).Verifiable();
 
@@ -371,7 +375,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void CheckVerificationAll_ReturnsNullWhenNotConfigured()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
 
         var failure = interceptor.CheckVerificationAll();
 
@@ -381,7 +385,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void CheckVerificationAll_ReturnsFailureWhenConfiguredButNotCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -397,7 +401,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Invoke_StrictMode_ThrowsWhenUnconfigured()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
 
         await Assert.ThrowsAsync<StubException>(() => interceptor.Invoke(true, 0));
     }
@@ -405,7 +409,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Invoke_StrictMode_SequenceExhausted_Throws()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate first = async (int x) => { await Task.Yield(); };
         AsyncVoidProcessDelegate second = async (int x) => { await Task.Yield(); };
         interceptor.Call(first).ThenCall(second);
@@ -422,7 +426,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Reset_ClearsTrackingState()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -442,7 +446,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task TotalCallCount_IncludesAllCalls()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -455,7 +459,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task UnconfiguredCallCount_OnlyCountsUnconfiguredCalls()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
 
         await interceptor.Invoke(false, 0);
         await interceptor.Invoke(false, 0);
@@ -470,7 +474,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void IsConfigured_FalseByDefault()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
 
         Assert.False(interceptor.IsConfigured);
     }
@@ -478,7 +482,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void IsConfigured_TrueAfterCall()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         interceptor.Call(callback);
 
@@ -492,7 +496,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_ThenWhen_ChainsMultipleMatchers()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate cb1 = async (int x) => { await Task.Yield(); calls.Add(10); };
         AsyncVoidProcessDelegate cb2 = async (int x) => { await Task.Yield(); calls.Add(20); };
@@ -512,7 +516,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_ThenCall_TerminalMatcher()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate cb1 = async (int x) => { await Task.Yield(); calls.Add(10); };
         AsyncVoidProcessDelegate terminal = async (int x) => { await Task.Yield(); calls.Add(x * 100); };
@@ -532,7 +536,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task When_ThenNone_AdvancesChainPastTerminal()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         var calls = new List<int>();
         AsyncVoidProcessDelegate cb1 = async (int x) => { await Task.Yield(); calls.Add(10); };
         interceptor.When(1).Call(cb1)
@@ -551,7 +555,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task MethodCallBuilder_TracksLastArgs()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         var builder = interceptor.Call(callback);
 
@@ -563,7 +567,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public void MethodCallBuilder_Verify_ThrowsWhenNotCalled()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         var builder = interceptor.Call(callback);
 
@@ -573,7 +577,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task MethodCallBuilder_Verify_PassesAfterCall()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         AsyncVoidProcessDelegate callback = async (int x) => { await Task.Yield(); };
         var builder = interceptor.Call(callback);
 
@@ -589,7 +593,7 @@ public class AsyncVoidMethodInterceptorTests
     [Fact]
     public async Task Invoke_ConfigureAwaitFalse_DoesNotDeadlock()
     {
-        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, int>("Process");
+        var interceptor = new AsyncVoidMethodInterceptor<AsyncVoidProcessDelegate, SyncVoidProcessDelegate, int>("Process");
         int captured = 0;
         AsyncVoidProcessDelegate callback = async (int x) =>
         {

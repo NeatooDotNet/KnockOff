@@ -258,8 +258,8 @@ public class AsyncExceptionTests
         var stub = new AsyncUserSvcStub();
 
         #region async-throw
-        // Throw directly - cast to Func to disambiguate overloads
-        stub.GetUserAsync.Return((Func<int, User?>)(id =>
+        // Throw directly - cast to sync delegate to disambiguate overloads
+        stub.GetUserAsync.Return((AsyncUserSvcStub.GetUserAsyncSyncDelegate)((int id) =>
             throw new NotFoundException($"User {id} not found")));
         #endregion
 

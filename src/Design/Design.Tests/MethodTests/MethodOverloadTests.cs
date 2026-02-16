@@ -162,7 +162,11 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
-        var tracking2 = stub.TransformAsync.Return(((string input, CancellationToken cancellationToken) args) => $"[{args.input}:ct]");
+        var tracking2 = stub.TransformAsync.Return((input, cancellationToken) =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return $"[{input}:ct]";
+        });
 
         IFormatter formatter = stub;
 

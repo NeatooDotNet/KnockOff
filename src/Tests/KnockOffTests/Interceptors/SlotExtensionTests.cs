@@ -18,9 +18,17 @@ delegate int MethodSlotDelegate2(string data, int priority);
 delegate Task AsyncVoidSlotDelegate1(string data);
 delegate Task AsyncVoidSlotDelegate2(string data, int priority);
 
+// Sync void delegate equivalents for TSyncDelegate
+delegate void SyncVoidSlotDelegate1(string data);
+delegate void SyncVoidSlotDelegate2(string data, int priority);
+
 // Async non-void family delegates
 delegate Task<int> AsyncMethodSlotDelegate1(string data);
 delegate Task<int> AsyncMethodSlotDelegate2(string data, int priority);
+
+// Sync non-void delegate equivalents for TSyncDelegate
+delegate int SyncMethodSlotDelegate1(string data);
+delegate int SyncMethodSlotDelegate2(string data, int priority);
 
 // ============================================================================
 // Hand-written compositors implementing slot interfaces
@@ -60,32 +68,32 @@ class MethodTestCompositor
 
 /// <summary>Async void compositor with 2 overloads.</summary>
 class AsyncVoidTestCompositor
-    : IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, string>,
-      IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, (string data, int priority)>
+    : IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>,
+      IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, SyncVoidSlotDelegate2, (string data, int priority)>
 {
-    private readonly AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, string> _interceptor1 = new("ExecuteAsync");
-    private readonly AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate2, (string data, int priority)> _interceptor2 = new("ExecuteAsync");
+    private readonly AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string> _interceptor1 = new("ExecuteAsync");
+    private readonly AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate2, SyncVoidSlotDelegate2, (string data, int priority)> _interceptor2 = new("ExecuteAsync");
 
-    AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, string>
-        IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, string>.AsyncVoidSlot1Interceptor => _interceptor1;
-    AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate2, (string data, int priority)>
-        IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, (string data, int priority)>.AsyncVoidSlot2Interceptor => _interceptor2;
+    AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>
+        IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>.AsyncVoidSlot1Interceptor => _interceptor1;
+    AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate2, SyncVoidSlotDelegate2, (string data, int priority)>
+        IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, SyncVoidSlotDelegate2, (string data, int priority)>.AsyncVoidSlot2Interceptor => _interceptor2;
 
     public IReadOnlyList<IInterceptor> Interceptors => new IInterceptor[] { _interceptor1, _interceptor2 };
 }
 
 /// <summary>Async non-void compositor with 2 overloads.</summary>
 class AsyncMethodTestCompositor
-    : IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>,
-      IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, (string data, int priority), int>
+    : IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>,
+      IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string data, int priority), int>
 {
-    private readonly AsyncMethodInterceptor<AsyncMethodSlotDelegate1, string, int> _interceptor1 = new("FetchAsync");
-    private readonly AsyncMethodInterceptor<AsyncMethodSlotDelegate2, (string data, int priority), int> _interceptor2 = new("FetchAsync");
+    private readonly AsyncMethodInterceptor<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int> _interceptor1 = new("FetchAsync");
+    private readonly AsyncMethodInterceptor<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string data, int priority), int> _interceptor2 = new("FetchAsync");
 
-    AsyncMethodInterceptor<AsyncMethodSlotDelegate1, string, int>
-        IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>.AsyncMethodSlot1Interceptor => _interceptor1;
-    AsyncMethodInterceptor<AsyncMethodSlotDelegate2, (string data, int priority), int>
-        IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, (string data, int priority), int>.AsyncMethodSlot2Interceptor => _interceptor2;
+    AsyncMethodInterceptor<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>
+        IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>.AsyncMethodSlot1Interceptor => _interceptor1;
+    AsyncMethodInterceptor<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string data, int priority), int>
+        IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string data, int priority), int>.AsyncMethodSlot2Interceptor => _interceptor2;
 
     public IReadOnlyList<IInterceptor> Interceptors => new IInterceptor[] { _interceptor1, _interceptor2 };
 }
@@ -317,7 +325,7 @@ public class SlotExtensionTests
         compositor.Call(callback);
 
         // Invoke
-        await ((IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, string>)compositor)
+        await ((IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>)compositor)
             .AsyncVoidSlot1Interceptor.Invoke(false, "async-hello");
         Assert.Equal("async-hello", captured);
     }
@@ -331,7 +339,7 @@ public class SlotExtensionTests
         // Call with simplified sync Action<TArgs>
         compositor.Call((string data) => captured = data);
 
-        await ((IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, string>)compositor)
+        await ((IAsyncVoidOverloadSlot1<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>)compositor)
             .AsyncVoidSlot1Interceptor.Invoke(false, "sync-action");
         Assert.Equal("sync-action", captured);
     }
@@ -351,7 +359,7 @@ public class SlotExtensionTests
 
         compositor.Call(callback);
 
-        await ((IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, (string, int)>)compositor)
+        await ((IAsyncVoidOverloadSlot2<AsyncVoidSlotDelegate2, SyncVoidSlotDelegate2, (string, int)>)compositor)
             .AsyncVoidSlot2Interceptor.Invoke(false, ("world", 7));
         Assert.Equal("world", capturedData);
         Assert.Equal(7, capturedPriority);
@@ -365,7 +373,7 @@ public class SlotExtensionTests
         var whenBuilder = compositor.When("async-expected");
 
         Assert.NotNull(whenBuilder);
-        Assert.IsType<AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, string>.VoidWhenBuilder>(whenBuilder);
+        Assert.IsType<AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>.VoidWhenBuilder>(whenBuilder);
     }
 
     // ========================================================================
@@ -384,7 +392,7 @@ public class SlotExtensionTests
 
         compositor.Return(callback);
 
-        var result = await ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>)compositor)
+        var result = await ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>)compositor)
             .AsyncMethodSlot1Interceptor.Invoke(false, "hello");
         Assert.Equal(5, result);
     }
@@ -397,7 +405,7 @@ public class SlotExtensionTests
         // Return with simplified sync Func<TArgs, TReturn>
         compositor.Return((string data) => data.Length * 2);
 
-        var result = await ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>)compositor)
+        var result = await ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>)compositor)
             .AsyncMethodSlot1Interceptor.Invoke(false, "hello");
         Assert.Equal(10, result);
     }
@@ -414,7 +422,7 @@ public class SlotExtensionTests
 
         compositor.Return(callback);
 
-        var result = await ((IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, (string, int), int>)compositor)
+        var result = await ((IAsyncMethodOverloadSlot2<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string, int), int>)compositor)
             .AsyncMethodSlot2Interceptor.Invoke(false, ("hello", 10));
         Assert.Equal(15, result);
     }
@@ -423,7 +431,7 @@ public class SlotExtensionTests
     public async Task AsyncMethodSlot_Return_Value_ViaSlotCast()
     {
         var compositor = new AsyncMethodTestCompositor();
-        var slot1 = (IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>)compositor;
+        var slot1 = (IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>)compositor;
         slot1.Return(99);
 
         var result = await slot1.AsyncMethodSlot1Interceptor.Invoke(false, "anything");
@@ -438,7 +446,7 @@ public class SlotExtensionTests
         var whenBuilder = compositor.When("async-expected");
 
         Assert.NotNull(whenBuilder);
-        Assert.IsType<AsyncMethodInterceptor<AsyncMethodSlotDelegate1, string, int>.WhenBuilder>(whenBuilder);
+        Assert.IsType<AsyncMethodInterceptor<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>.WhenBuilder>(whenBuilder);
     }
 
     [Fact]
@@ -449,7 +457,7 @@ public class SlotExtensionTests
         var whenBuilder = compositor.When(("expected", 5));
 
         Assert.NotNull(whenBuilder);
-        Assert.IsType<AsyncMethodInterceptor<AsyncMethodSlotDelegate2, (string, int), int>.WhenBuilder>(whenBuilder);
+        Assert.IsType<AsyncMethodInterceptor<AsyncMethodSlotDelegate2, SyncMethodSlotDelegate2, (string, int), int>.WhenBuilder>(whenBuilder);
     }
 
     [Fact]
@@ -459,7 +467,7 @@ public class SlotExtensionTests
 
         compositor.When("specific").Return(200);
 
-        var interceptor = ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, string, int>)compositor)
+        var interceptor = ((IAsyncMethodOverloadSlot1<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>)compositor)
             .AsyncMethodSlot1Interceptor;
         var result = await interceptor.Invoke(false, "specific");
         Assert.Equal(200, result);
@@ -655,8 +663,8 @@ public class SlotExtensionTests
         // Verify TTuple types implement IInterceptor
         IInterceptor methodInterceptor = new MethodInterceptor<MethodSlotDelegate1, string, int>("test");
         IInterceptor voidInterceptor = new VoidMethodInterceptor<VoidSlotDelegate1, string>("test");
-        IInterceptor asyncMethodInterceptor = new AsyncMethodInterceptor<AsyncMethodSlotDelegate1, string, int>("test");
-        IInterceptor asyncVoidInterceptor = new AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, string>("test");
+        IInterceptor asyncMethodInterceptor = new AsyncMethodInterceptor<AsyncMethodSlotDelegate1, SyncMethodSlotDelegate1, string, int>("test");
+        IInterceptor asyncVoidInterceptor = new AsyncVoidMethodInterceptor<AsyncVoidSlotDelegate1, SyncVoidSlotDelegate1, string>("test");
 
         // Verify zero-param types implement IInterceptor
         IInterceptor methodInterceptor0 = new MethodInterceptor0<int>("test");

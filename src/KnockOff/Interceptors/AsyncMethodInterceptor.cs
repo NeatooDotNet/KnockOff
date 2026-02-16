@@ -16,14 +16,25 @@ namespace KnockOff.Interceptors;
 /// Expression trees bridge between TDelegate invocation and TArgs matching.
 /// </summary>
 /// <typeparam name="TDelegate">The generated delegate type for async callbacks (returns Task&lt;TReturn&gt;).</typeparam>
+/// <typeparam name="TSyncDelegate">The generated delegate type for simplified sync callbacks (returns TReturn).</typeparam>
 /// <typeparam name="TArgs">The argument type: raw type for 1 param, ValueTuple for 2+ params.</typeparam>
 /// <typeparam name="TReturn">The inner return type (e.g., int for Task&lt;int&gt;).</typeparam>
-public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor where TDelegate : Delegate
+public sealed class AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> : IInterceptor
+    where TDelegate : Delegate
+    where TSyncDelegate : Delegate
 {
     // Static expression tree invoker -- compiled once per closed generic type combo
     // Bridges TDelegate invocation: (del, args) => del(args.Item1, args.Item2, ...) : Task<TReturn>
     private static readonly Func<TDelegate, TArgs, Task<TReturn>> s_asyncInvoker
         = DelegateInvokerFactory.BuildAsyncInvoker<TDelegate, TArgs, TReturn>();
+
+    // Static sync invoker for TSyncDelegate callback bridging
+    private static readonly Func<TSyncDelegate, TArgs, TReturn> s_syncInvoker
+        = DelegateInvokerFactory.BuildInvoker<TSyncDelegate, TArgs, TReturn>();
+
+    // Static sync value delegate factory for ThenReturn(TReturn value) routing
+    private static readonly Func<TReturn, TSyncDelegate> s_syncValueDelegate
+        = DelegateInvokerFactory.BuildValueDelegate<TSyncDelegate, TReturn>();
 
     private readonly string _memberName;
 
@@ -208,14 +219,14 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
         return builder;
     }
 
-    /// <summary>Configures simplified sync callback. Wraps result in Task.FromResult.</summary>
-    public MethodCallBuilder Return(Func<TArgs, TReturn> callback)
+    /// <summary>Configures simplified sync callback via TSyncDelegate. Wraps result in Task.FromResult.</summary>
+    public MethodCallBuilder Return(TSyncDelegate syncCallback)
     {
         var builder = new MethodCallBuilder(this);
         _sequence = null; _sequenceIndex = 0;
         _isVerifiable = false; _verifiableTimes = null;
         _hasReturnValue = false; _returnValue = default!; _returnValueTracking = null;
-        _call = (args) => Task.FromResult(callback(args));
+        _call = (args) => Task.FromResult(s_syncInvoker(syncCallback, args));
         _callTracking = builder;
         return builder;
     }
@@ -388,11 +399,11 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
     public sealed class MethodCallBuilder : IMethodReturnBuilder<TDelegate, TArgs?>
     {
-        private readonly AsyncMethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> _interceptor;
         internal int _callCount;
         private TArgs? _lastArgs;
 
-        internal MethodCallBuilder(AsyncMethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal MethodCallBuilder(AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -432,19 +443,19 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
             return new MethodSequence(_interceptor);
         }
 
-        /// <summary>Elevates to sequence and adds simplified sync callback.</summary>
-        public MethodSequence ThenReturn(Func<TArgs, TReturn> callback)
+        /// <summary>Elevates to sequence and adds simplified sync callback via TSyncDelegate.</summary>
+        public MethodSequence ThenReturn(TSyncDelegate syncCallback)
         {
             ElevateToSequence();
             var nextBuilder = new MethodCallBuilder(_interceptor);
-            _interceptor._sequence!.Add(((args) => Task.FromResult(callback(args)), nextBuilder));
+            _interceptor._sequence!.Add(((args) => Task.FromResult(s_syncInvoker(syncCallback, args)), nextBuilder));
             return new MethodSequence(_interceptor);
         }
 
         /// <summary>Elevates to sequence and adds a value.</summary>
         public MethodSequence ThenReturn(TReturn value)
         {
-            return ThenReturn((_) => value);
+            return ThenReturn(s_syncValueDelegate(value));
         }
 
         /// <summary>Adds multiple values to the sequence.</summary>
@@ -518,9 +529,9 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
     /// <summary>Sequence for async non-void methods. Supports ThenReturn chaining.</summary>
     public sealed class MethodSequence : IMethodReturnSequence<TDelegate>, IMethodReturnSequence, IMethodSequence
     {
-        private readonly AsyncMethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> _interceptor;
 
-        internal MethodSequence(AsyncMethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal MethodSequence(AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -533,18 +544,18 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
             return this;
         }
 
-        /// <summary>Adds simplified sync callback to the sequence.</summary>
-        public MethodSequence ThenReturn(Func<TArgs, TReturn> callback)
+        /// <summary>Adds simplified sync callback via TSyncDelegate to the sequence.</summary>
+        public MethodSequence ThenReturn(TSyncDelegate syncCallback)
         {
             var tracking = new MethodCallBuilder(_interceptor);
-            _interceptor._sequence!.Add(((args) => Task.FromResult(callback(args)), tracking));
+            _interceptor._sequence!.Add(((args) => Task.FromResult(s_syncInvoker(syncCallback, args)), tracking));
             return this;
         }
 
         /// <summary>Adds a value to the sequence.</summary>
         public MethodSequence ThenReturn(TReturn value)
         {
-            return ThenReturn((_) => value);
+            return ThenReturn(s_syncValueDelegate(value));
         }
 
         /// <summary>Adds multiple values to the sequence.</summary>
@@ -589,10 +600,10 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
     /// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>
     public sealed class WhenBuilder
     {
-        private readonly AsyncMethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> _interceptor;
         private readonly Func<TArgs, bool> _predicate;
 
-        internal WhenBuilder(AsyncMethodInterceptor<TDelegate, TArgs, TReturn> interceptor, Func<TArgs, bool> predicate)
+        internal WhenBuilder(AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> interceptor, Func<TArgs, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
@@ -614,9 +625,9 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
     /// <summary>When chain with ThenWhen, ThenCall, ThenNone, verification support.</summary>
     public sealed class WhenChain
     {
-        private readonly AsyncMethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> _interceptor;
 
-        internal WhenChain(AsyncMethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal WhenChain(AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -641,11 +652,11 @@ public sealed class AsyncMethodInterceptor<TDelegate, TArgs, TReturn> : IInterce
             return this;
         }
 
-        /// <summary>Adds an unconditional sync callback as terminal matcher.</summary>
-        public WhenChain ThenCall(Func<TArgs, TReturn> callback)
+        /// <summary>Adds an unconditional sync callback via TSyncDelegate as terminal matcher.</summary>
+        public WhenChain ThenCall(TSyncDelegate syncCallback)
         {
             _interceptor._whenChain ??= new List<WhenMatcherBase>();
-            _interceptor._whenChain.Add(new WhenMatcherCall((args) => Task.FromResult(callback(args))));
+            _interceptor._whenChain.Add(new WhenMatcherCall((args) => Task.FromResult(s_syncInvoker(syncCallback, args))));
             return this;
         }
 

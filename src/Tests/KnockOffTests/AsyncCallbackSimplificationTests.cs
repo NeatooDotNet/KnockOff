@@ -73,7 +73,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetUserAsync.Return(args => new User { Id = args.id, Name = args.name });
+		stub.GetUserAsync.Return((id, name) => new User { Id = id, Name = name });
 
 		var result = await service.GetUserAsync(99, "Alice");
 
@@ -139,7 +139,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetDoubleAsync.Return(args => (double)(args.a + args.b + args.c));
+		stub.GetDoubleAsync.Return((a, b, c) => (double)(a + b + c));
 
 		var result = await service.GetDoubleAsync(1, 2, 3);
 
@@ -192,10 +192,10 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		string? capturedName = null;
-		stub.ProcessAsync.Call(args =>
+		stub.ProcessAsync.Call((id, name) =>
 		{
-			capturedId = args.id;
-			capturedName = args.name;
+			capturedId = id;
+			capturedName = name;
 		});
 
 		await service.ProcessAsync(42, "Alice");
@@ -259,10 +259,10 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		int capturedCount = 0;
-		stub.RecordAsync.Call(args =>
+		stub.RecordAsync.Call((id, count) =>
 		{
-			capturedId = args.id;
-			capturedCount = args.count;
+			capturedId = id;
+			capturedCount = count;
 		});
 
 		await service.RecordAsync(5, 10);
@@ -325,7 +325,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.GetUserAsync.Return(args => new User { Id = args.id, Name = args.name });
+		var tracking = stub.GetUserAsync.Return((id, name) => new User { Id = id, Name = name });
 
 		await service.GetUserAsync(1, "A");
 		await service.GetUserAsync(2, "B");

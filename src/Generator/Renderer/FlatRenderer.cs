@@ -1558,6 +1558,10 @@ internal static class FlatRenderer
 				{
 					w.Line(PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
 						method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid, method.InterceptorName));
+					var syncDecl = PreCompiledInterceptorRenderer.BuildSyncDelegateDeclaration(
+						method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid, method.InterceptorName);
+					if (syncDecl != null)
+						w.Line(syncDecl);
 				}
 				var factory = PreCompiledInterceptorRenderer.GetMethodSmartDefaultFactory(
 					method.ReturnType, method.IsVoid, method.DefaultStrategy, method.ConcreteTypeForNew, method.MethodName);
