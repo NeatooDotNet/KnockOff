@@ -862,7 +862,8 @@ internal static class PreCompiledInterceptorRenderer
 	public static void RenderOverloadCompositorClass(
 		CodeWriter w,
 		UnifiedMethodInterceptorModel model,
-		InterceptorRenderOptions options)
+		InterceptorRenderOptions options,
+		HashSet<string>? emittedDelegates = null)
 	{
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
@@ -879,10 +880,19 @@ internal static class PreCompiledInterceptorRenderer
 				var overload = model.Overloads.GetArray()![i];
 				if (overload.Parameters.Count > 0)
 				{
-					w.Line(BuildOverloadDelegateDeclaration(overload));
+					// Skip delegates already emitted by a previous stub in the same file
+					// (e.g., when multiple inline stubs share a base interface with overloads)
+					if (emittedDelegates == null || emittedDelegates.Add(overload.DelegateName))
+					{
+						w.Line(BuildOverloadDelegateDeclaration(overload));
+					}
 					var syncDecl = BuildOverloadSyncDelegateDeclaration(overload);
 					if (syncDecl != null)
-						w.Line(syncDecl);
+					{
+						var syncDelegateName = ComputeOverloadSyncDelegateName(overload)!;
+						if (emittedDelegates == null || emittedDelegates.Add(syncDelegateName))
+							w.Line(syncDecl);
+					}
 				}
 			}
 		}

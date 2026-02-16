@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.51.0</FileVersion>
-		<PackageVersion>0.51.0</PackageVersion>
+		<FileVersion>0.51.1</FileVersion>
+		<PackageVersion>0.51.1</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Three-tier interceptor architecture: 0-param, 1-param (LastArg), 2+-param (LastArgs named tuple). Breaking: single-param methods use LastArg instead of LastArgs. Adds TSyncDelegate for natural async callback params. When() for 2+ params uses tuple syntax. Fixes ref/out overload dispatch.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix CS0102 duplicate delegate type definitions when multiple inline stubs share a base interface with overloaded methods.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

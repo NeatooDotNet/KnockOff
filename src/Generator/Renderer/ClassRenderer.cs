@@ -20,7 +20,7 @@ internal static class ClassRenderer
     /// <summary>
     /// Renders a class stub to the CodeWriter at the given base indent level.
     /// </summary>
-    public static void Render(CodeWriter w, InlineClassStubModel cls, int baseIndent = 2)
+    public static void Render(CodeWriter w, InlineClassStubModel cls, int baseIndent = 2, HashSet<string>? emittedCompositorDelegates = null)
     {
         var indent = new string('\t', baseIndent);
         var indent1 = indent + "\t";
@@ -114,7 +114,7 @@ internal static class ClassRenderer
                         InterceptorTypeParameters: cls.TypeParameterList,
                         InterceptorConstraints: cls.ConstraintClauses);
                     w.SetIndent(2);
-                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options);
+                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options, emittedCompositorDelegates);
                     compositorGroups[method.MethodName] = method;
                 }
                 else
