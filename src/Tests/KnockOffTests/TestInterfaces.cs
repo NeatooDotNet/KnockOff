@@ -684,11 +684,9 @@ public interface IRefOutOverloadService
 	bool TryGet(string key, out string? value);
 }
 
-// TODO: Generator bug - overload dispatch passes ref/out args as tuple instead of individual params
-// Uncomment when generator bug is fixed
-// [KnockOff]
-// public partial class RefOutOverloadServiceKnockOff : IRefOutOverloadService
-// {
-// }
+[KnockOff]
+public partial class RefOutOverloadServiceKnockOff : IRefOutOverloadService
+{
+}
 
 #endregion

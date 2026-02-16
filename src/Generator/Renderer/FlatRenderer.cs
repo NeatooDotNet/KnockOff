@@ -265,7 +265,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer, multiIndexerInterceptors);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors, compositorGroups);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -2308,7 +2308,8 @@ internal static class FlatRenderer
 		HashSet<string> multiOverloadStubOverrideInterceptors,
 		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
 		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups,
-		Dictionary<string, string> preCompiledInterceptors)
+		Dictionary<string, string> preCompiledInterceptors,
+		Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
 	{
 		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
 		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
@@ -2357,10 +2358,13 @@ internal static class FlatRenderer
 		using (w.Braces())
 		{
 			// Build invoke args (includes Strict, no stub parameter)
-			// For compositor methods (isMultiOverload), the Invoke_* methods now accept TTuple args,
+			// For compositor methods (pre-compiled overload groups), the Invoke_* methods accept TTuple args,
 			// so 2+ params must be wrapped in a tuple literal.
+			// For generated interceptor classes (fallback, e.g., ref/out), the Invoke_* methods accept
+			// individual params with ref/out modifiers.
+			var isCompositor = isMultiOverload && compositorGroups.ContainsKey(method.InterceptorName);
 			string invokeArgs;
-			if (isMultiOverload && method.Parameters.Count > 0)
+			if (isCompositor && method.Parameters.Count > 0)
 			{
 				var cleanArgs = string.Join(", ", method.Parameters.Select(p => p.EscapedName));
 				var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);

@@ -4,13 +4,7 @@ namespace KnockOff.Tests;
 /// Tests for overload groups where one overload has ref or out parameters.
 /// When any overload in a group has ref/out, the entire group falls back to
 /// generated interceptor classes instead of pre-compiled TTuple types.
-///
-/// BLOCKED: Generator bug - overload dispatch in explicit interface implementation
-/// passes ref/out args as a tuple instead of individual params with ref/out modifiers.
-/// See RefOutOverloadServiceKnockOff.g.cs lines ~1497-1510.
-/// Uncomment when the generator bug is fixed.
 /// </summary>
-#if REFOUT_OVERLOAD_FIXED
 public class RefOutOverloadTests
 {
 	[Fact]
@@ -35,7 +29,7 @@ public class RefOutOverloadTests
 
 		Assert.Equal(5, result);
 		tracking.Verify(Called.Once);
-		Assert.Equal("hello", tracking.LastArgs);
+		Assert.Equal("hello", tracking.LastArg);
 	}
 
 	[Fact]
@@ -57,8 +51,8 @@ public class RefOutOverloadTests
 		Assert.Equal(15, counter);
 		tracking.Verify(Called.Once);
 		var args = tracking.LastArgs;
-		Assert.Equal("hello", args!.Value.input);
-		Assert.Equal(10, args!.Value.counter); // original value at call time
+		Assert.Equal("hello", args.input);
+		Assert.Equal(10, args.counter); // original value at call time
 	}
 
 	[Fact]
@@ -144,4 +138,3 @@ public class RefOutOverloadTests
 		Assert.Equal(21, c); // 1 + 10 + 10
 	}
 }
-#endif
