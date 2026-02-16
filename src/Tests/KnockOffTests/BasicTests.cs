@@ -82,9 +82,9 @@ public class BasicTests
 		service.Calculate("test", 100, true);
 
 		var args = tracking.LastArgs;
-		Assert.Equal("test", args.Item1);
-		Assert.Equal(100, args.Item2);
-		Assert.True(args.Item3);
+		Assert.Equal("test", args.name);
+		Assert.Equal(100, args.value);
+		Assert.True(args.flag);
 	}
 
 	[Fact]

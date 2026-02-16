@@ -321,8 +321,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(2, "email");
 
 		var lastArgs = tracking.LastArgs;
-		Assert.Equal(2, lastArgs.Item1);
-		Assert.Equal("email", lastArgs.Item2);
+		Assert.Equal(2, lastArgs.id);
+		Assert.Equal("email", lastArgs.includeFields);
 	}
 
 	[Fact]
