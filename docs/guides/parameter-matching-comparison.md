@@ -45,8 +45,8 @@ No matchers. The `qty > 10` check is plain C#.
 <!-- snippet: parammatch-specific-values -->
 ```cs
 // Exact value matching — no Arg.Is<> or It.Is<>
-stub.GetPrice.When("widget", 5).Return(49.95m);
-stub.GetPrice.When("gadget", 1).Return(29.99m);
+stub.GetPrice.When(("widget", 5)).Return(49.95m);
+stub.GetPrice.When(("gadget", 1)).Return(29.99m);
 ```
 <!-- endSnippet -->
 
@@ -84,7 +84,7 @@ No `Callback<>` pre-setup. No `Arg.Do<>`. The tracking object captures arguments
 <!-- snippet: parammatch-fallback -->
 ```cs
 // When() for specifics, Return() as fallback
-stub.GetPrice.When("premium-widget", 1).Return(99.99m);
+stub.GetPrice.When(("premium-widget", 1)).Return(99.99m);
 stub.GetPrice.Return((product, qty) => qty * 9.99m);
 ```
 <!-- endSnippet -->
@@ -97,7 +97,7 @@ When() matches specific values first. Unmatched calls fall through to Return().
 ```cs
 // Predicate on multiple params — standard C# lambda
 stub.GetPrice
-    .When((product, qty) => qty > 100).Return(7.99m)
+    .When(args => args.quantity > 100).Return(7.99m)
     .ThenCall((product, qty) => qty > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->

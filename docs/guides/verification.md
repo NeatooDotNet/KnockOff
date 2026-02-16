@@ -157,7 +157,7 @@ For argument inspection, use `LastArg` or `LastArgs` from the interceptor.
 <!-- snippet: verify-lastcallarg -->
 ```cs
 // LastArg contains the most recent argument value
-Assert.Equal(42, tracking.LastArg);
+Assert.Equal(42, tracking.LastArgs);
 ```
 <!-- endSnippet -->
 
@@ -314,7 +314,7 @@ Here's a comprehensive verification scenario demonstrating the recommended patte
 stub.Verify();
 
 // 2. Argument verification via tracking
-Assert.Equal(2, getTracking.LastArg);
+Assert.Equal(2, getTracking.LastArgs);
 
 // 3. Call history verification
 Assert.Equal(new[] { 1, 2 }, getIdHistory);

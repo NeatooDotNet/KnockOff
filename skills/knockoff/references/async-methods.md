@@ -54,7 +54,7 @@ Methods returning `Task` or `ValueTask` (no result) use `Return()` with an `Acti
 
 <!-- snippet: async-void-method -->
 ```cs
-stub.ExecuteAsync.Return((command) => { /* side effect */ });
+stub.ExecuteAsync.Call((command) => { /* side effect */ });
 
 IAsyncFetchSvc service = stub;
 await service.ExecuteAsync("test"); // Callback invoked
@@ -170,7 +170,7 @@ await service.FetchAsync(1);
 await service.FetchAsync(2);
 
 stub.FetchAsync.Verify(Called.Exactly(2));
-Assert.Equal(2, stub.FetchAsync.LastArg); // last argument
+Assert.Equal(2, stub.FetchAsync.LastArgs); // last argument
 ```
 <!-- endSnippet -->
 

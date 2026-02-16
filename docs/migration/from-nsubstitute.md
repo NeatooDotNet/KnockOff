@@ -323,7 +323,7 @@ substitute.DidNotReceive().GetUser(1);
 ```cs
 // KnockOff: Inspect captured arguments or use LastArg
 Assert.Contains(42, calledIds);
-Assert.Equal(99, stub.GetUser.LastArg);
+Assert.Equal(99, stub.GetUser.LastArgs);
 ```
 <!-- endSnippet -->
 

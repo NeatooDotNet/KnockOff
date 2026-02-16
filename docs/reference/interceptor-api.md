@@ -526,10 +526,10 @@ When() returns `IWhenBuilder<TDelegate, TReturn>` which requires calling `.Retur
 <!-- snippet: when-chain-return-method-api -->
 ```cs
 // When() returns IWhenBuilder, which requires .Return() to complete
-var chain = stub.Calculate.When(5, 10).Return(50);
+var chain = stub.Calculate.When((5, 10)).Return(50);
 
 // chain is IWhenChain - can continue chaining or verify
-chain.ThenWhen(1, 2).Return(100);
+chain.ThenWhen((1, 2)).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -559,7 +559,7 @@ When() returns `IVoidWhenChain<TDelegate>` directly - no builder step needed sin
 <!-- snippet: when-chain-void-method-api -->
 ```cs
 // Void methods: When() returns IVoidWhenChain directly
-var chain = stub.Process.When(1, 2);
+var chain = stub.Process.When((1, 2));
 
 // .Call() is optional - adds callback for side effects
 chain.Call((a, b) => called = true);
@@ -657,7 +657,7 @@ IApiMethodRepo repo = stub;
 repo.GetById(42);
 
 // Access LastArg on the tracking object, not the interceptor
-Assert.Equal(42, getTracking.LastArg);
+Assert.Equal(42, getTracking.LastArgs);
 
 // Both support verification
 stub.GetById.Verify(Called.Once);      // Interceptor verification

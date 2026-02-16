@@ -186,7 +186,7 @@ stub.Save.Call((user) => { /* side effects */ });
 
 // Async methods - auto-wrapped, no Task.FromResult needed
 stub.GetUserAsync.Return((id) => new User { Id = id });  // Returns Task<User>
-stub.SaveAsync.Return((user) => { });  // Returns Task.CompletedTask
+stub.SaveAsync.Call((user) => { });  // Returns Task.CompletedTask
 ```
 <!-- endSnippet -->
 
@@ -363,7 +363,7 @@ Called constraints: `Called.Never`, `Called.Once`, `Called.AtLeastOnce`, `Called
 // Single parameter - LastArg
 var getTracking = stub.GetUser.Return((id) => new User { Id = id });
 service.GetUser(42);
-Assert.Equal(42, getTracking.LastArg);
+Assert.Equal(42, getTracking.LastArgs);
 
 // Multiple parameters - LastArgs tuple
 var updateTracking = stub.Update.Call((id, name) => { });

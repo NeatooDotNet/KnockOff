@@ -140,7 +140,7 @@ repository.IsActive(42);
 
 // Tracking works whether using Return or stub override
 stub.IsActive.Verify(Called.Once);
-Assert.Equal(42, stub.IsActive.LastArg);
+Assert.Equal(42, stub.IsActive.LastArgs);
 ```
 <!-- endSnippet -->
 

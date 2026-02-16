@@ -278,7 +278,7 @@ When chains have **higher priority** than sequences. When matches don't advance 
 <!-- snippet: sequences-when-interaction -->
 ```cs
 stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
-stub.Add.When(99, 99).Return(9999);
+stub.Add.When((99, 99)).Return(9999);
 
 ISeqCalc calc = stub;
 calc.Add(0, 0);   // 1 (sequence)

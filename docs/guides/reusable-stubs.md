@@ -175,7 +175,7 @@ service.MarkShipped(1);
 
 // Verify SaveOrder was called
 stub.SaveOrder.Verify(Called.Once);
-Assert.Equal(1, stub.SaveOrder.LastArg!.Id);
+Assert.Equal(1, stub.SaveOrder.LastArgs!.Id);
 ```
 <!-- endSnippet -->
 

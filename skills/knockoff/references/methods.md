@@ -152,7 +152,7 @@ Access the last call's argument using `LastArg`:
 <!-- snippet: methods-capture-single -->
 ```cs
 // LastArg captures the most recent call's argument
-int capturedId = tracking.LastArg;
+int capturedId = tracking.LastArgs;
 ```
 <!-- endSnippet -->
 
