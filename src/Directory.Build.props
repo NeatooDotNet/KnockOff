@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.50.0</FileVersion>
-		<PackageVersion>0.50.0</PackageVersion>
+		<FileVersion>0.51.0</FileVersion>
+		<PackageVersion>0.51.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Replace generated interceptor classes with pre-compiled arity-based generic types, dramatically reducing generated type count. Breaking: LastArgs named tuple fields become unnamed; async void methods use .Call() instead of .Return().</PackageReleaseNotes>
+		<PackageReleaseNotes>Replace 36 arity-based interceptor types with 4 TTuple types using named ValueTuples. Restores LastArgs named fields. Adds TSyncDelegate for natural lambda params on async callbacks. When() for 2+ params now uses tuple syntax. Fixes ref/out overload dispatch.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>
