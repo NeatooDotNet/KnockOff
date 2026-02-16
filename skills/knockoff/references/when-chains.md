@@ -73,10 +73,10 @@ When chains use `Return(value)` -- there is **no** `Return(callback)` on When ch
 
 ```csharp
 // This works:
-stub.Add.When(10, 10).Return(100);
+stub.Add.When((10, 10)).Return(100);
 
 // This does NOT exist:
-// stub.Add.When(10, 10).Return((a, b) => a * b);  // No Return(callback) on When
+// stub.Add.When((10, 10)).Return((a, b) => a * b);  // No Return(callback) on When
 
 // For dynamic behavior on all calls, use Return(callback) without When:
 stub.Add.Return((a, b) => a * b);

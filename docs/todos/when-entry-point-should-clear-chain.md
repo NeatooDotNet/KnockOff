@@ -13,8 +13,8 @@ Calling `.When()` as a new entry point on an interceptor accumulates matchers in
 
 Current behavior:
 ```csharp
-stub.Method.When(1, 2).Return(100);
-stub.Method.When(1, 2).Return(200);  // Adds second matcher, does NOT replace
+stub.Method.When((1, 2)).Return(100);
+stub.Method.When((1, 2)).Return(200);  // Adds second matcher, does NOT replace
 ```
 
 This creates two matchers in the list. First call returns 100, second call returns 200 (sequence behavior). The user expected only 200 to be returned because the second `.When()` is a fresh entry point, not a chained `.ThenWhen()`.

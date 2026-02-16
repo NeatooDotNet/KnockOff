@@ -12,7 +12,7 @@ For argument matching, argument capture, and method overload resolution comparis
 |------|-----|-------------|----------|
 | **Return value** | `mock.Setup(x => x.Add(1, 2)).Returns(3);` | `calc.Add(1, 2).Returns(3);` | `stub.Add.Return(3);` |
 | **Any argument** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(10);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Return(10);` |
-| **Match values** | `mock.Setup(x => x.Add(1, 2)).Returns(100);` | `calc.Add(1, 2).Returns(100);` | `stub.Add.When(1, 2).Return(100);` |
+| **Match values** | `mock.Setup(x => x.Add(1, 2)).Returns(100);` | `calc.Add(1, 2).Returns(100);` | `stub.Add.When((1, 2)).Return(100);` |
 | **Conditional** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns<int, int>((a, b) => a > 0 ? a + b : 0);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.Return((a, b) => a > 0 ? a + b : 0);` |
 | **Throw** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Throws<Exception>();` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.Return((a, b) => throw new Exception());` |
 | **Callback** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(3).Callback<int, int>((a, b) => log.Add(a));` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.Return((a, b) => { log.Add(a); return 3; });` |

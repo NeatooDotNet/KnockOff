@@ -191,7 +191,7 @@ pricing.GetPrice(Arg.Any<string>(), Arg.Is<int>(qty => qty > 100))
 | Capability | KnockOff | Moq | NSubstitute |
 |------------|----------|-----|-------------|
 | Conditional return | `Return((product, qty) => qty > 10 ? 8.99m : 9.99m)` | `It.IsAny<>` + `.Returns<T1, T2>(lambda)` | `Arg.Any<>` + `x.ArgAt<T>(index)` |
-| Exact values | `When("widget", 5).Return(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` |
+| Exact values | `When(("widget", 5)).Return(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` |
 | Same-typed params | `(firstName, lastName) => ...` — named | `Returns<string, string>((a, b) => ...)` — named via Returns | `x.ArgAt<string>(0)`, `x.ArgAt<string>(1)` — index-based |
 | Argument capture | `tracking.LastArgs` — automatic | `.Callback<T1, T2>(...)` — pre-setup | `Arg.Do<T>(x => ...)` — per parameter |
 | Multi-param predicate | `When((product, qty) => qty > 100)` | `It.Is<T>()` per parameter only | `Arg.Is<T>()` per parameter only |
