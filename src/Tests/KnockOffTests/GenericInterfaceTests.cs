@@ -16,7 +16,7 @@ public class GenericInterfaceTests
 		repo.Save(user);
 
 		tracking.Verify();
-		Assert.Same(user, tracking.LastArgs);
+		Assert.Same(user, tracking.LastArg);
 	}
 
 	[Fact]
@@ -29,7 +29,7 @@ public class GenericInterfaceTests
 		var result = repo.GetById(42);
 
 		Assert.Null(result);
-		Assert.Equal(42, tracking.LastArgs);
+		Assert.Equal(42, tracking.LastArg);
 	}
 
 	[Fact]
@@ -42,7 +42,7 @@ public class GenericInterfaceTests
 		var result = await repo.GetByIdAsync(100);
 
 		Assert.Null(result);
-		Assert.Equal(100, tracking.LastArgs);
+		Assert.Equal(100, tracking.LastArg);
 	}
 
 	[Fact]

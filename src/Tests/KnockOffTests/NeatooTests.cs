@@ -380,7 +380,7 @@ public class ValidateBaseStandaloneTests
         _ = validate.GetProperty("Age");
 
         tracking.Verify();
-        Assert.Equal("Age", tracking.LastArgs);
+        Assert.Equal("Age", tracking.LastArg);
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public partial class InlineValidateBaseTests
         _ = validate.GetProperty("TestProp");
 
         stub.GetProperty.Verify();
-        Assert.Equal("TestProp", stub.GetProperty.LastArgs);
+        Assert.Equal("TestProp", stub.GetProperty.LastArg);
     }
 
     [Fact]

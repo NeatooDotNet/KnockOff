@@ -169,7 +169,7 @@ public class GenericStandaloneOverloadTests
         formatter.Format(entity2);
 
         // Assert - LastArg captures the generic type
-        Assert.Equal(entity2, tracking.LastArgs);
+        Assert.Equal(entity2, tracking.LastArg);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class GenericStandaloneOverloadTests
         formatter.Format("test", true, 100);
 
         // Assert - LastArgs captures tuple with generic type
-        var (item, uppercase, maxLength) = tracking.LastArgs;
+        var (item, uppercase, maxLength) = tracking.LastArgs!.Value;
         Assert.Equal("test", item);
         Assert.True(uppercase);
         Assert.Equal(100, maxLength);

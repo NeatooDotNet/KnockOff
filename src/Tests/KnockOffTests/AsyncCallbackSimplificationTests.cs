@@ -316,7 +316,7 @@ public partial class AsyncCallbackSimplificationTests
 		await service.GetStringAsync(42);
 		await service.GetStringAsync(99);
 
-		Assert.Equal(99, tracking.LastArgs);
+		Assert.Equal(99, tracking.LastArg);
 	}
 
 	[Fact]
@@ -359,7 +359,7 @@ public partial class AsyncCallbackSimplificationTests
 		await service.SaveAsync("first");
 		await service.SaveAsync("last");
 
-		Assert.Equal("last", tracking.LastArgs);
+		Assert.Equal("last", tracking.LastArg);
 	}
 
 	[Fact]

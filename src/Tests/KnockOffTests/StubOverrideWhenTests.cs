@@ -334,7 +334,7 @@ public class StubOverrideWhenTests
         service.Process("user-value");  // Stub override fallback
 
         // Assert - LastArg tracks most recent call
-        Assert.Equal("user-value", stub.Process.LastArgs);
+        Assert.Equal("user-value", stub.Process.LastArg);
     }
 
     #endregion

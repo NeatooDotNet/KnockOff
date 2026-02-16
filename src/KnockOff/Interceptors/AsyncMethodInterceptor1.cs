@@ -3,31 +3,43 @@
 #pragma warning disable CA1002 // Do not expose generic lists
 #pragma warning disable CA1062 // Validate arguments of public methods
 #pragma warning disable CA1716 // Identifiers should not match keywords
+#pragma warning disable CA1030 // Use events where appropriate
 
 namespace KnockOff.Interceptors;
 
 /// <summary>
-/// Pre-compiled interceptor for non-void methods with 1+ parameters using TTuple approach.
+/// Pre-compiled async interceptor for non-void methods with exactly 1 parameter.
 /// TDelegate is a generated delegate type providing named callback parameters.
-/// TArgs is either a raw type (1 param) or a ValueTuple (2+ params) providing named When parameters.
+/// TArg is the raw parameter type.
+/// TReturn is the inner return type (e.g., int for Task&lt;int&gt;).
 /// All behavioral logic (Return, When, sequences, verification, builders) is pre-compiled.
-/// Expression trees bridge between TDelegate invocation and TArgs matching.
+/// Expression trees bridge between TDelegate invocation and TArg matching.
 /// </summary>
-/// <typeparam name="TDelegate">The generated delegate type for callbacks (e.g., AddDelegate).</typeparam>
-/// <typeparam name="TArgs">The argument type: raw type for 1 param, ValueTuple for 2+ params.</typeparam>
-/// <typeparam name="TReturn">The return type.</typeparam>
-public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor where TDelegate : Delegate where TArgs : struct
+/// <typeparam name="TDelegate">The generated delegate type for async callbacks (returns Task&lt;TReturn&gt;).</typeparam>
+/// <typeparam name="TSyncDelegate">The generated delegate type for simplified sync callbacks (returns TReturn).</typeparam>
+/// <typeparam name="TArg">The single argument type.</typeparam>
+/// <typeparam name="TReturn">The inner return type (e.g., int for Task&lt;int&gt;).</typeparam>
+public sealed class AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> : IInterceptor
+    where TDelegate : Delegate
+    where TSyncDelegate : Delegate
 {
-    // Static expression tree invokers -- compiled once per closed generic type combo
-    private static readonly Func<TDelegate, TArgs, TReturn> s_invoker
-        = DelegateInvokerFactory.BuildInvoker<TDelegate, TArgs, TReturn>();
-    private static readonly Func<TReturn, TDelegate> s_valueDelegate
-        = DelegateInvokerFactory.BuildValueDelegate<TDelegate, TReturn>();
+    // Static expression tree invoker -- compiled once per closed generic type combo
+    // Bridges TDelegate invocation: (del, arg) => del(arg) : Task<TReturn>
+    private static readonly Func<TDelegate, TArg, Task<TReturn>> s_asyncInvoker
+        = DelegateInvokerFactory.BuildAsyncInvoker<TDelegate, TArg, TReturn>();
+
+    // Static sync invoker for TSyncDelegate callback bridging
+    private static readonly Func<TSyncDelegate, TArg, TReturn> s_syncInvoker
+        = DelegateInvokerFactory.BuildInvoker<TSyncDelegate, TArg, TReturn>();
+
+    // Static sync value delegate factory for ThenReturn(TReturn value) routing
+    private static readonly Func<TReturn, TSyncDelegate> s_syncValueDelegate
+        = DelegateInvokerFactory.BuildValueDelegate<TSyncDelegate, TReturn>();
 
     private readonly string _memberName;
 
-    // Callback
-    private TDelegate? _call;
+    // Callback (stored as converted Func<TArg, Task<TReturn>>)
+    private Func<TArg, Task<TReturn>>? _call;
     private MethodCallBuilder? _callTracking;
 
     // Return value
@@ -35,8 +47,8 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     private bool _hasReturnValue;
     private MethodCallBuilder? _returnValueTracking;
 
-    // Sequence
-    private List<(TDelegate Callback, MethodCallBuilder Tracking)>? _sequence;
+    // Sequence (stored as converted Func<TArg, Task<TReturn>>)
+    private List<(Func<TArg, Task<TReturn>> Callback, MethodCallBuilder Tracking)>? _sequence;
     private int _sequenceIndex;
     private bool _repeatLastValue = true;
 
@@ -51,22 +63,22 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
 
     // Unconfigured tracking
     private int _unconfiguredCallCount;
-    private TArgs? _unconfiguredLastArgs;
+    private TArg? _unconfiguredLastArg;
 
-    // Fallback delegates
+    // Fallback delegates (stored as raw TDelegate, invoked via s_asyncInvoker at call time)
     private TDelegate? _fallback;
     private TDelegate? _sourceFallback;
 
     // Smart default factory (for NewInstance/ThrowException strategies)
     private readonly Func<TReturn>? _defaultFactory;
 
-    public MethodInterceptor(string memberName)
+    public AsyncMethodInterceptor1(string memberName)
     {
         _memberName = memberName;
     }
 
     /// <summary>Constructor with smart default factory for non-strict unconfigured calls.</summary>
-    public MethodInterceptor(string memberName, Func<TReturn> defaultFactory)
+    public AsyncMethodInterceptor1(string memberName, Func<TReturn> defaultFactory)
     {
         _memberName = memberName;
         _defaultFactory = defaultFactory;
@@ -96,20 +108,20 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     /// <summary>Whether this interceptor has been configured.</summary>
     public bool IsConfigured => _hasReturnValue || _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
-    /// <summary>Last arguments from the most recently called registration.</summary>
-    public TArgs? LastArgs
+    /// <summary>Last argument from the most recently called registration.</summary>
+    public TArg? LastArg
     {
         get
         {
             if ((_returnValueTracking?._callCount ?? 0) > 0)
-                return _returnValueTracking!.LastArgs;
+                return _returnValueTracking!.LastArg;
             if ((_callTracking?._callCount ?? 0) > 0)
-                return _callTracking!.LastArgs;
+                return _callTracking!.LastArg;
             if (_sequence != null)
                 for (int i = _sequence.Count - 1; i >= 0; i--)
                     if (_sequence[i].Tracking._callCount > 0)
-                        return _sequence[i].Tracking.LastArgs;
-            return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;
+                        return _sequence[i].Tracking.LastArg;
+            return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;
         }
     }
 
@@ -118,18 +130,18 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     // ========================================================================
 
     /// <summary>Invokes the configured behavior. Called by generated interface implementation.</summary>
-    public TReturn Invoke(bool strict, TArgs args)
+    public async Task<TReturn> Invoke(bool strict, TArg arg)
     {
         // When chain
         if (_whenChain != null && _whenChainHead < _whenChain.Count)
         {
             var matcher = _whenChain[_whenChainHead];
-            if (matcher.Matches(args))
+            if (matcher.Matches(arg))
             {
                 matcher.CallCount++;
                 if (_whenChainHead < _whenChain.Count - 1)
                     _whenChainHead++;
-                return matcher.CallReturn(args);
+                return await matcher.CallReturn(arg).ConfigureAwait(false);
             }
             else if (matcher.IsTerminal)
             {
@@ -141,28 +153,28 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         if (_sequence != null && _sequenceIndex < _sequence.Count)
         {
             var (callback, tracking) = _sequence[_sequenceIndex];
-            tracking.RecordCall(args);
+            tracking.RecordCall(arg);
             _sequenceIndex++;
-            return s_invoker(callback, args);
+            return await callback(arg).ConfigureAwait(false);
         }
 
         // Return value
         if (_hasReturnValue && _returnValueTracking != null)
         {
-            _returnValueTracking.RecordCall(args);
+            _returnValueTracking.RecordCall(arg);
             return _returnValue;
         }
 
         // Callback
         if (_call != null && _callTracking != null)
         {
-            _callTracking.RecordCall(args);
-            return s_invoker(_call, args);
+            _callTracking.RecordCall(arg);
+            return await _call(arg).ConfigureAwait(false);
         }
 
         // Nothing handled - unconfigured path
         _unconfiguredCallCount++;
-        _unconfiguredLastArgs = args;
+        _unconfiguredLastArg = arg;
 
         // Sequence exhaustion repeat
         if (_sequence != null && _sequenceIndex >= _sequence.Count)
@@ -171,17 +183,17 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
             if (_repeatLastValue && _sequence.Count > 0)
             {
                 var (callback, tracking) = _sequence[_sequence.Count - 1];
-                tracking.RecordCall(args);
-                return s_invoker(callback, args);
+                tracking.RecordCall(arg);
+                return await callback(arg).ConfigureAwait(false);
             }
             return default!;
         }
 
-        // Fallback (stub override)
-        if (_fallback != null) return s_invoker(_fallback, args);
+        // Fallback (stub override) -- stored as raw TDelegate, invoked via expression tree
+        if (_fallback != null) return await s_asyncInvoker(_fallback, arg).ConfigureAwait(false);
 
         // Source fallback
-        if (_sourceFallback != null) return s_invoker(_sourceFallback, args);
+        if (_sourceFallback != null) return await s_asyncInvoker(_sourceFallback, arg).ConfigureAwait(false);
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
@@ -195,19 +207,31 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     // Return / When / Verify / Reset
     // ========================================================================
 
-    /// <summary>Configures callback that repeats indefinitely. Returns builder for sequence chaining.</summary>
-    public MethodCallBuilder Return(TDelegate callback)
+    /// <summary>Configures async callback using TDelegate. Converts to internal Func via expression tree.</summary>
+    public MethodCallBuilder Return(TDelegate asyncCallback)
     {
         var builder = new MethodCallBuilder(this);
         _sequence = null; _sequenceIndex = 0;
         _isVerifiable = false; _verifiableTimes = null;
         _hasReturnValue = false; _returnValue = default!; _returnValueTracking = null;
-        _call = callback;
+        _call = (arg) => s_asyncInvoker(asyncCallback, arg);
         _callTracking = builder;
         return builder;
     }
 
-    /// <summary>Configures return value that repeats indefinitely. Returns builder for sequence chaining.</summary>
+    /// <summary>Configures simplified sync callback via TSyncDelegate. Wraps result in Task.FromResult.</summary>
+    public MethodCallBuilder Return(TSyncDelegate syncCallback)
+    {
+        var builder = new MethodCallBuilder(this);
+        _sequence = null; _sequenceIndex = 0;
+        _isVerifiable = false; _verifiableTimes = null;
+        _hasReturnValue = false; _returnValue = default!; _returnValueTracking = null;
+        _call = (arg) => Task.FromResult(s_syncInvoker(syncCallback, arg));
+        _callTracking = builder;
+        return builder;
+    }
+
+    /// <summary>Configures return value that repeats indefinitely.</summary>
     public MethodCallBuilder Return(TReturn value)
     {
         var builder = new MethodCallBuilder(this);
@@ -222,37 +246,31 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     /// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>
     public MethodSequence Return(TReturn first, params TReturn[] rest)
     {
-        var builder = Return(s_valueDelegate(first));
-        if (rest.Length == 0)
-        {
-            return builder.ThenReturn(first);
-        }
+        var builder = Return(first);
+        if (rest.Length == 0) return builder.ThenReturn(first);
         var seq = builder.ThenReturn(rest[0]);
-        for (int i = 1; i < rest.Length; i++)
-        {
-            seq.ThenReturn(rest[i]);
-        }
+        for (int i = 1; i < rest.Length; i++) seq.ThenReturn(rest[i]);
         return seq;
     }
 
-    /// <summary>Configures parameter-specific matching with exact value. Returns builder for Return().</summary>
-    public WhenBuilder When(TArgs args)
+    /// <summary>Configures parameter-specific matching with exact value.</summary>
+    public WhenBuilder When(TArg arg)
     {
         _whenChain ??= new List<WhenMatcherBase>();
-        return new WhenBuilder(this, (a) => object.Equals(a, args));
+        return new WhenBuilder(this, (a) => object.Equals(a, arg));
     }
 
-    /// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>
-    public WhenBuilder When(Func<TArgs, bool> predicate)
+    /// <summary>Configures parameter-specific matching with predicate.</summary>
+    public WhenBuilder When(Func<TArg, bool> predicate)
     {
         _whenChain ??= new List<WhenMatcherBase>();
         return new WhenBuilder(this, predicate);
     }
 
-    /// <summary>Sets the fallback delegate for stub overrides.</summary>
+    /// <summary>Sets the fallback delegate for stub overrides. Stored as raw TDelegate.</summary>
     public void SetFallback(TDelegate? fallback) => _fallback = fallback;
 
-    /// <summary>Sets the source fallback delegate for source delegation.</summary>
+    /// <summary>Sets the source fallback delegate for source delegation. Stored as raw TDelegate.</summary>
     public void SetSourceFallback(TDelegate? sourceFallback) => _sourceFallback = sourceFallback;
 
     /// <summary>Verifies method was called at least once.</summary>
@@ -266,18 +284,10 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     }
 
     /// <summary>Marks for verification by Stub.Verify().</summary>
-    public void Verifiable()
-    {
-        _isVerifiable = true;
-        _verifiableTimes = null;
-    }
+    public void Verifiable() { _isVerifiable = true; _verifiableTimes = null; }
 
     /// <summary>Marks for verification by Stub.Verify() with Called constraint.</summary>
-    public void Verifiable(Called times)
-    {
-        _isVerifiable = true;
-        _verifiableTimes = times;
-    }
+    public void Verifiable(Called times) { _isVerifiable = true; _verifiableTimes = times; }
 
     /// <summary>Whether this interceptor was marked with Verifiable().</summary>
     public bool IsVerifiable => _isVerifiable;
@@ -322,21 +332,15 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     public void Reset()
     {
         _unconfiguredCallCount = 0;
-        _unconfiguredLastArgs = default;
+        _unconfiguredLastArg = default;
         _callTracking?.Reset();
         _returnValueTracking?.Reset();
         if (_sequence != null)
-        {
-            foreach (var (_, tracking) in _sequence)
-                tracking.Reset();
-        }
+            foreach (var (_, tracking) in _sequence) tracking.Reset();
         _sequenceIndex = 0;
         _whenChainHead = 0;
         if (_whenChain != null)
-        {
-            foreach (var matcher in _whenChain)
-                matcher.CallCount = 0;
-        }
+            foreach (var matcher in _whenChain) matcher.CallCount = 0;
     }
 
     // ========================================================================
@@ -345,8 +349,8 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
 
     private abstract class WhenMatcherBase
     {
-        public abstract bool Matches(TArgs args);
-        public abstract TReturn CallReturn(TArgs args);
+        public abstract bool Matches(TArg arg);
+        public abstract Task<TReturn> CallReturn(TArg arg);
         public abstract bool IsTerminal { get; }
         public int CallCount { get; set; }
     }
@@ -354,37 +358,37 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     /// <summary>Matcher that uses a predicate and returns a stored value.</summary>
     private sealed class WhenMatcherValue : WhenMatcherBase
     {
-        private readonly Func<TArgs, bool> _predicate;
+        private readonly Func<TArg, bool> _predicate;
         private readonly TReturn _value;
 
-        public WhenMatcherValue(Func<TArgs, bool> predicate, TReturn value)
+        public WhenMatcherValue(Func<TArg, bool> predicate, TReturn value)
         {
             _predicate = predicate;
             _value = value;
         }
 
-        public override bool Matches(TArgs args) => _predicate(args);
-        public override TReturn CallReturn(TArgs args) => _value;
+        public override bool Matches(TArg arg) => _predicate(arg);
+        public override Task<TReturn> CallReturn(TArg arg) => Task.FromResult(_value);
         public override bool IsTerminal => false;
     }
 
-    /// <summary>Matcher that always matches and invokes a callback via expression tree. Terminal.</summary>
+    /// <summary>Matcher that always matches and invokes a stored callback. Terminal.</summary>
     private sealed class WhenMatcherCall : WhenMatcherBase
     {
-        private readonly TDelegate _callback;
+        private readonly Func<TArg, Task<TReturn>> _callback;
 
-        public WhenMatcherCall(TDelegate callback) => _callback = callback;
+        public WhenMatcherCall(Func<TArg, Task<TReturn>> callback) => _callback = callback;
 
-        public override bool Matches(TArgs args) => true;
-        public override TReturn CallReturn(TArgs args) => s_invoker(_callback, args);
+        public override bool Matches(TArg arg) => true;
+        public override Task<TReturn> CallReturn(TArg arg) => _callback(arg);
         public override bool IsTerminal => true;
     }
 
     /// <summary>Matcher that never matches. Terminal.</summary>
     private sealed class WhenMatcherNone : WhenMatcherBase
     {
-        public override bool Matches(TArgs args) => false;
-        public override TReturn CallReturn(TArgs args) => default!;
+        public override bool Matches(TArg arg) => false;
+        public override Task<TReturn> CallReturn(TArg arg) => Task.FromResult(default(TReturn)!);
         public override bool IsTerminal => true;
     }
 
@@ -393,31 +397,31 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     // ========================================================================
 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public sealed class MethodCallBuilder : IMethodReturnBuilderArgs<TDelegate, TArgs?>
+    public sealed class MethodCallBuilder : IMethodReturnBuilder<TDelegate, TArg?>
     {
-        private readonly MethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> _interceptor;
         internal int _callCount;
-        private TArgs? _lastArgs;
+        private TArg? _lastArg;
 
-        internal MethodCallBuilder(MethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal MethodCallBuilder(AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
 
-        /// <summary>Last arguments passed to this callback.</summary>
-        public TArgs? LastArgs => _lastArgs;
+        /// <summary>Last argument passed to this callback.</summary>
+        public TArg? LastArg => _lastArg;
 
-        internal void RecordCall(TArgs args)
+        internal void RecordCall(TArg arg)
         {
             _callCount++;
-            _lastArgs = args;
+            _lastArg = arg;
         }
 
         /// <summary>Resets tracking state.</summary>
         public void Reset()
         {
             _callCount = 0;
-            _lastArgs = default;
+            _lastArg = default;
         }
 
         /// <summary>Verifies callback was invoked at least once.</summary>
@@ -430,22 +434,31 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
                 throw new VerificationException(new VerificationFailure("method", called, _callCount));
         }
 
-        /// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>
-        public MethodSequence ThenReturn(TDelegate callback)
+        /// <summary>Elevates to sequence and adds async TDelegate callback.</summary>
+        public MethodSequence ThenReturn(TDelegate asyncCallback)
         {
             ElevateToSequence();
             var nextBuilder = new MethodCallBuilder(_interceptor);
-            _interceptor._sequence!.Add((callback, nextBuilder));
+            _interceptor._sequence!.Add(((arg) => s_asyncInvoker(asyncCallback, arg), nextBuilder));
             return new MethodSequence(_interceptor);
         }
 
-        /// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>
-        public MethodSequence ThenReturn(TReturn value)
+        /// <summary>Elevates to sequence and adds simplified sync callback via TSyncDelegate.</summary>
+        public MethodSequence ThenReturn(TSyncDelegate syncCallback)
         {
-            return ThenReturn(s_valueDelegate(value));
+            ElevateToSequence();
+            var nextBuilder = new MethodCallBuilder(_interceptor);
+            _interceptor._sequence!.Add(((arg) => Task.FromResult(s_syncInvoker(syncCallback, arg)), nextBuilder));
+            return new MethodSequence(_interceptor);
         }
 
-        /// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
+        /// <summary>Elevates to sequence and adds a value.</summary>
+        public MethodSequence ThenReturn(TReturn value)
+        {
+            return ThenReturn(s_syncValueDelegate(value));
+        }
+
+        /// <summary>Adds multiple values to the sequence.</summary>
         public MethodSequence ThenReturn(params TReturn[] values)
         {
             if (values.Length == 0)
@@ -479,7 +492,7 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         {
             if (_interceptor._sequence == null)
             {
-                _interceptor._sequence = new List<(TDelegate Callback, MethodCallBuilder Tracking)>();
+                _interceptor._sequence = new List<(Func<TArg, Task<TReturn>> Callback, MethodCallBuilder Tracking)>();
                 if (_interceptor._call != null)
                 {
                     _interceptor._sequence.Add((_interceptor._call, this));
@@ -487,7 +500,7 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
                 else if (_interceptor._hasReturnValue)
                 {
                     var capturedValue = _interceptor._returnValue;
-                    _interceptor._sequence.Add((s_valueDelegate(capturedValue), this));
+                    _interceptor._sequence.Add(((_) => Task.FromResult(capturedValue), this));
                     _interceptor._hasReturnValue = false;
                     _interceptor._returnValue = default!;
                     _interceptor._returnValueTracking = null;
@@ -499,47 +512,56 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         }
 
         // Explicit interface implementations
-        IMethodReturnSequence<TDelegate> IMethodReturnBuilderArgs<TDelegate, TArgs?>.ThenReturn(TDelegate callback) => ThenReturn(callback);
+        IMethodReturnSequence<TDelegate> IMethodReturnBuilder<TDelegate, TArg?>.ThenReturn(TDelegate callback) => ThenReturn(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable(Called called) => Verifiable(called);
-        IMethodReturnBuilderArgs<TDelegate, TArgs?> IMethodReturnBuilderArgs<TDelegate, TArgs?>.Verifiable() => Verifiable();
-        IMethodReturnBuilderArgs<TDelegate, TArgs?> IMethodReturnBuilderArgs<TDelegate, TArgs?>.Verifiable(Called called) => Verifiable(called);
+        IMethodTracking<TArg?> IMethodTracking<TArg?>.Verifiable() => Verifiable();
+        IMethodTracking<TArg?> IMethodTracking<TArg?>.Verifiable(Called called) => Verifiable(called);
+        IMethodReturnBuilder<TDelegate, TArg?> IMethodReturnBuilder<TDelegate, TArg?>.Verifiable() => Verifiable();
+        IMethodReturnBuilder<TDelegate, TArg?> IMethodReturnBuilder<TDelegate, TArg?>.Verifiable(Called called) => Verifiable(called);
+        TArg? IMethodTracking<TArg?>.LastArg => _lastArg;
     }
 
     // ========================================================================
     // Inner class: MethodSequence
     // ========================================================================
 
-    /// <summary>Sequence for non-void methods. Supports ThenReturn chaining.</summary>
+    /// <summary>Sequence for async non-void methods. Supports ThenReturn chaining.</summary>
     public sealed class MethodSequence : IMethodReturnSequence<TDelegate>, IMethodReturnSequence, IMethodSequence
     {
-        private readonly MethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> _interceptor;
 
-        internal MethodSequence(MethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal MethodSequence(AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
 
-        /// <summary>Adds another callback to the sequence.</summary>
-        public MethodSequence ThenReturn(TDelegate callback)
+        /// <summary>Adds async TDelegate callback to the sequence.</summary>
+        public MethodSequence ThenReturn(TDelegate asyncCallback)
         {
             var tracking = new MethodCallBuilder(_interceptor);
-            _interceptor._sequence!.Add((callback, tracking));
+            _interceptor._sequence!.Add(((arg) => s_asyncInvoker(asyncCallback, arg), tracking));
+            return this;
+        }
+
+        /// <summary>Adds simplified sync callback via TSyncDelegate to the sequence.</summary>
+        public MethodSequence ThenReturn(TSyncDelegate syncCallback)
+        {
+            var tracking = new MethodCallBuilder(_interceptor);
+            _interceptor._sequence!.Add(((arg) => Task.FromResult(s_syncInvoker(syncCallback, arg)), tracking));
             return this;
         }
 
         /// <summary>Adds a value to the sequence.</summary>
         public MethodSequence ThenReturn(TReturn value)
         {
-            return ThenReturn(s_valueDelegate(value));
+            return ThenReturn(s_syncValueDelegate(value));
         }
 
-        /// <summary>Adds multiple values to the sequence. Each value returned once.</summary>
+        /// <summary>Adds multiple values to the sequence.</summary>
         public MethodSequence ThenReturn(params TReturn[] values)
         {
-            foreach (var value in values) ThenReturn(value);
+            foreach (var v in values) ThenReturn(v);
             return this;
         }
 
@@ -547,10 +569,8 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         public void Verify()
         {
             if (_interceptor._sequence == null) return;
-            var sequenceLength = _interceptor._sequence.Count;
-            var completedCount = _interceptor._sequenceIndex;
-            if (completedCount < sequenceLength)
-                throw new VerificationException(VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
+            if (_interceptor._sequenceIndex < _interceptor._sequence.Count)
+                throw new VerificationException(VerificationFailure.SequenceIncomplete("method", _interceptor._sequence.Count, _interceptor._sequenceIndex));
         }
 
         /// <summary>Resets all tracking in the sequence.</summary>
@@ -565,10 +585,7 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         }
 
         /// <summary>Terminates sequence with default instead of repeating last value.</summary>
-        public void ThenDefault()
-        {
-            _interceptor._repeatLastValue = false;
-        }
+        public void ThenDefault() => _interceptor._repeatLastValue = false;
 
         // Explicit interface implementations
         IMethodReturnSequence<TDelegate> IMethodReturnSequence<TDelegate>.ThenReturn(TDelegate callback) => ThenReturn(callback);
@@ -583,10 +600,10 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     /// <summary>Builder for When matchers. Captures predicate, awaits Return(value).</summary>
     public sealed class WhenBuilder
     {
-        private readonly MethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
-        private readonly Func<TArgs, bool> _predicate;
+        private readonly AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> _interceptor;
+        private readonly Func<TArg, bool> _predicate;
 
-        internal WhenBuilder(MethodInterceptor<TDelegate, TArgs, TReturn> interceptor, Func<TArgs, bool> predicate)
+        internal WhenBuilder(AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> interceptor, Func<TArg, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
@@ -608,30 +625,38 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
     /// <summary>When chain with ThenWhen, ThenCall, ThenNone, verification support.</summary>
     public sealed class WhenChain
     {
-        private readonly MethodInterceptor<TDelegate, TArgs, TReturn> _interceptor;
+        private readonly AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> _interceptor;
 
-        internal WhenChain(MethodInterceptor<TDelegate, TArgs, TReturn> interceptor)
+        internal WhenChain(AsyncMethodInterceptor1<TDelegate, TSyncDelegate, TArg, TReturn> interceptor)
         {
             _interceptor = interceptor;
         }
 
         /// <summary>Adds another matcher with exact value matching.</summary>
-        public WhenBuilder ThenWhen(TArgs args)
+        public WhenBuilder ThenWhen(TArg arg)
         {
-            return new WhenBuilder(_interceptor, (a) => object.Equals(a, args));
+            return new WhenBuilder(_interceptor, (a) => object.Equals(a, arg));
         }
 
         /// <summary>Adds another matcher with predicate matching.</summary>
-        public WhenBuilder ThenWhen(Func<TArgs, bool> predicate)
+        public WhenBuilder ThenWhen(Func<TArg, bool> predicate)
         {
             return new WhenBuilder(_interceptor, predicate);
         }
 
-        /// <summary>Adds an unconditional callback as terminal matcher.</summary>
-        public WhenChain ThenCall(TDelegate callback)
+        /// <summary>Adds an unconditional async TDelegate callback as terminal matcher.</summary>
+        public WhenChain ThenCall(TDelegate asyncCallback)
         {
             _interceptor._whenChain ??= new List<WhenMatcherBase>();
-            _interceptor._whenChain.Add(new WhenMatcherCall(callback));
+            _interceptor._whenChain.Add(new WhenMatcherCall((arg) => s_asyncInvoker(asyncCallback, arg)));
+            return this;
+        }
+
+        /// <summary>Adds an unconditional sync callback via TSyncDelegate as terminal matcher.</summary>
+        public WhenChain ThenCall(TSyncDelegate syncCallback)
+        {
+            _interceptor._whenChain ??= new List<WhenMatcherBase>();
+            _interceptor._whenChain.Add(new WhenMatcherCall((arg) => Task.FromResult(s_syncInvoker(syncCallback, arg))));
             return this;
         }
 
@@ -650,9 +675,7 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
             var head = _interceptor._whenChainHead;
             var count = _interceptor._whenChain.Count;
             if (head < count && !_interceptor._whenChain[head].IsTerminal && _interceptor._whenChain[head].CallCount == 0)
-            {
                 throw new VerificationException(VerificationFailure.SequenceIncomplete("When chain", count, head));
-            }
         }
 
         /// <summary>Resets When chain HEAD and all matcher call counts.</summary>
@@ -660,10 +683,7 @@ public sealed class MethodInterceptor<TDelegate, TArgs, TReturn> : IInterceptor 
         {
             _interceptor._whenChainHead = 0;
             if (_interceptor._whenChain != null)
-            {
-                foreach (var matcher in _interceptor._whenChain)
-                    matcher.CallCount = 0;
-            }
+                foreach (var matcher in _interceptor._whenChain) matcher.CallCount = 0;
         }
 
         /// <summary>Marks this When chain for verification by Stub.Verify().</summary>

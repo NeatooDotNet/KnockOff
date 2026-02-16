@@ -22,6 +22,7 @@ namespace KnockOff.Interceptors;
 public sealed class AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> : IInterceptor
     where TDelegate : Delegate
     where TSyncDelegate : Delegate
+    where TArgs : struct
 {
     // Static expression tree invoker -- compiled once per closed generic type combo
     // Bridges TDelegate invocation: (del, args) => del(args.Item1, args.Item2, ...) : Task<TReturn>
@@ -397,7 +398,7 @@ public sealed class AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TRet
     // ========================================================================
 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public sealed class MethodCallBuilder : IMethodReturnBuilder<TDelegate, TArgs?>
+    public sealed class MethodCallBuilder : IMethodReturnBuilderArgs<TDelegate, TArgs?>
     {
         private readonly AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TReturn> _interceptor;
         internal int _callCount;
@@ -512,14 +513,13 @@ public sealed class AsyncMethodInterceptor<TDelegate, TSyncDelegate, TArgs, TRet
         }
 
         // Explicit interface implementations
-        IMethodReturnSequence<TDelegate> IMethodReturnBuilder<TDelegate, TArgs?>.ThenReturn(TDelegate callback) => ThenReturn(callback);
+        IMethodReturnSequence<TDelegate> IMethodReturnBuilderArgs<TDelegate, TArgs?>.ThenReturn(TDelegate callback) => ThenReturn(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTracking<TArgs?> IMethodTracking<TArgs?>.Verifiable() => Verifiable();
-        IMethodTracking<TArgs?> IMethodTracking<TArgs?>.Verifiable(Called called) => Verifiable(called);
-        IMethodReturnBuilder<TDelegate, TArgs?> IMethodReturnBuilder<TDelegate, TArgs?>.Verifiable() => Verifiable();
-        IMethodReturnBuilder<TDelegate, TArgs?> IMethodReturnBuilder<TDelegate, TArgs?>.Verifiable(Called called) => Verifiable(called);
-        TArgs? IMethodTracking<TArgs?>.LastArg => _lastArgs;
+        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable() => Verifiable();
+        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable(Called called) => Verifiable(called);
+        IMethodReturnBuilderArgs<TDelegate, TArgs?> IMethodReturnBuilderArgs<TDelegate, TArgs?>.Verifiable() => Verifiable();
+        IMethodReturnBuilderArgs<TDelegate, TArgs?> IMethodReturnBuilderArgs<TDelegate, TArgs?>.Verifiable(Called called) => Verifiable(called);
     }
 
     // ========================================================================

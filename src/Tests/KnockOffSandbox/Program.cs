@@ -42,7 +42,7 @@ knockOff.GetGreeting.Verify(Called.Once);
 Console.WriteLine($"  Verified: Verify(Called.Once) passed");
 
 // User-defined method tracking has LastArg directly on the interceptor
-string lastArg = knockOff.GetGreeting.LastArgs!;
+string lastArg = knockOff.GetGreeting.LastArg!;
 Console.WriteLine($"  LastArg: {lastArg}");
 Console.WriteLine();
 
@@ -52,10 +52,10 @@ var processTracking = knockOff.Process.Call((id, count, urgent) => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
-var processArgs = processTracking.LastArgs;
+var processArgs = processTracking.LastArgs!.Value;
 // Verify method was called twice (throws if not)
 processTracking.Verify(Called.Exactly(2));
-Console.WriteLine($"  Last call: ({processArgs.Item1}, {processArgs.Item2}, {processArgs.Item3})");
+Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");
 Console.WriteLine();
 
 // Test interface access via implicit cast

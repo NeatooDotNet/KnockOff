@@ -162,8 +162,8 @@ public partial class StubOverrideBasicsDemo
         service.FindById(42);
         service.FindById(99);
 
-        // LastArgs gives the most recent argument
-        var lastId = stub.FindById.LastArgs;
+        // LastArg gives the most recent argument (singular for single-param methods)
+        var lastId = stub.FindById.LastArg;
         // lastId == 99
     }
 
@@ -176,7 +176,7 @@ public partial class StubOverrideBasicsDemo
         service.Calculate(30, 40);
 
         // LastArgs gives tuple of most recent arguments (nullable)
-        var (a, b) = stub.Calculate.LastArgs!;
+        var (a, b) = stub.Calculate.LastArgs!.Value;
         // a == 30, b == 40
     }
 
@@ -508,8 +508,8 @@ public partial class AsyncStubOverrideDemo
         await service.ExecuteAsync("command");
 
         stub.ExecuteAsync.Verify(Called.Once);
-        // LastArgs captures the command
-        var lastCommand = stub.ExecuteAsync.LastArgs;
+        // LastArg captures the command (singular for single-param methods)
+        var lastCommand = stub.ExecuteAsync.LastArg;
     }
 
     public async Task AsyncStubOverride_ValueTask()
@@ -640,8 +640,8 @@ public static class WhenChainStubOverrideDemo
         // Call with non-matching value - falls through to stub override
         var result2 = service.Process("normal");   // Returns stub override result
 
-        // LastArgs tracks the most recent call (from When or stub override)
-        var lastInput = stub.Process.LastArgs;      // "normal"
+        // LastArg tracks the most recent call (from When or stub override)
+        var lastInput = stub.Process.LastArg;       // "normal"
     }
 
     // =========================================================================

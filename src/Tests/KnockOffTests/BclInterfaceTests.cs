@@ -156,7 +156,7 @@ public class BclInterfaceTests
         list.Add("test");
 
         stub.Add.Verify();
-        Assert.Equal("test", stub.Add.LastArgs);
+        Assert.Equal("test", stub.Add.LastArg);
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class BclInterfaceTests
         var result = list.Contains("test");
 
         stub.Contains.Verify();
-        Assert.Equal("test", stub.Contains.LastArgs);
+        Assert.Equal("test", stub.Contains.LastArg);
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public class BclInterfaceTests
         list.Add("item2");
 
         stub.Add.Verify(Called.Exactly(2));
-        Assert.Equal("item2", stub.Add.LastArgs);
+        Assert.Equal("item2", stub.Add.LastArg);
     }
 
     [Fact]
@@ -220,7 +220,7 @@ public class BclInterfaceTests
         list.Add(100);
 
         stub.Add.Verify(Called.Exactly(2));
-        Assert.Equal(100, stub.Add.LastArgs);
+        Assert.Equal(100, stub.Add.LastArg);
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class BclInterfaceTests
         list.Add(user);
 
         stub.Add.Verify();
-        Assert.Same(user, stub.Add.LastArgs);
+        Assert.Same(user, stub.Add.LastArg);
     }
 
     /// <summary>
@@ -407,7 +407,7 @@ public class BclInterfaceTests
         collection.Add("item");
 
         stub.Add.Verify();
-        Assert.Equal("item", stub.Add.LastArgs);
+        Assert.Equal("item", stub.Add.LastArg);
     }
 
     [Fact]
@@ -430,7 +430,7 @@ public class BclInterfaceTests
         collection.Contains(42);
 
         stub.Contains.Verify();
-        Assert.Equal(42, stub.Contains.LastArgs);
+        Assert.Equal(42, stub.Contains.LastArg);
     }
 
     #endregion
@@ -506,7 +506,7 @@ public class BclInterfaceTests
         dict.ContainsKey("test");
 
         stub.ContainsKey.Verify();
-        Assert.Equal("test", stub.ContainsKey.LastArgs);
+        Assert.Equal("test", stub.ContainsKey.LastArg);
     }
 
     #endregion
@@ -581,7 +581,7 @@ public class BclInterfaceTests
         set.Add("item");
 
         stub.Add.Verify();
-        Assert.Equal("item", stub.Add.LastArgs);
+        Assert.Equal("item", stub.Add.LastArg);
     }
 
     [Fact]
@@ -632,7 +632,7 @@ public class BclInterfaceTests
         comparable.CompareTo("other");
 
         stub.CompareTo.Verify();
-        Assert.Equal("other", stub.CompareTo.LastArgs);
+        Assert.Equal("other", stub.CompareTo.LastArg);
     }
 
     [Fact]
@@ -644,7 +644,7 @@ public class BclInterfaceTests
         comparable.CompareTo("other");
 
         stub.CompareTo.Verify();
-        Assert.Equal("other", stub.CompareTo.LastArgs);
+        Assert.Equal("other", stub.CompareTo.LastArg);
     }
 
     [Fact]
@@ -656,7 +656,7 @@ public class BclInterfaceTests
         comparable.CompareTo(42);
 
         stub.CompareTo.Verify();
-        Assert.Equal(42, stub.CompareTo.LastArgs);
+        Assert.Equal(42, stub.CompareTo.LastArg);
     }
 
     [Fact]
@@ -752,7 +752,7 @@ public class BclInterfaceTests
         provider.GetService(typeof(string));
 
         stub.GetService.Verify();
-        Assert.Equal(typeof(string), stub.GetService.LastArgs);
+        Assert.Equal(typeof(string), stub.GetService.LastArg);
     }
 
     [Fact]
@@ -793,7 +793,7 @@ public class BclInterfaceTests
         observer.OnNext("value");
 
         stub.OnNext.Verify();
-        Assert.Equal("value", stub.OnNext.LastArgs);
+        Assert.Equal("value", stub.OnNext.LastArg);
     }
 
     [Fact]
@@ -806,7 +806,7 @@ public class BclInterfaceTests
         observer.OnError(error);
 
         stub.OnError.Verify();
-        Assert.Same(error, stub.OnError.LastArgs);
+        Assert.Same(error, stub.OnError.LastArg);
     }
 
     [Fact]
@@ -829,7 +829,7 @@ public class BclInterfaceTests
         observer.OnNext(42);
 
         stub.OnNext.Verify();
-        Assert.Equal(42, stub.OnNext.LastArgs);
+        Assert.Equal(42, stub.OnNext.LastArg);
     }
 
     #endregion
@@ -960,7 +960,7 @@ public class BclInterfaceTests
         reader.GetValue(0);
 
         stub.GetValue.Verify();
-        Assert.Equal(0, stub.GetValue.LastArgs);
+        Assert.Equal(0, stub.GetValue.LastArg);
     }
 
     [Fact]
@@ -994,7 +994,7 @@ public class BclInterfaceTests
         // GetString throws when not configured (string has no safe default - smart defaults behavior)
         Assert.Throws<InvalidOperationException>(() => record.GetString(0));
         stub.GetString.Verify();
-        Assert.Equal(0, stub.GetString.LastArgs);
+        Assert.Equal(0, stub.GetString.LastArg);
     }
 
     [Fact]
@@ -1100,7 +1100,7 @@ public class BclInterfaceTests
         provider.GetFormat(typeof(string));
 
         stub.GetFormat.Verify();
-        Assert.Equal(typeof(string), stub.GetFormat.LastArgs);
+        Assert.Equal(typeof(string), stub.GetFormat.LastArg);
     }
 
     #endregion
@@ -1152,7 +1152,7 @@ public class BclInterfaceTests
         progress.Report(50);
 
         stub.Report.Verify();
-        Assert.Equal(50, stub.Report.LastArgs);
+        Assert.Equal(50, stub.Report.LastArg);
     }
 
     [Fact]
@@ -1164,7 +1164,7 @@ public class BclInterfaceTests
         progress.Report("50% complete");
 
         stub.Report.Verify();
-        Assert.Equal("50% complete", stub.Report.LastArgs);
+        Assert.Equal("50% complete", stub.Report.LastArg);
     }
 
     [Fact]

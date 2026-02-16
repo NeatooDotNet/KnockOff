@@ -106,7 +106,7 @@ public class MethodInterceptionTests
         stub.GetData.Verify(Called.Exactly(2));
 
         // Access call history
-        Assert.Equal(2, stub.GetData.LastArgs);
+        Assert.Equal(2, stub.GetData.LastArg);
     }
 }
 

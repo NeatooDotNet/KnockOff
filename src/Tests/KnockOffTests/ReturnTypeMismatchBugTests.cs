@@ -67,8 +67,8 @@ public class ReturnTypeMismatchBugTests
 		// Each overload has separate tracking
 		trackingAsync.Verify(Called.Once);
 		trackingSync.Verify(Called.Once);
-		Assert.Equal(1L, trackingAsync.LastArgs);
-		Assert.Same(entity, trackingSync.LastArgs);
+		Assert.Equal(1L, trackingAsync.LastArg);
+		Assert.Same(entity, trackingSync.LastArg);
 	}
 }
 

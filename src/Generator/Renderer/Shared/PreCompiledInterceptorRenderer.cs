@@ -279,7 +279,8 @@ internal static class PreCompiledInterceptorRenderer
 	/// <summary>
 	/// Gets the fully qualified pre-compiled interceptor type for a method.
 	/// Determines the correct type family (sync/void/async/async-void).
-	/// For 0 params, returns arity-0 types. For 1+ params, returns TTuple types.
+	/// For 0 params, returns arity-0 types. For 1 param, returns single-param types.
+	/// For 2+ params, returns TTuple types.
 	/// </summary>
 	public static string GetMethodInterceptorType(UnifiedMethodInterceptorModel model, string? delegateBaseName = null)
 	{
@@ -296,6 +297,11 @@ internal static class PreCompiledInterceptorRenderer
 			if (paramCount == 0)
 				return "global::KnockOff.Interceptors.VoidMethodInterceptor0";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			if (paramCount == 1)
+			{
+				var tArg = model.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.VoidMethodInterceptor1<{delegateType}, {tArg}>";
+			}
 			var tArgs = ComputeTArgsType(model.Parameters);
 			return $"global::KnockOff.Interceptors.VoidMethodInterceptor<{delegateType}, {tArgs}>";
 		}
@@ -306,6 +312,11 @@ internal static class PreCompiledInterceptorRenderer
 				return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
 			var syncDelegateType = ComputeSyncDelegateTypeName(nameForDelegate);
+			if (paramCount == 1)
+			{
+				var tArg = model.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor1<{delegateType}, {syncDelegateType}, {tArg}>";
+			}
 			var tArgs = ComputeTArgsType(model.Parameters);
 			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{delegateType}, {syncDelegateType}, {tArgs}>";
 		}
@@ -316,6 +327,11 @@ internal static class PreCompiledInterceptorRenderer
 				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
 			var syncDelegateType = ComputeSyncDelegateTypeName(nameForDelegate);
+			if (paramCount == 1)
+			{
+				var tArg = model.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor1<{delegateType}, {syncDelegateType}, {tArg}, {innerType}>";
+			}
 			var tArgs = ComputeTArgsType(model.Parameters);
 			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{delegateType}, {syncDelegateType}, {tArgs}, {innerType}>";
 		}
@@ -325,6 +341,11 @@ internal static class PreCompiledInterceptorRenderer
 			if (paramCount == 0)
 				return $"global::KnockOff.Interceptors.MethodInterceptor0<{model.ReturnType}>";
 			var delegateType = ComputeDelegateTypeName(nameForDelegate);
+			if (paramCount == 1)
+			{
+				var tArg = model.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.MethodInterceptor1<{delegateType}, {tArg}, {model.ReturnType}>";
+			}
 			var tArgs = ComputeTArgsType(model.Parameters);
 			return $"global::KnockOff.Interceptors.MethodInterceptor<{delegateType}, {tArgs}, {model.ReturnType}>";
 		}
@@ -768,8 +789,8 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Gets the pre-compiled interceptor type for a single overload signature.
-	/// For 0 params, returns arity-0 types. For 1+ params, returns TTuple types
-	/// using the overload's DelegateName.
+	/// For 0 params, returns arity-0 types. For 1 param, returns single-param types.
+	/// For 2+ params, returns TTuple types using the overload's DelegateName.
 	/// </summary>
 	public static string GetOverloadInterceptorType(MethodOverloadSignature overload)
 	{
@@ -783,6 +804,11 @@ internal static class PreCompiledInterceptorRenderer
 		if (overload.IsVoid)
 		{
 			if (paramCount == 0) return "global::KnockOff.Interceptors.VoidMethodInterceptor0";
+			if (paramCount == 1)
+			{
+				var tArg = overload.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.VoidMethodInterceptor1<{overload.DelegateName}, {tArg}>";
+			}
 			var tArgs = ComputeTArgsType(overload.Parameters);
 			return $"global::KnockOff.Interceptors.VoidMethodInterceptor<{overload.DelegateName}, {tArgs}>";
 		}
@@ -790,8 +816,13 @@ internal static class PreCompiledInterceptorRenderer
 		if (isVoidAsync)
 		{
 			if (paramCount == 0) return "global::KnockOff.Interceptors.AsyncVoidMethodInterceptor0";
-			var tArgs = ComputeTArgsType(overload.Parameters);
 			var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+			if (paramCount == 1)
+			{
+				var tArg = overload.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor1<{overload.DelegateName}, {syncDelegateName}, {tArg}>";
+			}
+			var tArgs = ComputeTArgsType(overload.Parameters);
 			return $"global::KnockOff.Interceptors.AsyncVoidMethodInterceptor<{overload.DelegateName}, {syncDelegateName}, {tArgs}>";
 		}
 
@@ -799,14 +830,24 @@ internal static class PreCompiledInterceptorRenderer
 		{
 			if (paramCount == 0)
 				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor0<{innerType}>";
-			var tArgs = ComputeTArgsType(overload.Parameters);
 			var syncDelegateName = ComputeOverloadSyncDelegateName(overload);
+			if (paramCount == 1)
+			{
+				var tArg = overload.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.AsyncMethodInterceptor1<{overload.DelegateName}, {syncDelegateName}, {tArg}, {innerType}>";
+			}
+			var tArgs = ComputeTArgsType(overload.Parameters);
 			return $"global::KnockOff.Interceptors.AsyncMethodInterceptor<{overload.DelegateName}, {syncDelegateName}, {tArgs}, {innerType}>";
 		}
 
 		{
 			if (paramCount == 0)
 				return $"global::KnockOff.Interceptors.MethodInterceptor0<{overload.ReturnType}>";
+			if (paramCount == 1)
+			{
+				var tArg = overload.Parameters.First().Type;
+				return $"global::KnockOff.Interceptors.MethodInterceptor1<{overload.DelegateName}, {tArg}, {overload.ReturnType}>";
+			}
 			var tArgs = ComputeTArgsType(overload.Parameters);
 			return $"global::KnockOff.Interceptors.MethodInterceptor<{overload.DelegateName}, {tArgs}, {overload.ReturnType}>";
 		}
@@ -1038,7 +1079,7 @@ internal static class PreCompiledInterceptorRenderer
 		for (int i = 0; i < model.Overloads.Count; i++)
 		{
 			var overload = model.Overloads.GetArray()![i];
-			if (overload.Parameters.Count == 0) continue; // Zero-param overloads don't use slots
+			if (overload.Parameters.Count <= 1) continue; // 0-param and 1-param overloads don't use slots
 
 			var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
@@ -1089,7 +1130,7 @@ internal static class PreCompiledInterceptorRenderer
 		for (int i = 0; i < model.Overloads.Count; i++)
 		{
 			var overload = model.Overloads.GetArray()![i];
-			if (overload.Parameters.Count == 0) continue;
+			if (overload.Parameters.Count <= 1) continue; // 0-param and 1-param overloads don't use slots
 
 			var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;

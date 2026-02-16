@@ -103,7 +103,7 @@ public class BclStandaloneTests
         comparable.CompareTo("other");
 
         tracking.Verify();
-        Assert.Equal("other", tracking.LastArgs);
+        Assert.Equal("other", tracking.LastArg);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class BclStandaloneTests
         comparable.CompareTo("ccc");
 
         tracking.Verify(Called.Exactly(3));
-        Assert.Equal("ccc", tracking.LastArgs);
+        Assert.Equal("ccc", tracking.LastArg);
     }
 
     #endregion
@@ -230,7 +230,7 @@ public class BclStandaloneTests
         provider.GetService(typeof(string));
 
         tracking.Verify();
-        Assert.Equal(typeof(string), tracking.LastArgs);
+        Assert.Equal(typeof(string), tracking.LastArg);
     }
 
     [Fact]
@@ -354,7 +354,7 @@ public class BclStandaloneTests
         observer.OnNext("value");
 
         tracking.Verify();
-        Assert.Equal("value", tracking.LastArgs);
+        Assert.Equal("value", tracking.LastArg);
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public class BclStandaloneTests
         observer.OnError(error);
 
         tracking.Verify();
-        Assert.Same(error, tracking.LastArgs);
+        Assert.Same(error, tracking.LastArg);
     }
 
     [Fact]
@@ -416,7 +416,7 @@ public class BclStandaloneTests
         progress.Report(50);
 
         tracking.Verify();
-        Assert.Equal(50, tracking.LastArgs);
+        Assert.Equal(50, tracking.LastArg);
     }
 
     [Fact]
@@ -517,7 +517,7 @@ public class BclStandaloneTests
         collection.Add("test");
 
         tracking.Verify();
-        Assert.Equal("test", tracking.LastArgs);
+        Assert.Equal("test", tracking.LastArg);
     }
 
     [Fact]
@@ -687,7 +687,7 @@ public class BclStandaloneTests
         collection.Add("test");
 
         tracking.Verify();
-        Assert.Equal("test", tracking.LastArgs);
+        Assert.Equal("test", tracking.LastArg);
     }
 
     [Fact]

@@ -284,7 +284,7 @@ public class StrictModeTests
 
 		Assert.Equal(50, result); // Stub override multiplies by 10
 		stub.GetValue.Verify(Called.Once);
-		Assert.Equal(5, stub.GetValue.LastArgs);
+		Assert.Equal(5, stub.GetValue.LastArg);
 	}
 
 	[Fact]

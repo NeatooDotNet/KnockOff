@@ -9,48 +9,56 @@ namespace KnockOff.Interceptors;
 
 public interface IVoidOverloadSlot1<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot1Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot2<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot2Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot3<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot3Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot4<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot4Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot5<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot5Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot6<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot6Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot7<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot7Interceptor { get; }
 }
 
 public interface IVoidOverloadSlot8<TDelegate, TArgs>
     where TDelegate : Delegate
+    where TArgs : struct
 {
     VoidMethodInterceptor<TDelegate, TArgs> VoidSlot8Interceptor { get; }
 }

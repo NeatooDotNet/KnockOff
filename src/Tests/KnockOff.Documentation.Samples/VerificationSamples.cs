@@ -178,7 +178,7 @@ public class ArgumentVerificationTests
 
         #region verify-lastcallarg
         // LastArg contains the most recent argument value
-        Assert.Equal(42, tracking.LastArgs);
+        Assert.Equal(42, tracking.LastArg);
         #endregion
     }
 
@@ -193,7 +193,7 @@ public class ArgumentVerificationTests
 
         #region verify-lastcallargs-tuple
         // LastArgs is a named tuple for multi-parameter methods
-        var (id, name) = tracking.LastArgs;
+        var (id, name) = tracking.LastArgs!.Value;
         Assert.Equal(42, id);
         Assert.Equal("Alice", name);
         #endregion
@@ -410,7 +410,7 @@ public class CompleteVerificationTests
         stub.Verify();
 
         // 2. Argument verification via tracking
-        Assert.Equal(2, getTracking.LastArgs);
+        Assert.Equal(2, getTracking.LastArg);
 
         // 3. Call history verification
         Assert.Equal(new[] { 1, 2 }, getIdHistory);

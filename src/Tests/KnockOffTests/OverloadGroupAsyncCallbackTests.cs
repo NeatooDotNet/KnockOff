@@ -305,7 +305,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(20);
 		await service.GetByIdAsync(30);
 
-		Assert.Equal(30, tracking.LastArgs);
+		Assert.Equal(30, tracking.LastArg);
 	}
 
 	[Fact]
@@ -320,7 +320,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(1, "name");
 		await service.GetByIdAsync(2, "email");
 
-		var lastArgs = tracking.LastArgs;
+		var lastArgs = tracking.LastArgs!.Value;
 		Assert.Equal(2, lastArgs.id);
 		Assert.Equal("email", lastArgs.includeFields);
 	}

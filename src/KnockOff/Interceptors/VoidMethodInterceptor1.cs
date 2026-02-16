@@ -7,19 +7,19 @@
 namespace KnockOff.Interceptors;
 
 /// <summary>
-/// Pre-compiled interceptor for void methods with 1+ parameters using TTuple approach.
+/// Pre-compiled interceptor for void methods with exactly 1 parameter.
 /// TDelegate is a generated delegate type providing named callback parameters.
-/// TArgs is either a raw type (1 param) or a ValueTuple (2+ params) providing named When parameters.
+/// TArg is the raw parameter type.
 /// All behavioral logic (Call, When, sequences, verification, builders) is pre-compiled.
-/// Expression trees bridge between TDelegate invocation and TArgs matching.
+/// Expression trees bridge between TDelegate invocation and TArg matching.
 /// </summary>
 /// <typeparam name="TDelegate">The generated delegate type for callbacks (e.g., ExecuteDelegate).</typeparam>
-/// <typeparam name="TArgs">The argument type: raw type for 1 param, ValueTuple for 2+ params.</typeparam>
-public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where TDelegate : Delegate where TArgs : struct
+/// <typeparam name="TArg">The single argument type.</typeparam>
+public sealed class VoidMethodInterceptor1<TDelegate, TArg> : IInterceptor where TDelegate : Delegate
 {
     // Static expression tree invoker -- compiled once per closed generic type combo
-    private static readonly Action<TDelegate, TArgs> s_voidInvoker
-        = DelegateInvokerFactory.BuildVoidInvoker<TDelegate, TArgs>();
+    private static readonly Action<TDelegate, TArg> s_voidInvoker
+        = DelegateInvokerFactory.BuildVoidInvoker<TDelegate, TArg>();
 
     private readonly string _memberName;
 
@@ -43,13 +43,13 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
 
     // Unconfigured tracking
     private int _unconfiguredCallCount;
-    private TArgs? _unconfiguredLastArgs;
+    private TArg? _unconfiguredLastArg;
 
     // Fallback delegates
     private TDelegate? _fallback;
     private TDelegate? _sourceFallback;
 
-    public VoidMethodInterceptor(string memberName)
+    public VoidMethodInterceptor1(string memberName)
     {
         _memberName = memberName;
     }
@@ -76,18 +76,18 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     /// <summary>Whether this interceptor has been configured.</summary>
     public bool IsConfigured => _call != null || (_sequence?.Count ?? 0) > 0 || (_whenChain?.Count ?? 0) > 0;
 
-    /// <summary>Last arguments from the most recently called registration.</summary>
-    public TArgs? LastArgs
+    /// <summary>Last argument from the most recently called registration.</summary>
+    public TArg? LastArg
     {
         get
         {
             if ((_callTracking?._callCount ?? 0) > 0)
-                return _callTracking!.LastArgs;
+                return _callTracking!.LastArg;
             if (_sequence != null)
                 for (int i = _sequence.Count - 1; i >= 0; i--)
                     if (_sequence[i].Tracking._callCount > 0)
-                        return _sequence[i].Tracking.LastArgs;
-            return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;
+                        return _sequence[i].Tracking.LastArg;
+            return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;
         }
     }
 
@@ -96,18 +96,18 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     // ========================================================================
 
     /// <summary>Invokes the configured behavior. Called by generated interface implementation.</summary>
-    public void Invoke(bool strict, TArgs args)
+    public void Invoke(bool strict, TArg arg)
     {
         // When chain
         if (_whenChain != null && _whenChainHead < _whenChain.Count)
         {
             var matcher = _whenChain[_whenChainHead];
-            if (matcher.Matches(args))
+            if (matcher.Matches(arg))
             {
                 matcher.CallCount++;
                 if (_whenChainHead < _whenChain.Count - 1)
                     _whenChainHead++;
-                matcher.Call(args);
+                matcher.Call(arg);
                 return;
             }
             else if (matcher.IsTerminal)
@@ -120,23 +120,23 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
         if (_sequence != null && _sequenceIndex < _sequence.Count)
         {
             var (callback, tracking) = _sequence[_sequenceIndex];
-            tracking.RecordCall(args);
+            tracking.RecordCall(arg);
             _sequenceIndex++;
-            s_voidInvoker(callback, args);
+            s_voidInvoker(callback, arg);
             return;
         }
 
         // Callback
         if (_call != null && _callTracking != null)
         {
-            _callTracking.RecordCall(args);
-            s_voidInvoker(_call, args);
+            _callTracking.RecordCall(arg);
+            s_voidInvoker(_call, arg);
             return;
         }
 
         // Nothing handled - unconfigured path
         _unconfiguredCallCount++;
-        _unconfiguredLastArgs = args;
+        _unconfiguredLastArg = arg;
 
         // Sequence exhaustion repeat
         if (_sequence != null && _sequenceIndex >= _sequence.Count)
@@ -145,18 +145,18 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
             if (_repeatLastValue && _sequence.Count > 0)
             {
                 var (callback, tracking) = _sequence[_sequence.Count - 1];
-                tracking.RecordCall(args);
-                s_voidInvoker(callback, args);
+                tracking.RecordCall(arg);
+                s_voidInvoker(callback, arg);
                 return;
             }
             return; // exhausted but no repeat - just return (void)
         }
 
         // Fallback (stub override)
-        if (_fallback != null) { s_voidInvoker(_fallback, args); return; }
+        if (_fallback != null) { s_voidInvoker(_fallback, arg); return; }
 
         // Source fallback
-        if (_sourceFallback != null) { s_voidInvoker(_sourceFallback, args); return; }
+        if (_sourceFallback != null) { s_voidInvoker(_sourceFallback, arg); return; }
 
         // Strict mode
         if (strict) throw StubException.NotConfigured("", _memberName);
@@ -178,14 +178,14 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     }
 
     /// <summary>Configures parameter-specific matching with exact value.</summary>
-    public VoidWhenBuilder When(TArgs args)
+    public VoidWhenBuilder When(TArg arg)
     {
         _whenChain ??= new List<VoidWhenMatcherBase>();
-        return new VoidWhenBuilder(this, (a) => object.Equals(a, args));
+        return new VoidWhenBuilder(this, (a) => object.Equals(a, arg));
     }
 
     /// <summary>Configures parameter-specific matching with predicate.</summary>
-    public VoidWhenBuilder When(Func<TArgs, bool> predicate)
+    public VoidWhenBuilder When(Func<TArg, bool> predicate)
     {
         _whenChain ??= new List<VoidWhenMatcherBase>();
         return new VoidWhenBuilder(this, predicate);
@@ -264,7 +264,7 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     public void Reset()
     {
         _unconfiguredCallCount = 0;
-        _unconfiguredLastArgs = default;
+        _unconfiguredLastArg = default;
         _callTracking?.Reset();
         if (_sequence != null)
         {
@@ -286,8 +286,8 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
 
     private abstract class VoidWhenMatcherBase
     {
-        public abstract bool Matches(TArgs args);
-        public abstract void Call(TArgs args);
+        public abstract bool Matches(TArg arg);
+        public abstract void Call(TArg arg);
         public abstract bool IsTerminal { get; }
         public int CallCount { get; set; }
     }
@@ -295,13 +295,13 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     /// <summary>Matcher that uses a predicate and optionally invokes a callback via expression tree.</summary>
     private sealed class VoidWhenMatcherPredicate : VoidWhenMatcherBase
     {
-        private readonly Func<TArgs, bool> _predicate;
+        private readonly Func<TArg, bool> _predicate;
         private TDelegate? _callback;
 
-        public VoidWhenMatcherPredicate(Func<TArgs, bool> predicate) => _predicate = predicate;
+        public VoidWhenMatcherPredicate(Func<TArg, bool> predicate) => _predicate = predicate;
 
-        public override bool Matches(TArgs args) => _predicate(args);
-        public override void Call(TArgs args) { if (_callback != null) s_voidInvoker(_callback, args); }
+        public override bool Matches(TArg arg) => _predicate(arg);
+        public override void Call(TArg arg) { if (_callback != null) s_voidInvoker(_callback, arg); }
         public override bool IsTerminal => false;
 
         public void SetCallback(TDelegate callback) => _callback = callback;
@@ -314,16 +314,16 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
 
         public VoidWhenMatcherCall(TDelegate callback) => _callback = callback;
 
-        public override bool Matches(TArgs args) => true;
-        public override void Call(TArgs args) => s_voidInvoker(_callback, args);
+        public override bool Matches(TArg arg) => true;
+        public override void Call(TArg arg) => s_voidInvoker(_callback, arg);
         public override bool IsTerminal => true;
     }
 
     /// <summary>Matcher that never matches. Terminal.</summary>
     private sealed class VoidWhenMatcherNone : VoidWhenMatcherBase
     {
-        public override bool Matches(TArgs args) => false;
-        public override void Call(TArgs args) { }
+        public override bool Matches(TArg arg) => false;
+        public override void Call(TArg arg) { }
         public override bool IsTerminal => true;
     }
 
@@ -332,31 +332,31 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     // ========================================================================
 
     /// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>
-    public sealed class MethodCallBuilder : IMethodCallBuilderArgs<TDelegate, TArgs?>
+    public sealed class MethodCallBuilder : IMethodCallBuilder<TDelegate, TArg?>
     {
-        private readonly VoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly VoidMethodInterceptor1<TDelegate, TArg> _interceptor;
         internal int _callCount;
-        private TArgs? _lastArgs;
+        private TArg? _lastArg;
 
-        internal MethodCallBuilder(VoidMethodInterceptor<TDelegate, TArgs> interceptor)
+        internal MethodCallBuilder(VoidMethodInterceptor1<TDelegate, TArg> interceptor)
         {
             _interceptor = interceptor;
         }
 
-        /// <summary>Last arguments passed to this callback.</summary>
-        public TArgs? LastArgs => _lastArgs;
+        /// <summary>Last argument passed to this callback.</summary>
+        public TArg? LastArg => _lastArg;
 
-        internal void RecordCall(TArgs args)
+        internal void RecordCall(TArg arg)
         {
             _callCount++;
-            _lastArgs = args;
+            _lastArg = arg;
         }
 
         /// <summary>Resets tracking state.</summary>
         public void Reset()
         {
             _callCount = 0;
-            _lastArgs = default;
+            _lastArg = default;
         }
 
         /// <summary>Verifies callback was invoked at least once.</summary>
@@ -410,13 +410,14 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
         }
 
         // Explicit interface implementations
-        IMethodCallSequence<TDelegate> IMethodCallBuilderArgs<TDelegate, TArgs?>.ThenCall(TDelegate callback) => ThenCall(callback);
+        IMethodCallSequence<TDelegate> IMethodCallBuilder<TDelegate, TArg?>.ThenCall(TDelegate callback) => ThenCall(callback);
         IMethodTracking IMethodTracking.Verifiable() => Verifiable();
         IMethodTracking IMethodTracking.Verifiable(Called called) => Verifiable(called);
-        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable() => Verifiable();
-        IMethodTrackingArgs<TArgs?> IMethodTrackingArgs<TArgs?>.Verifiable(Called called) => Verifiable(called);
-        IMethodCallBuilderArgs<TDelegate, TArgs?> IMethodCallBuilderArgs<TDelegate, TArgs?>.Verifiable() => Verifiable();
-        IMethodCallBuilderArgs<TDelegate, TArgs?> IMethodCallBuilderArgs<TDelegate, TArgs?>.Verifiable(Called called) => Verifiable(called);
+        IMethodTracking<TArg?> IMethodTracking<TArg?>.Verifiable() => Verifiable();
+        IMethodTracking<TArg?> IMethodTracking<TArg?>.Verifiable(Called called) => Verifiable(called);
+        IMethodCallBuilder<TDelegate, TArg?> IMethodCallBuilder<TDelegate, TArg?>.Verifiable() => Verifiable();
+        IMethodCallBuilder<TDelegate, TArg?> IMethodCallBuilder<TDelegate, TArg?>.Verifiable(Called called) => Verifiable(called);
+        TArg? IMethodTracking<TArg?>.LastArg => _lastArg;
     }
 
     // ========================================================================
@@ -426,9 +427,9 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     /// <summary>Sequence for void methods. Supports ThenCall chaining.</summary>
     public sealed class MethodSequence : IMethodCallSequence<TDelegate>, IMethodCallSequence, IMethodSequence
     {
-        private readonly VoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly VoidMethodInterceptor1<TDelegate, TArg> _interceptor;
 
-        internal MethodSequence(VoidMethodInterceptor<TDelegate, TArgs> interceptor)
+        internal MethodSequence(VoidMethodInterceptor1<TDelegate, TArg> interceptor)
         {
             _interceptor = interceptor;
         }
@@ -481,11 +482,11 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     /// <summary>Builder for When matchers on void methods. Captures predicate, awaits Call().</summary>
     public sealed class VoidWhenBuilder
     {
-        private readonly VoidMethodInterceptor<TDelegate, TArgs> _interceptor;
-        private readonly Func<TArgs, bool> _predicate;
+        private readonly VoidMethodInterceptor1<TDelegate, TArg> _interceptor;
+        private readonly Func<TArg, bool> _predicate;
         private int _matcherIndex = -1;
 
-        internal VoidWhenBuilder(VoidMethodInterceptor<TDelegate, TArgs> interceptor, Func<TArgs, bool> predicate)
+        internal VoidWhenBuilder(VoidMethodInterceptor1<TDelegate, TArg> interceptor, Func<TArg, bool> predicate)
         {
             _interceptor = interceptor;
             _predicate = predicate;
@@ -523,23 +524,23 @@ public sealed class VoidMethodInterceptor<TDelegate, TArgs> : IInterceptor where
     /// <summary>Void When chain with ThenWhen, ThenCall, ThenNone, verification support.</summary>
     public sealed class VoidWhenChain
     {
-        private readonly VoidMethodInterceptor<TDelegate, TArgs> _interceptor;
+        private readonly VoidMethodInterceptor1<TDelegate, TArg> _interceptor;
         private readonly int _currentMatcherIndex;
 
-        internal VoidWhenChain(VoidMethodInterceptor<TDelegate, TArgs> interceptor, int currentMatcherIndex)
+        internal VoidWhenChain(VoidMethodInterceptor1<TDelegate, TArg> interceptor, int currentMatcherIndex)
         {
             _interceptor = interceptor;
             _currentMatcherIndex = currentMatcherIndex;
         }
 
         /// <summary>Adds another matcher with exact value matching.</summary>
-        public VoidWhenBuilder ThenWhen(TArgs args)
+        public VoidWhenBuilder ThenWhen(TArg arg)
         {
-            return new VoidWhenBuilder(_interceptor, (a) => object.Equals(a, args));
+            return new VoidWhenBuilder(_interceptor, (a) => object.Equals(a, arg));
         }
 
         /// <summary>Adds another matcher with predicate matching.</summary>
-        public VoidWhenBuilder ThenWhen(Func<TArgs, bool> predicate)
+        public VoidWhenBuilder ThenWhen(Func<TArg, bool> predicate)
         {
             return new VoidWhenBuilder(_interceptor, predicate);
         }

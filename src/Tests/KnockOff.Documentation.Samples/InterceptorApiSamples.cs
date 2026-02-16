@@ -242,10 +242,10 @@ public class MethodInterceptorApiTests
         stub.Verify();
 
         // Tracking object's LastArg for single-parameter methods
-        Assert.Equal(42, getTracking.LastArgs);
+        Assert.Equal(42, getTracking.LastArg);
 
         // Tracking object's LastArgs tuple for multi-parameter methods
-        var (id, name) = updateTracking.LastArgs;
+        var (id, name) = updateTracking.LastArgs!.Value;
         Assert.Equal(1, id);
         Assert.Equal("UpdatedName", name);
 
@@ -686,7 +686,7 @@ public class TrackingObjectsTests
         repo.GetById(42);
 
         // Access LastArg on the tracking object, not the interceptor
-        Assert.Equal(42, getTracking.LastArgs);
+        Assert.Equal(42, getTracking.LastArg);
 
         // Both support verification
         stub.GetById.Verify(Called.Once);      // Interceptor verification

@@ -58,7 +58,7 @@ public class InterfaceContractTests
 	public void VoidMethod_MultiParam_Builder_IsIMethodCallBuilderArgs()
 	{
 		var stub = new SampleKnockOff();
-		IMethodCallBuilder<SampleKnockOff.CalculateDelegate, (string name, int @value, bool flag)> builder =
+		IMethodCallBuilderArgs<SampleKnockOff.CalculateDelegate, (string name, int @value, bool flag)?> builder =
 			stub.Calculate.Call((name, value, flag) => { });
 		Assert.NotNull(builder);
 	}
@@ -67,7 +67,7 @@ public class InterfaceContractTests
 	public void VoidMethod_MultiParam_Builder_IsIMethodTrackingArgs()
 	{
 		var stub = new SampleKnockOff();
-		IMethodTracking<(string name, int @value, bool flag)> tracking =
+		IMethodTrackingArgs<(string name, int @value, bool flag)?> tracking =
 			stub.Calculate.Call((name, value, flag) => { });
 		Assert.NotNull(tracking);
 	}

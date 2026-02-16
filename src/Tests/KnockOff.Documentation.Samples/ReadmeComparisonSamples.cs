@@ -445,7 +445,7 @@ public class ArgumentCaptureKnockOffTests
         var tracking = stub.Add.Return((a, b) => a + b);
         ICalculator calc = stub;
         calc.Add(1, 2);
-        var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
+        var (a, b) = tracking.LastArgs!.Value;  // Named tuple: a = 1, b = 2
         #endregion
 
         Assert.Equal(1, a);

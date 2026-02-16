@@ -94,7 +94,7 @@ public class GenericStandaloneClassStubTests
 
 		stub.Object.GetById(42);
 
-		Assert.Equal(42, stub.GetById.LastArgs);
+		Assert.Equal(42, stub.GetById.LastArg);
 	}
 
 	[Fact]
@@ -131,7 +131,7 @@ public class GenericStandaloneClassStubTests
 		stub.Object.Save(user);
 
 		stub.Save.Verify(Called.Once);
-		Assert.Same(user, stub.Save.LastArgs);
+		Assert.Same(user, stub.Save.LastArg);
 		Assert.Single(saved);
 	}
 
@@ -165,7 +165,7 @@ public class GenericStandaloneClassStubTests
 		stub.GetById.Reset();
 
 		stub.GetById.Verify(Called.Never);
-		Assert.Equal(default, stub.GetById.LastArgs);
+		Assert.Equal(default, stub.GetById.LastArg);
 	}
 
 	[Fact]

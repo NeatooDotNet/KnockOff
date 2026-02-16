@@ -185,6 +185,6 @@ public class ChoosingPatternTests
 
         // Verify using the new API
         standalone.Verify();
-        Assert.Equal("Alice", saveTracking.LastArgs!.Name);
+        Assert.Equal("Alice", saveTracking.LastArg!.Name);
     }
 }

@@ -140,7 +140,7 @@ public class GenericStandaloneEdgeCaseTests
 
 		// Assert
 		tracking.Verify(Called.Once);
-		Assert.Same(entity, tracking.LastArgs);
+		Assert.Same(entity, tracking.LastArg);
 	}
 
 	[Fact]
@@ -222,7 +222,7 @@ public class GenericStandaloneEdgeCaseTests
 		repo.Save(user);
 
 		// Assert
-		Assert.Same(user, tracking.LastArgs);
+		Assert.Same(user, tracking.LastArg);
 	}
 
 	#endregion

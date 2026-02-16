@@ -26,7 +26,7 @@ public class AsyncMethodTests
 		var result = await service.GetValueAsync(10);
 
 		Assert.Equal(30, result); // Stub override multiplies by 3
-		Assert.Equal(10, knockOff.GetValueAsync.LastArgs);
+		Assert.Equal(10, knockOff.GetValueAsync.LastArg);
 	}
 
 	[Fact]
@@ -63,6 +63,6 @@ public class AsyncMethodTests
 		var result = await service.GetValueValueTaskAsync(5);
 
 		Assert.Equal(20, result); // Stub override multiplies by 4
-		Assert.Equal(5, knockOff.GetValueValueTaskAsync.LastArgs);
+		Assert.Equal(5, knockOff.GetValueValueTaskAsync.LastArg);
 	}
 }

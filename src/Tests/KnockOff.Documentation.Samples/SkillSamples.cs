@@ -240,7 +240,7 @@ public class ArgumentAccessTests
         notifier.Notify(42, "Hello");
 
         // Access arguments from tracking object
-        var (userId, message) = tracking.LastArgs;
+        var (userId, message) = tracking.LastArgs!.Value;
         Assert.Equal(42, userId);
         Assert.Equal("Hello", message);
     }

@@ -83,7 +83,7 @@ public class BuilderElevationTests
 
         // First call - builder tracks it (in repeating mode)
         Assert.Equal(50, svc.Calculate(5));
-        Assert.Equal(5, builder.LastArgs);
+        Assert.Equal(5, builder.LastArg);
 
         // Elevate to sequence - this converts to sequence mode with fresh index
         // Sequence becomes: [x*10 (original), x*100 (new)]
@@ -96,7 +96,7 @@ public class BuilderElevationTests
         Assert.Equal(900, svc.Calculate(9));  // Uses sequence[1] = x*100
 
         // The original builder should still have tracked (builder is reused as sequence[0]'s tracking)
-        Assert.Equal(7, builder.LastArgs);  // Last call that used the first callback
+        Assert.Equal(7, builder.LastArg);  // Last call that used the first callback
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class BuilderElevationTests
         svc.Calculate(99);
 
         // Assert - tracking should work
-        Assert.Equal(99, tracking.LastArgs);
+        Assert.Equal(99, tracking.LastArg);
         tracking.Verify(Called.Exactly(2));
     }
 

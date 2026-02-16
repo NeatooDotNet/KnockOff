@@ -68,7 +68,7 @@ public class BasicTests
 		Assert.Equal(84, result);
 		knockOff.GetValue.Verify(Called.Once);
 
-		int lastArg = knockOff.GetValue.LastArgs!;
+		int lastArg = knockOff.GetValue.LastArg!;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -81,7 +81,7 @@ public class BasicTests
 
 		service.Calculate("test", 100, true);
 
-		var args = tracking.LastArgs;
+		var args = tracking.LastArgs!.Value;
 		Assert.Equal("test", args.name);
 		Assert.Equal(100, args.value);
 		Assert.True(args.flag);
@@ -98,7 +98,7 @@ public class BasicTests
 		service.GetValue(3);
 
 		knockOff.GetValue.Verify(Called.Exactly(3));
-		Assert.Equal(3, knockOff.GetValue.LastArgs); // Last call was GetValue(3)
+		Assert.Equal(3, knockOff.GetValue.LastArg); // Last call was GetValue(3)
 	}
 
 	[Fact]
@@ -155,7 +155,7 @@ public class BasicTests
 
 		service.Calculate("test", 42, true);
 
-		var (name, value, flag) = tracking.LastArgs;
+		var (name, value, flag) = tracking.LastArgs!.Value;
 		Assert.Equal("test", name);
 		Assert.Equal(42, value);
 		Assert.True(flag);
