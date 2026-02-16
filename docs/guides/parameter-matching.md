@@ -51,7 +51,7 @@ The API reads clearly: "When called with these arguments, return this value."
 
 ### Value Matching
 
-Match exact parameter values with `When()`. For methods with 2+ parameters, arguments are passed as a ValueTuple -- note the double parentheses `When((a, b))`. Single-parameter methods use `When(value)` directly.
+Match exact parameter values with `When()`. For methods with 2+ parameters, arguments are passed as a ValueTuple -- note the double parentheses `When((a, b))`. Single-parameter methods use `When(value)` directly. The tuple approach allows KnockOff to use a single pre-compiled generic interceptor type for all parameter counts, dramatically reducing generated code and build times.
 
 <!-- snippet: when-basic-value-matching -->
 ```cs
