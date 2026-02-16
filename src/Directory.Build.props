@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Replace 36 arity-based interceptor types with 4 TTuple types using named ValueTuples. Restores LastArgs named fields. Adds TSyncDelegate for natural lambda params on async callbacks. When() for 2+ params now uses tuple syntax. Fixes ref/out overload dispatch.</PackageReleaseNotes>
+		<PackageReleaseNotes>Three-tier interceptor architecture: 0-param, 1-param (LastArg), 2+-param (LastArgs named tuple). Breaking: single-param methods use LastArg instead of LastArgs. Adds TSyncDelegate for natural async callback params. When() for 2+ params uses tuple syntax. Fixes ref/out overload dispatch.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>
