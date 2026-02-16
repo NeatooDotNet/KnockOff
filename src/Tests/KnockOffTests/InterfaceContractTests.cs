@@ -51,14 +51,14 @@ public class InterfaceContractTests
 	}
 
 	// ========================================================================
-	// Method: void, 3 params → IMethodCallBuilderArgs, IMethodTrackingArgs
+	// Method: void, 3 params → IMethodCallBuilder<TDelegate, TArgs?>, IMethodTracking<TArgs?>
 	// ========================================================================
 
 	[Fact]
 	public void VoidMethod_MultiParam_Builder_IsIMethodCallBuilderArgs()
 	{
 		var stub = new SampleKnockOff();
-		IMethodCallBuilderArgs<Action<string, int, bool>, (string?, int?, bool?)> builder =
+		IMethodCallBuilderArgs<SampleKnockOff.CalculateDelegate, (string name, int @value, bool flag)?> builder =
 			stub.Calculate.Call((name, value, flag) => { });
 		Assert.NotNull(builder);
 	}
@@ -67,7 +67,7 @@ public class InterfaceContractTests
 	public void VoidMethod_MultiParam_Builder_IsIMethodTrackingArgs()
 	{
 		var stub = new SampleKnockOff();
-		IMethodTrackingArgs<(string?, int?, bool?)> tracking =
+		IMethodTrackingArgs<(string name, int @value, bool flag)?> tracking =
 			stub.Calculate.Call((name, value, flag) => { });
 		Assert.NotNull(tracking);
 	}
@@ -85,7 +85,7 @@ public class InterfaceContractTests
 	{
 		var stub = new SampleKnockOff();
 		var builder = stub.Calculate.Call((name, value, flag) => { });
-		IMethodCallSequence<Action<string, int, bool>> sequence =
+		IMethodCallSequence<SampleKnockOff.CalculateDelegate> sequence =
 			builder.ThenCall((name, value, flag) => { });
 		Assert.NotNull(sequence);
 	}
@@ -98,7 +98,7 @@ public class InterfaceContractTests
 	public void NonVoidMethod_0Param_Builder_IsIMethodReturnBuilder()
 	{
 		var stub = new SampleKnockOff();
-		IMethodReturnBuilder<SampleKnockOff.GetOptionalInterceptor.GetOptionalDelegate> builder =
+		IMethodReturnBuilder<Func<string?>> builder =
 			stub.GetOptional.Return(() => "test");
 		Assert.NotNull(builder);
 	}
@@ -116,7 +116,7 @@ public class InterfaceContractTests
 	{
 		var stub = new SampleKnockOff();
 		var builder = stub.GetOptional.Return(() => "test");
-		IMethodReturnSequence<SampleKnockOff.GetOptionalInterceptor.GetOptionalDelegate> sequence =
+		IMethodReturnSequence<Func<string?>> sequence =
 			builder.ThenReturn(() => "test2");
 		Assert.NotNull(sequence);
 	}
@@ -138,7 +138,7 @@ public class InterfaceContractTests
 	public void NonVoidMethod_1Param_Builder_IsIMethodReturnBuilder()
 	{
 		var stub = new SampleKnockOff();
-		IMethodReturnBuilder<SampleKnockOff.GetValueInterceptor.GetValueDelegate, int> builder =
+		IMethodReturnBuilder<SampleKnockOff.GetValueDelegate, int> builder =
 			stub.GetValue.Return((int x) => x * 10);
 		Assert.NotNull(builder);
 	}
@@ -156,7 +156,7 @@ public class InterfaceContractTests
 	{
 		var stub = new SampleKnockOff();
 		var builder = stub.GetValue.Return((int x) => x * 10);
-		IMethodReturnSequence<SampleKnockOff.GetValueInterceptor.GetValueDelegate> sequence =
+		IMethodReturnSequence<SampleKnockOff.GetValueDelegate> sequence =
 			builder.ThenReturn((int x) => x * 20);
 		Assert.NotNull(sequence);
 	}

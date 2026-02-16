@@ -111,7 +111,7 @@ public partial class SourceDelegationDemo
         stub.Source(realCalculator);
 
         // Configure Divide to handle specific case
-        stub.Divide.When(10, 2).Return(5);
+        stub.Divide.When((10, 2)).Return(5);
 
         ICalculator calc = stub;
 

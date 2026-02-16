@@ -113,7 +113,7 @@ IEmailSvc emailService = stub;
 emailService.Send("user@example.com", "Welcome", "Hello!");
 
 // Access captured arguments from the tracking object
-var args = tracking.LastArgs;
+var args = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 
@@ -207,7 +207,7 @@ For `Task` or `ValueTask` methods (no return value), use `Action` callbacks - Kn
 <!-- snippet: async-task-simplified-void -->
 ```cs
 // Action callback for void async - Task.CompletedTask auto-returned
-stub.UpdateUserAsync.Return((user) => updatedUsers.Add(user)).Verifiable();
+stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 

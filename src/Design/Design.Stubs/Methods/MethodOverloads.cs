@@ -120,13 +120,13 @@ public partial class MethodOverloadsDemo
     // DESIGN DECISION: When() works naturally with overloads because the
     // parameter values themselves determine which overload is being configured.
     //
-    // GENERATOR BEHAVIOR: Each overload gets its own When():
+    // GENERATOR BEHAVIOR: The compositor generates When() per overload:
     //
-    //   public class FormatInterceptor
+    //   public class IFormatter_FormatInterceptor
     //   {
-    //       public WhenBuilder When(string input) { ... }
-    //       public WhenBuilder When(string input, FormatOptions options) { ... }
-    //       public WhenBuilder When(string input, FormatOptions options, int maxLength) { ... }
+    //       public WhenBuilder When(string input) { ... }  // 1-param overload
+    //       public WhenBuilder When((string input, FormatOptions options) args) { ... }  // 2-param tuple
+    //       public WhenBuilder When((string input, FormatOptions options, int maxLength) args) { ... }
     //   }
     // =========================================================================
 
@@ -140,7 +140,7 @@ public partial class MethodOverloadsDemo
 
         // Each When targets a specific overload based on parameter signature
         stub.Format.When("special").Return("SPECIAL-1");
-        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
+        stub.Format.When(("special", new FormatOptions(Uppercase: true))).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -160,7 +160,7 @@ public partial class MethodOverloadsDemo
 
         // Predicate parameter count determines which overload
         stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
-        stub.Format.When((input, options) => options.Uppercase).Return("UPPER-MODE");
+        stub.Format.When(((string input, FormatOptions options) args) => args.options.Uppercase).Return("UPPER-MODE");
 
         IFormatter formatter = stub;
 
@@ -276,13 +276,13 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        // Configure async overload without cancellation
-        var tracking1 = stub.TransformAsync.Return((input) => $"[{input}]");
+        // Configure async overload without cancellation (natural params via TSyncDelegate)
+        var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
 
-        // Configure async overload with cancellation
-        var tracking2 = stub.TransformAsync.Return((input, ct) =>
+        // Configure async overload with cancellation (natural params via TSyncDelegate)
+        var tracking2 = stub.TransformAsync.Return((input, cancellationToken) =>
         {
-            ct.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             return $"[{input}:ct]";
         });
 

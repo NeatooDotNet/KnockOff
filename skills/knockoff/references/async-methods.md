@@ -54,7 +54,7 @@ Methods returning `Task` or `ValueTask` (no result) use `Return()` with an `Acti
 
 <!-- snippet: async-void-method -->
 ```cs
-stub.ExecuteAsync.Return((command) => { /* side effect */ });
+stub.ExecuteAsync.Call((command) => { /* side effect */ });
 
 IAsyncFetchSvc service = stub;
 await service.ExecuteAsync("test"); // Callback invoked

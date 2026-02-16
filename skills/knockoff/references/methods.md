@@ -163,7 +163,7 @@ Access arguments using the `LastArgs` named tuple:
 <!-- snippet: methods-capture-multiple -->
 ```cs
 // LastArgs is a named tuple with all parameters
-var (username, password) = tracking.LastArgs;
+var (username, password) = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 

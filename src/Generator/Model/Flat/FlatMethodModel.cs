@@ -27,6 +27,10 @@ internal sealed record FlatMethodModel(
     string? CustomDelegateSignature,
     string DefaultExpression,
     bool ThrowsOnDefault,
+    /// <summary>The default value strategy for the return type.</summary>
+    DefaultValueStrategy DefaultStrategy,
+    /// <summary>Concrete type when DefaultStrategy is NewInstance and return type is an interface (e.g., List&lt;T&gt; for IList&lt;T&gt;).</summary>
+    string? ConcreteTypeForNew,
     /// <summary>True if user provided a protected override method (base class pattern).</summary>
     bool HasStubOverride,
     string SimpleInterfaceName,

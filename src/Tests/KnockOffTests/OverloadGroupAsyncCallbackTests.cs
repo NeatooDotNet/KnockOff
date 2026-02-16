@@ -64,7 +64,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		// Configure two-param overload with simplified callback
+		// Configure two-param overload with simplified callback (natural params via TSyncDelegate)
 		stub.GetByIdAsync.Return((int id, CancellationToken ct) => new User { Id = id, Name = "FromCT" });
 
 		using var cts = new CancellationTokenSource();
@@ -177,7 +177,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		User? savedUser = null;
-		stub.SaveAsync.Return((User user) => { savedUser = user; });
+		stub.SaveAsync.Call((User user) => { savedUser = user; });
 
 		var user = new User { Id = 1, Name = "Test" };
 		await service.SaveAsync(user);
@@ -195,7 +195,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		User? savedUser = null;
 		bool tokenPassed = false;
 
-		stub.SaveAsync.Return((User user, CancellationToken ct) =>
+		stub.SaveAsync.Call((User user, CancellationToken ct) =>
 		{
 			savedUser = user;
 			tokenPassed = !ct.IsCancellationRequested;
@@ -217,8 +217,8 @@ public partial class OverloadGroupAsyncCallbackTests
 
 		var calls = new List<string>();
 
-		stub.SaveAsync.Return((User user) => calls.Add("single"));
-		stub.SaveAsync.Return((User user, CancellationToken ct) => calls.Add("withToken"));
+		stub.SaveAsync.Call((User user) => { calls.Add("single"); });
+		stub.SaveAsync.Call((User user, CancellationToken ct) => { calls.Add("withToken"); });
 
 		await service.SaveAsync(new User { Id = 1 });
 		using var cts = new CancellationTokenSource();
@@ -240,7 +240,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		string? loggedMessage = null;
-		stub.LogAsync.Return((string message) => { loggedMessage = message; });
+		stub.LogAsync.Call((string message) => { loggedMessage = message; });
 
 		await service.LogAsync("Hello");
 
@@ -256,7 +256,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		string? loggedMessage = null;
 		int? loggedLevel = null;
 
-		stub.LogAsync.Return((string message, int level) =>
+		stub.LogAsync.Call((string message, int level) =>
 		{
 			loggedMessage = message;
 			loggedLevel = level;
@@ -318,7 +318,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(1, "name");
 		await service.GetByIdAsync(2, "email");
 
-		var lastArgs = tracking.LastArgs;
+		var lastArgs = tracking.LastArgs!.Value;
 		Assert.Equal(2, lastArgs.id);
 		Assert.Equal("email", lastArgs.includeFields);
 	}
@@ -458,7 +458,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		User? savedUser = null;
-		stub.SaveAsync.Return((User user) => { savedUser = user; });
+		stub.SaveAsync.Call((User user) => { savedUser = user; });
 
 		await service.SaveAsync(new User { Id = 99 });
 

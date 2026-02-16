@@ -440,7 +440,7 @@ public class VerificationTests
         var stub = new OverloadTestKnockOff();
         stub.Format.Return((input) => input.ToUpper());
         stub.Format.Return(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            (OverloadTestKnockOff.FormatDelegate_String_Boolean_String)
             ((input, uppercase) => uppercase ? input.ToUpper() : input));
 
         // Act
@@ -459,7 +459,7 @@ public class VerificationTests
         var stub = new OverloadTestKnockOff();
         stub.Format.Return((input) => input.ToUpper());
         stub.Format.Return(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            (OverloadTestKnockOff.FormatDelegate_String_Boolean_String)
             ((input, uppercase) => uppercase ? input.ToUpper() : input));
 
         // Act - Only call one overload
@@ -478,7 +478,7 @@ public class VerificationTests
         var stub = new OverloadTestKnockOff();
         stub.Format.Return((input) => input.ToUpper()).Verifiable();
         stub.Format.Return(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            (OverloadTestKnockOff.FormatDelegate_String_Boolean_String)
             ((input, uppercase) => uppercase ? input.ToUpper() : input));
         // Second overload not marked verifiable
 

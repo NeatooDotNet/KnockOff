@@ -45,8 +45,8 @@ No matchers. The `qty > 10` check is plain C#.
 <!-- snippet: parammatch-specific-values -->
 ```cs
 // Exact value matching — no Arg.Is<> or It.Is<>
-stub.GetPrice.When("widget", 5).Return(49.95m);
-stub.GetPrice.When("gadget", 1).Return(29.99m);
+stub.GetPrice.When(("widget", 5)).Return(49.95m);
+stub.GetPrice.When(("gadget", 1)).Return(29.99m);
 ```
 <!-- endSnippet -->
 
@@ -73,7 +73,7 @@ IPricingService pricing = stub;
 pricing.RecordSale("widget", 3);
 
 // Tuple destructuring with named fields
-var (product, quantity) = tracking.LastArgs;
+var (product, quantity) = tracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 
@@ -84,7 +84,7 @@ No `Callback<>` pre-setup. No `Arg.Do<>`. The tracking object captures arguments
 <!-- snippet: parammatch-fallback -->
 ```cs
 // When() for specifics, Return() as fallback
-stub.GetPrice.When("premium-widget", 1).Return(99.99m);
+stub.GetPrice.When(("premium-widget", 1)).Return(99.99m);
 stub.GetPrice.Return((product, qty) => qty * 9.99m);
 ```
 <!-- endSnippet -->
@@ -97,7 +97,7 @@ When() matches specific values first. Unmatched calls fall through to Return().
 ```cs
 // Predicate on multiple params — standard C# lambda
 stub.GetPrice
-    .When((product, qty) => qty > 100).Return(7.99m)
+    .When(args => args.quantity > 100).Return(7.99m)
     .ThenCall((product, qty) => qty > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->
@@ -191,7 +191,7 @@ pricing.GetPrice(Arg.Any<string>(), Arg.Is<int>(qty => qty > 100))
 | Capability | KnockOff | Moq | NSubstitute |
 |------------|----------|-----|-------------|
 | Conditional return | `Return((product, qty) => qty > 10 ? 8.99m : 9.99m)` | `It.IsAny<>` + `.Returns<T1, T2>(lambda)` | `Arg.Any<>` + `x.ArgAt<T>(index)` |
-| Exact values | `When("widget", 5).Return(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` |
+| Exact values | `When(("widget", 5)).Return(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` | `GetPrice("widget", 5).Returns(49.95m)` |
 | Same-typed params | `(firstName, lastName) => ...` — named | `Returns<string, string>((a, b) => ...)` — named via Returns | `x.ArgAt<string>(0)`, `x.ArgAt<string>(1)` — index-based |
 | Argument capture | `tracking.LastArgs` — automatic | `.Callback<T1, T2>(...)` — pre-setup | `Arg.Do<T>(x => ...)` — per parameter |
 | Multi-param predicate | `When((product, qty) => qty > 100)` | `It.Is<T>()` per parameter only | `Arg.Is<T>()` per parameter only |

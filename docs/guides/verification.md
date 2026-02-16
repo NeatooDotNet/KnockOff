@@ -166,7 +166,7 @@ Assert.Equal(42, tracking.LastArg);
 <!-- snippet: verify-lastcallargs-tuple -->
 ```cs
 // LastArgs is a named tuple for multi-parameter methods
-var (id, name) = tracking.LastArgs;
+var (id, name) = tracking.LastArgs!.Value;
 Assert.Equal(42, id);
 Assert.Equal("Alice", name);
 ```

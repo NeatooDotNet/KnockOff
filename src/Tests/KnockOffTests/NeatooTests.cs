@@ -215,7 +215,7 @@ public class EntityBaseStandaloneTests
     {
         var stub = new EntityBaseStub();
         // WaitForTasks is overloaded - use OnCall with no-arg lambda for the parameterless overload
-        var tracking = stub.WaitForTasks.Return(() => Task.CompletedTask);
+        var tracking = stub.WaitForTasks.Call(() => Task.CompletedTask);
         IEntityBase entity = stub;
 
         await entity.WaitForTasks();
@@ -322,8 +322,8 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithPropertyName_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        // RunRules is overloaded - use explicit delegate type to disambiguate
-        var tracking = stub.RunRules.Return((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propertyName, token) => Task.CompletedTask));
+        // RunRules is overloaded - disambiguate via generated delegate type
+        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propertyName, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
@@ -336,8 +336,8 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithFlag_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        // RunRules is overloaded - use explicit delegate type to disambiguate
-        var tracking = stub.RunRules.Return((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((flag, token) => Task.CompletedTask));
+        // RunRules is overloaded - disambiguate via generated delegate type
+        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((flag, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
@@ -535,7 +535,7 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Return((InlineValidateBaseTests.Stubs.IValidateBase_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
+        stub.RunRules.Call((InlineValidateBaseTests.Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;

@@ -165,7 +165,7 @@ public class GenericStandaloneClassStubTests
 		stub.GetById.Reset();
 
 		stub.GetById.Verify(Called.Never);
-		Assert.Null(stub.GetById.LastArg);
+		Assert.Equal(default, stub.GetById.LastArg);
 	}
 
 	[Fact]

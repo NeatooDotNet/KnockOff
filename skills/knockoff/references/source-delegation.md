@@ -57,7 +57,7 @@ Source delegation sits below configuration but above defaults:
 <!-- snippet: source-delegation-ref-priority -->
 ```cs
 stub.Source(realCalculator);
-stub.Divide.When(10, 2).Return(5);
+stub.Divide.When((10, 2)).Return(5);
 
 ISourceCalc calc = stub;
 calc.Divide(10, 2);  // 5 (When chain matched)

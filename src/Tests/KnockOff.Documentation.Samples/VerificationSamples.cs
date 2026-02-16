@@ -193,7 +193,7 @@ public class ArgumentVerificationTests
 
         #region verify-lastcallargs-tuple
         // LastArgs is a named tuple for multi-parameter methods
-        var (id, name) = tracking.LastArgs;
+        var (id, name) = tracking.LastArgs!.Value;
         Assert.Equal(42, id);
         Assert.Equal("Alice", name);
         #endregion

@@ -97,7 +97,8 @@ internal static class FlatModelBuilder
 			SourceProviders: sourceProviders,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
 			ImplementsIKnockOffStub: true,
-			Strict: typeInfo.Strict);
+			Strict: typeInfo.Strict,
+			HasPrimaryConstructor: typeInfo.HasPrimaryConstructor);
 	}
 
 	#region Name Map Building
@@ -360,6 +361,8 @@ internal static class FlatModelBuilder
 					HasSetter: member.HasSetter,
 					IsInitOnly: member.IsInitOnly,
 					DefaultExpression: defaultExpr,
+					DefaultStrategy: member.DefaultStrategy,
+					ConcreteTypeForNew: member.ConcreteTypeForNew,
 					SetterPragmaDisable: string.IsNullOrEmpty(setterPragmaDisable) ? null : setterPragmaDisable,
 					SetterPragmaRestore: string.IsNullOrEmpty(setterPragmaRestore) ? null : setterPragmaRestore,
 					SimpleInterfaceName: simpleIfaceName,
@@ -634,6 +637,8 @@ internal static class FlatModelBuilder
 					ReturnType: member.ReturnType,
 					NullableReturnType: MakeNullable(member.ReturnType),
 					DefaultExpression: defaultExpr,
+					DefaultStrategy: member.DefaultStrategy,
+					ConcreteTypeForNew: member.ConcreteTypeForNew,
 					KeyType: keyType,
 					KeyParamName: keyParamName,
 					KeyRefPrefix: keyRefPrefix,
@@ -874,6 +879,8 @@ internal static class FlatModelBuilder
 			CustomDelegateSignature: customDelegateSignature,
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
+			DefaultStrategy: member.DefaultStrategy,
+			ConcreteTypeForNew: member.ConcreteTypeForNew,
 			HasStubOverride: stubOverrideMethods.Contains(BuildOverrideSignatureKeyFromMember(member)),
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: "",
@@ -1007,6 +1014,8 @@ internal static class FlatModelBuilder
 			CustomDelegateSignature: delegateSignature,
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
+			DefaultStrategy: DefaultValueStrategy.Default, // Generic methods use SmartDefault helper, not strategy-based factories
+			ConcreteTypeForNew: null,
 			HasStubOverride: false, // Generic methods excluded from base class pattern per design
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: typeParamDecl,

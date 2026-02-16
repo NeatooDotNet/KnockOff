@@ -55,7 +55,7 @@ public partial class IEntityPropertyTests
         property.IsPaused = true;
 
         stub.IsPaused.VerifySet(Called.Once);
-        Assert.Equal(true, stub.IsPaused.LastSetValue);
+        Assert.True(stub.IsPaused.LastSetValue);
     }
 
     [Fact]

@@ -56,7 +56,7 @@ public class MethodOverloadTests
 
         // Specific matches
         stub.Format.When("special").Return("SPECIAL-1");
-        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
+        stub.Format.When(("special", new FormatOptions(Uppercase: true))).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -161,8 +161,12 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.TransformAsync.Return((input) => $"[{input}]");
-        var tracking2 = stub.TransformAsync.Return((input, ct) => $"[{input}:ct]");
+        var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
+        var tracking2 = stub.TransformAsync.Return((input, cancellationToken) =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return $"[{input}:ct]";
+        });
 
         IFormatter formatter = stub;
 

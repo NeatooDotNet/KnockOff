@@ -18,6 +18,10 @@ internal sealed record FlatPropertyModel(
     bool HasSetter,
     bool IsInitOnly,
     string DefaultExpression,
+    /// <summary>The default value strategy for the property type.</summary>
+    DefaultValueStrategy DefaultStrategy,
+    /// <summary>Concrete type when DefaultStrategy is NewInstance and property type is an interface.</summary>
+    string? ConcreteTypeForNew,
     string? SetterPragmaDisable,
     string? SetterPragmaRestore,
     string SimpleInterfaceName,

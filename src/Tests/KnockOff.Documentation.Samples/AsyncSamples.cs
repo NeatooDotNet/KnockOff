@@ -107,7 +107,7 @@ public class TaskMethodTests
 
         #region async-task-simplified-void
         // Action callback for void async - Task.CompletedTask auto-returned
-        stub.UpdateUserAsync.Return((user) => updatedUsers.Add(user)).Verifiable();
+        stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -124,8 +124,8 @@ public class TaskMethodTests
         var updatedUsers = new List<User>();
 
         #region async-task-void
-        // Return() auto-returns Task.CompletedTask for async void methods
-        stub.UpdateUserAsync.Return((user) =>
+        // Call() auto-returns Task.CompletedTask for async void methods
+        stub.UpdateUserAsync.Call((user) =>
         {
             updatedUsers.Add(user);
         }).Verifiable();
@@ -184,9 +184,9 @@ public class ValueTaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         #region async-valuetask
-        // Create ValueTask directly when you need parameter-based return values
+        // ValueTask<T> methods use the same Return() API — just return the inner value
         stub.GetCachedUserAsync.Return((id) =>
-            new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
+            new User { Id = id, Name = "Cached" }).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -258,8 +258,8 @@ public class AsyncExceptionTests
         var stub = new AsyncUserSvcStub();
 
         #region async-throw
-        // Throw directly - use explicit delegate type to disambiguate overloads
-        stub.GetUserAsync.Return((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
+        // Throw directly - cast to sync delegate to disambiguate overloads
+        stub.GetUserAsync.Return((AsyncUserSvcStub.GetUserAsyncSyncDelegate)((int id) =>
             throw new NotFoundException($"User {id} not found")));
         #endregion
 
@@ -355,7 +355,7 @@ public class AsyncTierTests
         var stub = new AsyncFetchSvcStub();
 
         #region async-void-method
-        stub.ExecuteAsync.Return((command) => { /* side effect */ });
+        stub.ExecuteAsync.Call((command) => { /* side effect */ });
 
         IAsyncFetchSvc service = stub;
         await service.ExecuteAsync("test"); // Callback invoked
@@ -490,7 +490,7 @@ public class CompleteAsyncExampleTests
         // Configure multiple async methods with verification
         stub.FindAsync.Return((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
-        stub.SaveAsync.Return((user) => { }).Verifiable();
+        stub.SaveAsync.Call((user) => { }).Verifiable();
         #endregion
 
         var manager = new UserManager(stub);

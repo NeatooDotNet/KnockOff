@@ -39,7 +39,7 @@ The callback must inspect parameters and branch on logic. When() solves this by 
 <!-- snippet: when-solution-match-then-respond -->
 ```cs
 // With When(): match arguments, then configure response
-stub.Calculate.When(5, 10).Return(50);
+stub.Calculate.When((5, 10)).Return(50);
 ```
 <!-- endSnippet -->
 
@@ -51,13 +51,13 @@ The API reads clearly: "When called with these arguments, return this value."
 
 ### Value Matching
 
-Match exact parameter values with `When()`:
+Match exact parameter values with `When()`. For methods with 2+ parameters, arguments are passed as a ValueTuple -- note the double parentheses `When((a, b))`. Single-parameter methods use `When(value)` directly. The tuple approach allows KnockOff to use a single pre-compiled generic interceptor type for all parameter counts, dramatically reducing generated code and build times.
 
 <!-- snippet: when-basic-value-matching -->
 ```cs
 // Configure different returns for different argument values
-stub.Add.When(1, 2).Return(100);
-stub.Add.When(3, 4).Return(200);
+stub.Add.When((1, 2)).Return(100);
+stub.Add.When((3, 4)).Return(200);
 ```
 <!-- endSnippet -->
 
@@ -70,7 +70,7 @@ Match based on conditions using a predicate:
 <!-- snippet: when-basic-predicate-matching -->
 ```cs
 // Match based on condition
-stub.Add.When((a, b) => a > 10).Return(999);
+stub.Add.When(args => args.a > 10).Return(999);
 ```
 <!-- endSnippet -->
 
@@ -100,7 +100,7 @@ Use `When()` alone to track parameter-specific calls:
 <!-- snippet: when-void-tracking-only -->
 ```cs
 // When() alone tracks parameter-specific calls
-var chain = stub.Process.When(1, 2);
+var chain = stub.Process.When((1, 2));
 ```
 <!-- endSnippet -->
 
@@ -113,7 +113,7 @@ Add a callback with `.Call()` if you need side effects:
 <!-- snippet: when-void-with-callback -->
 ```cs
 // Call() adds callback for side effects
-stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+stub.Process.When((1, 2)).Call((a, b) => calls.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -126,7 +126,7 @@ Predicates work the same as return methods:
 <!-- snippet: when-void-predicate -->
 ```cs
 // Predicate matching works the same for void methods
-stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
+stub.Process.When(args => args.a > 10).Call((a, b) => matched.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -142,9 +142,9 @@ Chain multiple matchers with `ThenWhen()`:
 ```cs
 // Chain matchers with ThenWhen()
 stub.Add
-    .When(1, 2).Return(100)
-    .ThenWhen(3, 4).Return(200)
-    .ThenWhen((a, b) => a > 100).Return(999);
+    .When((1, 2)).Return(100)
+    .ThenWhen((3, 4)).Return(200)
+    .ThenWhen(args => args.a > 100).Return(999);
 ```
 <!-- endSnippet -->
 
@@ -163,9 +163,9 @@ Calling `When()` multiple times adds to the same chain:
 <!-- snippet: when-multiple-calls -->
 ```cs
 // Multiple When() calls build the same chain
-stub.Add.When(1, 2).Return(100);
-stub.Add.When(2, 3).Return(200);
-stub.Add.When(3, 4).Return(300);
+stub.Add.When((1, 2)).Return(100);
+stub.Add.When((2, 3)).Return(200);
+stub.Add.When((3, 4)).Return(300);
 ```
 <!-- endSnippet -->
 
@@ -183,7 +183,7 @@ Use `ThenCall()` to add an unconditional matcher that repeats forever:
 ```cs
 // ThenCall() is an unconditional terminal matcher
 stub.Add
-    .When(1, 2).Return(100)
+    .When((1, 2)).Return(100)
     .ThenCall((a, b) => a + b);
 ```
 <!-- endSnippet -->
@@ -201,7 +201,7 @@ Use `ThenNone()` to close the chain and fall through:
 <!-- snippet: when-thennone-exhaust -->
 ```cs
 // ThenNone() closes the chain and falls through
-stub.Add.When(1, 2).Return(100).ThenNone();
+stub.Add.When((1, 2)).Return(100).ThenNone();
 stub.Add.Return(999);
 ```
 <!-- endSnippet -->
@@ -231,7 +231,7 @@ When no When() matcher matches, the call falls through to other configured behav
 <!-- snippet: when-fallback-returns -->
 ```cs
 // When() falls through to Return() when no match
-stub.Add.When(1, 2).Return(100);
+stub.Add.When((1, 2)).Return(100);
 stub.Add.Return(999);
 ```
 <!-- endSnippet -->
@@ -241,7 +241,7 @@ stub.Add.Return(999);
 <!-- snippet: when-fallback-oncall -->
 ```cs
 // When() falls through to Return() when no match
-stub.Add.When(1, 2).Return(100);
+stub.Add.When((1, 2)).Return(100);
 stub.Add.Return((a, b) => a * b);
 ```
 <!-- endSnippet -->
@@ -252,7 +252,7 @@ stub.Add.Return((a, b) => a * b);
 ```cs
 // Non-strict mode: unmatched calls return default
 stub.Strict = false;
-stub.Add.When(1, 2).Return(100);
+stub.Add.When((1, 2)).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -262,7 +262,7 @@ In strict mode, unmatched calls throw:
 ```cs
 // Strict mode: unmatched calls throw
 stub.Strict = true;
-stub.Add.When(1, 2).Return(100);
+stub.Add.When((1, 2)).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -278,7 +278,7 @@ When() has higher priority than sequences created via `Return(callback).ThenRetu
 stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
 
 // When() has higher priority
-stub.Add.When(1, 2).Return(100);
+stub.Add.When((1, 2)).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -296,7 +296,7 @@ Call `.Verify()` on the returned chain to verify it reached a terminal state:
 ```cs
 // Chain with ThenCall terminal
 var chain = stub.Add
-    .When(1, 2).Return(100)
+    .When((1, 2)).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->
@@ -312,8 +312,8 @@ Verification passes if the chain reaches:
 ```cs
 // Chain with multiple matchers
 var chain = stub.Add
-    .When(1, 2).Return(100)
-    .ThenWhen(2, 3).Return(200);
+    .When((1, 2)).Return(100)
+    .ThenWhen((2, 3)).Return(200);
 ```
 <!-- endSnippet -->
 
@@ -325,7 +325,7 @@ Mark a chain for batch verification:
 ```cs
 // Mark chain for batch verification
 stub.Add
-    .When(1, 2).Return(100)
+    .When((1, 2)).Return(100)
     .ThenCall((a, b) => 999)
     .Verifiable();
 ```
@@ -338,7 +338,7 @@ For void methods, verify specific parameter calls with `Called`:
 <!-- snippet: when-void-verify-times -->
 ```cs
 // Track specific parameter combination
-var chain = stub.Process.When(1, 2);
+var chain = stub.Process.When((1, 2));
 ```
 <!-- endSnippet -->
 
@@ -356,7 +356,7 @@ Call `Reset()` on the returned chain to restart from the beginning:
 ```cs
 // Chain tracks position - Reset() restarts from beginning
 var chain = stub.Add
-    .When(1, 2).Return(100)
+    .When((1, 2)).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->
@@ -373,7 +373,7 @@ Calling `Reset()` on the interceptor also resets the When chain:
 ```cs
 // Interceptor Reset() also resets When chain
 stub.Add
-    .When(1, 2).Return(100)
+    .When((1, 2)).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->

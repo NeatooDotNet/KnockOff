@@ -312,4 +312,16 @@ public abstract class PropertyGetInterceptorBase<TValue>
         _getVerifiableTimes = times;
         return this;
     }
+
+    /// <summary>Marks this property interceptor for verification by Stub.Verify().</summary>
+    public PropertyGetInterceptorBase<TValue> Verifiable()
+    {
+        return SetVerifiable();
+    }
+
+    /// <summary>Marks this property interceptor for verification by Stub.Verify() with Called constraint.</summary>
+    public PropertyGetInterceptorBase<TValue> Verifiable(Called times)
+    {
+        return SetVerifiable(times);
+    }
 }

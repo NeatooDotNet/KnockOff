@@ -1018,6 +1018,9 @@ public partial class KnockOffGenerator
 		var stubOverrideProperties = DetectStubOverrideProperties(classSymbol);
 		var stubOverridePropertiesArray = new EquatableArray<string>(stubOverrideProperties.ToArray());
 
+		// Detect primary constructor (C# 12 parameter list on class declaration)
+		var hasPrimaryConstructor = classDeclaration.ParameterList != null;
+
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
@@ -1029,7 +1032,8 @@ public partial class KnockOffGenerator
 			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),
 			StubOverrideMethods: stubOverrideMethodsArray,
 			StubOverrideProperties: stubOverridePropertiesArray,
-			Strict: strict);
+			Strict: strict,
+			HasPrimaryConstructor: hasPrimaryConstructor);
 	}
 
 	/// <summary>

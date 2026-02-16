@@ -102,7 +102,7 @@ public class InlineStubTests
 		stub.GetValue.Verify(Called.Never);
 		stub.GetValue.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Null(stub.GetValue.LastArg);
+		Assert.Equal(default, stub.GetValue.LastArg);
 	}
 
 	[Fact]
@@ -832,9 +832,8 @@ public class ClassStubTests
 
 		stub.Object.Format("Test", 123);
 
-		Assert.NotNull(stub.Format.LastArgs);
-		Assert.Equal("Test", stub.Format.LastArgs.Value.input);
-		Assert.Equal(123, stub.Format.LastArgs.Value.count);
+		Assert.Equal("Test", stub.Format.LastArgs!.Value.input);
+		Assert.Equal(123, stub.Format.LastArgs!.Value.count);
 	}
 
 	[Fact]
@@ -851,7 +850,7 @@ public class ClassStubTests
 		stub.Calculate.Verify(Called.Never);
 		stub.Calculate.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Null(stub.Calculate.LastArg);
+		Assert.Equal(default, stub.Calculate.LastArg);
 	}
 
 	[Fact]

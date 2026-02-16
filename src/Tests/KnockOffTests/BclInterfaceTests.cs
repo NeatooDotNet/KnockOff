@@ -991,10 +991,8 @@ public class BclInterfaceTests
         var stub = new DataRecordStubTests.Stubs.IDataRecord();
         IDataRecord record = stub;
 
-        // GetString returns null when not configured (reference type default)
-        var result = record.GetString(0);
-
-        Assert.Null(result);
+        // GetString throws when not configured (string has no safe default - smart defaults behavior)
+        Assert.Throws<InvalidOperationException>(() => record.GetString(0));
         stub.GetString.Verify();
         Assert.Equal(0, stub.GetString.LastArg);
     }
@@ -1194,10 +1192,8 @@ public class BclInterfaceTests
         var stub = new CustomFormatterStubTests.Stubs.ICustomFormatter();
         ICustomFormatter formatter = stub;
 
-        // Format returns null when not configured (reference type default)
-        var result = formatter.Format("G", 42, null);
-
-        Assert.Null(result);
+        // Format throws when not configured (string has no safe default - smart defaults behavior)
+        Assert.Throws<InvalidOperationException>(() => formatter.Format("G", 42, null));
         stub.Format.Verify();
     }
 

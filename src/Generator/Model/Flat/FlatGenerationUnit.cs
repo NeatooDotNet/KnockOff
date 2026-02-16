@@ -29,4 +29,6 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<SourceProviderInfo> SourceProviders,
     bool HasGenericMethods,
     bool ImplementsIKnockOffStub,
-    bool Strict);
+    bool Strict,
+    /// <summary>When true, the user's partial class uses a primary constructor. Generated constructors need `: this()` initializer.</summary>
+    bool HasPrimaryConstructor = false);

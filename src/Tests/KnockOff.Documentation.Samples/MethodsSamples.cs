@@ -254,7 +254,7 @@ public class ArgumentCaptureTests
 
         #region methods-capture-multiple
         // LastArgs is a named tuple with all parameters
-        var (username, password) = tracking.LastArgs;
+        var (username, password) = tracking.LastArgs!.Value;
         #endregion
 
         Assert.Equal("admin", username);
@@ -342,7 +342,7 @@ public class CompleteMethodExampleTests
         Assert.True(result);
         stub.Verify();
         Assert.Equal(1, getTracking.LastArg);
-        Assert.Equal("new@test.com", saveTracking.LastArg.Email);
+        Assert.Equal("new@test.com", saveTracking.LastArg!.Email);
     }
 }
 

@@ -62,7 +62,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         string? capturedPropertyName = null;
 
-        stub.RunRules.Return((propOrFlag, token) =>
+        stub.RunRules.Call((propOrFlag, token) =>
         {
             capturedPropertyName = propOrFlag?.ToString();
             return Task.CompletedTask;
@@ -91,7 +91,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         CancellationToken? capturedToken = null;
 
-        stub.RunRules.Return((Stubs.IRuleManager_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
+        stub.RunRules.Call((Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             capturedToken = token;
             return Task.CompletedTask;
@@ -126,9 +126,10 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         IRule? capturedRule = null;
 
-        stub.RunRule.Return((rule, token) =>
+        stub.RunRule.Call((rule, token) =>
         {
             capturedRule = rule;
+            return Task.CompletedTask;
         });
 
         var ruleStub = new RuleStubForManager();
@@ -342,7 +343,7 @@ public class IRuleManagerStandaloneTests
         IRuleManager ruleManager = stub;
 
         // Configure callback to enable tracking (string overload)
-        var tracking = stub.RunRules.Return((string propertyName, CancellationToken? token) => Task.CompletedTask);
+        var tracking = stub.RunRules.Call((string propertyName, CancellationToken? token) => Task.CompletedTask);
 
         await ruleManager.RunRules("Property", null);
 

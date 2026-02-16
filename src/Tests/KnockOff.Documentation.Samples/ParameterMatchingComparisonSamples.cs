@@ -55,8 +55,8 @@ public partial class ParameterMatchingComparisonTests
 
         #region parammatch-specific-values
         // Exact value matching — no Arg.Is<> or It.Is<>
-        stub.GetPrice.When("widget", 5).Return(49.95m);
-        stub.GetPrice.When("gadget", 1).Return(29.99m);
+        stub.GetPrice.When(("widget", 5)).Return(49.95m);
+        stub.GetPrice.When(("gadget", 1)).Return(29.99m);
         #endregion
 
         IPricingService pricing = stub;
@@ -93,7 +93,7 @@ public partial class ParameterMatchingComparisonTests
         pricing.RecordSale("widget", 3);
 
         // Tuple destructuring with named fields
-        var (product, quantity) = tracking.LastArgs;
+        var (product, quantity) = tracking.LastArgs!.Value;
         #endregion
 
         Assert.Equal("widget", product);
@@ -107,7 +107,7 @@ public partial class ParameterMatchingComparisonTests
 
         #region parammatch-fallback
         // When() for specifics, Return() as fallback
-        stub.GetPrice.When("premium-widget", 1).Return(99.99m);
+        stub.GetPrice.When(("premium-widget", 1)).Return(99.99m);
         stub.GetPrice.Return((product, qty) => qty * 9.99m);
         #endregion
 
@@ -128,7 +128,7 @@ public partial class ParameterMatchingComparisonTests
         #region parammatch-predicate
         // Predicate on multiple params — standard C# lambda
         stub.GetPrice
-            .When((product, qty) => qty > 100).Return(7.99m)
+            .When(args => args.quantity > 100).Return(7.99m)
             .ThenCall((product, qty) => qty > 10 ? 8.99m : 9.99m);
         #endregion
 

@@ -145,7 +145,7 @@ public partial class IValidateMetaPropertiesTests
         IValidateMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Return((Stubs.IValidateMetaProperties_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propOrFlag, token) =>
+        stub.RunRules.Call((Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propOrFlag, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
@@ -256,7 +256,7 @@ public class IValidateMetaPropertiesStandaloneTests
         IValidateMetaProperties meta = stub;
 
         // Configure callback to enable tracking
-        var tracking = stub.WaitForTasks.Return(() => Task.CompletedTask);
+        var tracking = stub.WaitForTasks.Call(() => Task.CompletedTask);
 
         await meta.WaitForTasks();
 

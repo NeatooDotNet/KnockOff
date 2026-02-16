@@ -250,7 +250,7 @@ public partial class IValidatePropertyTests
         IValidateProperty property = stub;
         RunRulesFlag? capturedFlag = null;
 
-        stub.RunRules.Return((flag, token) =>
+        stub.RunRules.Call((flag, token) =>
         {
             capturedFlag = flag;
             return Task.CompletedTask;

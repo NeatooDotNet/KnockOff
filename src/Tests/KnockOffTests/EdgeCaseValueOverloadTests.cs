@@ -162,11 +162,8 @@ public partial class EdgeCaseValueOverloadTests
 		IOverloadedMethodService service = knockOff;
 
 		// Each overload is distinguished by its delegate type
-		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Void handler1 = (x) => { };
-		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Int32_Void handler2 = (x, y) => { };
-
-		knockOff.Calculate.Call(handler1);
-		knockOff.Calculate.Call(handler2);
+		knockOff.Calculate.Call((int x) => { });
+		knockOff.Calculate.Call((int x, int y) => { });
 
 		service.Calculate(1);
 		service.Calculate(2, 3);
@@ -181,9 +178,8 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new OverloadedMethodKnockOff();
 		IOverloadedMethodService service = knockOff;
 
-		// Add is a single-signature method (not overloaded), so it uses the simple delegate name
-		OverloadedMethodKnockOff.AddInterceptor.AddDelegate addHandler = (a, b) => a + b;
-		knockOff.Add.Return(addHandler);
+		// Add is a single-signature method (not overloaded), so it uses a pre-compiled interceptor directly
+		knockOff.Add.Return((a, b) => a + b);
 
 		Assert.Equal(5, service.Add(2, 3));
 		Assert.Equal(10, service.Add(4, 6));

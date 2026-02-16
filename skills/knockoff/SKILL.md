@@ -186,7 +186,7 @@ stub.Save.Call((user) => { /* side effects */ });
 
 // Async methods - auto-wrapped, no Task.FromResult needed
 stub.GetUserAsync.Return((id) => new User { Id = id });  // Returns Task<User>
-stub.SaveAsync.Return((user) => { });  // Returns Task.CompletedTask
+stub.SaveAsync.Call((user) => { });  // Returns Task.CompletedTask
 ```
 <!-- endSnippet -->
 
@@ -368,7 +368,7 @@ Assert.Equal(42, getTracking.LastArg);
 // Multiple parameters - LastArgs tuple
 var updateTracking = stub.Update.Call((id, name) => { });
 service.Update(1, "Alice");
-var (id, name) = updateTracking.LastArgs;
+var (id, name) = updateTracking.LastArgs!.Value;
 ```
 <!-- endSnippet -->
 

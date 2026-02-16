@@ -134,8 +134,7 @@ public partial class StubOverrideBasicsDemo
     //
     // The tracking interceptor provides:
     // - Verify(Called) - verify call count
-    // - LastArg - last single argument
-    // - LastArgs - last arguments as tuple
+    // - LastArgs - last arguments (raw type for 1-param, tuple for 2+ params)
     // - Reset() - clear tracking state
     // - Returns()/Execute() - supersede stub override per-test
     // - Returns() - constant value that supersedes stub override
@@ -163,7 +162,7 @@ public partial class StubOverrideBasicsDemo
         service.FindById(42);
         service.FindById(99);
 
-        // LastArg gives the most recent argument
+        // LastArg gives the most recent argument (singular for single-param methods)
         var lastId = stub.FindById.LastArg;
         // lastId == 99
     }
@@ -176,7 +175,7 @@ public partial class StubOverrideBasicsDemo
         service.Calculate(10, 20);
         service.Calculate(30, 40);
 
-        // LastArgs gives tuple of most recent arguments (nullable wrapper)
+        // LastArgs gives tuple of most recent arguments (nullable)
         var (a, b) = stub.Calculate.LastArgs!.Value;
         // a == 30, b == 40
     }
@@ -509,7 +508,7 @@ public partial class AsyncStubOverrideDemo
         await service.ExecuteAsync("command");
 
         stub.ExecuteAsync.Verify(Called.Once);
-        // LastArg captures the command
+        // LastArg captures the command (singular for single-param methods)
         var lastCommand = stub.ExecuteAsync.LastArg;
     }
 
@@ -642,7 +641,7 @@ public static class WhenChainStubOverrideDemo
         var result2 = service.Process("normal");   // Returns stub override result
 
         // LastArg tracks the most recent call (from When or stub override)
-        var lastInput = stub.Process.LastArg;      // "normal"
+        var lastInput = stub.Process.LastArg;       // "normal"
     }
 
     // =========================================================================
@@ -695,8 +694,8 @@ public static class WhenChainStubOverrideDemo
         IStubOverrideService service = stub;
 
         // Configure specific parameter combinations
-        stub.Calculate.When(0, 0).Return(0);  // Edge case
-        stub.Calculate.When((a, b) => a < 0 && b < 0).Return(-1);  // Both negative
+        stub.Calculate.When((0, 0)).Return(0);  // Edge case
+        stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);  // Both negative
 
         // Matching calls use When chain
         var zero = service.Calculate(0, 0);      // 0 (from When)

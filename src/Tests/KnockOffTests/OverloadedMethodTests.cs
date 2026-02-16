@@ -54,8 +54,8 @@ public class OverloadedMethodTests
 
 		service.Process("test", 42);
 
-		// Two params uses LastArgs tuple with proper types
-		var lastArgs = tracking.LastArgs;
+		// Two params uses LastArgs tuple with named fields
+		var lastArgs = tracking.LastArgs!.Value;
 		Assert.Equal("test", lastArgs.data);
 		Assert.Equal(42, lastArgs.priority);
 	}
@@ -70,10 +70,10 @@ public class OverloadedMethodTests
 
 		service.Process("full", 100, true);
 
-		var lastArgs = tracking.LastArgs;
+		var lastArgs = tracking.LastArgs!.Value;
 		Assert.Equal("full", lastArgs.data);
 		Assert.Equal(100, lastArgs.priority);
-		Assert.True(lastArgs.async);
+		Assert.True(lastArgs.@async);
 	}
 
 	[Fact]
@@ -173,7 +173,7 @@ public class OverloadedMethodTests
 		Assert.Equal(1, tracking1.LastArg);
 
 		// LastArgs for two param overload
-		var lastArgs = tracking2.LastArgs;
+		var lastArgs = tracking2.LastArgs!.Value;
 		Assert.Equal(99, lastArgs.id);
 	}
 #pragma warning restore xUnit1051

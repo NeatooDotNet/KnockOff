@@ -265,6 +265,18 @@ public abstract class PropertyGetSetInterceptorBase<TValue> : PropertyGetInterce
         return this;
     }
 
+    /// <summary>Marks this property interceptor for verification by Stub.Verify().</summary>
+    public new PropertyGetSetInterceptorBase<TValue> Verifiable()
+    {
+        return SetVerifiable();
+    }
+
+    /// <summary>Marks this property interceptor for verification by Stub.Verify() with Called constraint.</summary>
+    public new PropertyGetSetInterceptorBase<TValue> Verifiable(Called times)
+    {
+        return SetVerifiable(times);
+    }
+
     /// <summary>The value from the last setter call (from most recently called registration).</summary>
     public TValue? LastSetValue
     {

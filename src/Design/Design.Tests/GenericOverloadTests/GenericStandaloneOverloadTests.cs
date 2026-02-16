@@ -102,8 +102,8 @@ public class GenericStandaloneOverloadTests
 
         // Configure When for different overloads
         stub.Format.When("a").Return("SINGLE-A");
-        stub.Format.When("b", true).Return("DOUBLE-B-UPPER");
-        stub.Format.When("c", false, 10).Return("TRIPLE-C");
+        stub.Format.When(("b", true)).Return("DOUBLE-B-UPPER");
+        stub.Format.When(("c", false, 10)).Return("TRIPLE-C");
 
         // Default callbacks for non-matched
         stub.Format.Return((item) => "default-1");
@@ -186,7 +186,7 @@ public class GenericStandaloneOverloadTests
         formatter.Format("test", true, 100);
 
         // Assert - LastArgs captures tuple with generic type
-        var (item, uppercase, maxLength) = tracking.LastArgs;
+        var (item, uppercase, maxLength) = tracking.LastArgs!.Value;
         Assert.Equal("test", item);
         Assert.True(uppercase);
         Assert.Equal(100, maxLength);

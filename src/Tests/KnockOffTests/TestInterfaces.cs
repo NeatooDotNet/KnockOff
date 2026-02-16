@@ -648,3 +648,45 @@ public partial class RefReturnServiceBaseKnockOff
 }
 
 #endregion
+
+#region High Parameter Count Test Types
+
+/// <summary>
+/// Interface with methods exceeding 8 parameters, triggering the generated
+/// interceptor fallback path instead of pre-compiled TTuple types.
+/// </summary>
+public interface IHighParamCountService
+{
+	int Compute(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+	void ProcessAll(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+}
+
+[KnockOff]
+public partial class HighParamCountServiceKnockOff : IHighParamCountService
+{
+}
+
+#endregion
+
+#region Ref/Out Overload Group Test Types
+
+/// <summary>
+/// Interface with overload groups where one overload has ref or out parameters.
+/// When any overload in a group has ref/out, the entire group falls back to
+/// generated interceptor classes instead of pre-compiled TTuple types.
+/// </summary>
+public interface IRefOutOverloadService
+{
+	int Process(string input);
+	int Process(string input, ref int counter);
+
+	bool TryGet(string key);
+	bool TryGet(string key, out string? value);
+}
+
+[KnockOff]
+public partial class RefOutOverloadServiceKnockOff : IRefOutOverloadService
+{
+}
+
+#endregion

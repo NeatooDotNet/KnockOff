@@ -245,7 +245,7 @@ public class MethodInterceptorApiTests
         Assert.Equal(42, getTracking.LastArg);
 
         // Tracking object's LastArgs tuple for multi-parameter methods
-        var (id, name) = updateTracking.LastArgs;
+        var (id, name) = updateTracking.LastArgs!.Value;
         Assert.Equal(1, id);
         Assert.Equal("UpdatedName", name);
 

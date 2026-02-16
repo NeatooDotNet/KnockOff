@@ -52,7 +52,7 @@ var processTracking = knockOff.Process.Call((id, count, urgent) => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
-var processArgs = processTracking.LastArgs;
+var processArgs = processTracking.LastArgs!.Value;
 // Verify method was called twice (throws if not)
 processTracking.Verify(Called.Exactly(2));
 Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");

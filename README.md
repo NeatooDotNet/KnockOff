@@ -269,7 +269,7 @@ stub.Add.Return((a, b) => a > 0 ? 100 : 0);
 <!-- snippet: readme-argmatch-knockoff-when -->
 ```cs
 // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-stub.Add.When((a, b) => a > 0).Return(100).ThenCall((a, b) => a + b);
+stub.Add.When(args => args.a > 0).Return(100).ThenCall((a, b) => a + b);
 ```
 <!-- endSnippet -->
 
@@ -291,8 +291,8 @@ calc.Add(3, 4).Returns(200);
 
 <!-- snippet: readme-argmatch-knockoff-specific -->
 ```cs
-stub.Add.When(1, 2).Return(100);
-stub.Add.When(3, 4).Return(200);
+stub.Add.When((1, 2)).Return(100);
+stub.Add.When((3, 4)).Return(200);
 ```
 <!-- endSnippet -->
 
@@ -326,7 +326,7 @@ calc.Add(1, 2);
 var tracking = stub.Add.Return((a, b) => a + b);
 ICalculator calc = stub;
 calc.Add(1, 2);
-var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
+var (a, b) = tracking.LastArgs!.Value;  // Named tuple: a = 1, b = 2
 ```
 <!-- endSnippet -->
 
@@ -390,8 +390,8 @@ formatter.Format("test", 10).Returns("truncated");
 <!-- snippet: readme-knockoff-specific-value -->
 ```cs
 // Specific value matching - parameter types resolve the overload
-stub.Format.When("test", true).Return("UPPERCASE");
-stub.Format.When("test", 10).Return("truncated");
+stub.Format.When(("test", true)).Return("UPPERCASE");
+stub.Format.When(("test", 10)).Return("truncated");
 ```
 <!-- endSnippet -->
 
