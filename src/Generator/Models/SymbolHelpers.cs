@@ -51,7 +51,7 @@ internal static class SymbolHelpers
 					c.Parameters.Length == 0 &&
 					c.DeclaredAccessibility >= Accessibility.Public);
 
-				if (hasParameterlessCtor)
+				if (hasParameterlessCtor && !HasRequiredMembers(named))
 					return (DefaultValueStrategy.NewInstance, null);
 			}
 
@@ -108,6 +108,27 @@ internal static class SymbolHelpers
 
 			_ => null
 		};
+	}
+
+	/// <summary>
+	/// Checks whether the type (or any base type) has required members.
+	/// Types with required members cannot be instantiated with plain new T().
+	/// </summary>
+	private static bool HasRequiredMembers(INamedTypeSymbol type)
+	{
+		var current = type;
+		while (current != null)
+		{
+			foreach (var member in current.GetMembers())
+			{
+				if (member is IPropertySymbol prop && prop.IsRequired)
+					return true;
+				if (member is IFieldSymbol field && field.IsRequired)
+					return true;
+			}
+			current = current.BaseType;
+		}
+		return false;
 	}
 
 	/// <summary>
