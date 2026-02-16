@@ -12,6 +12,7 @@ Claude Code was used to write this library. Skip to more [AI discussion](#ai).
 [![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+We've confirmed KnockOff matches Moq and NSubstitute [performance](#performance) across 5,000 unit tests — build and execution — even with source generation overhead.
 
 ## KnockOff Stub
 
@@ -132,6 +133,32 @@ myRepoKO.Verify();
 - **Event verification** — `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute.
 - **Explicit Get/Set verification** — `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers.
 - **Stubbing concrete classes** — Override virtual methods on non-sealed classes with the same API.
+
+---
+
+## Performance
+
+Source generation adds code to your build, so we wanted to confirm KnockOff keeps up with Moq and NSubstitute. We ran [5,000 equivalent unit tests](https://github.com/NeatooDotNet/5000UnitTests) across all three frameworks.
+
+### Test Execution (5,000 tests each)
+
+| Project | Duration |
+|---------|----------|
+| KnockOff Inline Stubs | ~600ms |
+| KnockOff Standalone Stubs | ~610ms |
+| NSubstitute | ~870ms |
+| Moq | ~1,000ms |
+
+### Clean Build Time
+
+| Project | Duration |
+|---------|----------|
+| NSubstitute | 2.83s |
+| KnockOff Inline Stubs | 3.35s |
+| KnockOff Standalone Stubs | 3.61s |
+| Moq | 4.57s |
+
+KnockOff's build times land between NSubstitute and Moq despite generating all stubs at compile time. Test execution is comparable across all three frameworks. Full methodology and test design in the [5000 Unit Tests](https://github.com/NeatooDotNet/5000UnitTests) repository.
 
 ---
 
