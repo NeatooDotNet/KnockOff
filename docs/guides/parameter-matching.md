@@ -51,7 +51,7 @@ The API reads clearly: "When called with these arguments, return this value."
 
 ### Value Matching
 
-Match exact parameter values with `When()`:
+Match exact parameter values with `When()`. For methods with 2+ parameters, arguments are passed as a ValueTuple -- note the double parentheses `When((a, b))`. Single-parameter methods use `When(value)` directly.
 
 <!-- snippet: when-basic-value-matching -->
 ```cs

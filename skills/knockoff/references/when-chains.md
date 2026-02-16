@@ -6,7 +6,7 @@ When chains provide parameter-specific matching. When the method is called with 
 
 ## Value Equality Matching
 
-Match specific argument values using equality:
+Match specific argument values using equality. For 2+ parameter methods, pass values as a tuple (double parentheses):
 
 <!-- snippet: when-chains-ref-value -->
 ```cs
