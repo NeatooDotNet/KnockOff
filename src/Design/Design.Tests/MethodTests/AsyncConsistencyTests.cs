@@ -2,9 +2,9 @@
 // Design.Tests - Async Method API Consistency Tests
 // -----------------------------------------------------------------------------
 // Verifies all three async APIs work identically across all 9 patterns:
-// - Returns(unwrappedValue) — auto-wraps in Task.FromResult
-// - OnCall(Func<..., T>) — simplified callback, auto-wrapped
-// - OnCall(Func<..., Task<T>>) — full delegate
+// - Return(unwrappedValue) — auto-wraps in Task.FromResult
+// - Call(Func<..., T>) — simplified callback, auto-wrapped
+// - Call(Func<..., Task<T>>) — full delegate
 //
 // Pattern 1 is covered in MethodBasicsTests (IDataService).
 // Pattern 7 (delegate) supports full auto-wrapping via MethodInterceptorRenderer reuse.
@@ -39,7 +39,7 @@ public class AsyncConsistencyTests
     public async Task Pattern2_OnCallSimplified()
     {
         var stub = new AsyncRepositoryStub<string>();
-        stub.GetByIdAsync.Return((id) => $"Item-{id}");
+        stub.GetByIdAsync.Call((id) => $"Item-{id}");
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(42);
@@ -51,7 +51,7 @@ public class AsyncConsistencyTests
     public async Task Pattern2_OnCallFull()
     {
         var stub = new AsyncRepositoryStub<string>();
-        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Call((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(99);
@@ -92,7 +92,7 @@ public class AsyncConsistencyTests
     public async Task Pattern3_OnCallSimplified()
     {
         var stub = new AsyncServiceStub();
-        stub.FetchAsync.Return((id) => $"Fetch-{id}");
+        stub.FetchAsync.Call((id) => $"Fetch-{id}");
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(42);
@@ -104,7 +104,7 @@ public class AsyncConsistencyTests
     public async Task Pattern3_OnCallFull()
     {
         var stub = new AsyncServiceStub();
-        stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+        stub.FetchAsync.Call((int id) => Task.FromResult($"Full-{id}"));
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(99);
@@ -145,7 +145,7 @@ public class AsyncConsistencyTests
     public async Task Pattern4_OnCallSimplified()
     {
         var stub = new AsyncRepositoryBaseStub<string>();
-        stub.GetByIdAsync.Return((id) => $"Item-{id}");
+        stub.GetByIdAsync.Call((id) => $"Item-{id}");
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(42);
@@ -157,7 +157,7 @@ public class AsyncConsistencyTests
     public async Task Pattern4_OnCallFull()
     {
         var stub = new AsyncRepositoryBaseStub<string>();
-        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Call((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(99);
@@ -185,7 +185,7 @@ public class AsyncConsistencyTests
     public async Task Pattern5_OnCallSimplified()
     {
         var stub = new BasicMethodsDemo.Stubs.IDataService();
-        stub.GetDataAsync.Return((id) => $"Data-{id}");
+        stub.GetDataAsync.Call((id) => $"Data-{id}");
 
         IDataService svc = stub;
         var result = await svc.GetDataAsync(42);
@@ -197,7 +197,7 @@ public class AsyncConsistencyTests
     public async Task Pattern5_OnCallFull()
     {
         var stub = new BasicMethodsDemo.Stubs.IDataService();
-        stub.GetDataAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetDataAsync.Call((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         IDataService svc = stub;
         var result = await svc.GetDataAsync(99);
@@ -225,7 +225,7 @@ public class AsyncConsistencyTests
     public async Task Pattern6_OnCallSimplified()
     {
         var stub = new AsyncClosedGenericDemo.Stubs.AsyncServiceBase();
-        stub.FetchAsync.Return((id) => $"Fetch-{id}");
+        stub.FetchAsync.Call((id) => $"Fetch-{id}");
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(42);
@@ -237,7 +237,7 @@ public class AsyncConsistencyTests
     public async Task Pattern6_OnCallFull()
     {
         var stub = new AsyncClosedGenericDemo.Stubs.AsyncServiceBase();
-        stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+        stub.FetchAsync.Call((int id) => Task.FromResult($"Full-{id}"));
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(99);
@@ -254,7 +254,7 @@ public class AsyncConsistencyTests
     public async Task Pattern7_Returns()
     {
         var stub = new AsyncClosedGenericDemo.Stubs.AsyncOperation();
-        // Returns takes the inner type (int) and auto-wraps in Task.FromResult
+        // Return takes the inner type (int) and auto-wraps in Task.FromResult
         stub.Interceptor.Return(42);
 
         AsyncOperation op = stub;
@@ -267,7 +267,7 @@ public class AsyncConsistencyTests
     public async Task Pattern7_OnCall()
     {
         var stub = new AsyncClosedGenericDemo.Stubs.AsyncOperation();
-        stub.Interceptor.Return((x) => Task.FromResult(x * 2));
+        stub.Interceptor.Call((x) => Task.FromResult(x * 2));
 
         AsyncOperation op = stub;
         var result = await op(21);
@@ -295,7 +295,7 @@ public class AsyncConsistencyTests
     public async Task Pattern8_OnCallSimplified()
     {
         var stub = new AsyncOpenGenericDemo.Stubs.IAsyncRepository<string>();
-        stub.GetByIdAsync.Return((id) => $"Item-{id}");
+        stub.GetByIdAsync.Call((id) => $"Item-{id}");
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(42);
@@ -307,7 +307,7 @@ public class AsyncConsistencyTests
     public async Task Pattern8_OnCallFull()
     {
         var stub = new AsyncOpenGenericDemo.Stubs.IAsyncRepository<string>();
-        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Call((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(99);
@@ -335,7 +335,7 @@ public class AsyncConsistencyTests
     public async Task Pattern9_OnCallSimplified()
     {
         var stub = new AsyncOpenGenericDemo.Stubs.AsyncRepositoryBase<string>();
-        stub.GetByIdAsync.Return((id) => $"Item-{id}");
+        stub.GetByIdAsync.Call((id) => $"Item-{id}");
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(42);
@@ -347,7 +347,7 @@ public class AsyncConsistencyTests
     public async Task Pattern9_OnCallFull()
     {
         var stub = new AsyncOpenGenericDemo.Stubs.AsyncRepositoryBase<string>();
-        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Call((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(99);

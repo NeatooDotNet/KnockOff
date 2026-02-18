@@ -24,7 +24,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "found-" + key;
             return true;
@@ -42,7 +42,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;
@@ -61,7 +61,7 @@ public class RefOutParameterTests
         var stub = new RefOutDemo.Stubs.IOutParameterService();
         var data = new Dictionary<string, string> { ["key1"] = "value1" };
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
             data.TryGetValue(key, out value!));
 
         IOutParameterService service = stub;
@@ -104,7 +104,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.Parse.Return((string input, out string error) =>
+        stub.Parse.Call((string input, out string error) =>
         {
             if (int.TryParse(input, out var parsed))
             {
@@ -127,7 +127,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.Parse.Return((string input, out string error) =>
+        stub.Parse.Call((string input, out string error) =>
         {
             if (int.TryParse(input, out var parsed))
             {
@@ -168,7 +168,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IRefParameterService();
 
-        stub.TryUpdate.Return((string key, ref string value) =>
+        stub.TryUpdate.Call((string key, ref string value) =>
         {
             value = value.ToUpperInvariant();
             return true;
@@ -206,7 +206,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IMixedRefOutService();
 
-        stub.Process.Return((string input, out string output, ref int counter) =>
+        stub.Process.Call((string input, out string output, ref int counter) =>
         {
             output = input.ToUpperInvariant();
             counter++;
@@ -227,7 +227,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IMixedRefOutService();
 
-        stub.Transform.Return((string input, out string transformed, out bool wasModified) =>
+        stub.Transform.Call((string input, out string transformed, out bool wasModified) =>
         {
             transformed = input.Trim();
             wasModified = transformed != input;
@@ -251,7 +251,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;
@@ -269,7 +269,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;
@@ -291,7 +291,7 @@ public class RefOutParameterTests
     {
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "found";
             return true;
@@ -341,7 +341,7 @@ public class RefOutParameterTests
         var stub = new RefOutDemo.Stubs.IOutParameterService();
 
         stub.TryGetValue
-            .Return((string key, out string value) => { value = "first"; return true; })
+            .Call((string key, out string value) => { value = "first"; return true; })
             .ThenReturn((string key, out string value) => { value = "second"; return true; });
 
         IOutParameterService service = stub;
@@ -382,7 +382,7 @@ public class RefOutParameterTests
     {
         var stub = new OutParameterStub();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "standalone-" + key;
             return true;
@@ -414,7 +414,7 @@ public class RefOutParameterTests
     {
         var stub = new MixedRefOutStub();
 
-        stub.Process.Return((string input, out string output, ref int counter) =>
+        stub.Process.Call((string input, out string output, ref int counter) =>
         {
             output = input + "!";
             counter += 10;

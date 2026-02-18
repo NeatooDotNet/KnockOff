@@ -94,7 +94,7 @@ public class MethodInterceptionTests
         #region matrix-method-interception
         // Configure behavior
         stub.GetData.Return("test-value");
-        stub.GetData.Return((id) => $"Data-{id}");
+        stub.GetData.Call((id) => $"Data-{id}");
 
         // Verify calls
         stub.GetData.Verify(Called.Never);
@@ -239,7 +239,7 @@ public class SequenceTests
         #region matrix-sequences
         // Return different values on successive calls
         stub.GetStatus
-            .Return(() => "Pending")
+            .Call(() => "Pending")
             .ThenReturn(() => "Processing")
             .ThenReturn(() => "Complete");
         // Call 1: "Pending", Call 2: "Processing", Call 3+: "Complete" (repeats last)
@@ -275,8 +275,8 @@ public class WhenChainsTests
         #region matrix-when-chains
         // Chain multiple conditions (sequential - each consumed once)
         stub.Add
-            .When((1, 2)).Return(100)
-            .ThenWhen((3, 4)).Return(200)
+            .When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
             .ThenWhen(args => args.a < 0).Return(0);
 
         // Fallback for non-matching calls or after chain is consumed
@@ -304,7 +304,7 @@ public class VerificationTests
 
         #region matrix-verification
         // Mark for verification
-        stub.GetData.Return((id) => "data").Verifiable();
+        stub.GetData.Call((id) => "data").Verifiable();
 
         // Verify only marked items
         // stub.Verify();  // Throws if any Verifiable() not called
@@ -361,7 +361,7 @@ public class ResetTests
         var stub = new MatrixServiceStub();
         IMatrixService svc = stub;
 
-        stub.GetData.Return((id) => "data");
+        stub.GetData.Call((id) => "data");
         svc.GetData(1);
         stub.GetData.Verify(Called.Once);
 
@@ -393,7 +393,7 @@ public class StubOverridesTests
         Assert.Equal(7, result);
 
         // Return supersedes stub override
-        stub.Add.Return((a, b) => 999);
+        stub.Add.Call(_ => 999);
         var overridden = calc.Add(3, 4);
         Assert.Equal(999, overridden);
         #endregion
@@ -419,10 +419,10 @@ public class AsyncAutoWrapTests
         stub.GetDataAsync.Return("hello");
 
         // Tier 2: Return(simplified callback) - returns T, auto-wrapped
-        stub.GetDataAsync.Return((id) => $"Data-{id}");
+        stub.GetDataAsync.Call((id) => $"Data-{id}");
 
         // Tier 3: Return(full delegate) - returns Task<T> directly
-        stub.GetDataAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+        stub.GetDataAsync.Call((int id) => Task.FromResult($"Full-{id}"));
         #endregion
 
         var result = await svc.GetDataAsync(42);
@@ -451,7 +451,7 @@ public class InstantiationTests
         IMatrixCalculator calc = calcStub;
 
         // Configure and use - same API across all patterns
-        calcStub.Add.Return((a, b) => a + b);
+        calcStub.Add.Call(args => args.a + args.b);
         var result = calc.Add(3, 4);
         Assert.Equal(7, result);
 

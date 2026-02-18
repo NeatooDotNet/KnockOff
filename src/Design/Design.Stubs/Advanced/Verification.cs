@@ -254,9 +254,9 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var sequence = stub.Add.Return((a, b) => a + b)
-            .ThenReturn((a, b) => a * b)
-            .ThenReturn((a, b) => 999);
+        var sequence = stub.Add.Call(args => args.a + args.b)
+            .ThenReturn(args => args.a * args.b)
+            .ThenReturn(_ => 999);
 
         ICalculator calc = stub;
 
@@ -283,9 +283,9 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var chain = stub.Add.When((1, 2)).Return(10)
-            .ThenWhen((3, 4)).Return(20)
-            .ThenCall((a, b) => 999); // Terminal
+        var chain = stub.Add.When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20)
+            .ThenCall(_ => 999); // Terminal
 
         ICalculator calc = stub;
 

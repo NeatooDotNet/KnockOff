@@ -28,7 +28,7 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupSingleReturn()
     {
         var stub = new CalculatorStub();
-        stub.Add.Return((a, b) => 42);
+        stub.Add.Call(_ => 42);
         return stub;
     }
 
@@ -55,7 +55,7 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupWithCallback()
     {
         var stub = new CalculatorStub();
-        stub.Add.Return((a, b) => a + b);
+        stub.Add.Call(args => args.a + args.b);
         return stub;
     }
 
@@ -85,11 +85,11 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupMultiple()
     {
         var stub = new CalculatorStub();
-        stub.Add.Return((a, b) => 1);
-        stub.Subtract.Return((a, b) => 2);
-        stub.Multiply.Return((a, b) => 3);
-        stub.Divide.Return((a, b) => 4.0);
-        stub.Square.Return((x) => 5);
+        stub.Add.Call(_ => 1);
+        stub.Subtract.Call(_ => 2);
+        stub.Multiply.Call(_ => 3);
+        stub.Divide.Call(_ => 4.0);
+        stub.Square.Call((x) => 5);
         return stub;
     }
 

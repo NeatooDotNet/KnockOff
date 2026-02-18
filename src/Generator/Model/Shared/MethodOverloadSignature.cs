@@ -20,10 +20,10 @@ internal sealed record MethodOverloadSignature(
     string ReturnType,
     /// <summary>Whether this signature returns void.</summary>
     bool IsVoid,
-    /// <summary>Delegate name for this signature (e.g., "ProcessDelegate_String_void").</summary>
+    /// <summary>Delegate type for this signature. Either a custom delegate name (e.g., "ProcessDelegate_String_void") or a Func/Action type (e.g., "global::System.Func&lt;string, string&gt;").</summary>
     string DelegateName,
-    /// <summary>Full delegate signature declaration.</summary>
-    string DelegateSignature,
+    /// <summary>Full delegate signature declaration. Null when using Func/Action (no custom delegate needed).</summary>
+    string? DelegateSignature,
     /// <summary>LastArg type for single param, null otherwise.</summary>
     string? LastArgType,
     /// <summary>LastArgs tuple type for multiple params, null otherwise.</summary>
@@ -44,7 +44,15 @@ internal sealed record MethodOverloadSignature(
     /// <summary>True if this signature returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if this signature returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+
+    // XML documentation
+    /// <summary>XML documentation summary text for this overload, extracted from the original interface/class. Null if none.</summary>
+    string? XmlDocSummary = null,
+
+    // Tuple delegate support
+    /// <summary>True when the delegate type uses a named tuple parameter (2+ params, no ref/out). Affects how args are passed at call sites.</summary>
+    bool UsesTupleCallDelegate = false)
 {
     /// <summary>True if this signature returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

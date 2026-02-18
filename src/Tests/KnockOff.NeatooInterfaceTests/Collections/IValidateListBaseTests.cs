@@ -361,7 +361,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.Contains.Return((item) => true);
+        stub.Contains.Call((item) => true);
 
         var result = list.Contains(itemStub);
 
@@ -376,7 +376,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.IndexOf.Return((item) => 3);
+        stub.IndexOf.Call((item) => 3);
 
         var result = list.IndexOf(itemStub);
 

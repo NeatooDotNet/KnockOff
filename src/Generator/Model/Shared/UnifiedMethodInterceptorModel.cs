@@ -70,7 +70,20 @@ internal sealed record UnifiedMethodInterceptorModel(
     /// <summary>True if the method returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+
+    // Tuple delegate info
+    /// <summary>
+    /// True when the CallDelegateType uses a named tuple for 2+ params (e.g., Func&lt;(int a, int b), int&gt;).
+    /// False for delegate stubs where the original delegate type has individual params (e.g., Func&lt;int, int, int&gt;),
+    /// and false for custom delegates (ref/out) and 0-1 param methods.
+    /// Used by the renderer to determine whether to pass typedArgs as a single tuple or unpack individual fields.
+    /// </summary>
+    bool UsesTupleCallDelegate = false,
+
+    // XML documentation
+    /// <summary>XML documentation summary text for the method, extracted from the original interface/class. Null if none.</summary>
+    string? XmlDocSummary = null)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

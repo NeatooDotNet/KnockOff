@@ -27,7 +27,7 @@ public class ProtectedMemberTests
 	public void ProtectedAbstractMethod_Configured_ReturnsCallbackValue()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "ABC-123");
+		stub.GetInternalId.Call(() => "ABC-123");
 
 		var description = stub.Object.GetDescription();
 
@@ -38,7 +38,7 @@ public class ProtectedMemberTests
 	public void ProtectedAbstractMethod_TracksCallCount()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		stub.Object.GetDescription();
 		stub.Object.GetDescription();
@@ -65,7 +65,7 @@ public class ProtectedMemberTests
 	public void ProtectedVirtualMethod_Unconfigured_DelegatesToBase()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		// FormatLabel() base implementation: $"[{Label}]" where Label defaults to ""
 		var description = stub.Object.GetDescription();
@@ -77,8 +77,8 @@ public class ProtectedMemberTests
 	public void ProtectedVirtualMethod_Configured_OverridesBase()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "X");
-		stub.FormatLabel.Return(() => "custom-format");
+		stub.GetInternalId.Call(() => "X");
+		stub.FormatLabel.Call(() => "custom-format");
 
 		var description = stub.Object.GetDescription();
 
@@ -103,7 +103,7 @@ public class ProtectedMemberTests
 	public void ProtectedProperty_Unconfigured_UsesBaseDefault()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		// Label base default is "", FormatLabel uses Label: $"[{Label}]"
 		var description = stub.Object.GetDescription();
@@ -116,7 +116,7 @@ public class ProtectedMemberTests
 	{
 		var stub = new ProtectedMemberStub();
 		stub.Label.Get(() => "MyLabel");
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		// FormatLabel (unconfigured → base: $"[{Label}]") reads Label (configured → "MyLabel")
 		var description = stub.Object.GetDescription();
@@ -226,7 +226,7 @@ public class ProtectedMemberTests
 	public void Protected_Verify_TracksMultipleCalls()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		stub.Object.GetDescription();
 		stub.Object.GetDescription();
@@ -251,7 +251,7 @@ public class ProtectedMemberTests
 	public void Protected_Verifiable_PassesWhenCalled()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id").Verifiable();
+		stub.GetInternalId.Call(() => "id").Verifiable();
 
 		stub.Object.GetDescription();
 
@@ -262,7 +262,7 @@ public class ProtectedMemberTests
 	public void Protected_Verifiable_ThrowsWhenNotCalled()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id").Verifiable();
+		stub.GetInternalId.Call(() => "id").Verifiable();
 		// Don't call GetDescription
 
 		Assert.Throws<VerificationException>(() => stub.Verify());
@@ -277,7 +277,7 @@ public class ProtectedMemberTests
 	{
 		var stub = new ProtectedMemberStub();
 		stub.GetInternalId
-			.Return(() => "first")
+			.Call(() => "first")
 			.ThenReturn(() => "second");
 
 		var d1 = stub.Object.GetDescription();
@@ -293,9 +293,9 @@ public class ProtectedMemberTests
 	public void ProtectedVirtualMethod_Sequence_ReturnsValuesInOrder()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "X");
+		stub.GetInternalId.Call(() => "X");
 		stub.FormatLabel
-			.Return(() => "label-1")
+			.Call(() => "label-1")
 			.ThenReturn(() => "label-2");
 
 		var d1 = stub.Object.GetDescription();
@@ -309,9 +309,9 @@ public class ProtectedMemberTests
 	public void ProtectedVirtualMethod_Sequence_FallsToBaseAfterExhausted()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "X");
+		stub.GetInternalId.Call(() => "X");
 		stub.FormatLabel
-			.Return(() => "label-1")
+			.Call(() => "label-1")
 			.ThenReturn(() => "label-2");
 
 		stub.Object.GetDescription(); // label-1
@@ -329,7 +329,7 @@ public class ProtectedMemberTests
 	public void Protected_Reset_ClearsTrackingState()
 	{
 		var stub = new ProtectedMemberStub();
-		var tracking = stub.GetInternalId.Return(() => "id");
+		var tracking = stub.GetInternalId.Call(() => "id");
 
 		stub.Object.GetDescription();
 		tracking.Verify(Called.Once);
@@ -343,7 +343,7 @@ public class ProtectedMemberTests
 	public void Protected_ResetInterceptors_ClearsAllState()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		stub.Object.GetDescription();
 		stub.Object.GetItemAt(0);
@@ -376,8 +376,8 @@ public class ProtectedMemberTests
 	{
 		var stub = new ProtectedMemberStub();
 		stub.Strict = true;
-		stub.GetInternalId.Return(() => "id");
-		stub.FormatLabel.Return(() => "label");
+		stub.GetInternalId.Call(() => "id");
+		stub.FormatLabel.Call(() => "label");
 
 		// Both configured → strict mode doesn't throw
 		var description = stub.Object.GetDescription();
@@ -390,7 +390,7 @@ public class ProtectedMemberTests
 	{
 		var stub = new ProtectedMemberStub();
 		stub.Strict = true;
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 
 		// FormatLabel is virtual but unconfigured → strict mode throws
 		Assert.Throws<StubException>(() => stub.Object.GetDescription());
@@ -404,7 +404,7 @@ public class ProtectedMemberTests
 	public void ProtectedMembers_AllConfigured_WorkTogether()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "SVC-001");
+		stub.GetInternalId.Call(() => "SVC-001");
 		stub.Label.Get(() => "Production");
 		// FormatLabel unconfigured → base reads Label → "Production" → "[Production]"
 
@@ -417,7 +417,7 @@ public class ProtectedMemberTests
 	public void ProtectedMembers_MethodAndIndexer_IndependentTracking()
 	{
 		var stub = new ProtectedMemberStub();
-		stub.GetInternalId.Return(() => "id");
+		stub.GetInternalId.Call(() => "id");
 		stub.Indexer.Get((i) => $"val-{i}");
 
 		stub.Object.GetDescription();

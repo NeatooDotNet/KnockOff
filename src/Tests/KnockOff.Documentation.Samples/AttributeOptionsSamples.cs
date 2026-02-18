@@ -50,7 +50,7 @@ public class StandAlonePatternTests
         // Stand-alone stub is created directly
         var stub = new AttrUserRepositoryStub();
 
-        stub.GetById.Return((id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.Call((id) => new User { Id = id, Name = "Test User" });
 
         IAttrUserRepository repository = stub;
         var user = repository.GetById(42);
@@ -78,7 +78,7 @@ public partial class InlineInterfacePatternTests
         #region attr-inline-interface-usage
         // Access the generated stub through the Stubs namespace
         var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
-        stub.GetById.Return((id) => new User { Id = id, Name = "Inline User" });
+        stub.GetById.Call((id) => new User { Id = id, Name = "Inline User" });
         IAttrUserRepository repository = stub;
         #endregion
 
@@ -107,7 +107,7 @@ public partial class InlineClassPatternTests
         #region attr-inline-class-usage
         // Generated stub inherits from EmailServiceBase
         var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
-        stub.Send.Call((to, subject, body) => { }).Verifiable();
+        stub.Send.Call(_ => { }).Verifiable();
 
         // Use .Object to get the base class type
         EmailServiceBase service = stub.Object;
@@ -142,8 +142,8 @@ public partial class MultipleStubsPatternTests
         var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
         var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 
-        userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
-        emailService.Send.Call((to, subject, body) => { }).Verifiable();
+        userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        emailService.Send.Call(_ => { }).Verifiable();
         logger.Log.Call((message) => { }).Verifiable();
         #endregion
 

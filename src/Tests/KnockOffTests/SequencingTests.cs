@@ -52,7 +52,7 @@ public class SequencingTests
     public void OnCall_WithoutTimes_RepeatsForever()
     {
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Return((a, b) => a + b);
+        var tracking = stub.Add.Call(args => args.a + args.b);
 
         ISequenceTestService svc = stub;
         Assert.Equal(3, svc.Add(1, 2));
@@ -67,9 +67,9 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .Return((a, b) => 100)
-            .ThenReturn((a, b) => 200)
-            .ThenReturn((a, b) => 300);
+            .Call(_ => 100)
+            .ThenReturn(_ => 200)
+            .ThenReturn(_ => 300);
 
         ISequenceTestService svc = stub;
         Assert.Equal(100, svc.Add(1, 2));  // First call - uses first callback
@@ -82,8 +82,8 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .Return((a, b) => 100)
-            .ThenReturn((a, b) => 200);
+            .Call(_ => 100)
+            .ThenReturn(_ => 200);
 
         ISequenceTestService svc = stub;
         Assert.Equal(100, svc.Add(0, 0));  // First
@@ -96,8 +96,8 @@ public class SequencingTests
         var stub = new SequenceTestKnockOff();
         stub.Strict = true;
         stub.Add
-            .Return((a, b) => 100)
-            .ThenReturn((a, b) => 200);
+            .Call(_ => 100)
+            .ThenReturn(_ => 200);
 
         ISequenceTestService svc = stub;
         svc.Add(1, 2);  // First - OK
@@ -112,8 +112,8 @@ public class SequencingTests
         var stub = new SequenceTestKnockOff();
         stub.Strict = false;
         stub.Add
-            .Return((a, b) => 100)
-            .ThenReturn((a, b) => 200);
+            .Call(_ => 100)
+            .ThenReturn(_ => 200);
 
         ISequenceTestService svc = stub;
         svc.Add(1, 2);  // First - OK
@@ -129,8 +129,8 @@ public class SequencingTests
         var stub = new SequenceTestKnockOff();
         stub.Strict = false;
         stub.Add
-            .Return((a, b) => 100)
-            .ThenReturn((a, b) => 200)
+            .Call(_ => 100)
+            .ThenReturn(_ => 200)
             .ThenDefault();  // Explicitly request default after exhaustion
 
         ISequenceTestService svc = stub;
@@ -159,7 +159,7 @@ public class SequencingTests
     public void OnCall_TrackingReturnsCorrectLastArgs()
     {
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Return((a, b) => a + b);
+        var tracking = stub.Add.Call(args => args.a + args.b);
 
         ISequenceTestService svc = stub;
         svc.Add(1, 2);
@@ -174,8 +174,8 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Return((a, b) => 1)
-            .ThenReturn((a, b) => 2);
+            .Call(_ => 1)
+            .ThenReturn(_ => 2);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);
@@ -190,8 +190,8 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Return((a, b) => 1)
-            .ThenReturn((a, b) => 2);
+            .Call(_ => 1)
+            .ThenReturn(_ => 2);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);  // Only called once, but two callbacks in sequence
@@ -204,9 +204,9 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Return((a, b) => 1)
-            .ThenReturn((a, b) => 2)
-            .ThenReturn((a, b) => 3);
+            .Call(_ => 1)
+            .ThenReturn(_ => 2)
+            .ThenReturn(_ => 3);
 
         ISequenceTestService svc = stub;
         Assert.Equal(1, svc.Add(0, 0)); // First callback
@@ -222,8 +222,8 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Return((a, b) => 1)
-            .ThenReturn((a, b) => 2);
+            .Call(_ => 1)
+            .ThenReturn(_ => 2);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);
@@ -265,7 +265,7 @@ public class SequencingTests
     public void OnCall_SingleArgMethod_TracksLastArg()
     {
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.GetMessage.Return((name) => $"Hello {name}");
+        var tracking = stub.GetMessage.Call((name) => $"Hello {name}");
 
         ISequenceTestService svc = stub;
         svc.GetMessage("Alice");
@@ -393,11 +393,11 @@ public class MethodOverloadTests
     {
         var stub = new OverloadTestKnockOff();
 
-        // Single-param overload can be inferred
-        var tracking1 = stub.Format.Return((input) => input.ToUpper());
-        // Two-param overloads need explicit delegate types because (input, x) is ambiguous
-        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Boolean_String)((input, uppercase) => uppercase ? input.ToUpper() : input));
-        var tracking3 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Int32_String)((input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))));
+        // Single-param overload needs explicit type for disambiguation
+        var tracking1 = stub.Format.Call((string input) => input.ToUpper());
+        // Two-param overloads use named tuple to disambiguate
+        var tracking2 = stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
+        var tracking3 = stub.Format.Call(((string input, int maxLength) args) => args.input.Substring(0, Math.Min(args.input.Length, args.maxLength)));
 
         IOverloadTestService svc = stub;
 
@@ -415,8 +415,8 @@ public class MethodOverloadTests
     {
         var stub = new OverloadTestKnockOff();
 
-        var tracking1 = stub.Format.Return((input) => "1");
-        var tracking2 = stub.Format.Return((OverloadTestKnockOff.FormatDelegate_String_Boolean_String)((input, uppercase) => "2"));
+        var tracking1 = stub.Format.Call((string input) => "1");
+        var tracking2 = stub.Format.Call(((string input, bool uppercase) args) => "2");
 
         IOverloadTestService svc = stub;
 

@@ -241,7 +241,7 @@ public class GenericValidationP1Tests
 		var knockOff = new GenericValidationStandaloneKnockOff();
 		IGenericValidation<int, ValidationEntity> service = knockOff;
 
-		knockOff.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		knockOff.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input });
 
 		var result = service.MapConstrained<int, ValidationEntity>(42);
@@ -255,7 +255,7 @@ public class GenericValidationP1Tests
 		var knockOff = new GenericValidationStandaloneKnockOff();
 		IGenericValidation<int, ValidationEntity> service = knockOff;
 
-		knockOff.Convert.Of<List<string>>().Return((v) => new List<string> { v.Name });
+		knockOff.Convert.Of<List<string>>().Call((v) => new List<string> { v.Name });
 
 		var result = service.Convert<List<string>>(new ValidationEntity { Name = "test" });
 
@@ -270,7 +270,7 @@ public class GenericValidationP1Tests
 		var knockOff = new GenericValidationStandaloneKnockOff();
 		IGenericValidation<int, ValidationEntity> service = knockOff;
 
-		knockOff.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		knockOff.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 100);
 
@@ -283,8 +283,8 @@ public class GenericValidationP1Tests
 		var knockOff = new MixedArityStandaloneKnockOff();
 		IMixedArityGenericService service = knockOff;
 
-		knockOff.Execute.Of<ValidationEntity>().Return(() => new ValidationEntity { Id = 1 });
-		knockOff.Execute.Of<string, ValidationEntity>().Return((input) => new ValidationEntity { Name = input });
+		knockOff.Execute.Of<ValidationEntity>().Call(() => new ValidationEntity { Id = 1 });
+		knockOff.Execute.Of<string, ValidationEntity>().Call((input) => new ValidationEntity { Name = input });
 
 		var result1 = service.Execute<ValidationEntity>();
 		var result2 = service.Execute<string, ValidationEntity>("test");
@@ -323,7 +323,7 @@ public class GenericValidationP2Tests
 		IGenericValidation<int, ValidationEntity> service = stub;
 
 		var input = new ValidationEntity { Id = 1 };
-		stub.Convert.Of<List<string>>().Return((v) => new List<string> { v.Name });
+		stub.Convert.Of<List<string>>().Call((v) => new List<string> { v.Name });
 
 		var result = service.Convert<List<string>>(input);
 
@@ -337,7 +337,7 @@ public class GenericValidationP2Tests
 		var stub = new GenericValidationP2Stub<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 100);
 
@@ -351,7 +351,7 @@ public class GenericValidationP2Tests
 		var stub = new GenericValidationP2Stub<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		stub.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input * 2 });
 
 		var result = service.MapConstrained<int, ValidationEntity>(21);
@@ -382,8 +382,8 @@ public class GenericValidationP2Tests
 		var stub = new GenericValidationP2Stub<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Convert.Of<int>().Return((v) => v.Id);
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length);
+		stub.Convert.Of<int>().Call((v) => v.Id);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length);
 
 		var convertResult = service.Convert<int>(new ValidationEntity { Id = 42 });
 		var transformResult = service.Transform<string, int>("hello", 0);
@@ -399,8 +399,8 @@ public class GenericValidationP2Tests
 		IGenericValidation<string, ValidationEntity> service = stub;
 
 		var entity = new ValidationEntity { Id = 1, Name = "Test" };
-		stub.Get.Return((key) => entity);
-		var setTracking = stub.Set.Call((key, value) => { });
+		stub.Get.Call((key) => entity);
+		var setTracking = stub.Set.Call(args => { });
 
 		var result = service.Get("key1");
 		service.Set("key2", entity);
@@ -422,7 +422,7 @@ public class GenericValidationP3Tests
 		var stub = new MixedArityClassStub();
 		MixedArityClassBase service = stub.Object;
 
-		stub.Transform.Of<string, ValidationEntity>().Return((input) =>
+		stub.Transform.Of<string, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Name = input });
 
 		var result = service.Transform<string, ValidationEntity>("test-input");
@@ -437,8 +437,8 @@ public class GenericValidationP3Tests
 		var stub = new MixedArityClassStub();
 		MixedArityClassBase service = stub.Object;
 
-		stub.Convert.Of<int>().Return((value) => 42);
-		stub.Transform.Of<string, ValidationEntity>().Return((input) =>
+		stub.Convert.Of<int>().Call((value) => 42);
+		stub.Transform.Of<string, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Name = input });
 
 		var convertResult = service.Convert<int>("anything");
@@ -479,7 +479,7 @@ public class GenericValidationP4Tests
 		var stub = new ValidationBaseP4Stub<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		stub.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input * 3 });
 
 		var result = service.MapConstrained<int, ValidationEntity>(14);
@@ -494,7 +494,7 @@ public class GenericValidationP4Tests
 		var stub = new ValidationBaseP4Stub<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.Convert.Of<List<int>>().Return((value) => new List<int> { value.Id });
+		stub.Convert.Of<List<int>>().Call((value) => new List<int> { value.Id });
 
 		var result = service.Convert<List<int>>(new ValidationEntity { Id = 7 });
 
@@ -508,7 +508,7 @@ public class GenericValidationP4Tests
 		var stub = new ValidationBaseP4Stub<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 10);
 
@@ -541,7 +541,7 @@ public class GenericValidationP5Tests
 		var stub = new GenericValidationInlineTest.Stubs.IGenericValidation();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		stub.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input });
 
 		var result = service.MapConstrained<int, ValidationEntity>(42);
@@ -555,7 +555,7 @@ public class GenericValidationP5Tests
 		var stub = new GenericValidationInlineTest.Stubs.IGenericValidation();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Convert.Of<List<string>>().Return((v) => new List<string> { v.Name });
+		stub.Convert.Of<List<string>>().Call((v) => new List<string> { v.Name });
 
 		var result = service.Convert<List<string>>(new ValidationEntity { Name = "inline" });
 
@@ -569,7 +569,7 @@ public class GenericValidationP5Tests
 		var stub = new GenericValidationInlineTest.Stubs.IGenericValidation();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 10);
 
@@ -582,8 +582,8 @@ public class GenericValidationP5Tests
 		var stub = new GenericValidationInlineTest.Stubs.IMixedArityGenericService();
 		IMixedArityGenericService service = stub;
 
-		stub.Execute.Of<ValidationEntity>().Return(() => new ValidationEntity { Id = 1 });
-		stub.Execute.Of<string, ValidationEntity>().Return((input) => new ValidationEntity { Name = input });
+		stub.Execute.Of<ValidationEntity>().Call(() => new ValidationEntity { Id = 1 });
+		stub.Execute.Of<string, ValidationEntity>().Call((input) => new ValidationEntity { Name = input });
 
 		var result1 = service.Execute<ValidationEntity>();
 		var result2 = service.Execute<string, ValidationEntity>("inline-test");
@@ -621,7 +621,7 @@ public class GenericValidationP6Tests
 		var stub = new MixedArityInlineClassTest.Stubs.MixedArityClassBase();
 		MixedArityClassBase service = stub.Object;
 
-		stub.Transform.Of<string, List<int>>().Return((input) => new List<int> { input.Length });
+		stub.Transform.Of<string, List<int>>().Call((input) => new List<int> { input.Length });
 
 		var result = service.Transform<string, List<int>>("hello");
 
@@ -635,8 +635,8 @@ public class GenericValidationP6Tests
 		var stub = new MixedArityInlineClassTest.Stubs.MixedArityClassBase();
 		MixedArityClassBase service = stub.Object;
 
-		stub.Convert.Of<int>().Return((value) => 42);
-		stub.Transform.Of<string, ValidationEntity>().Return((input) =>
+		stub.Convert.Of<int>().Call((value) => 42);
+		stub.Transform.Of<string, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Name = input });
 
 		var convertResult = service.Convert<int>("anything");
@@ -677,7 +677,7 @@ public class GenericValidationP8Tests
 		var stub = new GenericValidationP8Test.Stubs.IGenericValidation<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Convert.Of<List<string>>().Return((v) => new List<string> { v.Name });
+		stub.Convert.Of<List<string>>().Call((v) => new List<string> { v.Name });
 
 		var result = service.Convert<List<string>>(new ValidationEntity { Name = "test" });
 
@@ -692,7 +692,7 @@ public class GenericValidationP8Tests
 		var stub = new GenericValidationP8Test.Stubs.IGenericValidation<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 10);
 
@@ -721,8 +721,8 @@ public class GenericValidationP8Tests
 		var stub = new GenericValidationP8Test.Stubs.IGenericValidation<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.Convert.Of<int>().Return((v) => v.Id);
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length);
+		stub.Convert.Of<int>().Call((v) => v.Id);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length);
 
 		var convertResult = service.Convert<int>(new ValidationEntity { Id = 99 });
 		var transformResult = service.Transform<string, int>("abc", 0);
@@ -737,7 +737,7 @@ public class GenericValidationP8Tests
 		var stub = new GenericValidationP8Test.Stubs.IGenericValidation<int, ValidationEntity>();
 		IGenericValidation<int, ValidationEntity> service = stub;
 
-		stub.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		stub.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input });
 
 		var result = service.MapConstrained<int, ValidationEntity>(42);
@@ -758,7 +758,7 @@ public class GenericValidationP9Tests
 		var stub = new ValidationBaseP9Test.Stubs.ValidationBase<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.Transform.Of<string, int>().Return((input, context) => input.Length + context);
+		stub.Transform.Of<string, int>().Call((input, context) => input.Length + context);
 
 		var result = service.Transform<string, int>("hello", 10);
 
@@ -772,7 +772,7 @@ public class GenericValidationP9Tests
 		var stub = new ValidationBaseP9Test.Stubs.ValidationBase<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.Convert.Of<List<int>>().Return((value) => new List<int> { value.Id });
+		stub.Convert.Of<List<int>>().Call((value) => new List<int> { value.Id });
 
 		var result = service.Convert<List<int>>(new ValidationEntity { Id = 7 });
 
@@ -786,7 +786,7 @@ public class GenericValidationP9Tests
 		var stub = new ValidationBaseP9Test.Stubs.ValidationBase<int, ValidationEntity>();
 		ValidationBase<int, ValidationEntity> service = stub.Object;
 
-		stub.MapConstrained.Of<int, ValidationEntity>().Return((input) =>
+		stub.MapConstrained.Of<int, ValidationEntity>().Call((input) =>
 			new ValidationEntity { Id = input * 2 });
 
 		var result = service.MapConstrained<int, ValidationEntity>(21);
@@ -801,8 +801,8 @@ public class GenericValidationP9Tests
 		ValidationBase<string, ValidationEntity> service = stub.Object;
 
 		var entity = new ValidationEntity { Id = 1, Name = "Test" };
-		stub.Get.Return((key) => entity);
-		var setTracking = stub.Set.Call((key, value) => { });
+		stub.Get.Call((key) => entity);
+		var setTracking = stub.Set.Call(args => { });
 
 		var result = service.Get("key1");
 		service.Set("key2", entity);

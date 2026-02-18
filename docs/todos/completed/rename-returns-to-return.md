@@ -1,6 +1,6 @@
 # Rename Returns/ThenReturns to Return/ThenReturn
 
-**Status:** Not Started
+**Status:** Superseded by [IntelliSense API Redesign](intellisense-api-redesign.md)
 **Priority:** High
 **Created:** 2026-02-07
 **Last Updated:** 2026-02-07

@@ -81,7 +81,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.IsMatch.Return((propName) => propName == "ExpectedProperty");
+        stub.IsMatch.Call((propName) => propName == "ExpectedProperty");
 
         Assert.True(trigger.IsMatch("ExpectedProperty"));
         Assert.False(trigger.IsMatch("OtherProperty"));
@@ -178,7 +178,7 @@ public class ITriggerPropertyStandaloneTests
     public void IsMatch_TracksCall()
     {
         var stub = new TriggerPropertyStub();
-        var tracking = stub.IsMatch.Return((propertyName) => false);
+        var tracking = stub.IsMatch.Call((propertyName) => false);
         ITriggerProperty trigger = stub;
 
         trigger.IsMatch("Test");
@@ -237,7 +237,7 @@ public partial class ITriggerPropertyOfTTests
         ITriggerProperty<IValidateBase> trigger = stub;
         IValidateBase? capturedTarget = null;
 
-        stub.GetValue.Return((target) =>
+        stub.GetValue.Call((target) =>
         {
             capturedTarget = target;
             return "Value";
@@ -255,7 +255,7 @@ public partial class ITriggerPropertyOfTTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty<IValidateBase> trigger = stub;
 
-        stub.GetValue.Return((target) => "ConfiguredValue");
+        stub.GetValue.Call((target) => "ConfiguredValue");
 
         var targetStub = new ValidateBaseStubForTrigger();
         var result = trigger.GetValue(targetStub);
@@ -329,7 +329,7 @@ public class ITriggerPropertyOfTStandaloneTests
     public void GetValue_TracksCall()
     {
         var stub = new TriggerPropertyOfTStub();
-        var tracking = stub.GetValue.Return((target) => null);
+        var tracking = stub.GetValue.Call((target) => null);
         ITriggerProperty<IValidateBase> trigger = stub;
 
         var targetStub = new ValidateBaseStubForTrigger();

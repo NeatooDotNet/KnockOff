@@ -23,7 +23,7 @@ public class GenericInterfaceTests
 	public void GenericInterface_NullableReturn_ReturnsDefault()
 	{
 		var knockOff = new UserRepositoryKnockOff();
-		var tracking = knockOff.GetById.Return((id) => null);
+		var tracking = knockOff.GetById.Call((id) => null);
 		IRepository<User> repo = knockOff;
 
 		var result = repo.GetById(42);
@@ -36,7 +36,7 @@ public class GenericInterfaceTests
 	public async Task GenericInterface_AsyncMethod_ReturnsTaskWithDefault()
 	{
 		var knockOff = new UserRepositoryKnockOff();
-		var tracking = knockOff.GetByIdAsync.Return((id) => Task.FromResult<User?>(null));
+		var tracking = knockOff.GetByIdAsync.Call((id) => Task.FromResult<User?>(null));
 		IRepository<User> repo = knockOff;
 
 		var result = await repo.GetByIdAsync(100);

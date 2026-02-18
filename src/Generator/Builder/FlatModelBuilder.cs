@@ -793,7 +793,8 @@ internal static class FlatModelBuilder
 			Type: p.Type,
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
-			RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+			RefPrefix: GetRefKindPrefix(p.RefKind),
+			XmlDoc: p.XmlDoc)).ToEquatableArray();
 
 		// Trackable parameters (exclude out params)
 		var trackableParams = paramArray.Where(p => p.RefKind != RefKind.Out)
@@ -803,7 +804,8 @@ internal static class FlatModelBuilder
 				Type: p.Type,
 				NullableType: MakeNullable(p.Type),
 				RefKind: p.RefKind,
-				RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+				RefPrefix: GetRefKindPrefix(p.RefKind),
+				XmlDoc: p.XmlDoc)).ToEquatableArray();
 
 		// Parameter declarations and names
 		var paramDecls = string.Join(", ", paramArray.Select(p => FormatParameterWithRefKind(p)));
@@ -895,7 +897,8 @@ internal static class FlatModelBuilder
 			SignatureSuffix: signatureSuffix,
 			IsPartOfOverloadGroup: false, // Will be updated in third pass
 			ReturnsByRef: member.ReturnsByRef,
-			ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+			XmlDocSummary: member.XmlDocSummary);
 	}
 
 	/// <summary>
@@ -940,7 +943,8 @@ internal static class FlatModelBuilder
 			Type: p.Type,
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
-			RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+			RefPrefix: GetRefKindPrefix(p.RefKind),
+			XmlDoc: p.XmlDoc)).ToEquatableArray();
 
 		// Trackable parameters for generic methods: exclude out params AND generic-typed params
 		var trackableParams = paramArray
@@ -952,7 +956,8 @@ internal static class FlatModelBuilder
 				Type: p.Type,
 				NullableType: MakeNullable(p.Type),
 				RefKind: p.RefKind,
-				RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+				RefPrefix: GetRefKindPrefix(p.RefKind),
+				XmlDoc: p.XmlDoc)).ToEquatableArray();
 
 		// Parameter declarations and names (strip nullable annotations for explicit impl if needed)
 		var paramDecls = needsNullableDisable
@@ -1031,7 +1036,8 @@ internal static class FlatModelBuilder
 			IsPartOfOverloadGroup: false, // Generic methods don't use overload groups
 			ReturnsByRef: member.ReturnsByRef,
 			ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-			NeedsNullableDisable: needsNullableDisable);
+			NeedsNullableDisable: needsNullableDisable,
+			XmlDocSummary: member.XmlDocSummary);
 	}
 
 	/// <summary>

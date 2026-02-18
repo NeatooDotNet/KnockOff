@@ -110,7 +110,7 @@ public class StandaloneClassStubOverrideTests
 	{
 		// Arrange
 		var stub = new SCStubOverrideStub();
-		stub.Process.Return(input => "[ONCALL: " + input + "]");
+		stub.Process.Call(input => "[ONCALL: " + input + "]");
 
 		// Act
 		var result = stub.Object.Process("hello");
@@ -224,7 +224,7 @@ public class StandaloneClassStubOverrideTests
 	{
 		// Arrange
 		var stub = new SCStubOverrideStub();
-		stub.Process.Return(s => "[ONCALL]");
+		stub.Process.Call(s => "[ONCALL]");
 		stub.Process.When("special").Return("[WHEN]");
 
 		// Act
@@ -245,7 +245,7 @@ public class StandaloneClassStubOverrideTests
 	{
 		// Arrange
 		var stub = new SCStubOverrideStub();
-		stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
+		stub.Process.Call(s => "[FIRST]").ThenReturn("[SECOND]");
 
 		// Act
 		var r1 = stub.Object.Process("a");
@@ -448,7 +448,7 @@ public class StandaloneClassStubOverrideTests
 		// Arrange
 		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 99, Name = "OnCall" };
-		stub.GetById.Return(id => onCallEntity);
+		stub.GetById.Call(id => onCallEntity);
 
 		// Act
 		var result = stub.Object.GetById(1);
@@ -536,7 +536,7 @@ public class StandaloneClassStubOverrideTests
 		// Arrange
 		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 5, Name = "Filtered" };
-		stub.GetDefault.Return(filter => onCallEntity);
+		stub.GetDefault.Call(filter => onCallEntity);
 
 		// Act
 		var result = stub.Object.GetDefault("any-filter");
@@ -553,7 +553,7 @@ public class StandaloneClassStubOverrideTests
 		var userEntity = new ClassStubUser { Id = 0, Name = "UserDefault" };
 		var onCallEntity = new ClassStubUser { Id = 1, Name = "FilteredResult" };
 		stub.DefaultGetDefaultEntity = userEntity;
-		stub.GetDefault.Return(filter => onCallEntity);
+		stub.GetDefault.Call(filter => onCallEntity);
 
 		// Act
 		var userResult = stub.Object.GetDefault();        // Stub override overload
@@ -573,7 +573,7 @@ public class StandaloneClassStubOverrideTests
 	{
 		// Arrange
 		var stub = new SCStubOverrideStub();
-		stub.Process.Return(s => "[ONCALL]");
+		stub.Process.Call(s => "[ONCALL]");
 
 		stub.Object.Process("first");
 		stub.Process.Verify(Called.Once);

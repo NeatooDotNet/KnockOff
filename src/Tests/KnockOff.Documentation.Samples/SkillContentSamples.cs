@@ -290,7 +290,7 @@ public class ReturnOverloadsTests
 
         #region skill-gotcha-returns-vs-oncall
         stub.GetValue.Return("fixed");           // Sets constant value
-        stub.GetValue.Return((id) => $"val-{id}"); // REPLACES constant, now dynamic
+        stub.GetValue.Call((id) => $"val-{id}"); // REPLACES constant, now dynamic
         #endregion
 
         ISvc svc = stub;
@@ -345,13 +345,13 @@ public class MethodConfigTests
 
         #region skill-method-oncall
         // With arguments
-        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = $"User{id}" });
 
         // Void methods
         stub.Save.Call((user) => { /* side effects */ });
 
         // Async methods - auto-wrapped, no Task.FromResult needed
-        stub.GetUserAsync.Return((id) => new User { Id = id });  // Returns Task<User>
+        stub.GetUserAsync.Call((id) => new User { Id = id });  // Returns Task<User>
         stub.SaveAsync.Call((user) => { });  // Returns Task.CompletedTask
         #endregion
 
@@ -371,7 +371,7 @@ public class MethodConfigTests
         // After third call, repeats 3 (NSubstitute-like behavior)
 
         // Mix callbacks with value sequences
-        stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
+        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
         // First: computed, then 100, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating:
@@ -518,8 +518,8 @@ public class GenericMethodTests
 
         #region skill-generic-methods
         // Use .Of<T>() for type-specific configuration
-        stub.GetById.Of<User>().Return((id) => new User { Id = id });
-        stub.GetById.Of<Product>().Return((id) => new Product { Id = id });
+        stub.GetById.Of<User>().Call((id) => new User { Id = id });
+        stub.GetById.Of<Product>().Call((id) => new Product { Id = id });
 
         // Verify by type
         stub.GetById.Of<User>().Verify(Called.Never);
@@ -554,7 +554,7 @@ public partial class DelegateHost
 
         // Returns (value or callback)
         stub.Interceptor.Return(42);
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
 
         // Sequences
         stub.Interceptor.Return(10, 20, 30);
@@ -565,11 +565,11 @@ public partial class DelegateHost
 
         // Async auto-wrapping (for delegates returning Task<T>)
         // stub.Interceptor.Return(42);              // auto-wraps in Task.FromResult
-        // stub.Interceptor.Return((int x) => x * 2); // simplified, auto-wrapped
+        // stub.Interceptor.Call((int x) => x * 2); // simplified, auto-wrapped
 
         // Verification (fresh stub for clean tracking)
         var verifyStub = new Stubs.SkillArithmeticOp();
-        verifyStub.Interceptor.Return((a, b) => a + b);
+        verifyStub.Interceptor.Call((a, b) => a + b);
         SkillArithmeticOp op = verifyStub;
         op(1, 2);
         verifyStub.Interceptor.Verify(Called.Once);
@@ -613,7 +613,7 @@ public class VerificationTests
         ISvc svc = stub;
 
         #region skill-verify-batch
-        stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetUser.Call((id) => new User { Id = id }).Verifiable();
         stub.Save.Call((u) => { }).Verifiable(Called.Once);
         // ... exercise stub ...
         #endregion
@@ -638,14 +638,14 @@ public class ArgumentCaptureTests
 
         #region skill-arg-capture
         // Single parameter - LastArg
-        var getTracking = stub.GetUser.Return((id) => new User { Id = id });
+        var getTracking = stub.GetUser.Call((id) => new User { Id = id });
         service.GetUser(42);
         Assert.Equal(42, getTracking.LastArg);
 
         // Multiple parameters - LastArgs tuple
-        var updateTracking = stub.Update.Call((id, name) => { });
+        var updateTracking = stub.Update.Call(_ => { });
         service.Update(1, "Alice");
-        var (id, name) = updateTracking.LastArgs!.Value;
+        var (id, name) = updateTracking.LastArgs;
         #endregion
 
         Assert.Equal(1, id);
@@ -697,7 +697,7 @@ public class StubOverrideTests
         var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
         // With Returns: callback supersedes stub override (clean interceptor name)
-        stub.GetById.Return(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Call(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
         #endregion
 
@@ -754,7 +754,7 @@ public class StubOverrideTests
         IUserRepo repo = stub;
 
         #region skill-stub-override-tracking
-        stub.GetById.Return(id => new User { Id = id });
+        stub.GetById.Call(id => new User { Id = id });
         repo.GetById(42);
 
         stub.GetById.Verify(Called.Once);
@@ -769,7 +769,7 @@ public class StubOverrideTests
         IUserRepo repo = stub;
 
         #region skill-stub-override-reset
-        stub.GetById.Return(id => new User { Id = id });
+        stub.GetById.Call(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Called.Once);
 
@@ -862,7 +862,7 @@ public class SourceDelegationTests
         stub.Source(realImplementation);
 
         // Configured members override source
-        stub.GetById.Return((id) => testUser);  // This wins over source
+        stub.GetById.Call((id) => testUser);  // This wins over source
 
         // Reset clears tracking (counts, args, sequence position) and source delegation
         // but preserves callbacks (Return, Returns, Get, Set)
@@ -897,7 +897,7 @@ public class CommonMistakeTests
 
         #region skill-mistake-wrong-signature
         // WRONG: Type mismatch
-        // stub.Process.Return((string id) => { });  // Method takes int
+        // stub.Process.Call((string id) => { });  // Method takes int
 
         // RIGHT: Match signature exactly
         stub.Process.Call((int id) => { });

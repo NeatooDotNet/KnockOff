@@ -19,7 +19,7 @@ public class GenericMethodBugTests
 		var knockOff = new GenericMethodWithStubOverrideKnockOff();
 		IGenericMethodWithStubOverride service = knockOff;
 
-		knockOff.Create.Of<TestEntity>().Return(() => new TestEntity { Id = 999 });
+		knockOff.Create.Of<TestEntity>().Call(() => new TestEntity { Id = 999 });
 
 		var result = service.Create<TestEntity>();
 
@@ -34,8 +34,8 @@ public class GenericMethodBugTests
 		IGenericMethodWithStubOverride service = knockOff;
 
 		// OnCall doubles integers
-		knockOff.Transform.Of<int>().Return((value) => value * 2);
-		knockOff.Transform.Of<string>().Return((value) => value + "_transformed");
+		knockOff.Transform.Of<int>().Call((value) => value * 2);
+		knockOff.Transform.Of<string>().Call((value) => value + "_transformed");
 
 		var result = service.Transform(21);
 		Assert.Equal(42, result);
@@ -50,7 +50,7 @@ public class GenericMethodBugTests
 		var knockOff = new GenericMethodWithStubOverrideKnockOff();
 		IGenericMethodWithStubOverride service = knockOff;
 
-		knockOff.Convert.Of<int, TestEntity>().Return((input) => new TestEntity { Id = input * 10 });
+		knockOff.Convert.Of<int, TestEntity>().Call((input) => new TestEntity { Id = input * 10 });
 
 		var result = service.Convert<int, TestEntity>(5);
 
@@ -126,8 +126,8 @@ public class GenericMethodBugTests
 		var knockOff = new MixedOverloadServiceKnockOff();
 		IMixedOverloadService service = knockOff;
 
-		knockOff.Format.Return((int value) => $"int:{value}");
-		knockOff.FormatGeneric.Of<double>().Return((value) => $"double:{value}");
+		knockOff.Format.Call((int value) => $"int:{value}");
+		knockOff.FormatGeneric.Of<double>().Call((value) => $"double:{value}");
 
 		var intResult = service.Format(42);
 		var doubleResult = service.Format(3.14);
@@ -152,7 +152,7 @@ public class GenericMethodBugTests
 
 		// Configure to return a test attribute
 		var testAttr = new TestAttribute();
-		knockOff.GetAttribute.Of<TestAttribute>().Return(() => testAttr);
+		knockOff.GetAttribute.Of<TestAttribute>().Call(() => testAttr);
 
 		var result = service.GetAttribute<TestAttribute>();
 
@@ -166,7 +166,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.GetAttribute.Of<TestAttribute>().Return(() => null);
+		knockOff.GetAttribute.Of<TestAttribute>().Call(() => null);
 
 		var result = service.GetAttribute<TestAttribute>();
 
@@ -179,7 +179,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.GetOrDefault.Of<string>().Return(() => "test");
+		knockOff.GetOrDefault.Of<string>().Call(() => "test");
 
 		var result = service.GetOrDefault<string>();
 
@@ -192,7 +192,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.Transform.Of<int, string>().Return((input) => $"value:{input}");
+		knockOff.Transform.Of<int, string>().Call((input) => $"value:{input}");
 
 		var result = service.Transform<int, string>(42);
 
@@ -206,7 +206,7 @@ public class GenericMethodBugTests
 		IConstrainedGenericMethod service = knockOff;
 
 		var stream = new MemoryStream();
-		knockOff.FindService.Of<MemoryStream>().Return(() => stream);
+		knockOff.FindService.Of<MemoryStream>().Call(() => stream);
 
 		var result = service.FindService<MemoryStream>();
 
@@ -229,7 +229,7 @@ public class GenericMethodBugTests
 		var knockOff = new NullableGenericServiceKnockOff();
 		INullableGenericServiceForTests service = knockOff;
 
-		knockOff.NullableReturn.Of<string>().Return(() => "hello");
+		knockOff.NullableReturn.Of<string>().Call(() => "hello");
 
 		var result = service.NullableReturn<string>();
 
@@ -242,7 +242,7 @@ public class GenericMethodBugTests
 		var knockOff = new NullableGenericServiceKnockOff();
 		INullableGenericServiceForTests service = knockOff;
 
-		knockOff.NullableReturn.Of<string>().Return(() => null!);
+		knockOff.NullableReturn.Of<string>().Call(() => null!);
 
 		var result = service.NullableReturn<string>();
 
@@ -255,7 +255,7 @@ public class GenericMethodBugTests
 		var knockOff = new NullableGenericServiceKnockOff();
 		INullableGenericServiceForTests service = knockOff;
 
-		knockOff.NullableValues.Of<int>().Return((data) => data);
+		knockOff.NullableValues.Of<int>().Call((data) => data);
 
 		var result = service.NullableValues(42);
 
@@ -268,7 +268,7 @@ public class GenericMethodBugTests
 		var knockOff = new NullableGenericServiceKnockOff();
 		INullableGenericServiceForTests service = knockOff;
 
-		knockOff.NullableReturn.Of<int>().Return(() => 99);
+		knockOff.NullableReturn.Of<int>().Call(() => 99);
 
 		var result = service.NullableReturn<int>();
 
@@ -284,7 +284,7 @@ public class GenericMethodBugTests
 		INullableGenericServiceForTests service = knockOff;
 
 		var stream = new MemoryStream();
-		knockOff.InterfaceConstrainedReturn.Of<MemoryStream>().Return(() => stream);
+		knockOff.InterfaceConstrainedReturn.Of<MemoryStream>().Call(() => stream);
 
 		var result = service.InterfaceConstrainedReturn<MemoryStream>();
 
@@ -300,7 +300,7 @@ public class GenericMethodBugTests
 		INullableGenericServiceForTests service = knockOff;
 
 		var attr = new TestAttribute { Value = "test" };
-		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Return(() => attr);
+		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Call(() => attr);
 
 		var result = service.ConstrainedNullableReturn<TestAttribute>();
 
@@ -313,7 +313,7 @@ public class GenericMethodBugTests
 		var knockOff = new NullableGenericServiceKnockOff();
 		INullableGenericServiceForTests service = knockOff;
 
-		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Return(() => null);
+		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Call(() => null);
 
 		var result = service.ConstrainedNullableReturn<TestAttribute>();
 

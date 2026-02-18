@@ -114,7 +114,7 @@ public class AssemblyStrictTests
 	public void StandaloneStub_WithOnCall_DoesNotThrow()
 	{
 		var stub = new DefaultStrictStub();
-		stub.GetValue.Return((x) => x * 2);
+		stub.GetValue.Call((x) => x * 2);
 		IDefaultStrictTest service = stub;
 
 		// Callback configured - should work even with assembly strict
@@ -127,7 +127,7 @@ public class AssemblyStrictTests
 	public void InlineStub_WithOnCall_DoesNotThrow()
 	{
 		var stub = new DefaultStrictInlineTests.Stubs.IDefaultStrictTest();
-		stub.GetValue.Return((x) => x * 3);
+		stub.GetValue.Call((x) => x * 3);
 		IDefaultStrictTest service = stub;
 
 		var result = service.GetValue(5);
@@ -155,7 +155,7 @@ public class AssemblyStrictTests
 	public void MixedStub_ConfiguredMethodWorks_UnconfiguredThrows()
 	{
 		var stub = new DefaultStrictStub();
-		stub.GetValue.Return((x) => x * 2);
+		stub.GetValue.Call((x) => x * 2);
 		IDefaultStrictTest service = stub;
 
 		// Configured method works

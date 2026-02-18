@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.51.2</FileVersion>
-		<PackageVersion>0.51.2</PackageVersion>
+		<FileVersion>0.52.0</FileVersion>
+		<PackageVersion>0.52.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Fix CS9035 when method returns a type with required members - smart default now uses throw instead of new T().</PackageReleaseNotes>
+		<PackageReleaseNotes>Comprehensive IntelliSense API redesign: fully generated interceptor classes, Call/Return unified API, named tuples for 2+ params, XML comments on all generated methods, single property for overloads with tracking handles.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

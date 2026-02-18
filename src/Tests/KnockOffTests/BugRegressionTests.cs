@@ -78,9 +78,9 @@ public class BugRegressionTests
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		knockOff.Process.Call((data) => { });
-		knockOff.Process.Call((data, priority) => { });
-		knockOff.Process.Call((data, priority, async) => { });
+		knockOff.Process.Call((string data) => { });
+		knockOff.Process.Call(((string data, int priority) args) => { });
+		knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
 
 		service.Process("a");
 		service.Process("b", 1);

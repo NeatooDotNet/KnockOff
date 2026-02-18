@@ -50,12 +50,12 @@ stub.Interceptor.Return("FORMATTED");
 ```
 <!-- endSnippet -->
 
-### Return(callback) -- Dynamic Behavior
+### Call(callback) -- Dynamic Behavior
 
 <!-- snippet: delegate-stub-oncall-return -->
 ```cs
 // Return() - compute return value based on input
-stub.Interceptor.Return((input) => input.ToUpperInvariant());
+stub.Interceptor.Call((input) => input.ToUpperInvariant());
 ```
 <!-- endSnippet -->
 
@@ -86,7 +86,7 @@ Callback sequences:
 ```cs
 // Callback sequences
 stub.Interceptor
-    .Return((x) => x * 1)
+    .Call((x) => x * 1)
     .ThenReturn((x) => x * 2)
     .ThenReturn((x) => x * 3);
 ```
@@ -158,7 +158,7 @@ Closed generic delegates use the **simple name** in the Stubs namespace:
 ```cs
 // Closed generic: type arguments specified at stub definition
 var stub = new DelegateStubTests.Stubs.Factory();
-stub.Interceptor.Return(() => "generated value");
+stub.Interceptor.Call(() => "generated value");
 Factory<string> factory = stub;
 ```
 <!-- endSnippet -->
@@ -223,7 +223,7 @@ Assert.Equal("TEST", format("test")); // Return still works
 |------|------|
 | Create stub | `var stub = new Stubs.MyDelegate();` |
 | Configure return | `stub.Interceptor.Return(value)` |
-| Configure callback | `stub.Interceptor.Return((args) => result)` |
+| Configure callback | `stub.Interceptor.Call((args) => result)` |
 | Configure void | `stub.Interceptor.Call((args) => { })` |
 | Value sequence | `stub.Interceptor.Return(1, 2, 3)` |
 | When matching | `stub.Interceptor.When(args).Return(value)` |

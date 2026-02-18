@@ -346,7 +346,8 @@ internal static class InlineModelBuilder
                     Type: p.Type,
                     NullableType: MakeNullable(p.Type),
                     RefKind: p.RefKind,
-                    RefPrefix: GetRefKindPrefix(p.RefKind)))
+                    RefPrefix: GetRefKindPrefix(p.RefKind),
+                    XmlDoc: p.XmlDoc))
                 .ToEquatableArray();
 
             var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
@@ -354,7 +355,28 @@ internal static class InlineModelBuilder
 
             // Determine default expression - use per-overload return type for mixed return type groups
             var defaultExpr = overload.IsVoid ? "" : GetDefaultExpressionForReturn(overload.ReturnType, overload.IsNullable);
-            var throwsOnDefault = !overload.IsVoid && !overload.IsNullable && IsUninstantiableType(overload.ReturnType);
+
+            // Determine ThrowsOnDefault from the member's DefaultValueStrategy.
+            // Only throw when defaultExpr is "default!" (no sensible default available).
+            // Async return types (Task<T>, ValueTask<T>) have meaningful defaults via Task.FromResult,
+            // so they should NOT throw even if the inner type has ThrowException strategy.
+            // Match the overload to its InterfaceMemberInfo by name, parameter count, and types.
+            bool throwsOnDefault;
+            if (overload.IsVoid || overload.IsNullable || defaultExpr != "default!")
+            {
+                throwsOnDefault = false;
+            }
+            else
+            {
+                var overloadParams = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+                var matchingMember = iface.Members.FirstOrDefault(m =>
+                    !m.IsProperty && !m.IsIndexer && m.Name == group.Name && !m.IsGenericMethod &&
+                    (m.Parameters.GetArray()?.Length ?? 0) == overloadParams.Length &&
+                    (overloadParams.Length == 0 || m.Parameters.Zip(overload.Parameters, (a, b) => a.Type == b.Type).All(x => x)));
+                throwsOnDefault = matchingMember != null
+                    ? matchingMember.DefaultStrategy == DefaultValueStrategy.ThrowException
+                    : IsUninstantiableType(overload.ReturnType);
+            }
 
             signatures.Add(new MethodSignatureInfo(
                 Parameters: parameters,
@@ -528,7 +550,8 @@ internal static class InlineModelBuilder
                 Type: p.Type,
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
-                RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+                RefPrefix: GetRefKindPrefix(p.RefKind),
+                XmlDoc: p.XmlDoc)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{group.Name}TypedHandler";
@@ -908,7 +931,8 @@ internal static class InlineModelBuilder
                     Type: p.Type,
                     NullableType: MakeNullable(p.Type),
                     RefKind: p.RefKind,
-                    RefPrefix: GetRefKindPrefix(p.RefKind)))
+                    RefPrefix: GetRefKindPrefix(p.RefKind),
+                    XmlDoc: p.XmlDoc))
                 .ToEquatableArray();
             // Use member.ReturnType (not group.ReturnType) - each member needs its own suffix
             // when overloads have different return types

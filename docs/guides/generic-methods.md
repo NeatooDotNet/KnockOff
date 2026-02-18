@@ -8,7 +8,7 @@ KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-speci
 
 **Critical concept**: Use `.Of<T>()` to access type-specific configuration and verification for generic methods. Base properties like `CalledTypeArguments` track calls across all type arguments.
 
-**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Called)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `Return` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
+**Configuration and verification**: The `.Of<T>().Return()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Called)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().Return(...)` does not affect `.Of<Order>().Return(...)`.
 
 ---
 
@@ -48,7 +48,7 @@ The `Return` method accepts a callback matching the method signature and returns
 <!-- snippet: generic-configure-single -->
 ```cs
 // Configure behavior for User type
-stub.GetById.Of<User>().Return((id) =>
+stub.GetById.Of<User>().Call((id) =>
     new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
@@ -58,10 +58,10 @@ You can configure multiple types independently. Each `Return` is specific to its
 <!-- snippet: generic-configure-multiple -->
 ```cs
 // Configure different behavior for each type
-stub.GetById.Of<User>().Return((id) =>
+stub.GetById.Of<User>().Call((id) =>
     new User { Id = id, Name = "User" });
 
-stub.GetById.Of<Order>().Return((id) =>
+stub.GetById.Of<Order>().Call((id) =>
     new Order { Id = id, Amount = 99.99m });
 ```
 <!-- endSnippet -->
@@ -98,11 +98,11 @@ For methods with multiple type parameters, use `.Of<T1, T2, ...>()`:
 <!-- snippet: generic-multi-param -->
 ```cs
 // Configure for string -> int conversion
-stub.Convert.Of<string, int>().Return((source) =>
+stub.Convert.Of<string, int>().Call((source) =>
     int.Parse(source));
 
 // Configure for int -> string conversion
-stub.Convert.Of<int, string>().Return((source) =>
+stub.Convert.Of<int, string>().Call((source) =>
     source.ToString());
 ```
 <!-- endSnippet -->
@@ -159,17 +159,17 @@ Here's a full test demonstrating generic method stubbing for a serializer/deseri
 <!-- snippet: generic-complete-example -->
 ```cs
 // Configure Serialize for different types
-var serializeUserTracking = stub.Serialize.Of<User>().Return((obj) =>
+var serializeUserTracking = stub.Serialize.Of<User>().Call((obj) =>
     $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
 
-var serializeOrderTracking = stub.Serialize.Of<Order>().Return((obj) =>
+var serializeOrderTracking = stub.Serialize.Of<Order>().Call((obj) =>
     $"{{\"Id\":{obj.Id},\"Amount\":{obj.Amount}}}");
 
 // Configure Deserialize
-var deserializeUserTracking = stub.Deserialize.Of<User>().Return((data) =>
+var deserializeUserTracking = stub.Deserialize.Of<User>().Call((data) =>
     new User { Id = 1, Name = "Deserialized User" });
 
-var deserializeOrderTracking = stub.Deserialize.Of<Order>().Return((data) =>
+var deserializeOrderTracking = stub.Deserialize.Of<Order>().Call((data) =>
     new Order { Id = 2, Amount = 50.00m });
 ```
 <!-- endSnippet -->
@@ -195,4 +195,4 @@ Next: [Advanced Callbacks](advanced-callbacks.md) for complex callback scenarios
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-18

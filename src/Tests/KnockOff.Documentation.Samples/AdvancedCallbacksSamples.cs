@@ -106,7 +106,7 @@ public class SequentialQueueTests
         #region advanced-sequential-queue
         // Queue of results: first succeeds, second fails
         var results = new Queue<bool>(new[] { true, false });
-        stub.Send.Return((to, message) => results.Dequeue());
+        stub.Send.Call(_ => results.Dequeue());
         #endregion
 
         IEmailService service = stub;
@@ -130,7 +130,7 @@ public class SequentialCounterTests
         #region advanced-sequential-counter
         // Counter tracks call count for conditional behavior
         var attempts = 0;
-        stub.Attempt.Return(() =>
+        stub.Attempt.Call(() =>
         {
             attempts++;
             return attempts > 3; // Succeed on 4th attempt
@@ -159,7 +159,7 @@ public class ConditionalReturnsTests
 
         #region advanced-conditional-switch
         // Pattern matching for argument-based return values
-        stub.FindById.Return((id) => id switch
+        stub.FindById.Call((id) => id switch
         {
             1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
             2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -256,7 +256,7 @@ public class StateDependentMethodTests
         // Enforce method ordering with shared state
         var isInitialized = false;
         stub.Initialize.Call(() => { isInitialized = true; });
-        stub.Query.Return((sql) =>
+        stub.Query.Call((sql) =>
         {
             if (!isInitialized)
                 throw new InvalidOperationException("Must call Initialize() first");
@@ -293,7 +293,7 @@ public class SideEffectsTests
 
         #region advanced-side-effects
         // Callbacks can track state and perform side effects
-        stub.PlaceOrder.Return((order) =>
+        stub.PlaceOrder.Call((order) =>
         {
             placedOrders.Add(order);
             notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
@@ -332,7 +332,7 @@ public class CacheSimulationTests
 
         #region advanced-complete-example
         // Get: Check expiration, track hits/misses
-        stub.Get.Return((key) =>
+        stub.Get.Call((key) =>
         {
             if (cache.TryGetValue(key, out var entry))
             {
@@ -348,14 +348,14 @@ public class CacheSimulationTests
         });
 
         // Set: Enforce capacity, evict oldest if needed
-        stub.Set.Call((key, value) =>
+        stub.Set.Call(args =>
         {
-            if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
+            if (cache.Count >= maxCapacity && !cache.ContainsKey(args.key))
             {
                 var oldest = cache.OrderBy(kvp => kvp.Value.Added).First();
                 cache.Remove(oldest.Key);
             }
-            cache[key] = (value, DateTime.UtcNow);
+            cache[args.key] = (args.value, DateTime.UtcNow);
         });
 
         // Clear: Reset everything

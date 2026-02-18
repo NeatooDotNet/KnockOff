@@ -161,7 +161,7 @@ public class BaseClassStubOverrideTests
     {
         // Arrange
         var stub = new NoOverrideStub();
-        stub.GetValue.Return(x => x * 3);
+        stub.GetValue.Call(x => x * 3);
         INoOverrideService service = stub;
 
         // Act
@@ -191,7 +191,7 @@ public class BaseClassStubOverrideTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x * 100); // Override stub override (which does x * 10)
+        stub.GetValue.Call(x => x * 100); // Override stub override (which does x * 10)
 
         // Act
         IStrictModeStubOverrideTest service = stub;
@@ -237,7 +237,7 @@ public class BaseClassStubOverrideTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x * 100);
+        stub.GetValue.Call(x => x * 100);
         IStrictModeStubOverrideTest service = stub;
 
         // Act - first call uses OnCall
@@ -341,7 +341,7 @@ public class BaseClassStubOverrideTests
         IGenericRepository<User> repo = stub;
         var user = new User { Id = 42, Name = "Test" };
         stub.Save.Call(u => { });
-        stub.GetById.Return(id => user);
+        stub.GetById.Call(id => user);
 
         // Act
         repo.Save(user);
@@ -357,7 +357,7 @@ public class BaseClassStubOverrideTests
         // Arrange
         var stub = new GenericKeyValueStoreStub<string, int>();
         IGenericKeyValueStore<string, int> store = stub;
-        stub.Get.Return(key => 42);
+        stub.Get.Call(key => 42);
 
         // Act
         var result = store.Get("answer");
@@ -393,7 +393,7 @@ public class BaseClassStubOverrideTests
 
         // Act
         var entity = new ComparableEntity { Name = "Test" };
-        stub.Process.Return(e => e);
+        stub.Process.Call(e => e);
         var result = service.Process(entity);
 
         // Assert
@@ -451,7 +451,7 @@ public class BaseClassStubOverrideTests
         // Arrange
         var stub = new OverloadedStubOverrideStub();
         // Stub override overload uses Format (single-overload interceptor)
-        stub.Format.Return(input => "ONCALL:" + input);
+        stub.Format.Call(input => "ONCALL:" + input);
         IOverloadedStubOverrideService service = stub;
 
         // Act
@@ -467,7 +467,7 @@ public class BaseClassStubOverrideTests
         // Arrange
         var stub = new OverloadedStubOverrideStub();
         // Non-overridden overload uses Format2 (separate interceptor after fix)
-        stub.Format2.Return((input, upper) => upper ? input.ToUpper() : input);
+        stub.Format2.Call(args => args.uppercase ? args.input.ToUpper() : args.input);
         IOverloadedStubOverrideService service = stub;
 
         // Act
@@ -483,7 +483,7 @@ public class BaseClassStubOverrideTests
         // Arrange - one overload uses stub override, another uses OnCall
         var stub = new OverloadedStubOverrideStub();
         // Each overload now has its own interceptor (Format for overridden, Format2 for non-overridden)
-        stub.Format2.Return((input, upper) => "ONCALL:" + (upper ? input.ToUpper() : input));
+        stub.Format2.Call(args => "ONCALL:" + (args.uppercase ? args.input.ToUpper() : args.input));
         IOverloadedStubOverrideService service = stub;
 
         // Act

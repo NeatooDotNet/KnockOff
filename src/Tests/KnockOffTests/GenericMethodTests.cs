@@ -104,7 +104,7 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		var expected = new TestEntity { Id = 42, Name = "Test" };
-		knockOff.Create.Of<TestEntity>().Return(() => expected);
+		knockOff.Create.Of<TestEntity>().Call(() => expected);
 
 		var result = service.Create<TestEntity>();
 
@@ -117,8 +117,8 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.Create.Of<TestEntity>().Return(() => new TestEntity { Id = 1 });
-		knockOff.Create.Of<List<int>>().Return(() => new List<int> { 100 });
+		knockOff.Create.Of<TestEntity>().Call(() => new TestEntity { Id = 1 });
+		knockOff.Create.Of<List<int>>().Call(() => new List<int> { 100 });
 
 		var entity = service.Create<TestEntity>();
 		var list = service.Create<List<int>>();
@@ -148,7 +148,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.Deserialize.Of<TestEntity>().Return((json) =>
+		knockOff.Deserialize.Of<TestEntity>().Call((json) =>
 			new TestEntity { Id = 99, Name = json });
 
 		var result = service.Deserialize<TestEntity>("{\"Name\":\"test\"}");
@@ -250,7 +250,7 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		// Need to set OnCall for int->string since string has no parameterless ctor
-		knockOff.Convert.Of<int, string>().Return((i) => i.ToString());
+		knockOff.Convert.Of<int, string>().Call((i) => i.ToString());
 
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
@@ -265,7 +265,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.Convert.Of<string, int>().Return((input) => input.Length);
+		knockOff.Convert.Of<string, int>().Call((input) => input.Length);
 
 		var result = service.Convert<string, int>("hello");
 
@@ -279,7 +279,7 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		// Need to set OnCall for int->string since string has no parameterless ctor
-		knockOff.Convert.Of<int, string>().Return((i) => i.ToString());
+		knockOff.Convert.Of<int, string>().Call((i) => i.ToString());
 
 		service.Convert<string, int>("a");
 		service.Convert<string, int>("b");
@@ -345,7 +345,7 @@ public class GenericMethodTests
 		IConstrainedGenericService service = knockOff;
 
 		var expected = new TestEntityWithInterface { Id = 123, Name = "Constrained" };
-		knockOff.CreateEntity.Of<TestEntityWithInterface>().Return(() => expected);
+		knockOff.CreateEntity.Of<TestEntityWithInterface>().Call(() => expected);
 
 		var result = service.CreateEntity<TestEntityWithInterface>();
 
@@ -404,7 +404,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.Create.Of<TestEntity>().Return(() => new TestEntity { Id = 1 });
+		knockOff.Create.Of<TestEntity>().Call(() => new TestEntity { Id = 1 });
 		service.Create<TestEntity>();
 
 		knockOff.Create.Of<TestEntity>().Reset();

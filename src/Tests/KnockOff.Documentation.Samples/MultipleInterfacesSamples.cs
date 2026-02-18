@@ -90,9 +90,9 @@ public partial class HierarchyTests
         var stub = new Stubs.IStore();
 
         // All members from IStore AND IReadableStore — same flat API
-        stub.GetById.Return((id) => $"item-{id}");  // from IReadableStore
+        stub.GetById.Call((id) => $"item-{id}");  // from IReadableStore
         stub.Count.Get(42);                           // from IReadableStore
-        stub.Save.Call((id, value) => { });           // from IStore
+        stub.Save.Call(_ => { });           // from IStore
         stub.Delete.Call((id) => { });                // from IStore
 
         IStore store = stub;
@@ -132,7 +132,7 @@ public partial class UnrelatedInterfacesTests
         var repo = new Stubs.IRepository();
         var uow = new Stubs.IUnitOfWork();
 
-        repo.GetUser.Return((id) => new User { Id = id });
+        repo.GetUser.Call((id) => new User { Id = id });
         uow.Commit.Call(() => { }).Verifiable();
 
         // Pass both to the system under test

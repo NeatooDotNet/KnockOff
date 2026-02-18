@@ -4,10 +4,10 @@
 // This file explores and documents user-defined method patterns:
 // - Base class pattern (protected override methods with _ suffix)
 // - Tracking API on interceptors (Verify, LastArg, Reset)
-// - Returns/Execute to supersede stub overrides
+// - Return/Call to supersede stub overrides
 // - Stub override overloads
 // - Mixed scenarios (some with stub overrides, some without)
-// - Priority: Returns/Execute > stub override
+// - Priority: Return/Call > stub override
 // - Strict mode behavior
 // -----------------------------------------------------------------------------
 
@@ -136,8 +136,8 @@ public partial class StubOverrideBasicsDemo
     // - Verify(Called) - verify call count
     // - LastArgs - last arguments (raw type for 1-param, tuple for 2+ params)
     // - Reset() - clear tracking state
-    // - Returns()/Execute() - supersede stub override per-test
-    // - Returns() - constant value that supersedes stub override
+    // - Return()/Call() - supersede stub override per-test
+    // - Return() - constant value that supersedes stub override
     // =========================================================================
 
     public void TrackingWithVerify()
@@ -196,19 +196,19 @@ public partial class StubOverrideBasicsDemo
     }
 
     // =========================================================================
-    // Returns()/Execute() Supersedes Stub Overrides
+    // Return()/Call() Supersedes Stub Overrides
     // =========================================================================
-    // Stub overrides provide shareable defaults. Returns/Execute override per test.
+    // Stub overrides provide shareable defaults. Return/Call override per test.
     //
     // RATIONALE: Stubs should be shareable yet configurable per test.
     // - Stub override = sensible default for most tests
-    // - Returns/Execute = override when a specific test needs different behavior
+    // - Return/Call = override when a specific test needs different behavior
     //
     // GENERATED CODE PATTERN:
-    //   if (Interceptor.Callback is { } callback) return callback(args);  // Returns wins
+    //   if (Interceptor.Callback is { } callback) return callback(args);  // Call wins
     //   return Process_(args);                                            // Stub override
     //
-    // Reset() behavior: Clears tracking state but PRESERVES Returns/Execute configuration.
+    // Reset() behavior: Clears tracking state but PRESERVES Return/Call configuration.
     // This matches regular interceptor semantics.
     // =========================================================================
 
@@ -222,7 +222,7 @@ public partial class StubOverrideBasicsDemo
         // defaultResult == "[Processed: hello]" (from Process_ override)
 
         // Returns supersedes the stub override for per-test override
-        stub.Process.Return(input => $"[Override: {input}]");
+        stub.Process.Call(input => $"[Override: {input}]");
         var overrideResult = service.Process("hello");
         // overrideResult == "[Override: hello]" (Returns wins)
 
@@ -232,7 +232,7 @@ public partial class StubOverrideBasicsDemo
     public void Returns_SupersedesStubOverride()
     {
         var stub = new BasicStubOverrideStub();
-        stub.Process.Return("constant"); // Returns(value) is shorthand for Returns(_ => value)
+        stub.Process.Return("constant"); // Return(value) sets a constant return value
 
         IStubOverrideService service = stub;
         var result = service.Process("ignored");
@@ -255,7 +255,7 @@ public partial class StubOverrideBasicsDemo
     public void Reset_PreservesReturnsConfiguration()
     {
         var stub = new BasicStubOverrideStub();
-        stub.Calculate.Return((a, b) => a * b); // Override addition with multiplication
+        stub.Calculate.Call(args => args.a * args.b); // Override addition with multiplication
 
         IStubOverrideService service = stub;
         service.Calculate(3, 4);
@@ -330,7 +330,7 @@ public partial class MixedStubOverrideStub
     }
 
     // WithoutStubOverride_ and ComputeWithoutStubOverride_ are NOT overridden
-    // They use the regular interceptor path (Returns, Execute, or default)
+    // They use the regular interceptor path (Return, Call, or default)
 }
 
 [KnockOff<IMixedStubOverrideService>]
@@ -340,11 +340,11 @@ public partial class MixedStubOverrideDemo
     {
         var stub = new MixedStubOverrideStub();
 
-        // Methods WITH stub override use the interceptor for tracking + Returns
+        // Methods WITH stub override use the interceptor for tracking + Return/Call
         stub.WithStubOverride.Verify(Called.Never);
 
         // Methods WITHOUT stub override also use interceptor (same API)
-        stub.WithoutStubOverride.Return((input) => $"[Configured: {input}]");
+        stub.WithoutStubOverride.Call((input) => $"[Configured: {input}]");
         stub.WithoutStubOverride.Verify(Called.Never);
 
         stub.ComputeWithoutStubOverride.Return(42);
@@ -352,9 +352,9 @@ public partial class MixedStubOverrideDemo
         IMixedStubOverrideService service = stub;
 
         var r1 = service.WithStubOverride("test");       // "[User: test]" (from override)
-        var r2 = service.WithoutStubOverride("test");    // "[Configured: test]" (from Returns)
+        var r2 = service.WithoutStubOverride("test");    // "[Configured: test]" (from Call)
         var r3 = service.ComputeWithStubOverride(5);     // 10 (from override)
-        var r4 = service.ComputeWithoutStubOverride(5);  // 42 (from Returns)
+        var r4 = service.ComputeWithoutStubOverride(5);  // 42 (from Return)
 
         stub.WithStubOverride.Verify(Called.Once);
         stub.WithoutStubOverride.Verify(Called.Once);
@@ -368,8 +368,8 @@ public partial class MixedStubOverrideDemo
     // - No stub override: stub.Method (default/interceptor behavior)
     //
     // The presence or absence of a stub override is detected at compile time.
-    // When override exists: Returns > Stub override
-    // When no override: Returns > Strict/Default
+    // When override exists: Return/Call > Stub override
+    // When no override: Return/Call > Strict/Default
     // =========================================================================
 }
 
@@ -377,8 +377,8 @@ public partial class MixedStubOverrideDemo
 // PARTIAL STUB OVERRIDE COVERAGE FOR OVERLOADS
 // =============================================================================
 // You can override only SOME overloads. Each overload is handled independently:
-// - Overridden: Returns > Stub override
-// - Not overridden: Returns > Strict/Default
+// - Overridden: Return/Call > Stub override
+// - Not overridden: Return/Call > Strict/Default
 //
 // Example: Format has 3 overloads, but only Format(string) is overridden.
 // - Format(string) calls Format_(string) (your override)
@@ -416,7 +416,7 @@ public partial class StrictStubOverrideStub
     protected override string Process_(string input) => $"[Strict: {input}]";
 
     // Only Process_ is overridden
-    // Other methods will throw in strict mode if called without Returns/Execute configuration
+    // Other methods will throw in strict mode if called without Return/Call configuration
 }
 
 [KnockOff<IStubOverrideService>]
@@ -430,8 +430,8 @@ public partial class StrictModeStubOverrideDemo
         // Stub override works in strict mode - it IS the configuration
         var result = service.Process("test");  // "[Strict: test]"
 
-        // Non-overridden method in strict mode would throw without Returns
-        // service.Calculate(1, 2);  // Would throw - no override, no Returns
+        // Non-overridden method in strict mode would throw without Return/Call
+        // service.Calculate(1, 2);  // Would throw - no override, no Return/Call
     }
 
     // =========================================================================
@@ -439,7 +439,7 @@ public partial class StrictModeStubOverrideDemo
     // =========================================================================
     // Strict mode means "throw if unconfigured". Stub overrides ARE configured
     // by their very existence. This is consistent - the override IS the
-    // behavior, just defined in a different way than Returns/Execute.
+    // behavior, just defined in a different way than Return/Call.
     // =========================================================================
 }
 
@@ -545,7 +545,7 @@ public partial class GenericStubOverrideStub
     //
     // For generic methods, use the standard interceptor API:
     //   stub.Create.Of<List<int>>().Return(new List<int>());
-    //   stub.Create.Of<User>().Return(() => new User { Id = 1 });
+    //   stub.Create.Of<User>().Call(() => new User { Id = 1 });
     //
     // The Of<T>() pattern handles both behavior AND verification consistently.
     // =========================================================================
@@ -567,7 +567,7 @@ public partial class GenericStubOverrideDemo
         IGenericStubOverrideService service = stub;
 
         // Configure via Of<T>().Return() - this is the ONLY way for generic methods
-        stub.Create.Of<List<int>>().Return(() => new List<int> { 1, 2, 3 });
+        stub.Create.Of<List<int>>().Call(() => new List<int> { 1, 2, 3 });
 
         var list = service.Create<List<int>>();
         // list == { 1, 2, 3 }
@@ -582,7 +582,7 @@ public partial class GenericStubOverrideDemo
         IGenericStubOverrideService service = stub;
 
         // Multi-type-parameter methods also use Of<T>().Return()
-        stub.Transform.Of<string, StringBuilder>().Return(input => new StringBuilder($"transformed: {input}"));
+        stub.Transform.Of<string, StringBuilder>().Call(input => new StringBuilder($"transformed: {input}"));
 
         var result = service.Transform<string, StringBuilder>("hello");
         // result.ToString() == "transformed: hello"
@@ -613,8 +613,8 @@ public partial class GenericStubOverrideDemo
 //
 // PRIORITY CHAIN:
 // 1. When chains (parameter-specific matching)
-// 2. Sequences (ThenReturns/ThenExecute chain)
-// 3. Returns/Execute (explicit configuration)
+// 2. Sequences (ThenReturn/ThenCall chain)
+// 3. Return/Call (explicit configuration)
 // 4. Stub Override (fallback - always called if nothing else matches)
 //
 // This is the same priority order as inline stubs, except stub override replaces
@@ -694,7 +694,7 @@ public static class WhenChainStubOverrideDemo
         IStubOverrideService service = stub;
 
         // Configure specific parameter combinations
-        stub.Calculate.When((0, 0)).Return(0);  // Edge case
+        stub.Calculate.When(0, 0).Return(0);  // Edge case
         stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);  // Both negative
 
         // Matching calls use When chain
@@ -743,7 +743,7 @@ public static class WhenChainStubOverrideDemo
         var from_user = service.Process("anything");   // Stub override result
 
         // You can also configure Returns which takes precedence over stub override
-        stub.Process.Return(input => $"[RETURNS: {input}]");
+        stub.Process.Call(input => $"[RETURNS: {input}]");
         var from_returns = service.Process("test");     // "[RETURNS: test]"
     }
 }
@@ -767,7 +767,7 @@ public static class WhenChainStubOverrideDemo
 // - Basic stub overrides (any parameter count)
 // - Clean interceptor names (stub.Process, not stub.Process2)
 // - Interceptors with Verify(), LastArg, LastArgs, Reset(), Verifiable()
-// - Returns/Execute supersede stub overrides per-test
+// - Return/Call supersede stub overrides per-test
 // - Mixed stubs (some methods overridden, some not)
 // - Strict mode bypass for overridden methods
 // - Async stub overrides (Task<T>, Task, ValueTask<T>)
@@ -791,7 +791,7 @@ public static class WhenChainStubOverrideDemo
 //    Q: Do async stub overrides work as expected?
 //    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
 //       - Override the virtual method (ProcessAsync_)
-//       - Interceptors have Returns/Execute with auto-wrap
+//       - Interceptors have Return/Call with auto-wrap
 //       - See AsyncStubOverrideStub for working examples
 //
 // 3. GENERIC STUB OVERRIDES

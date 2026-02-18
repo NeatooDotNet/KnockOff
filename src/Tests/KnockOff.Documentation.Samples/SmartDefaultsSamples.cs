@@ -218,7 +218,7 @@ public class NoConstructorSmartDefaultsTests
         // factory.GetUser(); // throws InvalidOperationException
 
         // Fix: configure Return to provide the value
-        stub.GetUser.Return(() => new UserWithRequiredCtor(1, "Configured"));
+        stub.GetUser.Call(() => new UserWithRequiredCtor(1, "Configured"));
         #endregion
 
         var user = factory.GetUser();
@@ -294,7 +294,7 @@ public class OverrideSmartDefaultsTests
         var stub = new OverridableServiceStub();
 
         #region smart-defaults-override-oncall
-        stub.GetUser.Return(() => new User { Name = "Test" });
+        stub.GetUser.Call(() => new User { Name = "Test" });
         #endregion
 
         IOverridableService service = stub;

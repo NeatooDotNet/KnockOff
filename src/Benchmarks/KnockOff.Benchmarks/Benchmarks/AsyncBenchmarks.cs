@@ -27,7 +27,7 @@ public class AsyncInvocationBenchmarks
 
         var stub = new AsyncServiceStub();
         stub.DoWorkAsync.Call(() => Task.CompletedTask);
-        stub.GetValueAsync.Return(() => Task.FromResult(42));
+        stub.GetValueAsync.Call(() => Task.FromResult(42));
         stub.GetStringValueAsync.Return("test");
         _knockOff = stub;
     }
@@ -79,7 +79,7 @@ public class AsyncSetupBenchmarks
     {
         var stub = new AsyncServiceStub();
         stub.DoWorkAsync.Call(() => Task.CompletedTask);
-        stub.GetValueAsync.Return(() => Task.FromResult(42));
+        stub.GetValueAsync.Call(() => Task.FromResult(42));
         stub.GetStringValueAsync.Return("test");
         return stub;
     }

@@ -55,7 +55,7 @@ Return/Call callbacks receive only the method's parameters. The callback must ma
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 // Return signature must match method parameters exactly
-stub.GetByIdAsync.Return((int id) =>
+stub.GetByIdAsync.Call((int id) =>
     Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 ```
 <!-- endSnippet -->
@@ -102,7 +102,7 @@ KnockOff throws this exception for methods returning non-nullable reference type
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
 // Configure required (non-nullable) return values explicitly
-stub.GetName.Return(() => "Configured Name");
+stub.GetName.Call(() => "Configured Name");
 ```
 <!-- endSnippet -->
 
@@ -179,10 +179,10 @@ public partial class CalcDelegateTests { }
 <!-- snippet: troubleshoot-delegate-interceptor-pattern -->
 ```cs
 // Interface stub pattern:
-interfaceStub.GetById.Return((id) => user);
+interfaceStub.GetById.Call((id) => user);
 
 // Delegate stub pattern (different!):
-delegateStub.Interceptor.Return((a, b) => a + b);
+delegateStub.Interceptor.Call((a, b) => a + b);
 delegateStub.Interceptor.Return(42);
 ```
 <!-- endSnippet -->
@@ -200,19 +200,19 @@ delegateStub.Interceptor.Return(42);
 // Delegate: int CalcOperation(int a, int b)
 
 // Wrong: missing parameter
-// stub.Interceptor.Return((a) => a);
+// stub.Interceptor.Call((a) => a);
 
 // Wrong: wrong parameter type
-// stub.Interceptor.Return((string a, string b) => 0);
+// stub.Interceptor.Call((string a, string b) => 0);
 ```
 <!-- endSnippet -->
 
 <!-- snippet: troubleshoot-delegate-oncall-correct -->
 ```cs
 // Correct: matches delegate signature
-stub.Interceptor.Return((int a, int b) => a + b);
+stub.Interceptor.Call((int a, int b) => a + b);
 // Or with inferred types:
-stub.Interceptor.Return((a, b) => a + b);
+stub.Interceptor.Call((a, b) => a + b);
 ```
 <!-- endSnippet -->
 
@@ -316,7 +316,7 @@ ITroubleshootUserRepo repo = stub;
 var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
 // You can still override per-test with Return
-stub.GetById.Return(id => new User { Id = id, Name = "Test User" });
+stub.GetById.Call(id => new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
 

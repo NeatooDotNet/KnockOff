@@ -196,7 +196,7 @@ public class DelegateValueOverloadTests
 		Assert.Equal("value", factory());
 
 		// Then configure with callback - should override
-		stub.Interceptor.Return(() => "callback");
+		stub.Interceptor.Call(() => "callback");
 		Assert.Equal("callback", factory());
 	}
 
@@ -207,7 +207,7 @@ public class DelegateValueOverloadTests
 		StringFactory factory = stub;
 
 		// First configure with callback
-		stub.Interceptor.Return(() => "callback");
+		stub.Interceptor.Call(() => "callback");
 		Assert.Equal("callback", factory());
 
 		// Then configure with value - should override

@@ -25,7 +25,7 @@ public class InlineClassGenericMethodTests
 	public void Return_ConfiguresGenericMethod()
 	{
 		var stub = new GenericMethodInlineClassTest.Stubs.GenericMethodBase();
-		stub.Convert.Of<int>().Return((value) => 42);
+		stub.Convert.Of<int>().Call((value) => 42);
 
 		var result = stub.Object.Convert<int>("anything");
 
@@ -61,7 +61,7 @@ public class InlineClassGenericMethodTests
 	public void MultipleTypeParams_WithConstraints()
 	{
 		var stub = new GenericMethodInlineClassTest.Stubs.GenericMethodBase();
-		stub.Transform.Of<string, List<int>>().Return((input) => new List<int> { input.Length });
+		stub.Transform.Of<string, List<int>>().Call((input) => new List<int> { input.Length });
 
 		var result = stub.Object.Transform<string, List<int>>("hello");
 
@@ -166,7 +166,7 @@ public class StandaloneClassGenericMethodTests
 	public void Return_ConfiguresGenericMethod()
 	{
 		var stub = new GenericMethodStandaloneStub();
-		stub.Convert.Of<int>().Return((value) => 42);
+		stub.Convert.Of<int>().Call((value) => 42);
 
 		var result = stub.Object.Convert<int>("anything");
 
@@ -202,7 +202,7 @@ public class StandaloneClassGenericMethodTests
 	public void MultipleTypeParams_WithConstraints()
 	{
 		var stub = new GenericMethodStandaloneStub();
-		stub.Transform.Of<string, List<int>>().Return((input) => new List<int> { input.Length });
+		stub.Transform.Of<string, List<int>>().Call((input) => new List<int> { input.Length });
 
 		var result = stub.Object.Transform<string, List<int>>("hello");
 
@@ -291,7 +291,7 @@ public class GenericStandaloneClassGenericMethodTests
 	public void Return_ConfiguresGenericMethod()
 	{
 		var stub = new GenericMethodRepositoryStub<string>();
-		stub.ConvertEntity.Of<int>().Return((entity) => entity.Length);
+		stub.ConvertEntity.Of<int>().Call((entity) => entity.Length);
 
 		var result = stub.Object.ConvertEntity<int>("hello");
 
@@ -339,7 +339,7 @@ public class GenericStandaloneClassGenericMethodTests
 	{
 		// GetById uses TEntity (class-level) not a method-level type param
 		var stub = new GenericMethodRepositoryStub<string>();
-		stub.GetById.Return((id) => $"entity-{id}");
+		stub.GetById.Call((id) => $"entity-{id}");
 
 		var result = stub.Object.GetById(42);
 
@@ -372,7 +372,7 @@ public class OpenGenericClassGenericMethodTests
 	public void Return_ConfiguresGenericMethod()
 	{
 		var stub = new GenericMethodOpenGenericClassTest.Stubs.GenericMethodRepositoryBase<string>();
-		stub.ConvertEntity.Of<int>().Return((entity) => entity.Length);
+		stub.ConvertEntity.Of<int>().Call((entity) => entity.Length);
 
 		var result = stub.Object.ConvertEntity<int>("hello");
 
@@ -419,7 +419,7 @@ public class OpenGenericClassGenericMethodTests
 	public void ClassLevelTypeParam_MethodStillWorks()
 	{
 		var stub = new GenericMethodOpenGenericClassTest.Stubs.GenericMethodRepositoryBase<string>();
-		stub.GetById.Return((id) => $"entity-{id}");
+		stub.GetById.Call((id) => $"entity-{id}");
 
 		var result = stub.Object.GetById(42);
 

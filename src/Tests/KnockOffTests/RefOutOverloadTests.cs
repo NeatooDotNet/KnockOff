@@ -23,7 +23,7 @@ public class RefOutOverloadTests
 		var knockOff = new RefOutOverloadServiceKnockOff();
 		IRefOutOverloadService service = knockOff;
 
-		var tracking = knockOff.Process.Return((input) => input.Length);
+		var tracking = knockOff.Process.Call((input) => input.Length);
 
 		var result = service.Process("hello");
 
@@ -38,7 +38,7 @@ public class RefOutOverloadTests
 		var knockOff = new RefOutOverloadServiceKnockOff();
 		IRefOutOverloadService service = knockOff;
 
-		var tracking = knockOff.Process.Return((string input, ref int counter) =>
+		var tracking = knockOff.Process.Call((string input, ref int counter) =>
 		{
 			counter += input.Length;
 			return counter;
@@ -61,8 +61,8 @@ public class RefOutOverloadTests
 		var knockOff = new RefOutOverloadServiceKnockOff();
 		IRefOutOverloadService service = knockOff;
 
-		var tracking1 = knockOff.Process.Return((input) => 1);
-		var tracking2 = knockOff.Process.Return((string input, ref int counter) =>
+		var tracking1 = knockOff.Process.Call((input) => 1);
+		var tracking2 = knockOff.Process.Call((string input, ref int counter) =>
 		{
 			counter++;
 			return 2;
@@ -83,7 +83,7 @@ public class RefOutOverloadTests
 		var knockOff = new RefOutOverloadServiceKnockOff();
 		IRefOutOverloadService service = knockOff;
 
-		knockOff.TryGet.Return((key) => key == "exists");
+		knockOff.TryGet.Call((key) => key == "exists");
 
 		Assert.True(service.TryGet("exists"));
 		Assert.False(service.TryGet("missing"));
@@ -95,7 +95,7 @@ public class RefOutOverloadTests
 		var knockOff = new RefOutOverloadServiceKnockOff();
 		IRefOutOverloadService service = knockOff;
 
-		knockOff.TryGet.Return((string key, out string? value) =>
+		knockOff.TryGet.Call((string key, out string? value) =>
 		{
 			if (key == "exists")
 			{
@@ -119,7 +119,7 @@ public class RefOutOverloadTests
 		IRefOutOverloadService service = knockOff;
 
 		knockOff.Process
-			.Return((string input, ref int counter) =>
+			.Call((string input, ref int counter) =>
 			{
 				counter += 1;
 				return 100;

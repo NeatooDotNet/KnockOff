@@ -20,7 +20,7 @@ internal static class ClassRenderer
     /// <summary>
     /// Renders a class stub to the CodeWriter at the given base indent level.
     /// </summary>
-    public static void Render(CodeWriter w, InlineClassStubModel cls, int baseIndent = 2, HashSet<string>? emittedCompositorDelegates = null)
+    public static void Render(CodeWriter w, InlineClassStubModel cls, int baseIndent = 2)
     {
         var indent = new string('\t', baseIndent);
         var indent1 = indent + "\t";
@@ -32,7 +32,6 @@ internal static class ClassRenderer
         var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
         var preCompiledDelegateDecls = new Dictionary<string, string>(); // interceptorName -> delegate declaration
         var preCompiledSyncDelegateDecls = new Dictionary<string, string>(); // interceptorName -> sync delegate declaration
-        var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
         var renderedInterceptorClasses = new HashSet<string>();
 
         // Render interceptor classes
@@ -86,48 +85,20 @@ internal static class ClassRenderer
             }
         }
 
-        // Use shared MethodInterceptorRenderer for method interceptors
+        // All method interceptors are fully generated classes inheriting from MethodInterceptorRuntime.
+        // No pre-compiled method interceptor types are used (Phase 2 redesign).
         foreach (var method in cls.Methods)
         {
             if (renderedInterceptorClasses.Add(method.InterceptorClassName))
             {
-                if (PreCompiledInterceptorRenderer.CanUsePreCompiled(method))
-                {
-                    preCompiledInterceptors[method.MethodName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(method);
-                    // Track delegate declaration for TTuple types (1+ params)
-                    if (method.Parameters.Count > 0)
-                    {
-                        preCompiledDelegateDecls[method.MethodName] = PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
-                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
-                        var syncDecl = PreCompiledInterceptorRenderer.BuildSyncDelegateDeclaration(
-                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
-                        if (syncDecl != null)
-                            preCompiledSyncDelegateDecls[method.MethodName] = syncDecl;
-                    }
-                }
-                else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
-                {
-                    var options = new InterceptorRenderOptions(
-                        BaseIndent: 2,
-                        IncludeStrictParameter: true,
-                        StrictAccessExpression: "strict",
-                        InterceptorTypeParameters: cls.TypeParameterList,
-                        InterceptorConstraints: cls.ConstraintClauses);
-                    w.SetIndent(2);
-                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options, emittedCompositorDelegates);
-                    compositorGroups[method.MethodName] = method;
-                }
-                else
-                {
-                    var options = new InterceptorRenderOptions(
-                        BaseIndent: 2,
-                        IncludeStrictParameter: true,
-                        StrictAccessExpression: "strict",
-                        InterceptorTypeParameters: cls.TypeParameterList,
-                        InterceptorConstraints: cls.ConstraintClauses);
-                    w.SetIndent(2);
-                    MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
-                }
+                var options = new InterceptorRenderOptions(
+                    BaseIndent: 2,
+                    IncludeStrictParameter: true,
+                    StrictAccessExpression: "strict",
+                    InterceptorTypeParameters: cls.TypeParameterList,
+                    InterceptorConstraints: cls.ConstraintClauses);
+                w.SetIndent(2);
+                MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
             }
         }
 
@@ -171,10 +142,6 @@ internal static class ClassRenderer
             {
                 w.Line($"{indent1}public {newKeyword}{preCompiledType} {interceptorProp.PropertyName} {{ get; }} = new(\"{interceptorProp.PropertyName}\");");
             }
-            else if (compositorGroups.ContainsKey(interceptorProp.PropertyName))
-            {
-                w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
-            }
             else
             {
                 w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
@@ -208,7 +175,7 @@ internal static class ClassRenderer
         RenderClassVerifyMethods(w, cls, indent1, indent2);
 
         // Nested Impl class
-        RenderImplClass(w, cls, indent1, indent2, indent3, indent4, preCompiledInterceptors, compositorGroups);
+        RenderImplClass(w, cls, indent1, indent2, indent3, indent4, preCompiledInterceptors);
 
         w.Line($"{indent}}}");
         w.Line();
@@ -569,7 +536,7 @@ internal static class ClassRenderer
         }
 
         // Return/Call method
-        var typedHandlerEntryPoint = arity.IsVoid ? "Call" : "Return";
+        var typedHandlerEntryPoint = "Call";
         w.Line($"{indent1}/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
         w.Line($"{indent1}public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({methodName}Delegate callback) {{ _call = callback; return this; }}");
         w.Line();
@@ -717,8 +684,7 @@ internal static class ClassRenderer
         string indent1,
         string indent2,
         string indent3,
-        Dictionary<string, string> preCompiledInterceptors,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, string> preCompiledInterceptors)
     {
         var stubClassName = cls.StubClassName + cls.TypeParameterList;
 
@@ -784,7 +750,7 @@ internal static class ClassRenderer
         // Method overrides
         foreach (var method in cls.ImplMethods)
         {
-            RenderImplMethodOverride(w, method, indent1, indent2, preCompiledInterceptors, compositorGroups);
+            RenderImplMethodOverride(w, method, indent1, indent2, preCompiledInterceptors);
         }
 
         // Event overrides
@@ -1016,8 +982,7 @@ internal static class ClassRenderer
         InlineClassImplMethodModel method,
         string indent,
         string indent1,
-        Dictionary<string, string> preCompiledInterceptors,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, string> preCompiledInterceptors)
     {
         if (method.IsGenericMethod)
         {
@@ -1026,7 +991,6 @@ internal static class ClassRenderer
         }
 
         var isPreCompiled = preCompiledInterceptors.ContainsKey(method.HandlerName);
-        var isCompositor = compositorGroups.ContainsKey(method.HandlerName);
 
         if (method.DoesNotReturn)
         {
@@ -1117,9 +1081,9 @@ internal static class ClassRenderer
             // Build invoke arguments: strict, then method parameters
             // For pre-compiled interceptors, strip ref/in prefixes and wrap for TTuple
             var rawInputArgs = method.InputArgumentList;
-            var cleanInputArgs = (isPreCompiled || isCompositor) ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
+            var cleanInputArgs = isPreCompiled ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
             string invokeArgs;
-            if (isPreCompiled || isCompositor)
+            if (isPreCompiled)
             {
                 // TTuple types: wrap 2+ params in tuple literal for Invoke(bool strict, TArgs args)
                 var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanInputArgs);
@@ -1130,7 +1094,7 @@ internal static class ClassRenderer
                 invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
             }
 
-            // Determine if ValueTask wrapping is needed (only for pre-compiled/compositor)
+            // Determine if ValueTask wrapping is needed (only for pre-compiled interceptors)
             var needsValueTaskWrap = false;
             var needsVoidValueTaskWrap = false;
             if (isPreCompiled)
@@ -1140,7 +1104,7 @@ internal static class ClassRenderer
                 needsValueTaskWrap = isAsyncValueTaskT;
                 needsVoidValueTaskWrap = isVoidValueTask;
             }
-            // Compositors already handle ValueTask wrapping in their Invoke methods
+            // Non-precompiled interceptors handle ValueTask wrapping in their Invoke methods
 
             if (method.IsAbstract)
             {

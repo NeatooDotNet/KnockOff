@@ -107,7 +107,7 @@ public class PartialOverrideTests
 
         #region source-partial-override
         // Override specific member while source handles the rest
-        stub.GetById.Return((id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.Call((id) => new User { Id = id, Name = "Test User" });
         #endregion
 
         IRepository repository = stub;
@@ -207,7 +207,7 @@ public class PriorityOrderTests
 
         #region source-priority
         // Return takes precedence over source
-        stub.GetPriority.Return((user) => 42);
+        stub.GetPriority.Call((user) => 42);
         #endregion
         var fromReturn = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromReturn);
@@ -226,7 +226,7 @@ public class PriorityOrderTests
         stub.GetPriority.Return(99);
 
         // Callback overload - use when you need logic or side effects
-        stub.GetPriority.Return((user) => user.IsActive ? 1 : 0);
+        stub.GetPriority.Call((user) => user.IsActive ? 1 : 0);
         #endregion
 
         var result = repository.GetPriority(new User { IsActive = true });
@@ -242,7 +242,7 @@ public class PriorityOrderTests
         IRepository repository = stub;
 
         #region source-oncall-api-callback
-        stub.GetById.Return((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetById.Call((id) => new User { Id = id, Name = $"User{id}" });
         #endregion
 
         var user = repository.GetById(1);
@@ -448,7 +448,7 @@ public class SourceRefBasicTests
 
         #region source-delegation-ref-priority
         stub.Source(realCalculator);
-        stub.Divide.When((10, 2)).Return(5);
+        stub.Divide.When(10, 2).Return(5);
 
         ISourceCalc calc = stub;
         calc.Divide(10, 2);  // 5 (When chain matched)
@@ -474,7 +474,7 @@ public class CompleteSourceExampleTests
 
         #region source-complete-example
         // Return takes full control - source not consulted even for non-matches
-        stub.Read.Return((filename) =>
+        stub.Read.Call((filename) =>
             filename == "config.txt" ? "Test Config" : null);
         #endregion
 

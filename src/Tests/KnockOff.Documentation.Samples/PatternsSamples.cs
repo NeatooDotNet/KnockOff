@@ -37,7 +37,7 @@ public class StandalonePatternTests
         #region patterns-standalone-usage
         // Stand-Alone: instantiate like any class, configure via Verify()
         var stub = new UserRepoStandaloneStub();
-        stub.GetById.Return((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
         stub.Save.Call((user) => { }).Verifiable();
         #endregion
 
@@ -77,7 +77,7 @@ public partial class InlineInterfaceTests
         #region patterns-inline-interface-usage
         // Inline Interface: access via Stubs namespace
         var stub = new Stubs.IUserRepoInline();
-        stub.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
         stub.Save.Call((user) => { }).Verifiable();
         #endregion
 
@@ -119,7 +119,7 @@ public partial class InlineClassTests
         #region patterns-inline-class-usage
         // Inline Class: configure stub, use .Object for the class instance
         var stub = new Stubs.UserServiceClass();
-        stub.GetUser.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+        stub.GetUser.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
         UserServiceClass service = stub.Object;
         #endregion
 
@@ -156,7 +156,7 @@ public partial class InlineDelegateTests
         #region patterns-inline-delegate-usage
         // Inline Delegate: configure via Interceptor, implicit conversion to delegate
         var ruleStub = new Stubs.ValidationRule();
-        ruleStub.Interceptor.Return((value) => value != "invalid");
+        ruleStub.Interceptor.Call((value) => value != "invalid");
         ValidationRule rule = ruleStub;
         #endregion
 
@@ -194,11 +194,11 @@ public class GenericStandalonePatternTests
         #region patterns-generic-standalone-usage
         // Generic Standalone: reusable across multiple type arguments
         var userRepo = new RepositoryGenericStub<User>();
-        userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
         userRepo.Save.Call((entity) => { }).Verifiable();
 
         var productRepo = new RepositoryGenericStub<Product>();
-        productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+        productRepo.GetById.Call((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
         #endregion
 
         IRepositoryGeneric<User> userRepository = userRepo;
@@ -275,7 +275,7 @@ public class GenericStandaloneClassPatternTests
         #region patterns-generic-standalone-class-usage
         // Generic Standalone Class: reusable across multiple type arguments, uses .Object
         var stub = new RepositoryBaseStub<User>();
-        stub.GetItem.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        stub.GetItem.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
         stub.Save.Call((entity) => { }).Verifiable();
         RepositoryBase<User> service = stub.Object;
         #endregion
@@ -315,10 +315,10 @@ public partial class OpenGenericTests
         #region patterns-open-generic-usage
         // Open Generic: instantiate with any type argument
         var userStub = new Stubs.IServiceOpenGeneric<User>();
-        userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+        userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
         var productStub = new Stubs.IServiceOpenGeneric<Product>();
-        productStub.GetItem.Return((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
+        productStub.GetItem.Call((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
         #endregion
 
         IServiceOpenGeneric<User> userService = userStub;
@@ -362,7 +362,7 @@ public partial class OpenGenericClassTests
         #region patterns-open-generic-class-usage
         // Open Generic Class: instantiate with any type argument, use .Object
         var userStub = new Stubs.ServiceBaseOpenGeneric<User>();
-        userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+        userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
         // IMPORTANT: .Object gives you the actual class instance
         ServiceBaseOpenGeneric<User> service = userStub.Object;
@@ -449,7 +449,7 @@ public class PatternComparisonTests
 
         // 1. Standalone Interface: direct instantiation, stub IS implementation
         var emailStub = new EmailSvcPatternStub();
-        emailStub.Send.Return((to, subject, body) => true).Verifiable();
+        emailStub.Send.Call(_ => true).Verifiable();
         IEmailSvcPattern email = emailStub;
 
         // 2. Generic Standalone Interface: reusable with type args
@@ -465,7 +465,7 @@ public class PatternComparisonTests
 
         // 4. Generic Standalone Class: reusable class stub with type args
         var repoStub = new RepositoryBaseStub<Product>();
-        repoStub.GetItem.Return((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+        repoStub.GetItem.Call((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
         repoStub.Save.Call((entity) => { }).Verifiable();
         RepositoryBase<Product> repo = repoStub.Object;
 
@@ -483,7 +483,7 @@ public class PatternComparisonTests
 
         // 7. Inline Delegate: implicit conversion
         var ruleStub = new InlineDelegateTests.Stubs.ValidationRule();
-        ruleStub.Interceptor.Return((value) => true);
+        ruleStub.Interceptor.Call((value) => true);
         ValidationRule rule = ruleStub;
 
         // 8. Open Generic Interface: inline stub with type args
@@ -493,7 +493,7 @@ public class PatternComparisonTests
 
         // 9. Open Generic Class: inline stub with type args, uses .Object
         var serviceStub = new CompleteExampleOpenGenericClassHost.Stubs.ServiceBase<Order>();
-        serviceStub.GetItem.Return((id) => new Order { Id = id }).Verifiable();
+        serviceStub.GetItem.Call((id) => new Order { Id = id }).Verifiable();
         ServiceBase<Order> service = serviceStub.Object;
         #endregion
 

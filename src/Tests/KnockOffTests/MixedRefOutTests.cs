@@ -22,7 +22,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Process.Return((string input, out string output, ref int counter) =>
+		knockOff.Process.Call((string input, out string output, ref int counter) =>
 		{
 			output = input.ToUpperInvariant();
 			counter++;
@@ -43,7 +43,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Process.Return((string input, out string output, ref int counter) =>
+		knockOff.Process.Call((string input, out string output, ref int counter) =>
 		{
 			output = input;
 			counter += 100;
@@ -66,7 +66,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Transform.Return((string input, out string transformed, out bool wasModified) =>
+		knockOff.Transform.Call((string input, out string transformed, out bool wasModified) =>
 		{
 			transformed = input.Trim();
 			wasModified = transformed != input;
@@ -86,7 +86,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Transform.Return((string input, out string transformed, out bool wasModified) =>
+		knockOff.Transform.Call((string input, out string transformed, out bool wasModified) =>
 		{
 			transformed = input.Trim();
 			wasModified = transformed != input;
@@ -120,7 +120,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Process.Return((string input, out string output, ref int counter) =>
+		knockOff.Process.Call((string input, out string output, ref int counter) =>
 		{
 			output = input;
 			return true;
@@ -139,7 +139,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		knockOff.Transform.Return((string input, out string transformed, out bool wasModified) =>
+		knockOff.Transform.Call((string input, out string transformed, out bool wasModified) =>
 		{
 			transformed = input;
 			wasModified = false;
@@ -159,7 +159,7 @@ public class MixedRefOutTests
 		IMixedRefOutService service = knockOff;
 
 		knockOff.Process
-			.Return((string input, out string output, ref int counter) =>
+			.Call((string input, out string output, ref int counter) =>
 			{
 				output = "first";
 				counter += 1;
@@ -195,7 +195,7 @@ public class MixedRefOutTests
 		var knockOff = new MixedRefOutServiceKnockOff();
 		IMixedRefOutService service = knockOff;
 
-		var tracking = knockOff.Process.Return((string input, out string output, ref int counter) =>
+		var tracking = knockOff.Process.Call((string input, out string output, ref int counter) =>
 		{
 			output = input;
 			return true;

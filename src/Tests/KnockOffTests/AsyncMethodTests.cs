@@ -33,7 +33,7 @@ public class AsyncMethodTests
 	public async Task AsyncMethod_TaskOfNullableT_ReturnsDefault()
 	{
 		var knockOff = new AsyncServiceKnockOff();
-		var tracking = knockOff.GetOptionalAsync.Return(() => Task.FromResult<string?>(null));
+		var tracking = knockOff.GetOptionalAsync.Call(() => Task.FromResult<string?>(null));
 		IAsyncService service = knockOff;
 
 		var result = await service.GetOptionalAsync();

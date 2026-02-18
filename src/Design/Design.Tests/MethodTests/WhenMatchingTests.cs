@@ -16,7 +16,7 @@ public class WhenMatchingTests
     public void When_MatchesExactValues()
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
-        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When(1, 2).Return(100);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -27,7 +27,7 @@ public class WhenMatchingTests
     public void When_NoMatchReturnsDefault()
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
-        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When(1, 2).Return(100);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -50,9 +50,9 @@ public class WhenMatchingTests
     public void When_ThenWhen_ChainMultipleConditions()
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
-        stub.Add.When((1, 2)).Return(10)
-            .ThenWhen((3, 4)).Return(20)
-            .ThenCall((a, b) => a + b);
+        stub.Add.When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20)
+            .ThenCall(args => args.a + args.b);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -65,7 +65,7 @@ public class WhenMatchingTests
     public void When_ThenNone_StopsMatching()
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
-        stub.Add.When((1, 2)).Return(100)
+        stub.Add.When(1, 2).Return(100)
             .ThenNone();
 
         Design.Domain.Services.ICalculator calc = stub;
@@ -93,9 +93,9 @@ public class WhenMatchingTests
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
 
-        var chain = stub.Add.When((1, 2)).Return(100)
-            .ThenWhen((3, 4)).Return(200)
-            .ThenCall((a, b) => 999);
+        var chain = stub.Add.When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
+            .ThenCall(_ => 999);
 
         Design.Domain.Services.ICalculator calc = stub;
 

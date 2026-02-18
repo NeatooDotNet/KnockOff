@@ -210,7 +210,7 @@ public class StubOverrideWhenTests
     {
         // Arrange
         var stub = new WhenStubOverrideStub();
-        stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
+        stub.Process.Call(s => "[FIRST]").ThenReturn("[SECOND]");
 
         // Act
         IWhenStubOverrideTest service = stub;
@@ -304,7 +304,7 @@ public class StubOverrideWhenTests
     {
         // Arrange
         var stub = new WhenStubOverrideStub();
-        stub.Process.Return(s => "[ONCALL]");
+        stub.Process.Call(s => "[ONCALL]");
         stub.Process.When("special").Return("[WHEN]");
 
         // Act
@@ -346,7 +346,7 @@ public class StubOverrideWhenTests
     {
         // Arrange
         var stub = new WhenStubOverrideStub();
-        stub.Calculate.When((0, 0)).Return(0);
+        stub.Calculate.When(0, 0).Return(0);
         stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);
 
         // Act
@@ -446,7 +446,7 @@ public class StubOverrideWhenTests
     {
         // Arrange - Format2 (two-param overload) has no stub override
         var stub = new OverloadedStubOverrideStub();
-        stub.Format2.When(("hello", true)).Return("[WHEN UPPER]");
+        stub.Format2.When("hello", true).Return("[WHEN UPPER]");
         stub.Format2.Return("[DEFAULT]");
 
         // Act
@@ -465,7 +465,7 @@ public class StubOverrideWhenTests
         // Arrange - Configure When on both overloads independently
         var stub = new OverloadedStubOverrideStub();
         stub.Format.When("special").Return("[WHEN1]");
-        stub.Format2.When(("special", true)).Return("[WHEN2]");
+        stub.Format2.When("special", true).Return("[WHEN2]");
         stub.Format2.Return("[DEFAULT2]");
 
         // Act

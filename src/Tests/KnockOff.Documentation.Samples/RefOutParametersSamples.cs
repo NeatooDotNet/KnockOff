@@ -63,7 +63,7 @@ public partial class RefOutTests
         #region refout-tryget
         var stub = new Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "found-" + key;
             return true;
@@ -89,7 +89,7 @@ public partial class RefOutTests
         #region refout-dictionary
         var data = new Dictionary<string, string> { ["key1"] = "value1" };
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
             data.TryGetValue(key, out value!));
         #endregion
 
@@ -178,7 +178,7 @@ public partial class RefOutTests
         var stub = new Stubs.IMixedRefOutService();
 
         #region refout-mixed
-        stub.Process.Return((string input, out string output, ref int counter) =>
+        stub.Process.Call((string input, out string output, ref int counter) =>
         {
             output = input.ToUpperInvariant();
             counter++;
@@ -206,7 +206,7 @@ public partial class RefOutTests
 
         #region refout-sequences
         stub.TryGetValue
-            .Return((string key, out string value) => { value = "first"; return true; })
+            .Call((string key, out string value) => { value = "first"; return true; })
             .ThenReturn((string key, out string value) => { value = "second"; return true; });
         #endregion
 
@@ -229,7 +229,7 @@ public partial class RefOutTests
     {
         var stub = new Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;

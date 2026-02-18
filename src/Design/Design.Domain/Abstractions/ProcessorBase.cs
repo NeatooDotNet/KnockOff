@@ -14,7 +14,7 @@ public abstract class ProcessorBase
     public abstract string Name { get; }
 
     // =========================================================================
-    // COMPATIBLE OVERLOADS - Single interceptor with multiple OnCall
+    // COMPATIBLE OVERLOADS - Single interceptor with multiple Call
     // =========================================================================
 
     /// <summary>Process with no parameters.</summary>

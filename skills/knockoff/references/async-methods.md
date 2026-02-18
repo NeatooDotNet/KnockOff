@@ -24,7 +24,7 @@ var result = await service.FetchAsync(1); // "value"
 
 <!-- snippet: async-tier2-callback -->
 ```cs
-stub.FetchAsync.Return((id) => $"Fetch-{id}");
+stub.FetchAsync.Call((id) => $"Fetch-{id}");
 // Internally: Task.FromResult(callback(id))
 
 IAsyncFetchSvc service = stub;
@@ -36,7 +36,7 @@ var result = await service.FetchAsync(42); // "Fetch-42"
 
 <!-- snippet: async-tier3-full -->
 ```cs
-stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+stub.FetchAsync.Call((int id) => Task.FromResult($"Full-{id}"));
 // Used as-is -- for custom async behavior
 
 IAsyncFetchSvc service = stub;
@@ -85,8 +85,8 @@ Callback sequences also work:
 
 <!-- snippet: async-callback-sequences -->
 ```cs
-stub.FetchAsync.Return((id) => $"First-{id}")
-    .ThenReturn((id) => $"Second-{id}")
+stub.FetchAsync.Call((id) => $"First-{id}")
+    .ThenReturn((id) => Task.FromResult($"Second-{id}"))
     .ThenReturn("constant");
 ```
 <!-- endSnippet -->
@@ -208,9 +208,9 @@ public partial class AsyncOverrideDemoStub
 | Task | Code |
 |------|------|
 | Return value (auto-wrap) | `stub.Method.Return("value")` |
-| Return callback (auto-wrap) | `stub.Method.Return((args) => result)` |
-| Return full async | `stub.Method.Return((args) => Task.FromResult(result))` |
-| Void async callback | `stub.Method.Return((args) => { })` |
+| Simplified callback (auto-wrap) | `stub.Method.Call((args) => result)` |
+| Full async callback | `stub.Method.Call((args) => Task.FromResult(result))` |
+| Void async callback | `stub.Method.Call((args) => { })` |
 | Sequence (auto-wrap) | `stub.Method.Return("a", "b", "c")` |
 | When chain (auto-wrap) | `stub.Method.When(arg).Return("value")` |
 | Verify | `stub.Method.Verify(Called.Once)` |

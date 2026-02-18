@@ -69,7 +69,7 @@ public class TaskMethodTests
 
         #region async-task-simplified-callback
         // Return() with unwrapped return type - auto-wrapped in Task.FromResult
-        stub.GetUserAsync.Return((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+        stub.GetUserAsync.Call((id) => new User { Id = id, Name = "Alice" }).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -87,7 +87,7 @@ public class TaskMethodTests
 
         #region async-task-result
         // Use Task.FromResult when you need parameter-based return values
-        stub.GetUserAsync.Return((id) =>
+        stub.GetUserAsync.Call((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
         #endregion
 
@@ -168,7 +168,7 @@ public class ValueTaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         // Return unwrapped type - auto-wrapped in new ValueTask<T>()
-        stub.GetCachedUserAsync.Return((id) => new User { Id = id, Name = "Cached" }).Verifiable();
+        stub.GetCachedUserAsync.Call((id) => new User { Id = id, Name = "Cached" }).Verifiable();
 
         IAsyncUserSvc service = stub;
         var user = await service.GetCachedUserAsync(42);
@@ -185,7 +185,7 @@ public class ValueTaskMethodTests
 
         #region async-valuetask
         // ValueTask<T> methods use the same Return() API — just return the inner value
-        stub.GetCachedUserAsync.Return((id) =>
+        stub.GetCachedUserAsync.Call((id) =>
             new User { Id = id, Name = "Cached" }).Verifiable();
         #endregion
 
@@ -211,7 +211,7 @@ public class AsyncDelayTests
 
         #region async-delay
         // Use async lambda to simulate network latency
-        stub.GetUserAsync.Return(async (id) =>
+        stub.GetUserAsync.Call(async (id) =>
         {
             await Task.Delay(50);
             return new User { Id = id, Name = "Delayed" };
@@ -242,7 +242,7 @@ public class AsyncExceptionTests
 
         #region async-exception
         // Return a faulted task using Task.FromException
-        stub.GetUserAsync.Return((id) =>
+        stub.GetUserAsync.Call((id) =>
             Task.FromException<User?>(new NotFoundException($"User {id} not found")));
         #endregion
 
@@ -259,7 +259,7 @@ public class AsyncExceptionTests
 
         #region async-throw
         // Throw directly - cast to sync delegate to disambiguate overloads
-        stub.GetUserAsync.Return((AsyncUserSvcStub.GetUserAsyncSyncDelegate)((int id) =>
+        stub.GetUserAsync.Call((Func<int, User?>)((int id) =>
             throw new NotFoundException($"User {id} not found")));
         #endregion
 
@@ -323,7 +323,7 @@ public class AsyncTierTests
         var stub = new AsyncFetchSvcStub();
 
         #region async-tier2-callback
-        stub.FetchAsync.Return((id) => $"Fetch-{id}");
+        stub.FetchAsync.Call((id) => $"Fetch-{id}");
         // Internally: Task.FromResult(callback(id))
 
         IAsyncFetchSvc service = stub;
@@ -339,7 +339,7 @@ public class AsyncTierTests
         var stub = new AsyncFetchSvcStub();
 
         #region async-tier3-full
-        stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+        stub.FetchAsync.Call((int id) => Task.FromResult($"Full-{id}"));
         // Used as-is -- for custom async behavior
 
         IAsyncFetchSvc service = stub;
@@ -387,8 +387,8 @@ public class AsyncTierTests
         var stub = new AsyncFetchSvcStub();
 
         #region async-callback-sequences
-        stub.FetchAsync.Return((id) => $"First-{id}")
-            .ThenReturn((id) => $"Second-{id}")
+        stub.FetchAsync.Call((id) => $"First-{id}")
+            .ThenReturn((id) => Task.FromResult($"Second-{id}"))
             .ThenReturn("constant");
         #endregion
 
@@ -488,7 +488,7 @@ public class CompleteAsyncExampleTests
 
         #region async-complete-example
         // Configure multiple async methods with verification
-        stub.FindAsync.Return((id) =>
+        stub.FindAsync.Call((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
         stub.SaveAsync.Call((user) => { }).Verifiable();
         #endregion

@@ -118,7 +118,7 @@ var orders = new List<Order>
 var stub = new OrderRepoStub(orders);
 
 // Override GetTotal for this specific test
-stub.GetTotal.Return((id) => 999m);
+stub.GetTotal.Call((id) => 999m);
 
 IOrderRepository repo = stub;
 Assert.Equal(999m, repo.GetTotal(1));  // Override wins
@@ -234,10 +234,10 @@ public partial class ReusableRepoStub<T> : IReusableRepo<T> where T : class { }
 ```cs
 // Same stub class, different type arguments
 var orderRepo = new ReusableRepoStub<Order>();
-orderRepo.GetById.Return((id) => new Order { Id = id, Customer = "Test" });
+orderRepo.GetById.Call((id) => new Order { Id = id, Customer = "Test" });
 
 var customerRepo = new ReusableRepoStub<Customer>();
-customerRepo.GetById.Return((id) => new Customer { Id = id, Name = "Test" });
+customerRepo.GetById.Call((id) => new Customer { Id = id, Name = "Test" });
 
 IReusableRepo<Order> orders = orderRepo;
 IReusableRepo<Customer> customers = customerRepo;
@@ -268,7 +268,7 @@ public partial class ReusablePaymentGatewayStub { }
 ```cs
 // Same stub class, different configuration per test
 var stub = new ReusablePaymentGatewayStub();
-stub.ProcessPayment.Return((amount) => amount * 0.98m); // 2% fee
+stub.ProcessPayment.Call((amount) => amount * 0.98m); // 2% fee
 
 ReusablePaymentGateway gateway = stub.Object;
 
@@ -296,10 +296,10 @@ public partial class ValidatorStub<T> where T : class { }
 <!-- snippet: reusable-generic-class-usage -->
 ```cs
 var orderValidator = new ValidatorStub<Order>();
-orderValidator.Validate.Return((entity) => entity.Total > 0);
+orderValidator.Validate.Call((entity) => entity.Total > 0);
 
 var customerValidator = new ValidatorStub<Customer>();
-customerValidator.Validate.Return((entity) => !string.IsNullOrEmpty(entity.Name));
+customerValidator.Validate.Call((entity) => !string.IsNullOrEmpty(entity.Name));
 
 ValidatorBase<Order> ov = orderValidator.Object;
 ValidatorBase<Customer> cv = customerValidator.Object;
@@ -329,4 +329,4 @@ Next: [Stub Overrides](stub-overrides.md) for details on the underscore-suffix o
 
 ---
 
-**UPDATED:** 2026-02-08
+**UPDATED:** 2026-02-18

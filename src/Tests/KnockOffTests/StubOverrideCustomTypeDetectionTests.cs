@@ -153,7 +153,7 @@ public class StubOverrideCustomTypeDetectionTests
     {
         // Arrange
         var stub = new CustomTypeStubOverrideStub();
-        stub.FindUser.Return(q => $"[ONCALL: {q.Id}]");
+        stub.FindUser.Call(q => $"[ONCALL: {q.Id}]");
 
         // Act
         ICustomTypeStubOverrideService service = stub;

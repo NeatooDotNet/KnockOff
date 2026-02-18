@@ -63,7 +63,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.TryUpdate.Return((string key, ref string value) =>
+		var tracking = knockOff.TryUpdate.Call((string key, ref string value) =>
 		{
 			if (key == "valid")
 			{
@@ -151,7 +151,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.TryUpdate.Return((string key, ref string value) =>
+		knockOff.TryUpdate.Call((string key, ref string value) =>
 		{
 			if (key == "modify")
 			{

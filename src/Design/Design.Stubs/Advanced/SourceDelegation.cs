@@ -89,16 +89,16 @@ public partial class SourceDelegationDemo
     }
 
     // =========================================================================
-    // Source Priority vs Returns/Execute Configuration
+    // Source Priority vs Return/Call Configuration
     // =========================================================================
-    // DESIGN DECISION: Returns/Execute configuration always takes priority over
+    // DESIGN DECISION: Return/Call configuration always takes priority over
     // Source delegation. The source is only used when:
-    // 1. The method is NOT configured (no Returns/Execute)
+    // 1. The method is NOT configured (no Return/Call)
     // 2. A When chain doesn't match (falls through to source)
     //
     // Order of evaluation:
     // 1. When chain (if configured)
-    // 2. Returns/Execute configuration
+    // 2. Return/Call configuration
     // 3. Source delegation
     // 4. Default value (if not strict)
     // =========================================================================
@@ -111,7 +111,7 @@ public partial class SourceDelegationDemo
         stub.Source(realCalculator);
 
         // Configure Divide to handle specific case
-        stub.Divide.When((10, 2)).Return(5);
+        stub.Divide.When(10, 2).Return(5);
 
         ICalculator calc = stub;
 
@@ -326,7 +326,7 @@ public partial class SourceHierarchyDemo
 
         // Explicitly configure write operations
         var saved = new Dictionary<int, string>();
-        stub.Save.Call((id, value) => saved[id] = value);
+        stub.Save.Call(args => saved[args.id] = args.value);
         stub.Delete.Call((id) => saved.Remove(id));
 
         IStore store = stub;

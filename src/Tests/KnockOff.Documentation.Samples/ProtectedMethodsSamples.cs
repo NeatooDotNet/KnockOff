@@ -87,7 +87,7 @@ public partial class ProtectedMethodsTests
 
         #region protected-sequences
         stub.GetInternalId
-            .Return(() => "first-id")
+            .Call(() => "first-id")
             .ThenReturn(() => "second-id");
         #endregion
 

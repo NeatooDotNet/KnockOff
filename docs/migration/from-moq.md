@@ -126,7 +126,7 @@ mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
 <!-- snippet: moq-migration-setup-method-knockoff -->
 ```cs
 // Return with typed delegate - arguments available directly
-stub.GetUser.Return((id) => testUser);
+stub.GetUser.Call((id) => testUser);
 ```
 <!-- endSnippet -->
 
@@ -214,7 +214,7 @@ mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
 <!-- snippet: moq-migration-async-knockoff -->
 ```cs
 // Use Task.FromResult to wrap the return value
-stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -226,10 +226,10 @@ stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
 stub.GetUserAsync.Return(testUser);
 
 // 2. Return() simplified -- callback returns unwrapped type, auto-wrapped
-stub.GetUserAsync.Return((id) => new User { Id = id });
+stub.GetUserAsync.Call((id) => new User { Id = id });
 
 // 3. Return() full -- callback returns Task<T> directly
-stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -291,7 +291,7 @@ mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
 <!-- snippet: moq-migration-arguments-knockoff -->
 ```cs
 // Arguments available directly - use standard C# conditionals
-stub.GetUser.Return((id) =>
+stub.GetUser.Call((id) =>
     id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
@@ -326,7 +326,7 @@ _mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
 <!-- snippet: moq-migration-complete-knockoff -->
 ```cs
 // Return with Verifiable marks for batch verification
-_stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
+_stub.GetUserAsync.Call((id) => Task.FromResult<User?>(user)).Verifiable();
 
 var result = await _service.GetUserAsync(1);
 
@@ -378,14 +378,14 @@ partial class MoqUserRepoStubCorrect { }
 <!-- snippet: moq-migration-gotcha-signature-wrong -->
 ```cs
 // Wrong: GetUser(int id) expects (int) callback
-// stub.GetUser.Return(() => user);  // Compile error
+// stub.GetUser.Call(() => user);  // Compile error
 ```
 <!-- endSnippet -->
 
 <!-- snippet: moq-migration-gotcha-signature-correct -->
 ```cs
 // Correct
-stub.GetUser.Return((id) => user);
+stub.GetUser.Call((id) => user);
 ```
 <!-- endSnippet -->
 

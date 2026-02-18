@@ -49,7 +49,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var user = new User { Id = 42, Name = "Test" };
 
 		// Use simplified callback - returns unwrapped User?, auto-wrapped in Task.FromResult
-		stub.GetByIdAsync.Return((int id) => user);
+		stub.GetByIdAsync.Call((int id) => user);
 
 		var result = await service.GetByIdAsync(42);
 
@@ -64,8 +64,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		// Configure two-param overload with simplified callback (natural params via TSyncDelegate)
-		stub.GetByIdAsync.Return((int id, CancellationToken ct) => new User { Id = id, Name = "FromCT" });
+		// Configure two-param overload with simplified callback (tuple params)
+		stub.GetByIdAsync.Call(((int id, CancellationToken ct) args) => new User { Id = args.id, Name = "FromCT" });
 
 		using var cts = new CancellationTokenSource();
 		var result = await service.GetByIdAsync(99, cts.Token);
@@ -82,7 +82,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// Configure to return null
-		stub.GetByIdAsync.Return((int id) => (User?)null);
+		stub.GetByIdAsync.Call((int id) => (User?)null);
 
 		var result = await service.GetByIdAsync(1);
 
@@ -96,9 +96,9 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// Configure each overload with different simplified callbacks
-		stub.GetByIdAsync.Return((int id) => new User { Id = id, Name = "Single" });
-		stub.GetByIdAsync.Return((int id, CancellationToken ct) => new User { Id = id * 2, Name = "WithToken" });
-		stub.GetByIdAsync.Return((int id, string includeFields) => new User { Id = id * 3, Name = includeFields });
+		stub.GetByIdAsync.Call((int id) => new User { Id = id, Name = "Single" });
+		stub.GetByIdAsync.Call(((int id, CancellationToken ct) args) => new User { Id = args.id * 2, Name = "WithToken" });
+		stub.GetByIdAsync.Call(((int id, string includeFields) args) => new User { Id = args.id * 3, Name = args.includeFields });
 
 		// Call each overload
 		var result1 = await service.GetByIdAsync(10);
@@ -127,7 +127,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		stub.GetCachedAsync.Return((string key) => $"cached-{key}");
+		stub.GetCachedAsync.Call((string key) => $"cached-{key}");
 
 		var result = await service.GetCachedAsync("test");
 
@@ -140,8 +140,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		stub.GetCachedAsync.Return((string key, bool refresh) =>
-			refresh ? $"fresh-{key}" : $"cached-{key}");
+		stub.GetCachedAsync.Call(((string key, bool refresh) args) =>
+			args.refresh ? $"fresh-{args.key}" : $"cached-{args.key}");
 
 		var cached = await service.GetCachedAsync("data", false);
 		var fresh = await service.GetCachedAsync("data", true);
@@ -156,8 +156,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		stub.GetCachedAsync.Return((string key) => "single-param");
-		stub.GetCachedAsync.Return((string key, bool refresh) => "two-params");
+		stub.GetCachedAsync.Call((string key) => "single-param");
+		stub.GetCachedAsync.Call(((string key, bool refresh) _) => "two-params");
 
 		var result1 = await service.GetCachedAsync("key");
 		var result2 = await service.GetCachedAsync("key", true);
@@ -195,10 +195,10 @@ public partial class OverloadGroupAsyncCallbackTests
 		User? savedUser = null;
 		bool tokenPassed = false;
 
-		stub.SaveAsync.Call((User user, CancellationToken ct) =>
+		stub.SaveAsync.Call(((User user, CancellationToken ct) args) =>
 		{
-			savedUser = user;
-			tokenPassed = !ct.IsCancellationRequested;
+			savedUser = args.user;
+			tokenPassed = !args.ct.IsCancellationRequested;
 		});
 
 		using var cts = new CancellationTokenSource();
@@ -218,7 +218,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var calls = new List<string>();
 
 		stub.SaveAsync.Call((User user) => { calls.Add("single"); });
-		stub.SaveAsync.Call((User user, CancellationToken ct) => { calls.Add("withToken"); });
+		stub.SaveAsync.Call(((User user, CancellationToken ct) _) => { calls.Add("withToken"); });
 
 		await service.SaveAsync(new User { Id = 1 });
 		using var cts = new CancellationTokenSource();
@@ -256,10 +256,10 @@ public partial class OverloadGroupAsyncCallbackTests
 		string? loggedMessage = null;
 		int? loggedLevel = null;
 
-		stub.LogAsync.Call((string message, int level) =>
+		stub.LogAsync.Call(((string message, int level) args) =>
 		{
-			loggedMessage = message;
-			loggedLevel = level;
+			loggedMessage = args.message;
+			loggedLevel = args.level;
 		});
 
 		await service.LogAsync("Warning", 2);
@@ -278,8 +278,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		var tracking1 = stub.GetByIdAsync.Return((int id) => new User { Id = id });
-		var tracking2 = stub.GetByIdAsync.Return((int id, CancellationToken ct) => new User { Id = id });
+		var tracking1 = stub.GetByIdAsync.Call((int id) => new User { Id = id });
+		var tracking2 = stub.GetByIdAsync.Call(((int id, CancellationToken ct) args) => new User { Id = args.id });
 
 		await service.GetByIdAsync(1);
 		await service.GetByIdAsync(2);
@@ -297,7 +297,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		var tracking = stub.GetByIdAsync.Return((int id) => new User { Id = id });
+		var tracking = stub.GetByIdAsync.Call((int id) => new User { Id = id });
 
 		await service.GetByIdAsync(10);
 		await service.GetByIdAsync(20);
@@ -312,13 +312,13 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		var tracking = stub.GetByIdAsync.Return((int id, string includeFields) =>
-			new User { Id = id, Name = includeFields });
+		var tracking = stub.GetByIdAsync.Call(((int id, string includeFields) args) =>
+			new User { Id = args.id, Name = args.includeFields });
 
 		await service.GetByIdAsync(1, "name");
 		await service.GetByIdAsync(2, "email");
 
-		var lastArgs = tracking.LastArgs!.Value;
+		var lastArgs = tracking.LastArgs;
 		Assert.Equal(2, lastArgs.id);
 		Assert.Equal("email", lastArgs.includeFields);
 	}
@@ -329,7 +329,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		var tracking = stub.GetCachedAsync.Return((string key) => "value");
+		var tracking = stub.GetCachedAsync.Call((string key) => "value");
 
 		await service.GetCachedAsync("a");
 		await service.GetCachedAsync("b");
@@ -351,10 +351,10 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// First configure with async delegate callback
-		stub.GetByIdAsync.Return((int id) => Task.FromResult<User?>(new User { Id = 100 }));
+		stub.GetByIdAsync.Call((int id) => Task.FromResult<User?>(new User { Id = 100 }));
 
 		// Then configure with simplified callback - should clear async callback
-		stub.GetByIdAsync.Return((int id) => new User { Id = 200 });
+		stub.GetByIdAsync.Call((int id) => new User { Id = 200 });
 
 		var result = await service.GetByIdAsync(1);
 
@@ -369,10 +369,10 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// First configure with simplified callback
-		stub.GetByIdAsync.Return((int id) => new User { Id = 100 });
+		stub.GetByIdAsync.Call((int id) => new User { Id = 100 });
 
 		// Then configure with async delegate callback - should clear simplified
-		stub.GetByIdAsync.Return((int id) => Task.FromResult<User?>(new User { Id = 200 }));
+		stub.GetByIdAsync.Call((int id) => Task.FromResult<User?>(new User { Id = 200 }));
 
 		var result = await service.GetByIdAsync(1);
 
@@ -387,10 +387,10 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// Configure single-param with simplified
-		stub.GetByIdAsync.Return((int id) => new User { Id = 100 });
+		stub.GetByIdAsync.Call((int id) => new User { Id = 100 });
 
 		// Configure two-param with async delegate (should NOT affect single-param)
-		stub.GetByIdAsync.Return((int id, CancellationToken ct) => Task.FromResult<User?>(new User { Id = 200 }));
+		stub.GetByIdAsync.Call(((int id, CancellationToken ct) args) => Task.FromResult<User?>(new User { Id = 200 }));
 
 		// Single-param still uses simplified callback
 		var result1 = await service.GetByIdAsync(1);
@@ -412,7 +412,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new AsyncOverloadServiceKnockOff();
 		IAsyncOverloadService service = stub;
 
-		var tracking = stub.GetByIdAsync.Return((int id) => new User { Id = id });
+		var tracking = stub.GetByIdAsync.Call((int id) => new User { Id = id });
 
 		await service.GetByIdAsync(1);
 		await service.GetByIdAsync(2);
@@ -442,7 +442,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// Configure simplified callbacks on inline interface stub
-		stub.GetByIdAsync.Return((int id) => new User { Id = id, Name = "Inline" });
+		stub.GetByIdAsync.Call((int id) => new User { Id = id, Name = "Inline" });
 
 		var result = await service.GetByIdAsync(42);
 
@@ -472,7 +472,7 @@ public partial class OverloadGroupAsyncCallbackTests
 		var stub = new InlineAsyncOverloadContainer.Stubs.IAsyncOverloadService();
 		IAsyncOverloadService service = stub;
 
-		stub.GetCachedAsync.Return((string key) => $"inline-{key}");
+		stub.GetCachedAsync.Call((string key) => $"inline-{key}");
 
 		var result = await service.GetCachedAsync("test");
 
@@ -486,8 +486,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		IAsyncOverloadService service = stub;
 
 		// Configure both overloads with simplified callbacks
-		stub.GetByIdAsync.Return((int id) => new User { Id = id, Name = "Single" });
-		stub.GetByIdAsync.Return((int id, CancellationToken ct) => new User { Id = id, Name = "WithToken" });
+		stub.GetByIdAsync.Call((int id) => new User { Id = id, Name = "Single" });
+		stub.GetByIdAsync.Call(((int id, CancellationToken ct) args) => new User { Id = args.id, Name = "WithToken" });
 
 		var result1 = await service.GetByIdAsync(1);
 		using var cts = new CancellationTokenSource();

@@ -1,6 +1,6 @@
 # Unify Configuration API: Returns + Execute, Drop OnCall
 
-**Status:** In Progress
+**Status:** Superseded by [IntelliSense API Redesign](intellisense-api-redesign.md)
 **Priority:** High
 **Created:** 2026-02-06
 **Last Updated:** 2026-02-06

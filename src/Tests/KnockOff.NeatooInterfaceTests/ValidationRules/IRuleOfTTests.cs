@@ -44,7 +44,7 @@ public partial class IRuleOfTTests
         var validateStub = new ValidateBaseStubForRuleT();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Call(_ => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 
@@ -58,9 +58,9 @@ public partial class IRuleOfTTests
         IRule<IValidateBase> rule = stub;
         IValidateBase? capturedTarget = null;
 
-        stub.RunRule.Return((target, token) =>
+        stub.RunRule.Call(args =>
         {
-            capturedTarget = target;
+            capturedTarget = args.target;
             return Task.FromResult<IRuleMessages>(RuleMessages.None);
         });
 
@@ -79,7 +79,7 @@ public partial class IRuleOfTTests
         var expectedMessages = new RuleMessages();
         expectedMessages.Add("Name", "Required");
 
-        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(expectedMessages));
+        stub.RunRule.Call(_ => Task.FromResult<IRuleMessages>(expectedMessages));
 
         var validateStub = new ValidateBaseStubForRuleT();
         var result = await rule.RunRule(validateStub, null);
@@ -94,9 +94,9 @@ public partial class IRuleOfTTests
         IRule<IValidateBase> rule = stub;
         CancellationToken? capturedToken = null;
 
-        stub.RunRule.Return((target, token) =>
+        stub.RunRule.Call(args =>
         {
-            capturedToken = token;
+            capturedToken = args.token;
             return Task.FromResult<IRuleMessages>(RuleMessages.None);
         });
 
@@ -199,7 +199,7 @@ public class IRuleOfTStandaloneTests
         var validateStub = new ValidateBaseStubForRuleT();
 
         // Must provide OnCall for methods with return types
-        var tracking = stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        var tracking = stub.RunRule.Call(_ => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 
@@ -248,7 +248,7 @@ public partial class IRuleOfCustomTypeTests
         var customStub = new CustomValidateBaseStub();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Return((ICustomValidateBase target, CancellationToken? token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Call(((ICustomValidateBase target, CancellationToken? token) args) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(customStub, null);
 
@@ -272,7 +272,7 @@ public partial class IRuleOfCustomTypeTests
         var customStub = new CustomValidateBaseStub();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Return((IValidateBase target, CancellationToken? token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Call(((IValidateBase target, CancellationToken? token) args) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await baseRule.RunRule(customStub, null);
 

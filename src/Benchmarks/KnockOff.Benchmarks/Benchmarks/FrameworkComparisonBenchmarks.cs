@@ -50,9 +50,9 @@ public class FrameworkComparisonBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        var getOrderTracking = stub.GetOrder.Return((id) => new Order { Id = id, CustomerId = 1 });
-        var validateOrderTracking = stub.ValidateOrder.Return((_) => true);
-        stub.CalculateTotal.Return((_) => 100m);
+        var getOrderTracking = stub.GetOrder.Call((id) => new Order { Id = id, CustomerId = 1 });
+        var validateOrderTracking = stub.ValidateOrder.Call((_) => true);
+        stub.CalculateTotal.Call((_) => 100m);
         var saveOrderTracking = stub.SaveOrder.Call((_) => { });
 
         var sut = new OrderProcessor(stub);
@@ -128,11 +128,11 @@ public class FrameworkComparisonBenchmarks
         var product = new FcBenchProduct { Id = 1, Name = "Widget", Price = 19.99m };
 
         var repository = new FcBenchProductRepositoryStub();
-        var getByIdTracking = repository.GetByIdAsync.Return((id) => Task.FromResult<FcBenchProduct?>(product));
+        var getByIdTracking = repository.GetByIdAsync.Call((id) => Task.FromResult<FcBenchProduct?>(product));
 
         var cache = new FcBenchCacheServiceStub();
-        cache.Get.Of<FcBenchProduct>().Return((key) => null);
-        cache.Set.Of<FcBenchProduct>().Call((key, value, expiration) => { });
+        cache.Get.Of<FcBenchProduct>().Call((key) => null);
+        cache.Set.Of<FcBenchProduct>().Call((_, _, _) => { });
 
         var logger = new FcBenchLoggerStub();
         var logInfoTracking = logger.LogInfo.Call((message) => { });

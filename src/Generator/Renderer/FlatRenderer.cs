@@ -65,8 +65,6 @@ internal static class FlatRenderer
 
 			// Track which interceptors use pre-compiled mode vs generated classes
 			var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
-			// Track overload compositor groups for source delegation
-			var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
 
 			// Generic method interfaces if needed
 			if (unit.HasGenericMethods)
@@ -126,37 +124,18 @@ internal static class FlatRenderer
 			}
 
 			// Render method interceptor classes using groups (handles overloads)
-			// Use shared renderer for unified API between inline and flat stubs
+			// All method interceptors are fully generated classes inheriting from MethodInterceptorRuntime.
+			// No pre-compiled method interceptor types are used (Phase 2 redesign).
 			foreach (var group in unit.MethodGroups)
 			{
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
 				{
 					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
-					if (PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel))
-					{
-						// Pre-compiled: record the type, skip class generation
-						// Pass interceptor name for delegate naming (unique when overloaded methods get separate interceptors)
-						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel, group.InterceptorName);
-					}
-					else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(unifiedModel))
-					{
-						// Overload group with all pre-compiled: generate thin compositor class
-						var options = new InterceptorRenderOptions(
-							BaseIndent: 0,
-							IncludeStrictParameter: true,
-							StrictAccessExpression: "strict");
-						PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, unifiedModel, options);
-						compositorGroups[group.InterceptorName] = unifiedModel;
-					}
-					else
-					{
-						// Fallback: generate class as before
-						var options = new InterceptorRenderOptions(
-							BaseIndent: 0,
-							IncludeStrictParameter: true,
-							StrictAccessExpression: "strict");
-						MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
-					}
+					var options = new InterceptorRenderOptions(
+						BaseIndent: 0,
+						IncludeStrictParameter: true,
+						StrictAccessExpression: "strict");
+					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
 				}
 			}
 
@@ -166,25 +145,13 @@ internal static class FlatRenderer
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
 				{
 					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
-					// For primary constructor classes, we cannot generate a parameterless constructor
-					// to wire SetFallback, so stub overrides must use the generated class approach.
-					if (!unit.HasPrimaryConstructor && PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel))
-					{
-						// Pre-compiled: record the type, skip class generation
-						// Pass interceptor name for delegate naming (unique when overloaded methods get separate interceptors)
-						preCompiledInterceptors[group.InterceptorName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(unifiedModel, group.InterceptorName);
-					}
-					else
-					{
-						// Fallback: generate class as before
-						var options = new InterceptorRenderOptions(
-							BaseIndent: 0,
-							IncludeStrictParameter: true,
-							StrictAccessExpression: "strict",
-							StubOverrideFallback: true,
-							StubTypeName: classNameWithTypeParams);
-						MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
-					}
+					var options = new InterceptorRenderOptions(
+						BaseIndent: 0,
+						IncludeStrictParameter: true,
+						StrictAccessExpression: "strict",
+						StubOverrideFallback: true,
+						StubTypeName: classNameWithTypeParams);
+					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
 				}
 			}
 
@@ -214,7 +181,7 @@ internal static class FlatRenderer
 			RenderStandardMembers(w, unit);
 
 			// Source(T) methods for each interface in the hierarchy
-			RenderSourceMethods(w, unit, preCompiledInterceptors, compositorGroups);
+			RenderSourceMethods(w, unit, preCompiledInterceptors);
 
 			// Constructor for stub override SetFallback wiring
 			RenderConstructorIfNeeded(w, unit, preCompiledInterceptors, classNameWithTypeParams);
@@ -265,7 +232,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer, multiIndexerInterceptors);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors, compositorGroups);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -1016,7 +983,7 @@ internal static class FlatRenderer
 			}
 
 			// Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
-			var typedHandlerEntryPoint = arity.IsVoid ? "Call" : "Return";
+			var typedHandlerEntryPoint = "Call";
 			w.Line("/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
 			w.Line($"public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({methodName}Delegate callback) {{ _call = callback; return this; }}");
 			w.Line();
@@ -1545,35 +1512,15 @@ internal static class FlatRenderer
 		}
 
 		// Methods (only non-generic - generic methods use handler properties)
+		// All method interceptors are fully generated classes inheriting MethodInterceptorRuntime.
+		// Constructor takes no arguments; member name is hardcoded in the constructor via base("MethodName").
 		foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod))
 		{
 			if (!renderedProperties.Add(method.InterceptorName))
 				continue;
 			var newKeyword = method.NeedsNewKeyword ? "new " : "";
-			if (preCompiledInterceptors.TryGetValue(method.InterceptorName, out var preCompiledType))
-			{
-				// Emit delegate declaration for TTuple types (1+ params)
-				// Use InterceptorName for delegate naming (unique when overloaded methods get separate interceptors)
-				if (method.Parameters.Count > 0)
-				{
-					w.Line(PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
-						method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid, method.InterceptorName));
-					var syncDecl = PreCompiledInterceptorRenderer.BuildSyncDelegateDeclaration(
-						method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid, method.InterceptorName);
-					if (syncDecl != null)
-						w.Line(syncDecl);
-				}
-				var factory = PreCompiledInterceptorRenderer.GetMethodSmartDefaultFactory(
-					method.ReturnType, method.IsVoid, method.DefaultStrategy, method.ConcreteTypeForNew, method.MethodName);
-				var ctorArgs = PreCompiledInterceptorRenderer.GetFieldConstructorArgs(method.MethodName, factory);
-				w.Line($"/// <summary>Interceptor for {method.MethodName}.</summary>");
-				w.Line($"public {newKeyword}{preCompiledType} {method.InterceptorName} {{ get; }} = new{ctorArgs};");
-			}
-			else
-			{
-				w.Line($"/// <summary>Interceptor for {method.MethodName}.</summary>");
-				w.Line($"public {newKeyword}{method.InterceptorClassName} {method.InterceptorName} {{ get; }} = new();");
-			}
+			w.Line($"/// <summary>Interceptor for {method.MethodName}.</summary>");
+			w.Line($"public {newKeyword}{method.InterceptorClassName} {method.InterceptorName} {{ get; }} = new();");
 			w.Line();
 		}
 
@@ -1797,7 +1744,7 @@ internal static class FlatRenderer
 	/// Each Source(T) overload sets _source for members declared on T or its bases,
 	/// and clears _source for members declared on more derived interfaces.
 	/// </summary>
-	private static void RenderSourceMethods(CodeWriter w, FlatGenerationUnit unit, Dictionary<string, string> preCompiledInterceptors, Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+	private static void RenderSourceMethods(CodeWriter w, FlatGenerationUnit unit, Dictionary<string, string> preCompiledInterceptors)
 	{
 		if (unit.SourceProviders.Count == 0)
 			return;
@@ -1901,33 +1848,6 @@ internal static class FlatRenderer
 							}
 						}
 					}
-					else if (compositorGroups.TryGetValue(mapping.InterceptorName, out var compositorModel))
-					{
-						// Compositor: set source fallback on each _ov field using lambdas
-						// Always use lambdas for compositors to avoid method group ambiguity:
-						// - Same method name may have overloads with different return types
-						//   (e.g., ISet<T>.Add(T)->bool vs ICollection<T>.Add(T)->void)
-						// - Method groups pick the wrong overload when return types differ
-						var methodName = compositorModel.MethodName;
-						for (int i = 0; i < compositorModel.Overloads.Count; i++)
-						{
-							var overload = compositorModel.Overloads.GetArray()![i];
-							var ovField = $"{mapping.InterceptorName}._ov{i + 1}";
-							if (mapping.SetSource)
-							{
-								w.Line(GetCompositorSourceFallbackExpression(
-									ovField, methodName, "source", overload, provider.InterfaceType));
-							}
-							else
-							{
-								w.Line(PreCompiledInterceptorRenderer.GetMethodSourceFallbackClearExpression(
-									ovField,
-									overload.Parameters.AsEnumerable(),
-									overload.ReturnType,
-									overload.IsVoid));
-							}
-						}
-					}
 					else
 					{
 						// Fallback: use existing _source assignment
@@ -1998,62 +1918,6 @@ internal static class FlatRenderer
 		var indexer = unit.Indexers.FirstOrDefault(i => i.InterceptorName == interceptorName);
 		if (indexer == null) return null;
 		return (indexer.KeyParamName, indexer.HasGetter, indexer.HasSetter);
-	}
-
-	/// <summary>
-	/// Generates source fallback for a compositor overload using lambdas.
-	/// Always uses lambdas to avoid method group ambiguity with overloads
-	/// that have the same parameter types but different return types.
-	/// </summary>
-	private static string GetCompositorSourceFallbackExpression(
-		string ovFieldPath,
-		string methodName,
-		string sourceParamName,
-		MethodOverloadSignature overload,
-		string providerInterface)
-	{
-		var paramList = overload.Parameters.AsEnumerable().ToList();
-		var lambdaParams = paramList.Count > 0
-			? string.Join(", ", paramList.Select(p => p.EscapedName))
-			: "";
-		var argList = paramList.Count > 0
-			? string.Join(", ", paramList.Select(p => p.EscapedName))
-			: "";
-		var invocation = $"{sourceParamName}.{methodName}({argList})";
-
-		var (_, _, isAsyncValueTaskT) = PreCompiledInterceptorRenderer.GetAsyncTypeInfoPublic(overload.ReturnType);
-		var (_, isVoidValueTask) = PreCompiledInterceptorRenderer.GetVoidAsyncInfoPublic(overload.ReturnType);
-
-		if (isVoidValueTask)
-		{
-			var lambda = paramList.Count > 0
-				? $"async ({lambdaParams}) => await {invocation}"
-				: $"async () => await {invocation}";
-			return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {lambda} : null);";
-		}
-		else if (isAsyncValueTaskT)
-		{
-			var lambda = paramList.Count > 0
-				? $"async ({lambdaParams}) => await {invocation}"
-				: $"async () => await {invocation}";
-			return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {lambda} : null);";
-		}
-		else if (overload.IsVoid)
-		{
-			// Void overload: use statement lambda to discard any return value from the source method
-			var lambda = paramList.Count > 0
-				? $"({lambdaParams}) => {{ {invocation}; }}"
-				: $"() => {{ {invocation}; }}";
-			return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {lambda} : null);";
-		}
-		else
-		{
-			// Non-void sync or Task: use expression lambda
-			var lambda = paramList.Count > 0
-				? $"({lambdaParams}) => {invocation}"
-				: $"() => {invocation}";
-			return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {lambda} : null);";
-		}
 	}
 
 	#endregion
@@ -2308,8 +2172,7 @@ internal static class FlatRenderer
 		HashSet<string> multiOverloadStubOverrideInterceptors,
 		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
 		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups,
-		Dictionary<string, string> preCompiledInterceptors,
-		Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+		Dictionary<string, string> preCompiledInterceptors)
 	{
 		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
 		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
@@ -2325,27 +2188,10 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// Check if this interceptor uses pre-compiled mode
-		var isPreCompiled = preCompiledInterceptors.ContainsKey(method.InterceptorName);
-
 		// User-defined methods with base class pattern
 		if (method.HasStubOverride)
 		{
-			if (isPreCompiled)
-			{
-				// Pre-compiled stub override: constructor wires SetFallback, Invoke handles the priority chain
-				RenderPreCompiledMethodImplementation(w, method);
-			}
-			else
-			{
-				RenderStubOverrideImplementation(w, method, multiOverloadStubOverrideInterceptors);
-			}
-			return;
-		}
-
-		if (isPreCompiled)
-		{
-			RenderPreCompiledMethodImplementation(w, method);
+			RenderStubOverrideImplementation(w, method, multiOverloadStubOverrideInterceptors);
 			return;
 		}
 
@@ -2353,29 +2199,13 @@ internal static class FlatRenderer
 		var isMultiOverload = multiOverloadInterceptors.Contains(method.InterceptorName);
 		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
 
-		// Non-generic methods use the new Invoke pattern
+		// All methods use the generated interceptor class's Invoke method
 		w.Line($"{method.RefReturnPrefix}{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
 		using (w.Braces())
 		{
-			// Build invoke args (includes Strict, no stub parameter)
-			// For compositor methods (pre-compiled overload groups), the Invoke_* methods accept TTuple args,
-			// so 2+ params must be wrapped in a tuple literal.
-			// For generated interceptor classes (fallback, e.g., ref/out), the Invoke_* methods accept
-			// individual params with ref/out modifiers.
-			var isCompositor = isMultiOverload && compositorGroups.ContainsKey(method.InterceptorName);
-			string invokeArgs;
-			if (isCompositor && method.Parameters.Count > 0)
-			{
-				var cleanArgs = string.Join(", ", method.Parameters.Select(p => p.EscapedName));
-				var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);
-				invokeArgs = "Strict" + wrappedArgs;
-			}
-			else
-			{
-				invokeArgs = method.Parameters.Count > 0
-					? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-					: "Strict";
-			}
+			var invokeArgs = method.Parameters.Count > 0
+				? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "Strict";
 
 			if (method.IsRefReturn)
 			{
@@ -2388,26 +2218,6 @@ internal static class FlatRenderer
 				w.Line($"{method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
 			else
 				w.Line($"return {method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
-		}
-		w.Line();
-	}
-
-	/// <summary>
-	/// Renders interface implementation for a method using a pre-compiled interceptor.
-	/// Handles sync, async, void, and non-void methods with appropriate wrapping.
-	/// </summary>
-	private static void RenderPreCompiledMethodImplementation(CodeWriter w, FlatMethodModel method)
-	{
-		w.Line($"{method.RefReturnPrefix}{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
-		using (w.Braces())
-		{
-			var invokeExpr = PreCompiledInterceptorRenderer.GetMethodInvokeExpression(
-				method.InterceptorName,
-				method.ReturnType,
-				method.IsVoid,
-				method.Parameters.AsEnumerable(),
-				"Strict");
-			w.Line(invokeExpr);
 		}
 		w.Line();
 	}

@@ -68,7 +68,7 @@ Configure and verify stub behavior through the generated interceptors:
 <!-- snippet: getting-started-standalone-use -->
 ```cs
 // Configure behavior and mark for verification
-stub.SaveUser.Return((user) => true).Verifiable();
+stub.SaveUser.Call((user) => true).Verifiable();
 
 // Call the method through the interface
 IUserRepo repository = stub;
@@ -107,13 +107,13 @@ Instantiate and configure the generated stub:
 <!-- snippet: getting-started-inline-use -->
 ```cs
 // Call returns a tracking object for argument access
-var tracking = stub.Send.Call((to, subject, body) => { }).Verifiable();
+var tracking = stub.Send.Call(_ => { }).Verifiable();
 
 IEmailSvc emailService = stub;
 emailService.Send("user@example.com", "Welcome", "Hello!");
 
 // Access captured arguments from the tracking object
-var args = tracking.LastArgs!.Value;
+var args = tracking.LastArgs;
 ```
 <!-- endSnippet -->
 
@@ -131,7 +131,7 @@ When your method needs to return a fixed value, use `Return()`. KnockOff generat
 stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
 // Return() - dynamic value based on arguments
-stub.GetById.Return((id) => new User { Id = id, Name = "Dynamic" });
+stub.GetById.Call((id) => new User { Id = id, Name = "Dynamic" });
 ```
 <!-- endSnippet -->
 
@@ -150,7 +150,7 @@ When you need to compute values based on arguments or implement conditional logi
 stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
 // Use Return for dynamic values, side effects, or conditional logic
-stub.GetById.Return((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
+stub.GetById.Call((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
 
 // Both return tracking objects for verification
 ```
@@ -196,7 +196,7 @@ When you need callback logic but don't need actual async operations, return the 
 <!-- snippet: async-task-simplified-callback -->
 ```cs
 // Return() with unwrapped return type - auto-wrapped in Task.FromResult
-stub.GetUserAsync.Return((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+stub.GetUserAsync.Call((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 ```
 <!-- endSnippet -->
 

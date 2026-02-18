@@ -34,7 +34,7 @@ public interface IUserSearch
 <!-- snippet: parammatch-conditional -->
 ```cs
 // Standard C# conditional — no matchers needed
-stub.GetPrice.Return((product, qty) => qty > 10 ? 8.99m : 9.99m);
+stub.GetPrice.Call(args => args.quantity > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->
 
@@ -45,8 +45,8 @@ No matchers. The `qty > 10` check is plain C#.
 <!-- snippet: parammatch-specific-values -->
 ```cs
 // Exact value matching — no Arg.Is<> or It.Is<>
-stub.GetPrice.When(("widget", 5)).Return(49.95m);
-stub.GetPrice.When(("gadget", 1)).Return(29.99m);
+stub.GetPrice.When("widget", 5).Return(49.95m);
+stub.GetPrice.When("gadget", 1).Return(29.99m);
 ```
 <!-- endSnippet -->
 
@@ -55,8 +55,8 @@ stub.GetPrice.When(("gadget", 1)).Return(29.99m);
 <!-- snippet: parammatch-named-params -->
 ```cs
 // Both params are string — names come from the lambda, not index math
-stub.FindUser.Return((firstName, lastName) =>
-    firstName == "Jane" && lastName == "Doe" ? "jane.doe" : null);
+stub.FindUser.Call(args =>
+    args.firstName == "Jane" && args.lastName == "Doe" ? "jane.doe" : null);
 ```
 <!-- endSnippet -->
 
@@ -67,13 +67,13 @@ Both parameters are `string`. The lambda names `firstName` and `lastName` come f
 <!-- snippet: parammatch-capture -->
 ```cs
 // Built-in capture — no Callback<> or Arg.Do<> setup
-var tracking = stub.RecordSale.Call((product, qty) => { });
+var tracking = stub.RecordSale.Call(_ => { });
 
 IPricingService pricing = stub;
 pricing.RecordSale("widget", 3);
 
 // Tuple destructuring with named fields
-var (product, quantity) = tracking.LastArgs!.Value;
+var (product, quantity) = tracking.LastArgs;
 ```
 <!-- endSnippet -->
 
@@ -84,8 +84,8 @@ No `Callback<>` pre-setup. No `Arg.Do<>`. The tracking object captures arguments
 <!-- snippet: parammatch-fallback -->
 ```cs
 // When() for specifics, Return() as fallback
-stub.GetPrice.When(("premium-widget", 1)).Return(99.99m);
-stub.GetPrice.Return((product, qty) => qty * 9.99m);
+stub.GetPrice.When("premium-widget", 1).Return(99.99m);
+stub.GetPrice.Call(args => args.quantity * 9.99m);
 ```
 <!-- endSnippet -->
 
@@ -98,7 +98,7 @@ When() matches specific values first. Unmatched calls fall through to Return().
 // Predicate on multiple params — standard C# lambda
 stub.GetPrice
     .When(args => args.quantity > 100).Return(7.99m)
-    .ThenCall((product, qty) => qty > 10 ? 8.99m : 9.99m);
+    .ThenCall(args => args.quantity > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->
 

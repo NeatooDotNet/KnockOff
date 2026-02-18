@@ -39,7 +39,7 @@ The generator creates custom delegates. Configuration uses standard C# lambda sy
 ```cs
 var stub = new Stubs.IOutParameterService();
 
-stub.TryGetValue.Return((string key, out string value) =>
+stub.TryGetValue.Call((string key, out string value) =>
 {
     value = "found-" + key;
     return true;
@@ -57,7 +57,7 @@ service.TryGetValue("myKey", out string result);
 ```cs
 var data = new Dictionary<string, string> { ["key1"] = "value1" };
 
-stub.TryGetValue.Return((string key, out string value) =>
+stub.TryGetValue.Call((string key, out string value) =>
     data.TryGetValue(key, out value!));
 ```
 <!-- endSnippet -->
@@ -101,7 +101,7 @@ stub.Swap.Call((ref int a, ref int b) => (a, b) = (b, a));
 
 <!-- snippet: refout-mixed -->
 ```cs
-stub.Process.Return((string input, out string output, ref int counter) =>
+stub.Process.Call((string input, out string output, ref int counter) =>
 {
     output = input.ToUpperInvariant();
     counter++;
@@ -115,7 +115,7 @@ Sequences, verification, and `LastArg` all work naturally:
 <!-- snippet: refout-sequences -->
 ```cs
 stub.TryGetValue
-    .Return((string key, out string value) => { value = "first"; return true; })
+    .Call((string key, out string value) => { value = "first"; return true; })
     .ThenReturn((string key, out string value) => { value = "second"; return true; });
 ```
 <!-- endSnippet -->

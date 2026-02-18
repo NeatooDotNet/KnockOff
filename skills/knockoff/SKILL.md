@@ -8,6 +8,22 @@ description: >-
 
 KnockOff is a Roslyn Source Generator that creates test stubs at compile time. Stubs are reusable, have zero reflection overhead, and provide compile-time safety.
 
+## Architecture
+
+Each method on a stubbed interface/class gets a **fully generated interceptor class** (e.g., `AddInterceptor`) that inherits from `MethodInterceptorRuntime`. These interceptors provide:
+- Clean IntelliSense with XML documentation showing original method signatures and parameter names
+- Typed `Call`/`Return`/`When` methods with named tuple parameters for 2+ param methods
+- `Verify()`, `LastArg`/`LastArgs`, `Reset()`, `Verifiable()` directly on the interceptor
+
+**Callback parameter conventions:**
+- **0 params:** `() => ...`
+- **1 param:** Raw type, you name the lambda parameter: `(id) => ...`
+- **2+ params (non-overloaded):** Named tuple: `args => args.a + args.b`
+- **2+ params (overloaded):** Explicit tuple type for disambiguation: `((string input, FormatOptions options) args) => args.input`
+- **ref/out:** Custom delegate fallback: `(ref int a) => { a = a + 1; }`
+
+**Overloaded methods** use a single interceptor property with overloaded `Call`/`When` methods. The lambda signature disambiguates which overload is configured. `Call()` returns a tracking handle for per-overload `Verify()`/`LastArg`/`LastArgs`.
+
 ## CRITICAL GOTCHAS
 
 ### 1. Sequences REPEAT Last Value After Exhaustion
@@ -132,7 +148,7 @@ public partial class SkillUserRepoStub : ISkillUserRepo { }
 public void StandaloneStub_ConfigureAndVerify()
 {
     var stub = new SkillUserRepoStub();
-    stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+    stub.GetById.Call((id) => new User { Id = id }).Verifiable();
     stub.Save.Call((user) => { }).Verifiable();
     ISkillUserRepo repo = stub;
 
@@ -155,7 +171,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.Return((to, subj) => true).Verifiable();
+        stub.Send.Call(_ => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -179,13 +195,13 @@ stub.GetUser.Return(new User { Id = 1, Name = "Alice" });
 <!-- snippet: skill-method-oncall -->
 ```cs
 // With arguments
-stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
+stub.GetUser.Call((id) => new User { Id = id, Name = $"User{id}" });
 
 // Void methods
 stub.Save.Call((user) => { /* side effects */ });
 
 // Async methods - auto-wrapped, no Task.FromResult needed
-stub.GetUserAsync.Return((id) => new User { Id = id });  // Returns Task<User>
+stub.GetUserAsync.Call((id) => new User { Id = id });  // Returns Task<User>
 stub.SaveAsync.Call((user) => { });  // Returns Task.CompletedTask
 ```
 <!-- endSnippet -->
@@ -197,7 +213,7 @@ stub.GetNext.Return(1, 2, 3);
 // After third call, repeats 3 (NSubstitute-like behavior)
 
 // Mix callbacks with value sequences
-stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
+stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
 // First: computed, then 100, 200, 200...
 
 // Use ThenDefault() to return default(T) instead of repeating:
@@ -288,8 +304,8 @@ stub.DataReceived.VerifyRemove(Called.Never);
 <!-- snippet: skill-generic-methods -->
 ```cs
 // Use .Of<T>() for type-specific configuration
-stub.GetById.Of<User>().Return((id) => new User { Id = id });
-stub.GetById.Of<Product>().Return((id) => new Product { Id = id });
+stub.GetById.Of<User>().Call((id) => new User { Id = id });
+stub.GetById.Of<Product>().Call((id) => new Product { Id = id });
 
 // Verify by type
 stub.GetById.Of<User>().Verify(Called.Never);
@@ -309,7 +325,7 @@ var stub = new Stubs.SkillArithmeticOp();
 
 // Returns (value or callback)
 stub.Interceptor.Return(42);
-stub.Interceptor.Return((a, b) => a + b);
+stub.Interceptor.Call((a, b) => a + b);
 
 // Sequences
 stub.Interceptor.Return(10, 20, 30);
@@ -320,11 +336,11 @@ stub.Interceptor.When(1, 2).Return(100)
 
 // Async auto-wrapping (for delegates returning Task<T>)
 // stub.Interceptor.Return(42);              // auto-wraps in Task.FromResult
-// stub.Interceptor.Return((int x) => x * 2); // simplified, auto-wrapped
+// stub.Interceptor.Call((int x) => x * 2); // simplified, auto-wrapped
 
 // Verification (fresh stub for clean tracking)
 var verifyStub = new Stubs.SkillArithmeticOp();
-verifyStub.Interceptor.Return((a, b) => a + b);
+verifyStub.Interceptor.Call((a, b) => a + b);
 SkillArithmeticOp op = verifyStub;
 op(1, 2);
 verifyStub.Interceptor.Verify(Called.Once);
@@ -346,7 +362,7 @@ SkillArithmeticOp opRef = stub;
 
 <!-- snippet: skill-verify-batch -->
 ```cs
-stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
+stub.GetUser.Call((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((u) => { }).Verifiable(Called.Once);
 // ... exercise stub ...
 ```
@@ -361,14 +377,14 @@ Called constraints: `Called.Never`, `Called.Once`, `Called.AtLeastOnce`, `Called
 <!-- snippet: skill-arg-capture -->
 ```cs
 // Single parameter - LastArg
-var getTracking = stub.GetUser.Return((id) => new User { Id = id });
+var getTracking = stub.GetUser.Call((id) => new User { Id = id });
 service.GetUser(42);
 Assert.Equal(42, getTracking.LastArg);
 
 // Multiple parameters - LastArgs tuple
-var updateTracking = stub.Update.Call((id, name) => { });
+var updateTracking = stub.Update.Call(_ => { });
 service.Update(1, "Alice");
-var (id, name) = updateTracking.LastArgs!.Value;
+var (id, name) = updateTracking.LastArgs;
 ```
 <!-- endSnippet -->
 
@@ -412,7 +428,7 @@ public partial class SkStubOverrideRepoStub
 ```
 <!-- endSnippet -->
 
-`Return()` supersedes the override: `stub.GetById.Return(id => new User { Id = id, Name = "Override" });`
+`Call()` supersedes the override: `stub.GetById.Call(id => new User { Id = id, Name = "Override" });`
 
 ---
 
@@ -426,7 +442,7 @@ var stub = new SkSourceDelegationStub();
 stub.Source(realImplementation);
 
 // Configured members override source
-stub.GetById.Return((id) => testUser);  // This wins over source
+stub.GetById.Call((id) => testUser);  // This wins over source
 
 // Reset clears tracking (counts, args, sequence position) and source delegation
 // but preserves callbacks (Return, Returns, Get, Set)
@@ -446,7 +462,7 @@ stub.GetById.Return((id) => testUser);  // This wins over source
 | `.Setup(x => x.Method(arg)).Returns(val)` | `stub.Method.When(arg).Return(val)` |
 | `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Get(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Return(val)` (auto-wraps) |
-| `.Callback(action)` | Logic inside `Return`/`Call` callback |
+| `.Callback(action)` | Logic inside `Call` callback |
 | `mock.CallBase = true` | Default for class stubs |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
@@ -476,7 +492,7 @@ public partial class SkillPartialDemoStub : ISvc { }
 <!-- snippet: skill-mistake-wrong-signature -->
 ```cs
 // WRONG: Type mismatch
-// stub.Process.Return((string id) => { });  // Method takes int
+// stub.Process.Call((string id) => { });  // Method takes int
 
 // RIGHT: Match signature exactly
 stub.Process.Call((int id) => { });

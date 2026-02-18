@@ -25,7 +25,7 @@ public class GenericInheritanceTypeMismatchBugTests
 
 		// Set up callback for Execute with typed parameter (ISampleTarget)
 		var expectedResult = new SampleResult { Success = true };
-		var typedTracking = stub.Execute.Return((ISampleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
+		var typedTracking = stub.Execute.Call(((ISampleTarget target, CancellationToken? token) args) => Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call the generic version (ISampleRule<T>.Execute)
 		var result = rule.Execute(target, CancellationToken.None);
@@ -44,7 +44,7 @@ public class GenericInheritanceTypeMismatchBugTests
 
 		// Set up callback for Execute with base parameter (ISampleRuleTarget)
 		var expectedResult = new SampleResult { Success = true };
-		var baseTracking = stub.Execute.Return((ISampleRuleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
+		var baseTracking = stub.Execute.Call(((ISampleRuleTarget target, CancellationToken? token) args) => Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call the non-generic version (ISampleRule.Execute)
 		var result = rule.Execute(target, CancellationToken.None);
@@ -61,8 +61,8 @@ public class GenericInheritanceTypeMismatchBugTests
 		// Set up callbacks for both overloads
 		var result1 = new SampleResult { Success = true };
 		var result2 = new SampleResult { Success = false };
-		var typedTracking = stub.Execute.Return((ISampleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(result1));
-		var baseTracking = stub.Execute.Return((ISampleRuleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(result2));
+		var typedTracking = stub.Execute.Call(((ISampleTarget target, CancellationToken? token) args) => Task.FromResult<ISampleResult>(result1));
+		var baseTracking = stub.Execute.Call(((ISampleRuleTarget target, CancellationToken? token) args) => Task.FromResult<ISampleResult>(result2));
 
 		// Call via derived interface (typed)
 		ISampleRule<ISampleTarget> typedRule = stub;
@@ -86,7 +86,7 @@ public class GenericInheritanceTypeMismatchBugTests
 		ISampleRule<ISampleTarget> rule = stub;
 
 		var expectedResult = new SampleResult { Success = true };
-		stub.Execute.Return((ISampleTarget target, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
+		stub.Execute.Call(((ISampleTarget target, CancellationToken? token) args) => Task.FromResult<ISampleResult>(expectedResult));
 
 		var target = new SampleTarget { Value = "callback" };
 		var result = await rule.Execute(target, CancellationToken.None);

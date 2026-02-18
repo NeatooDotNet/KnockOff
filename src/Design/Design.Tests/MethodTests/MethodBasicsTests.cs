@@ -8,7 +8,7 @@ using KnockOff;
 namespace Design.Tests.MethodTests;
 
 /// <summary>
-/// Tests for basic method stubbing: Returns, OnCall, argument capture.
+/// Tests for basic method stubbing: Return, Call, argument capture.
 /// </summary>
 public class MethodBasicsTests
 {
@@ -28,7 +28,7 @@ public class MethodBasicsTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Return((a, b) => a + b);
+        stub.Add.Call(args => args.a + args.b);
 
         Design.Domain.Services.ICalculator calc = stub;
 

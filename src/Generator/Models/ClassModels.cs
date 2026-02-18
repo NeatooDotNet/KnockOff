@@ -90,7 +90,9 @@ internal sealed record ClassMemberInfo(
 	/// True if the method has [DoesNotReturn] attribute.
 	/// When true, the generated override must also have [DoesNotReturn].
 	/// </summary>
-	bool DoesNotReturn = false) : IEquatable<ClassMemberInfo>
+	bool DoesNotReturn = false,
+	/// <summary>XML documentation summary text for the method, extracted from the original class. Null if none.</summary>
+	string? XmlDocSummary = null) : IEquatable<ClassMemberInfo>
 {
 	/// <summary>
 	/// Creates ClassMemberInfo for a property (including indexers).
@@ -213,8 +215,15 @@ internal sealed record ClassMemberInfo(
 			(defaultStrategy, concreteType) = SymbolHelpers.GetDefaultValueStrategyWithConcreteType(method.ReturnType);
 		}
 
+		// Extract XML documentation from the method symbol
+		var xmlDocSummary = SymbolHelpers.GetXmlDocSummary(method);
+
 		var parameters = method.Parameters
-			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind))
+			.Select(p => new ParameterInfo(
+				p.Name,
+				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
+				p.RefKind,
+				SymbolHelpers.GetXmlDocForParameter(method, p.Name)))
 			.ToArray();
 
 		var typeParameters = EquatableArray<TypeParameterInfo>.Empty;
@@ -264,7 +273,8 @@ internal sealed record ClassMemberInfo(
 			AccessModifier: accessModifier,
 			ReturnsByRef: method.ReturnsByRef,
 			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
-			DoesNotReturn: doesNotReturn);
+			DoesNotReturn: doesNotReturn,
+			XmlDocSummary: xmlDocSummary);
 	}
 }
 

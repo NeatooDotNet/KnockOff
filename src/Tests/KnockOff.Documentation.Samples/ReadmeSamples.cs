@@ -46,7 +46,7 @@ public class ReadmeTeaserKnockOffTests
     public void KnockOff_CompileTimeSetup()
     {
         var stub = new ReadmeUserRepoStub();
-        stub.GetUser.Return((id) => new User { Id = id, Name = "Test User" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = "Test User" });
 
         IReadmeUserRepo repository = stub;
         var user = repository.GetUser(42);
@@ -94,7 +94,7 @@ public class QuickStartConfigureTests
     {
         var stub = new QuickStartRepoStub();
 
-        stub.GetUser.Return((id) => new User { Id = id, Name = "Test User" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = "Test User" });
 
         IQuickStartRepo repository = stub;
         var user = repository.GetUser(42);
@@ -117,7 +117,7 @@ public class QuickStartVerifyTests
     public void VerifyCalls_WithVerifiable()
     {
         var stub = new QuickStartRepoStub();
-        stub.GetUser.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        stub.GetUser.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 
         IQuickStartRepo repository = stub;
 

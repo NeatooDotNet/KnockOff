@@ -27,8 +27,8 @@ public class OverloadedMethodInvocationBenchmarks
 
         var stub = new OverloadedServiceStub();
         // Overloaded methods use single interceptor with overloaded Return methods
-        stub.Calculate.Return((int v) => v * 2);
-        stub.Calculate.Return((int a, int b) => a + b);
+        stub.Calculate.Call((int v) => v * 2);
+        stub.Calculate.Call(((int a, int b) args) => args.a + args.b);
         _knockOff = stub;
     }
 
@@ -93,9 +93,9 @@ public class OverloadedMethodSetupBenchmarks
         // Overloaded methods use single interceptor with overloaded Call methods
         stub.Process.Call((int v) => { });
         stub.Process.Call((string v) => { });
-        stub.Process.Call((int a, int b) => { });
-        stub.Calculate.Return((int v) => v * 2);
-        stub.Calculate.Return((int a, int b) => a + b);
+        stub.Process.Call(((int a, int b) args) => { });
+        stub.Calculate.Call((int v) => v * 2);
+        stub.Calculate.Call(((int a, int b) args) => args.a + args.b);
         return stub;
     }
 }
@@ -111,8 +111,8 @@ public class OverloadedMethodVerificationBenchmarks
     private OverloadedServiceStub _knockOffStub = null!;
 #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private IMethodTracking<int> _processIntTracking = null!;
-    private IMethodTracking<string?> _processStringTracking = null!;
-    private IMethodTrackingArgs<(int, int)?> _processTwoArgsTracking = null!;
+    private IMethodTracking<string> _processStringTracking = null!;
+    private IMethodTrackingArgs<(int? a, int? b)> _processTwoArgsTracking = null!;
 #pragma warning restore CA1859
 
     [GlobalSetup]
@@ -127,7 +127,7 @@ public class OverloadedMethodVerificationBenchmarks
         // Set up callbacks to get tracking objects
         _processIntTracking = _knockOffStub.Process.Call((int v) => { });
         _processStringTracking = _knockOffStub.Process.Call((string v) => { });
-        _processTwoArgsTracking = _knockOffStub.Process.Call((int a, int b) => { });
+        _processTwoArgsTracking = _knockOffStub.Process.Call(((int a, int b) args) => { });
 
         ((IOverloadedService)_knockOffStub).Process(42);
         ((IOverloadedService)_knockOffStub).Process("test");

@@ -104,7 +104,12 @@ internal sealed record InterfaceMemberInfo(
 	/// <summary>
 	/// True if the member returns by ref readonly (ref readonly T).
 	/// </summary>
-	bool ReturnsByRefReadonly = false) : IEquatable<InterfaceMemberInfo>
+	bool ReturnsByRefReadonly = false,
+	/// <summary>
+	/// XML documentation summary text for this method, extracted from the original interface/class.
+	/// Null if no documentation was provided. Already XML-escaped.
+	/// </summary>
+	string? XmlDocSummary = null) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -245,8 +250,15 @@ internal sealed record InterfaceMemberInfo(
 			(defaultStrategy, concreteType) = SymbolHelpers.GetDefaultValueStrategyWithConcreteType(method.ReturnType);
 		}
 
+		// Extract XML documentation from the method symbol
+		var xmlDocSummary = SymbolHelpers.GetXmlDocSummary(method);
+
 		var parameters = method.Parameters
-			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind))
+			.Select(p => new ParameterInfo(
+				p.Name,
+				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
+				p.RefKind,
+				SymbolHelpers.GetXmlDocForParameter(method, p.Name)))
 			.ToArray();
 
 		// Extract type parameters for generic methods
@@ -280,14 +292,20 @@ internal sealed record InterfaceMemberInfo(
 			TypeParameters: typeParameters,
 			DeclaringInterfaceFullName: declaringInterfaceFullName,
 			ReturnsByRef: method.ReturnsByRef,
-			ReturnsByRefReadonly: method.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
+			XmlDocSummary: xmlDocSummary);
 	}
 }
 
 internal sealed record ParameterInfo(
 	string Name,
 	string Type,
-	RefKind RefKind) : IEquatable<ParameterInfo>;
+	RefKind RefKind,
+	/// <summary>
+	/// XML documentation text for this parameter, extracted from the original interface/class.
+	/// Null if no documentation was provided. Already XML-escaped.
+	/// </summary>
+	string? XmlDoc = null) : IEquatable<ParameterInfo>;
 
 /// <summary>
 /// Represents a type parameter for generic methods (e.g., T in Method&lt;T&gt;).

@@ -68,7 +68,7 @@ public class BasicTests
 		Assert.Equal(84, result);
 		knockOff.GetValue.Verify(Called.Once);
 
-		int lastArg = knockOff.GetValue.LastArg!;
+		int lastArg = knockOff.GetValue.LastArg!.Value;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -76,15 +76,15 @@ public class BasicTests
 	public void Method_WithMultipleParams_TracksArgs_AsNamedTuple()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.Call((name, value, flag) => { });
+		var tracking = knockOff.Calculate.Call(args => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 100, true);
 
-		var args = tracking.LastArgs!.Value;
-		Assert.Equal("test", args.name);
-		Assert.Equal(100, args.value);
-		Assert.True(args.flag);
+		var lastArgs = tracking.LastArgs;
+		Assert.Equal("test", lastArgs.name);
+		Assert.Equal(100, lastArgs.value);
+		Assert.True(lastArgs.flag);
 	}
 
 	[Fact]
@@ -105,7 +105,7 @@ public class BasicTests
 	public void Method_WithNullableReturn_NoStubOverride_ReturnsDefault()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.GetOptional.Return(() => null);
+		var tracking = knockOff.GetOptional.Call(() => null);
 		ISampleService service = knockOff;
 
 		var result = service.GetOptional();
@@ -150,14 +150,14 @@ public class BasicTests
 	public void TupleDestructuring_Works()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.Call((name, value, flag) => { });
+		var tracking = knockOff.Calculate.Call(args => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 42, true);
 
-		var (name, value, flag) = tracking.LastArgs!.Value;
-		Assert.Equal("test", name);
-		Assert.Equal(42, value);
-		Assert.True(flag);
+		var lastArgs = tracking.LastArgs;
+		Assert.Equal("test", lastArgs.name);
+		Assert.Equal(42, lastArgs.value);
+		Assert.True(lastArgs.flag);
 	}
 }

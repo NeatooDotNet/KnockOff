@@ -97,7 +97,7 @@ public class ReturnsKnockOffTests
 
         #region nsub-migration-returns-knockoff
         // KnockOff uses Return with typed delegate
-        stub.GetUser.Return((id) => testUser);
+        stub.GetUser.Call((id) => testUser);
         #endregion
 
         INSubUserRepo repository = stub;
@@ -143,7 +143,7 @@ public class ReturnsWithArgsKnockOffTests
 
         #region nsub-migration-returns-args-knockoff
         // KnockOff: Arguments are directly available in the delegate
-        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = $"User{id}" });
         #endregion
 
         INSubUserRepo repository = stub;
@@ -191,7 +191,7 @@ public class ReturnsForAnyArgsKnockOffTests
 
         #region nsub-migration-returns-anyargs-knockoff
         // KnockOff: Return inherently matches any arguments (no "ForAnyArgs" needed)
-        stub.GetUser.Return((id) => testUser);
+        stub.GetUser.Call((id) => testUser);
         #endregion
 
         INSubUserRepo repository = stub;
@@ -419,7 +419,7 @@ public class ReturnsAndDoesKnockOffTests
 
         #region nsub-migration-returnsanddoes-knockoff
         // KnockOff: Side effects and return in same delegate
-        stub.GetUser.Return((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
+        stub.GetUser.Call((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
         #endregion
 
         INSubUserRepo repository = stub;
@@ -467,7 +467,7 @@ public class ArgMatchersKnockOffTests
 
         #region nsub-migration-argmatchers-knockoff
         // KnockOff: Conditional logic in the callback
-        stub.GetUser.Return((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        stub.GetUser.Call((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
         #endregion
 
         INSubUserRepo repository = stub;
@@ -515,7 +515,7 @@ public class AsyncMethodKnockOffTests
 
         #region nsub-migration-async-knockoff
         // KnockOff: Must wrap in Task.FromResult explicitly
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         INSubUserRepo repository = stub;
@@ -560,8 +560,8 @@ public class MultipleArgsKnockOffTests
 
         #region nsub-migration-multiargs-knockoff
         // KnockOff: Named parameters directly in delegate
-        stub.FindUsers.Return((name, limit) =>
-            limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
+        stub.FindUsers.Call(args =>
+            args.limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = args.name } });
         #endregion
 
         INSubUserRepo repository = stub;
@@ -605,7 +605,7 @@ public class ReceivedWithArgsKnockOffTests
         var calledIds = new List<int>();
 
         // Capture arguments for later verification
-        stub.GetUser.Return((id) => { calledIds.Add(id); return null; });
+        stub.GetUser.Call((id) => { calledIds.Add(id); return null; });
 
         INSubUserRepo repository = stub;
         repository.GetUser(42);
@@ -649,7 +649,7 @@ public class ClearReceivedKnockOffTests
     public void ClearReceived_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
-        stub.GetUser.Return((id) => null);
+        stub.GetUser.Call((id) => null);
 
         INSubUserRepo repository = stub;
         repository.GetUser(1);
@@ -698,7 +698,7 @@ public class ThrowsKnockOffTests
 
         #region nsub-migration-throws-knockoff
         // KnockOff: Throw directly in callback
-        stub.GetUser.Return((id) => throw new InvalidOperationException("Database offline"));
+        stub.GetUser.Call((id) => throw new InvalidOperationException("Database offline"));
         #endregion
 
         INSubUserRepo repository = stub;
@@ -827,7 +827,7 @@ public class CompleteKnockOffNSubTests
     private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 
     // Setup: .Return() with typed delegate, .Verifiable() for verification
-    // _stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
+    // _stub.GetUserAsync.Call((id) => Task.FromResult<User?>(user)).Verifiable();
 
     // Verification: .Verify() checks all .Verifiable() members
     // _stub.Verify();
@@ -850,7 +850,7 @@ public class CompleteKnockOffNSubTests
     public async Task GetUser_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Alice" };
-        _stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
+        _stub.GetUserAsync.Call((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
@@ -874,7 +874,7 @@ public class CompleteKnockOffNSubTests
     public void TryDeleteUser_WhenUserExists_DeletesAndReturnsTrue()
     {
         var user = new User { Id = 1, Name = "Charlie" };
-        _stub.GetUser.Return((id) => user);
+        _stub.GetUser.Call((id) => user);
         _stub.DeleteUser.Call((id) => { }).Verifiable();
 
         var result = _service.TryDeleteUser(1);
@@ -886,7 +886,7 @@ public class CompleteKnockOffNSubTests
     [Fact]
     public void TryDeleteUser_WhenUserNotFound_ReturnsFalse()
     {
-        _stub.GetUser.Return((id) => null);
+        _stub.GetUser.Call((id) => null);
 
         var result = _service.TryDeleteUser(1);
 
@@ -931,7 +931,7 @@ public class WhenPredicateKnockOffTests
 
         #region nsub-migration-when-predicate-knockoff
         // Return with conditionals for permanent predicate matching
-        stub.GetUser.Return((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        stub.GetUser.Call((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
         #endregion
 
         INSubUserRepo repository = stub;
@@ -1039,10 +1039,10 @@ public class GotchaAsyncOptionsTests
         stub.GetUserAsync.Return(testUser);
 
         // 2. Return() simplified -- callback returns unwrapped type, auto-wrapped
-        stub.GetUserAsync.Return((id) => new User { Id = id });
+        stub.GetUserAsync.Call((id) => new User { Id = id });
 
         // 3. Return() full -- callback returns Task<T> directly
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         IOrderService service = stub;
@@ -1065,10 +1065,10 @@ public class GotchaVerifiableTests
 
         #region nsub-gotcha-verifiable
         // Wrong: Returns without Verifiable -- Verify() won't check this
-        stub.GetUser.Return((id) => new User { Id = id });
+        stub.GetUser.Call((id) => new User { Id = id });
 
         // Correct: Mark as Verifiable
-        stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetUser.Call((id) => new User { Id = id }).Verifiable();
         #endregion
 
         INSubUserRepo repository = stub;
@@ -1092,7 +1092,7 @@ public class GotchaAsyncSimpleTests
 
         #region nsub-gotcha-async-simple
         // Verbose: full Return with Task.FromResult
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
 
         // Simpler: Return() auto-wraps for you
         stub.GetUserAsync.Return(testUser);
@@ -1115,7 +1115,7 @@ public class GotchaReceivedSyntaxTests
     public void ReceivedSyntax_NotAvailable()
     {
         var stub = new NSubUserRepoStub();
-        stub.GetUser.Return((id) => null);
+        stub.GetUser.Call((id) => null);
 
         INSubUserRepo repository = stub;
         repository.GetUser(42);
@@ -1159,10 +1159,10 @@ public class GotchaReturnSignatureTests
 
         #region nsub-gotcha-oncall-signature
         // Wrong: GetUser(int id) expects (int) callback
-        // stub.GetUser.Return(() => user);  // Compile error
+        // stub.GetUser.Call(() => user);  // Compile error
 
         // Correct: match the method signature
-        stub.GetUser.Return((id) => new User { Id = id });
+        stub.GetUser.Call((id) => new User { Id = id });
         #endregion
 
         INSubUserRepo repository = stub;
@@ -1240,7 +1240,7 @@ public class ArgDoTests
 
         #region nsub-no-argdo-knockoff
         // KnockOff: Capture in the callback
-        stub.GetUser.Return((id) => { capturedIds.Add(id); return null; });
+        stub.GetUser.Call((id) => { capturedIds.Add(id); return null; });
         #endregion
 
         INSubUserRepo repository = stub;
@@ -1306,7 +1306,7 @@ public class SequenceTests
         #region nsub-sequence-advanced
         // KnockOff extension: Return/ThenCall for computed sequences
         stub.GetUser
-            .Return((id) => user1)
+            .Call((id) => user1)
             .ThenReturn((id) => new User { Id = id, Name = "Subsequent" });
         #endregion
 

@@ -62,8 +62,8 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Specific matches take precedence
-        stub.Add.When((1, 2)).Return(100);
-        stub.Add.When((5, 5)).Return(500);
+        stub.Add.When(1, 2).Return(100);
+        stub.Add.When(5, 5).Return(500);
 
         ICalculator calc = stub;
 
@@ -111,16 +111,16 @@ public partial class WhenMatchingDemo
     // =========================================================================
     // When Chain with Computed Values
     // =========================================================================
-    // DESIGN DECISION: When chains use Returns(value) only - no Returns(callback) variant.
-    // For dynamic behavior based on matched arguments, use Returns(callback) without When.
+    // DESIGN DECISION: When chains use Return(value) only - no Call(callback) variant.
+    // For dynamic behavior based on matched arguments, use Call(callback) without When.
     //
-    // DID NOT DO THIS: Add When().Return(callback) for dynamic returns on match
+    // DID NOT DO THIS: Add When().Call(callback) for dynamic returns on match
     //
     // REJECTED PATTERN:
-    //   stub.Add.When(10, 10).Return((a, b) => a * b);  // Does NOT exist
+    //   stub.Add.When(10, 10).Call((a, b) => a * b);  // Does NOT exist
     //
     // WHY NOT: When() is for simple "if args match, return value" scenarios.
-    // For dynamic behavior, use the predicate form of Returns():
+    // For dynamic behavior, use Call(callback):
     // =========================================================================
 
     public void When_UsesReturnsValue()
@@ -129,11 +129,11 @@ public partial class WhenMatchingDemo
 
         stub.Add.Return(0);
 
-        // When() uses Returns() for the match result
-        stub.Add.When((10, 10)).Return(100);
+        // When() uses Return() for the match result
+        stub.Add.When(10, 10).Return(100);
 
         // For dynamic behavior on ALL calls:
-        // stub.Add.Return((a, b) => a * b);
+        // stub.Add.Call((a, b) => a * b);
 
         ICalculator calc = stub;
 
@@ -158,9 +158,9 @@ public partial class WhenMatchingDemo
     // DID NOT DO THIS: Require separate When() calls for each matcher
     //
     // REJECTED PATTERN:
-    //   stub.Add.When((1, 1)).Return(1);
-    //   stub.Add.When((2, 2)).Return(2);
-    //   stub.Add.When((3, 3)).Return(3);
+    //   stub.Add.When(1, 1).Return(1);
+    //   stub.Add.When(2, 2).Return(2);
+    //   stub.Add.When(3, 3).Return(3);
     //
     // WHY ThenWhen EXISTS: While separate When() calls work fine, ThenWhen()
     // allows building related matchers as a logical group. This can be
@@ -175,9 +175,9 @@ public partial class WhenMatchingDemo
 
         // Chain of related matchers
         stub.Add
-            .When((1, 1)).Return(1)
-            .ThenWhen((2, 2)).Return(2)
-            .ThenWhen((3, 3)).Return(3);
+            .When(1, 1).Return(1)
+            .ThenWhen(2, 2).Return(2)
+            .ThenWhen(3, 3).Return(3);
 
         ICalculator calc = stub;
 
@@ -234,7 +234,7 @@ public partial class WhenMatchingDemo
 
         // Order matters! First match wins.
         stub.Add.When(args => args.a > 0).Return(100);  // Added first
-        stub.Add.When((5, 5)).Return(500);              // Added second
+        stub.Add.When(5, 5).Return(500);              // Added second
 
         ICalculator calc = stub;
 
@@ -250,7 +250,7 @@ public partial class WhenMatchingDemo
     // Void Method When Chains
     // =========================================================================
     // DESIGN DECISION: Void methods use IVoidWhenChain instead of IWhenChain.
-    // There's no Returns() - instead use Call() for optional callback.
+    // There's no Return() - instead use Call() for optional callback.
     //
     // GENERATOR BEHAVIOR: Void method When chains:
     //
@@ -296,8 +296,8 @@ public partial class WhenMatchingDemo
         var stub = new Stubs.ICalculator();
 
         // Mark When chains for batch verification
-        stub.Add.When((1, 2)).Return(100).Verifiable();
-        stub.Add.When((5, 5)).Return(500).Verifiable();
+        stub.Add.When(1, 2).Return(100).Verifiable();
+        stub.Add.When(5, 5).Return(500).Verifiable();
 
         ICalculator calc = stub;
 
@@ -312,7 +312,7 @@ public partial class WhenMatchingDemo
     // Async Method When Chains
     // =========================================================================
     // DESIGN DECISION: Async methods work identically to sync methods with
-    // When chains. Returns() auto-wraps with Task.FromResult.
+    // When chains. Return() auto-wraps with Task.FromResult.
     // =========================================================================
 
     public async Task When_WorksWithAsyncMethods()
@@ -340,7 +340,7 @@ public partial class WhenMatchingDemo
     // interceptor class itself. TArgs is the tuple type (e.g., (int a, int b)),
     // so When() and ThenWhen() accept tuples directly:
     //
-    //   stub.Add.When((1, 2)).Return(100);   // Tuple value matching
+    //   stub.Add.When(1, 2).Return(100);   // Tuple value matching
     //   stub.Add.When(args => args.a > 0).Return(42);  // Predicate matching
     //
     // Named tuple fields (args.a, args.b) provide natural access in predicates.

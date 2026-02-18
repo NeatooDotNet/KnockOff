@@ -40,7 +40,7 @@ public interface IDataService
 
     /// <summary>
     /// Deletes data asynchronously. Can throw exceptions.
-    /// Used to demonstrate: async exception handling in OnCall
+    /// Used to demonstrate: async exception handling in Call
     /// </summary>
     Task DeleteAsync(int id);
 }

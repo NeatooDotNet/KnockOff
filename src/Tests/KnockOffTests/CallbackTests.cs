@@ -48,11 +48,11 @@ public class CallbackTests
 		string? capturedName = null;
 		int? capturedValue = null;
 		bool? capturedFlag = null;
-		var tracking = knockOff.Calculate.Call((name, value, flag) =>
+		var tracking = knockOff.Calculate.Call(args =>
 		{
-			capturedName = name;
-			capturedValue = value;
-			capturedFlag = flag;
+			capturedName = args.name;
+			capturedValue = args.value;
+			capturedFlag = args.flag;
 		});
 
 		service.Calculate("test", 42, true);
@@ -122,7 +122,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.Return(() => "callback value");
+		var tracking = knockOff.GetOptional.Call(() => "callback value");
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
@@ -160,7 +160,7 @@ public class CallbackTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 42, Name = "MockUser" };
-		var tracking = knockOff.GetById.Return((id) =>
+		var tracking = knockOff.GetById.Call((id) =>
 		{
 			if (id == 42) return mockUser;
 			return null;

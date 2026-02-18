@@ -96,7 +96,7 @@ public class BclInterfaceTests
     {
         var stub = new EnumerableStringStubTests.Stubs.IEnumerable();
         var items = new List<string> { "a", "b", "c" };
-        stub.GetEnumerator.Return(() => items.GetEnumerator());
+        stub.GetEnumerator.Call(() => items.GetEnumerator());
         IEnumerable<string> enumerable = stub;
 
         using var enumerator = enumerable.GetEnumerator();
@@ -132,7 +132,7 @@ public class BclInterfaceTests
         // Bug: Prior to fix, non-generic GetEnumerator had its own interceptor instead of delegating
         var stub = new EnumerableStringStubTests.Stubs.IEnumerable();
         var items = new List<string> { "a", "b", "c" };
-        stub.GetEnumerator.Return(() => items.GetEnumerator());
+        stub.GetEnumerator.Call(() => items.GetEnumerator());
 
         // Cast to non-generic IEnumerable and call GetEnumerator - should delegate to generic version
         IEnumerable nonGenericEnumerable = stub;
@@ -663,7 +663,7 @@ public class BclInterfaceTests
     public void IComparableInt_CompareTo_OnCall_CustomBehavior()
     {
         var stub = new ComparableIntStubTests.Stubs.IComparable();
-        stub.CompareTo.Return((other) => other > 50 ? 1 : -1);
+        stub.CompareTo.Call((other) => other > 50 ? 1 : -1);
         IComparable<int> comparable = stub;
 
         var result1 = comparable.CompareTo(60);
@@ -703,7 +703,7 @@ public class BclInterfaceTests
     public void IComparerInt_Compare_OnCall_CustomBehavior()
     {
         var stub = new ComparerIntStubTests.Stubs.IComparer();
-        stub.Compare.Return((x, y) => x - y);
+        stub.Compare.Call(args => args.x - args.y);
         IComparer<int> comparer = stub;
 
         var result = comparer.Compare(10, 5);
@@ -731,7 +731,7 @@ public class BclInterfaceTests
     {
         var stub = new CloneableStubTests.Stubs.ICloneable();
         var clonedObject = new object();
-        stub.Clone.Return(() => clonedObject);
+        stub.Clone.Call(() => clonedObject);
         ICloneable cloneable = stub;
 
         var result = cloneable.Clone();
@@ -760,7 +760,7 @@ public class BclInterfaceTests
     {
         var stub = new ServiceProviderStubTests.Stubs.IServiceProvider();
         var service = new List<string>();
-        stub.GetService.Return((type) => type == typeof(IList<string>) ? service : null);
+        stub.GetService.Call((type) => type == typeof(IList<string>) ? service : null);
         IServiceProvider provider = stub;
 
         var result = provider.GetService(typeof(IList<string>));
@@ -1201,7 +1201,7 @@ public class BclInterfaceTests
     public void ICustomFormatter_Format_OnCall_ReturnsCustomFormat()
     {
         var stub = new CustomFormatterStubTests.Stubs.ICustomFormatter();
-        stub.Format.Return((format, arg, formatProvider) => $"[{format}:{arg}]");
+        stub.Format.Call(args => $"[{args.format}:{args.arg}]");
         ICustomFormatter formatter = stub;
 
         var result = formatter.Format("X", 255, null);

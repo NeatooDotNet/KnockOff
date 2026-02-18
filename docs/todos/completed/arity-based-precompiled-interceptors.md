@@ -1,6 +1,6 @@
 # Arity-Based Pre-compiled Interceptors
 
-**Status:** In Progress
+**Status:** Superseded by [IntelliSense API Redesign](intellisense-api-redesign.md) — precompiled types being removed
 **Priority:** High
 **Created:** 2026-02-14
 **Last Updated:** 2026-02-14 (Plan approved by developer, ready for implementation)

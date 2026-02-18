@@ -128,7 +128,7 @@ public class StubOverrideReturnTests
 
         #region stub-overrides-oncall
         // Return supersedes the stub override
-        stub.GetUserById.Return(id => new User { Id = id, Name = "Overridden" });
+        stub.GetUserById.Call(id => new User { Id = id, Name = "Overridden" });
 
         var user = repository.GetUserById(42);
         Assert.Equal("Overridden", user!.Name);
@@ -342,14 +342,14 @@ public class StubOverrideInterceptorApiExampleTests
         var user1 = repo.GetById(1);  // Returns "Default"
 
         // Return supersedes stub override (clean interceptor name)
-        stub.GetById.Return(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Call(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns "Override"
 
         // Full tracking works - counts all calls regardless of configuration
         stub.GetById.Verify(Called.Exactly(2));
         Assert.Equal(2, stub.GetById.LastArg);
 
-        // Returns for constant values (auto-wraps for async)
+        // Return for constant values (auto-wraps for async)
         stub.GetById.Return(new User { Id = 99 });
         var user3 = repo.GetById(3);  // Returns User { Id = 99 }
         #endregion
@@ -374,7 +374,7 @@ public class StubOverrideStandalonePatternTests
         var user1 = repo.GetById(1);  // Name = "Default"
 
         // With Return: callback supersedes stub override (clean interceptor name)
-        stub.GetById.Return(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Call(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Name = "Override"
         #endregion
 
@@ -389,7 +389,7 @@ public class StubOverrideStandalonePatternTests
         ISkillRepo repo = stub;
 
         #region stub-overrides-tracking-with-oncall
-        stub.GetById.Return(id => new User { Id = id });
+        stub.GetById.Call(id => new User { Id = id });
         repo.GetById(42);
 
         stub.GetById.Verify(Called.Once);
@@ -404,7 +404,7 @@ public class StubOverrideStandalonePatternTests
         ISkillRepo repo = stub;
 
         #region stub-overrides-reset-preserves-oncall
-        stub.GetById.Return(id => new User { Id = id });
+        stub.GetById.Call(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Called.Once);
 
@@ -526,7 +526,7 @@ public class StubOverrideRefMixedTests
         service.WithOverride("test");    // "[User: test]"
 
         // Methods WITHOUT override need configuration or return default
-        stub.WithoutOverride.Return((input) => $"[Configured: {input}]");
+        stub.WithoutOverride.Call((input) => $"[Configured: {input}]");
         service.WithoutOverride("test"); // "[Configured: test]"
         #endregion
 
@@ -548,7 +548,7 @@ public class StubOverrideRefReturnTests
         service.GetUserById(1); // "Default User"
 
         // Supersede with Return for this test
-        stub.GetUserById.Return(id => new User { Id = id, Name = "Override" });
+        stub.GetUserById.Call(id => new User { Id = id, Name = "Override" });
         service.GetUserById(1); // "Override"
         #endregion
 
@@ -605,7 +605,7 @@ public class CompleteStubOverrideExampleTests
         stub.GetUserById.Verify(Called.Once);
 
         // Override for next call
-        stub.GetUserById.Return(id => new User { Id = id, Name = "Custom" });
+        stub.GetUserById.Call(id => new User { Id = id, Name = "Custom" });
         var customUser = repository.GetUserById(99);
         Assert.Equal("Custom", customUser!.Name);
         #endregion

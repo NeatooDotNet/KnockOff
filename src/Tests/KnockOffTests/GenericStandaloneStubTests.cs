@@ -79,7 +79,7 @@ public class GenericStandaloneStubTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		var expected = new User { Id = 123, Name = "Found" };
-		stub.GetById.Return((id) => expected);
+		stub.GetById.Call((id) => expected);
 
 		// Act
 		var result = repo.GetById(123);
@@ -126,7 +126,7 @@ public class GenericStandaloneStubTests
 			new() { Id = 1, Name = "User1" },
 			new() { Id = 2, Name = "User2" }
 		};
-		stub.GetAll.Return(() => users);
+		stub.GetAll.Call(() => users);
 
 		// Act
 		var result = repo.GetAll();
@@ -160,7 +160,7 @@ public class GenericStandaloneStubTests
 		// Arrange
 		var stub = new GenericKeyValueStoreStub<string, int>();
 		IGenericKeyValueStore<string, int> store = stub;
-		var tracking = stub.Get.Return((key) => 42);
+		var tracking = stub.Get.Call((key) => 42);
 
 		// Act
 		var result = store.Get("answer");
@@ -227,7 +227,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.GetById.Return((id) => null);
+		var tracking = stub.GetById.Call((id) => null);
 		IGenericRepository<User> repo = stub;
 		repo.GetById(1);
 		repo.GetById(2);

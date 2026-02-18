@@ -149,8 +149,8 @@ public partial class CalculatorStub : ICalculator
 //   var orderRepo = new RepositoryStub<Order>();
 //
 //   // Configure each stub independently
-//   userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" });
-//   productRepo.GetById.Return((id) => new Product { Id = id, Price = 9.99m });
+//   userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.Call((id) => new Product { Id = id, Price = 9.99m });
 //
 //   // Use as interface implementations
 //   IRepository<User> userService = userRepo;
@@ -333,8 +333,8 @@ public partial class StandaloneServiceStub
 //   var productRepo = new RepositoryStub<Product>();
 //
 //   // Configure each stub independently
-//   userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" });
-//   productRepo.GetById.Return((id) => new Product { Id = id, Price = 9.99m });
+//   userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.Call((id) => new Product { Id = id, Price = 9.99m });
 //
 //   // Use .Object to get the actual class instance
 //   RepositoryBase<User> userService = userRepo.Object;
@@ -600,13 +600,13 @@ public partial class InlineDelegateExample
         LogAction logAction = logStub;
 
         // Configure via .Interceptor property
-        addStub.Interceptor.Return((a, b) => a + b);
+        addStub.Interceptor.Call((a, b) => a + b);
         logStub.Interceptor.Call((msg) => Console.WriteLine(msg));
 
         // DID NOT DO THIS: Allow direct configuration on the stub
         //
         // REJECTED PATTERN:
-        //   addStub.Return((a, b) => a + b);
+        //   addStub.Call((a, b) => a + b);
         //
         // WHY NOT: Delegates have only one "member" (the invocation).
         // Using .Interceptor makes it explicit and consistent with the
@@ -659,8 +659,8 @@ public partial class OpenGenericInterfaceExample
         IRepository<DataEventArgs> entityRepoInterface = entityRepo;
 
         // Configure like any other stub
-        stringRepo.GetById.Return((id) => $"Item-{id}");
-        entityRepo.GetById.Return((id) => new DataEventArgs($"Data-{id}"));
+        stringRepo.GetById.Call((id) => $"Item-{id}");
+        entityRepo.GetById.Call((id) => new DataEventArgs($"Data-{id}"));
 
         // DID NOT DO THIS: Require separate [KnockOff<IRepository<string>>] for each type
         //
@@ -814,14 +814,14 @@ public partial class OpenGenericClassExample
 // 1. When chains - Parameter-specific matching (highest priority)
 //    stub.Add.When(1, 2).Return(100);
 //
-// 2. Sequences - If Returns().ThenReturn() was used and not exhausted
-//    stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
+// 2. Sequences - If Call().ThenReturn() was used and not exhausted
+//    stub.Add.Call((a, b) => 1).ThenReturn((a, b) => 2);
 //
-// 3. Returns(value) - Simple constant return value
+// 3. Return(value) - Simple constant return value
 //    stub.Add.Return(42);
 //
-// 4. Returns(callback) - Callback invocation
-//    stub.Add.Return((a, b) => a + b);
+// 4. Call(callback) - Callback invocation
+//    stub.Add.Call((a, b) => a + b);
 //
 // 5. Source - Delegation to real implementation
 //    stub.Source(realCalculator);

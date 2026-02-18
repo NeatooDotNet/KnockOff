@@ -45,7 +45,7 @@ public class StandaloneUsageTests
 
         #region getting-started-standalone-use
         // Configure behavior and mark for verification
-        stub.SaveUser.Return((user) => true).Verifiable();
+        stub.SaveUser.Call((user) => true).Verifiable();
 
         // Call the method through the interface
         IUserRepo repository = stub;
@@ -88,13 +88,13 @@ public partial class InlineStubTests
 
         #region getting-started-inline-use
         // Call returns a tracking object for argument access
-        var tracking = stub.Send.Call((to, subject, body) => { }).Verifiable();
+        var tracking = stub.Send.Call(_ => { }).Verifiable();
 
         IEmailSvc emailService = stub;
         emailService.Send("user@example.com", "Welcome", "Hello!");
 
         // Access captured arguments from the tracking object
-        var args = tracking.LastArgs!.Value;
+        var args = tracking.LastArgs;
         #endregion
 
         stub.Verify();
@@ -118,7 +118,7 @@ public class ValueOverloadTests
         stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
         // Return() - dynamic value based on arguments
-        stub.GetById.Return((id) => new User { Id = id, Name = "Dynamic" });
+        stub.GetById.Call((id) => new User { Id = id, Name = "Dynamic" });
         #endregion
 
         IUserRepo repository = stub;
@@ -213,7 +213,7 @@ public class ReturnDynamicTests
         stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
         // Use Return for dynamic values, side effects, or conditional logic
-        stub.GetById.Return((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
+        stub.GetById.Call((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
 
         // Both return tracking objects for verification
         #endregion

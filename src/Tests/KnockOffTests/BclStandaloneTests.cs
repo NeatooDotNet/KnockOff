@@ -97,7 +97,7 @@ public class BclStandaloneTests
     public void ComparableStringKnockOff_CompareTo_TracksInvocation()
     {
         var knockOff = new ComparableStringKnockOff();
-        var tracking = knockOff.CompareTo.Return((other) => 0);
+        var tracking = knockOff.CompareTo.Call((other) => 0);
         IComparable<string> comparable = knockOff;
 
         comparable.CompareTo("other");
@@ -110,7 +110,7 @@ public class BclStandaloneTests
     public void ComparableStringKnockOff_OnCall_CustomBehavior()
     {
         var knockOff = new ComparableStringKnockOff();
-        knockOff.CompareTo.Return((other) => other?.Length ?? 0);
+        knockOff.CompareTo.Call((other) => other?.Length ?? 0);
         IComparable<string> comparable = knockOff;
 
         var result = comparable.CompareTo("test");
@@ -122,7 +122,7 @@ public class BclStandaloneTests
     public void ComparableStringKnockOff_MultipleInvocations_TracksAll()
     {
         var knockOff = new ComparableStringKnockOff();
-        var tracking = knockOff.CompareTo.Return((other) => 0);
+        var tracking = knockOff.CompareTo.Call((other) => 0);
         IComparable<string> comparable = knockOff;
 
         comparable.CompareTo("a");
@@ -141,7 +141,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_Compare_TracksInvocation()
     {
         var knockOff = new ComparerStringKnockOff();
-        var tracking = knockOff.Compare.Return((x, y) => 0);
+        var tracking = knockOff.Compare.Call(_ => 0);
         IComparer<string> comparer = knockOff;
 
         comparer.Compare("a", "b");
@@ -153,7 +153,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_OnCall_CustomBehavior()
     {
         var knockOff = new ComparerStringKnockOff();
-        knockOff.Compare.Return((x, y) => string.Compare(x, y, StringComparison.OrdinalIgnoreCase));
+        knockOff.Compare.Call(args => string.Compare(args.x, args.y, StringComparison.OrdinalIgnoreCase));
         IComparer<string> comparer = knockOff;
 
         var result = comparer.Compare("A", "a");
@@ -165,7 +165,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_OnCall_LengthComparer()
     {
         var knockOff = new ComparerStringKnockOff();
-        knockOff.Compare.Return((x, y) => (x?.Length ?? 0) - (y?.Length ?? 0));
+        knockOff.Compare.Call(args => (args.x?.Length ?? 0) - (args.y?.Length ?? 0));
         IComparer<string> comparer = knockOff;
 
         var result1 = comparer.Compare("aaa", "b");
@@ -183,7 +183,7 @@ public class BclStandaloneTests
     public void CloneableKnockOff_Clone_TracksInvocation()
     {
         var knockOff = new CloneableKnockOff();
-        var tracking = knockOff.Clone.Return(() => knockOff);
+        var tracking = knockOff.Clone.Call(() => knockOff);
         ICloneable cloneable = knockOff;
 
         cloneable.Clone();
@@ -196,7 +196,7 @@ public class BclStandaloneTests
     {
         var knockOff = new CloneableKnockOff();
         var clonedObject = new object();
-        knockOff.Clone.Return(() => clonedObject);
+        knockOff.Clone.Call(() => clonedObject);
         ICloneable cloneable = knockOff;
 
         var result = cloneable.Clone();
@@ -208,7 +208,7 @@ public class BclStandaloneTests
     public void CloneableKnockOff_OnCall_ReturnsSelf()
     {
         var knockOff = new CloneableKnockOff();
-        knockOff.Clone.Return(() => knockOff);
+        knockOff.Clone.Call(() => knockOff);
         ICloneable cloneable = knockOff;
 
         var result = cloneable.Clone();
@@ -224,7 +224,7 @@ public class BclStandaloneTests
     public void ServiceProviderKnockOff_GetService_TracksInvocation()
     {
         var knockOff = new ServiceProviderKnockOff();
-        var tracking = knockOff.GetService.Return((type) => null);
+        var tracking = knockOff.GetService.Call((type) => null);
         IServiceProvider provider = knockOff;
 
         provider.GetService(typeof(string));
@@ -238,7 +238,7 @@ public class BclStandaloneTests
     {
         var knockOff = new ServiceProviderKnockOff();
         var service = new List<string>();
-        knockOff.GetService.Return((type) => type == typeof(IList<string>) ? service : null);
+        knockOff.GetService.Call((type) => type == typeof(IList<string>) ? service : null);
         IServiceProvider provider = knockOff;
 
         var result = provider.GetService(typeof(IList<string>));
@@ -256,7 +256,7 @@ public class BclStandaloneTests
             { typeof(int), 42 },
             { typeof(List<string>), new List<string> { "a", "b" } }
         };
-        knockOff.GetService.Return((type) => services.TryGetValue(type, out var service) ? service : null);
+        knockOff.GetService.Call((type) => services.TryGetValue(type, out var service) ? service : null);
         IServiceProvider provider = knockOff;
 
         Assert.Equal("hello", provider.GetService(typeof(string)));
@@ -465,7 +465,7 @@ public class BclStandaloneTests
     public void EnumerableStringKnockOff_GenericGetEnumerator_TracksInvocation()
     {
         var knockOff = new EnumerableStringKnockOff();
-        var tracking = knockOff.GetEnumerator.Return(() => throw new InvalidOperationException());
+        var tracking = knockOff.GetEnumerator.Call(() => throw new InvalidOperationException());
         IEnumerable<string> enumerable = knockOff;
 
         // Call the generic GetEnumerator (will throw since callback throws)
@@ -479,7 +479,7 @@ public class BclStandaloneTests
     public void EnumerableStringKnockOff_NonGenericGetEnumerator_TracksInvocation()
     {
         var knockOff = new EnumerableStringKnockOff();
-        var tracking = knockOff.GetEnumerator.Return(() => throw new InvalidOperationException());
+        var tracking = knockOff.GetEnumerator.Call(() => throw new InvalidOperationException());
         System.Collections.IEnumerable enumerable = knockOff;
 
         // Call the non-generic GetEnumerator (will throw since callback throws)
@@ -496,7 +496,7 @@ public class BclStandaloneTests
         var knockOff = new EnumerableStringKnockOff();
         var items = new List<string> { "a", "b", "c" };
         // Must cast explicitly because List<T>.GetEnumerator() returns a struct
-        knockOff.GetEnumerator.Return(() => ((IEnumerable<string>)items).GetEnumerator());
+        knockOff.GetEnumerator.Call(() => ((IEnumerable<string>)items).GetEnumerator());
         IEnumerable<string> enumerable = knockOff;
 
         var result = enumerable.ToList();
@@ -539,7 +539,7 @@ public class BclStandaloneTests
         var knockOff = new CollectionStringKnockOff();
         var items = new List<string> { "x", "y" };
         // Must cast explicitly because List<T>.GetEnumerator() returns a struct
-        var tracking = knockOff.GetEnumerator.Return(() => ((IEnumerable<string>)items).GetEnumerator());
+        var tracking = knockOff.GetEnumerator.Call(() => ((IEnumerable<string>)items).GetEnumerator());
         IEnumerable<string> enumerable = knockOff;
 
         // Note: Don't use ToList() here because it optimizes for ICollection<T> and calls CopyTo instead of GetEnumerator
@@ -571,7 +571,7 @@ public class BclStandaloneTests
     public void ListStringKnockOff_IndexOf_TracksInvocation()
     {
         var knockOff = new ListStringKnockOff();
-        var tracking = knockOff.IndexOf.Return((item) => item == "found" ? 3 : -1);
+        var tracking = knockOff.IndexOf.Call((item) => item == "found" ? 3 : -1);
         IList<string> list = knockOff;
 
         var index = list.IndexOf("found");
@@ -598,7 +598,7 @@ public class BclStandaloneTests
         var knockOff = new ListStringKnockOff();
         var items = new List<string> { "1", "2", "3" };
         // Must cast explicitly because List<T>.GetEnumerator() returns a struct
-        knockOff.GetEnumerator.Return(() => ((IEnumerable<string>)items).GetEnumerator());
+        knockOff.GetEnumerator.Call(() => ((IEnumerable<string>)items).GetEnumerator());
         System.Collections.IEnumerable enumerable = knockOff;
 
         var result = new List<object>();
@@ -646,7 +646,7 @@ public class BclStandaloneTests
             new("b", 2)
         };
         // Must cast explicitly because List<T>.GetEnumerator() returns a struct
-        var tracking = knockOff.GetEnumerator.Return(() => ((IEnumerable<KeyValuePair<string, int>>)items).GetEnumerator());
+        var tracking = knockOff.GetEnumerator.Call(() => ((IEnumerable<KeyValuePair<string, int>>)items).GetEnumerator());
 
         // Note: Don't use ToList() here because it optimizes for ICollection<T> and calls CopyTo instead of GetEnumerator
         // Must cast to interface for foreach because 'GetEnumerator' property conflicts with the method
@@ -666,7 +666,7 @@ public class BclStandaloneTests
     public void SetStringKnockOff_Add_TracksInvocation()
     {
         var knockOff = new SetStringKnockOff();
-        var tracking = knockOff.Add.Return((item) => true);
+        var tracking = knockOff.Add.Call((item) => true);
         ISet<string> set = knockOff;
 
         var result = set.Add("test");
@@ -736,7 +736,7 @@ public class BclStandaloneTests
         var knockOff = new ReadOnlyListStringKnockOff();
         var items = new List<string> { "read", "only" };
         // Must cast explicitly because List<T>.GetEnumerator() returns a struct
-        knockOff.GetEnumerator.Return(() => ((IEnumerable<string>)items).GetEnumerator());
+        knockOff.GetEnumerator.Call(() => ((IEnumerable<string>)items).GetEnumerator());
         IEnumerable<string> enumerable = knockOff;
 
         var result = enumerable.ToList();

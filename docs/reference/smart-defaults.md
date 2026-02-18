@@ -105,7 +105,7 @@ This fail-fast behavior prevents subtle bugs from returning null where the type 
 // factory.GetUser(); // throws InvalidOperationException
 
 // Fix: configure Return to provide the value
-stub.GetUser.Return(() => new UserWithRequiredCtor(1, "Configured"));
+stub.GetUser.Call(() => new UserWithRequiredCtor(1, "Configured"));
 ```
 <!-- endSnippet -->
 
@@ -181,7 +181,7 @@ To override smart defaults:
 **Option 1: Returns**
 <!-- snippet: smart-defaults-override-oncall -->
 ```cs
-stub.GetUser.Return(() => new User { Name = "Test" });
+stub.GetUser.Call(() => new User { Name = "Test" });
 ```
 <!-- endSnippet -->
 

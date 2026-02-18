@@ -251,7 +251,7 @@ public class ReturnConfigurationTests
 
         #region delegate-stub-oncall-return
         // Return() - compute return value based on input
-        stub.Interceptor.Return((input) => input.ToUpperInvariant());
+        stub.Interceptor.Call((input) => input.ToUpperInvariant());
         #endregion
 
         Formatter format = stub;
@@ -267,7 +267,7 @@ public class ReturnConfigurationTests
 
         #region delegate-stub-oncall-multi-param
         // Configure with multiple parameters
-        stub.Interceptor.Return((name, age) => $"{name} is {age} years old");
+        stub.Interceptor.Call((name, age) => $"{name} is {age} years old");
         #endregion
 
         MessageBuilder builder = stub;
@@ -319,7 +319,7 @@ public class VerificationTests
     public void Verifiable_VerifyAfterReturn()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
-        stub.Interceptor.Return((input) => input.ToUpperInvariant());
+        stub.Interceptor.Call((input) => input.ToUpperInvariant());
         Formatter format = stub;
         format("test");
 
@@ -340,7 +340,7 @@ public class TrackingTests
     public void LastArg_SingleParameter()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
-        stub.Interceptor.Return((input) => input);
+        stub.Interceptor.Call((input) => input);
         Formatter format = stub;
         format("first");
         format("second");
@@ -355,7 +355,7 @@ public class TrackingTests
     public void LastArgs_MultipleParameters()
     {
         var stub = new DelegateStubTests.Stubs.MessageBuilder();
-        stub.Interceptor.Return((name, age) => $"{name}: {age}");
+        stub.Interceptor.Call((name, age) => $"{name}: {age}");
         MessageBuilder builder = stub;
         builder("Alice", 30);
         builder("Bob", 25);
@@ -396,7 +396,7 @@ public class GenericDelegateTests
         #region delegate-stub-closed-generic
         // Closed generic: type arguments specified at stub definition
         var stub = new DelegateStubTests.Stubs.Factory();
-        stub.Interceptor.Return(() => "generated value");
+        stub.Interceptor.Call(() => "generated value");
         Factory<string> factory = stub;
         #endregion
 
@@ -411,10 +411,10 @@ public class GenericDelegateTests
         #region delegate-stub-open-generic
         // Open generic: create stub with any type argument
         var stringFactory = new OpenGenericDelegateTest.Stubs.Factory<string>();
-        stringFactory.Interceptor.Return(() => "hello");
+        stringFactory.Interceptor.Call(() => "hello");
 
         var intFactory = new OpenGenericDelegateTest.Stubs.Factory<int>();
-        intFactory.Interceptor.Return(() => 42);
+        intFactory.Interceptor.Call(() => 42);
         #endregion
 
         Factory<string> sf = stringFactory;
@@ -429,7 +429,7 @@ public class GenericDelegateTests
         #region delegate-stub-generic-constraints
         // ConstrainedFactory<T> requires T : new() - compiler enforces this
         var productFactory = new OpenGenericDelegateTest.Stubs.ConstrainedFactory<Product>();
-        productFactory.Interceptor.Return(() => new Product { Id = 1, Name = "Widget" });
+        productFactory.Interceptor.Call(() => new Product { Id = 1, Name = "Widget" });
         #endregion
 
         ConstrainedFactory<Product> factory = productFactory;
@@ -448,7 +448,7 @@ public class ResetTests
     public void Reset_ClearsTrackingPreservesConfiguration()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
-        stub.Interceptor.Return((input) => input.ToUpperInvariant());
+        stub.Interceptor.Call((input) => input.ToUpperInvariant());
         Formatter format = stub;
         format("hello");
         format("world");
@@ -477,7 +477,7 @@ public class ImplicitConversionTests
     public void ImplicitConversion_DirectAssignment()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
-        stub.Interceptor.Return((input) => input.ToUpperInvariant());
+        stub.Interceptor.Call((input) => input.ToUpperInvariant());
 
         #region delegate-stub-implicit-conversion
         // Implicit conversion - no cast required
@@ -492,7 +492,7 @@ public class ImplicitConversionTests
     public void MethodParameter_SeamlessSubstitution()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
-        stub.Interceptor.Return((input) => $"[{input}]");
+        stub.Interceptor.Call((input) => $"[{input}]");
 
         #region delegate-stub-method-parameter
         // Pass stub directly to method expecting Formatter
@@ -522,7 +522,7 @@ public class RealWorldExampleTests
 
         #region delegate-stub-validation-rule
         // Configure validation: "admin" is taken, others are available
-        stub.Interceptor.Return((value) => value != "admin");
+        stub.Interceptor.Call((value) => value != "admin");
         #endregion
 
         IsUniqueRule isUnique = stub;
@@ -539,7 +539,7 @@ public class RealWorldExampleTests
 
         #region delegate-stub-factory
         // Configure factory to return test instance
-        stub.Interceptor.Return(() => testProduct);
+        stub.Interceptor.Call(() => testProduct);
         Factory<Product> factory = stub;
         #endregion
 
@@ -614,10 +614,10 @@ public class CompleteExampleTests
 
         #region delegate-stub-complete-example
         // Configure format rule: must be at least 3 characters
-        formatStub.Interceptor.Return((value) => value.Length >= 3);
+        formatStub.Interceptor.Call((value) => value.Length >= 3);
 
         // Configure uniqueness rule: "admin" and "root" are taken
-        uniqueStub.Interceptor.Return((value) => value != "admin" && value != "root");
+        uniqueStub.Interceptor.Call((value) => value != "admin" && value != "root");
 
         // Create validator with stubbed rules
         var validator = new UsernameValidator(uniqueStub, formatStub);
@@ -653,7 +653,7 @@ public class VerifiablePatternTests
 
         #region delegate-verifiable-pattern
         // Mark for verification with Verifiable() chaining
-        stub.Interceptor.Return((x) => x * 2).Verifiable();
+        stub.Interceptor.Call((x) => x * 2).Verifiable();
         stub.Interceptor.Verify(Called.Never); // Not called yet
 
         Transform transform = stub;
@@ -699,7 +699,7 @@ public class SequenceTests
         #region delegate-sequences-callback
         // Callback sequences
         stub.Interceptor
-            .Return((x) => x * 1)
+            .Call((x) => x * 1)
             .ThenReturn((x) => x * 2)
             .ThenReturn((x) => x * 3);
         #endregion
@@ -719,7 +719,7 @@ public class SequenceTests
         #region delegate-sequences-thenreturns
         // ThenReturn for fixed values after callback
         stub.Interceptor
-            .Return((x) => x)
+            .Call((x) => x)
             .ThenReturn(99);
         #endregion
 
@@ -737,7 +737,7 @@ public class SequenceTests
         #region delegate-sequences-thendefault
         // ThenDefault: return default(T) after exhaustion instead of repeating
         stub.Interceptor
-            .Return((a, b) => 100)
+            .Call((a, b) => 100)
             .ThenReturn((a, b) => 200)
             .ThenDefault();
         // Call 1: 100, Call 2: 200, Call 3+: 0 (default(int))
@@ -772,13 +772,13 @@ public class AsyncAutoWrappingTests
         stub.Interceptor.Reset();
 
         // Tier 2: simplified callback
-        stub.Interceptor.Return((int x) => x * 2);
+        stub.Interceptor.Call((int x) => x * 2);
         Assert.Equal(20, await op(10));
 
         stub.Interceptor.Reset();
 
         // Tier 3: full delegate
-        stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
+        stub.Interceptor.Call((int x) => Task.FromResult(x * 2));
         Assert.Equal(20, await op(10));
     }
 }
@@ -814,7 +814,7 @@ public class WhenChainTests
 
         #region delegate-when-predicate-matching
         // Match via predicate
-        stub.Interceptor.When((a, b) => a > 10).Return(999);
+        stub.Interceptor.When(args => args.a > 10).Return(999);
         #endregion
 
         Calculate calc = stub;
@@ -938,13 +938,13 @@ public class ReturnOverloadsReplaceEachOtherTests
 
         #region delegate-config-mutual-exclusivity
         stub.Interceptor.Return(42);
-        stub.Interceptor.Return((a, b) => a + b); // Clears Return(42)
+        stub.Interceptor.Call((a, b) => a + b); // Clears Return(42)
         #endregion
 
         Calculate calc = stub;
         Assert.Equal(3, calc(1, 2)); // Return(callback) wins
 
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
         stub.Interceptor.Return(99);              // Replaces callback
         Assert.Equal(99, calc(1, 2)); // Return(value) wins
     }

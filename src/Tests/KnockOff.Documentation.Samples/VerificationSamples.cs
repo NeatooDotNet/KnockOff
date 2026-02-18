@@ -55,7 +55,7 @@ public class BasicCallVerificationTests
 
         #region verify-verifiable
         // Mark for batch verification, then verify all marked members
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 
         IRepoVerify repository = stub;
         repository.GetById(42);
@@ -147,7 +147,7 @@ public class BasicCallVerificationTests
     public void VerifyAll_ChecksAllConfiguredMembers()
     {
         var stub = new RepoVerifyStub();
-        stub.GetById.Return((id) => new User { Id = id });
+        stub.GetById.Call((id) => new User { Id = id });
         stub.Save.Call((user) => { });
 
         IRepoVerify repository = stub;
@@ -171,7 +171,7 @@ public class ArgumentVerificationTests
     public void LastArg_VerifiesSingleParameter()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.GetById.Return((id) => new User { Id = id });
+        var tracking = stub.GetById.Call((id) => new User { Id = id });
 
         IRepoVerify repository = stub;
         repository.GetById(42);
@@ -186,14 +186,14 @@ public class ArgumentVerificationTests
     public void LastArgs_VerifiesMultipleParameters()
     {
         var stub = new SvcVerifyStub();
-        var tracking = stub.Update.Call((id, name) => { });
+        var tracking = stub.Update.Call(_ => { });
 
         ISvcVerify service = stub;
         service.Update(42, "Alice");
 
         #region verify-lastcallargs-tuple
         // LastArgs is a named tuple for multi-parameter methods
-        var (id, name) = tracking.LastArgs!.Value;
+        var (id, name) = tracking.LastArgs;
         Assert.Equal(42, id);
         Assert.Equal("Alice", name);
         #endregion
@@ -239,7 +239,7 @@ public class CallHistoryTests
         #region verify-call-history
         // Capture all calls to a list for history inspection
         var calls = new List<int>();
-        stub.GetById.Return((id) =>
+        stub.GetById.Call((id) =>
         {
             calls.Add(id);
             return new User { Id = id };
@@ -297,7 +297,7 @@ public class CrossInterceptorTests
 
         #region verify-cross-interceptor
         // Mark multiple methods as verifiable
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         stub.Save.Call((user) => { }).Verifiable();
         stub.Refresh.Call(() => { }).Verifiable();
         #endregion
@@ -389,7 +389,7 @@ public class CompleteVerificationTests
         var getIdHistory = new List<int>();
 
         // Configure with tracking and verification
-        var getTracking = stub.GetById.Return((id) =>
+        var getTracking = stub.GetById.Call((id) =>
         {
             getIdHistory.Add(id);
             getOrder = ++order;
@@ -431,7 +431,7 @@ public class VerifyRefDirectTests
     public void Verify_Direct()
     {
         var stub = new RepoVerifyStub();
-        stub.GetById.Return((id) => new User { Id = id });
+        stub.GetById.Call((id) => new User { Id = id });
         stub.Refresh.Call(() => { });
 
         IRepoVerify repo = stub;
@@ -455,7 +455,7 @@ public class VerifyRefBatchTests
 
         #region verification-ref-batch
         // Step 1: Mark during setup
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         stub.Save.Call((u) => { }).Verifiable(Called.Exactly(2));
         stub.Refresh.Call(() => { }).Verifiable(Called.Never);
 
@@ -479,7 +479,7 @@ public class VerifyRefVerifyAllTests
         var stub = new RepoVerifyStub();
 
         #region verification-ref-verifyall
-        stub.GetById.Return((id) => new User { Id = id });
+        stub.GetById.Call((id) => new User { Id = id });
         stub.Save.Call((user) => { });
 
         IRepoVerify repo = stub;
@@ -495,7 +495,7 @@ public class VerifyRefVerifyAllTests
     {
         var stub = new RepoVerifyStub();
 
-        stub.GetById.Return((id) => new User { Id = id });
+        stub.GetById.Call((id) => new User { Id = id });
         stub.Save.Call((user) => { });
 
         IRepoVerify repo = stub;
@@ -563,7 +563,7 @@ public class VerifyRefExceptionTests
         var stub = new RepoVerifyStub();
 
         #region verification-ref-exception
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         stub.Save.Call((user) => { }).Verifiable();
         stub.Refresh.Call(() => { }).Verifiable();
 
@@ -589,7 +589,7 @@ public class VerifyRefVerifiableChainingTests
 
         #region verification-ref-verifiable-chaining
         // Chain with Return
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
 
         // Chain with Call
         stub.Save.Call((u) => { }).Verifiable(Called.Once);
@@ -612,7 +612,7 @@ public class VerifyRefResetTests
         var stub = new RepoVerifyStub();
 
         #region verification-ref-reset
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         IRepoVerify repo = stub;
         repo.GetById(1);
         stub.Verify(); // Passes
@@ -638,7 +638,7 @@ public partial class DelegateVerificationHost
         #region verify-delegate-basic
         // Create delegate stub and configure with Verifiable()
         var stub = new DelegateVerificationHost.Stubs.VerifyArithmeticOp();
-        stub.Interceptor.Return((a, b) => a + b).Verifiable();
+        stub.Interceptor.Call((a, b) => a + b).Verifiable();
 
         VerifyArithmeticOp op = stub;
         op(2, 3);

@@ -64,7 +64,7 @@ var stub = new PartialSetupCalcStub();
 
 // One call does both: configures the method AND defines the return value
 // There is no second step to forget
-stub.Calculate.Return((a, b) => a + b);
+stub.Calculate.Call(args => args.a + args.b);
 
 IPartialSetupCalc calc = stub;
 Assert.Equal(3, calc.Calculate(1, 2));
@@ -185,7 +185,7 @@ var stub = new TypeSafeCalcStub();
 
 // (int a, int b) — types and names come from Add(int a, int b)
 // Wrong types here cause a COMPILE error, not a runtime error
-stub.Add.Return((a, b) => a + b);
+stub.Add.Call(args => args.a + args.b);
 
 ITypeSafeCalc calc = stub;
 Assert.Equal(3, calc.Add(1, 2));

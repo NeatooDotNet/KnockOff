@@ -3,7 +3,7 @@
 KnockOff provides three configuration tiers for async methods (`Task<T>`, `ValueTask<T>`), each with increasing control. The first two tiers auto-wrap return values so you never write `Task.FromResult` for simple cases.
 
 **See also:**
-- [Method Interceptors](methods.md) - Core `Returns` and `Execute` patterns
+- [Method Interceptors](methods.md) - Core `Return` and `Call` patterns
 - [API Consistency Matrix](api-consistency-matrix.md#feature-12-async-method-auto-wrapping) - Cross-pattern async support
 - [Verification Guide](verification.md) - Details on `Verifiable()` and `stub.Verify()`
 
@@ -31,7 +31,7 @@ All three tiers work identically across all 9 stub patterns (1–9), including d
 
 ```csharp
 // Given: Task<string?> GetDataAsync(int id)
-stub.GetDataAsync.Returns("hello");
+stub.GetDataAsync.Return("hello");
 
 IDataService svc = stub;
 var result = await svc.GetDataAsync(1); // "hello"
@@ -45,7 +45,7 @@ No `Task.FromResult` needed. This is the simplest syntax when the return value i
 
 ```csharp
 // Callback returns string, not Task<string> — auto-wrapped
-stub.GetDataAsync.Returns((id) => $"Data-{id}");
+stub.GetDataAsync.Return((id) => $"Data-{id}");
 
 IDataService svc = stub;
 var result = await svc.GetDataAsync(42); // "Data-42"
@@ -59,7 +59,7 @@ Use this when the return value depends on the arguments but you don't need async
 
 ```csharp
 // Callback returns Task<string?> directly
-stub.GetDataAsync.Returns((int id) => Task.FromResult<string?>($"Full-{id}"));
+stub.GetDataAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
 
 IDataService svc = stub;
 var result = await svc.GetDataAsync(99); // "Full-99"
@@ -71,12 +71,12 @@ Use this when you need `async`/`await` inside the callback (e.g., simulating del
 
 ## Void Async Methods (Task Return)
 
-For methods returning `Task` with no value, `Execute` accepts an `Action`:
+For methods returning `Task` with no value, `Call` accepts an `Action`:
 
 ```csharp
 // Given: Task SaveDataAsync(string data)
 string? savedData = null;
-stub.SaveDataAsync.Execute((data) => savedData = data);
+stub.SaveDataAsync.Call((data) => savedData = data);
 
 IDataService svc = stub;
 await svc.SaveDataAsync("important data");
@@ -92,33 +92,33 @@ The generated interceptor returns `Task.CompletedTask` automatically.
 The same three tiers apply to `ValueTask<T>`:
 
 ```csharp
-// Tier 1: Returns — auto-wraps in new ValueTask<T>(value)
-stub.GetCachedAsync.Returns(cachedUser);
+// Tier 1: Return — auto-wraps in new ValueTask<T>(value)
+stub.GetCachedAsync.Return(cachedUser);
 
 // Tier 2: Simplified callback — returns T, auto-wrapped
-stub.GetCachedAsync.Returns((id) => new User { Id = id });
+stub.GetCachedAsync.Return((id) => new User { Id = id });
 
 // Tier 3: Full delegate — returns ValueTask<T> directly
-stub.GetCachedAsync.Returns((id) => new ValueTask<User?>(new User { Id = id }));
+stub.GetCachedAsync.Return((id) => new ValueTask<User?>(new User { Id = id }));
 ```
 
 ---
 
 ## Delegate Stubs — Full Auto-Wrapping (Pattern 7)
 
-Delegate stubs (Pattern 7) support the same three-tier async API as all other patterns. After MethodInterceptorRenderer reuse, async delegates like `delegate Task<int> AsyncOperation(int x)` get auto-wrapping:
+Delegate stubs (Pattern 7) support the same three-tier async API as all other patterns. Async delegates like `delegate Task<int> AsyncOperation(int x)` get full auto-wrapping:
 
 ```csharp
 // Given: delegate Task<int> AsyncOperation(int x)
 
-// Tier 1: Returns takes the inner type — auto-wraps in Task.FromResult
-stub.Interceptor.Returns(42);
+// Tier 1: Return takes the inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Return(42);
 
 // Tier 2: Simplified callback — returns int, auto-wrapped
-stub.Interceptor.Returns((int x) => x * 2);
+stub.Interceptor.Return((int x) => x * 2);
 
 // Tier 3: Full delegate — returns Task<int> directly
-stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
+stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 ```
 
 **See also:** [Delegate Stubs Guide](delegates.md)
@@ -130,14 +130,14 @@ stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
 Async methods support params-style sequences with auto-wrapping:
 
 ```csharp
-// Returns multiple values — each auto-wrapped in Task.FromResult
-stub.GetDataAsync.Returns("first", "second", "third");
+// Return multiple values — each auto-wrapped in Task.FromResult
+stub.GetDataAsync.Return("first", "second", "third");
 // Call 1: "first", Call 2: "second", Call 3+: "third" (repeats last)
 
 // Callback sequences also work
 stub.GetDataAsync
-    .Returns((id) => "initial")
-    .ThenReturns((id) => "updated");
+    .Return((id) => "initial")
+    .ThenReturn((id) => "updated");
 ```
 
 ---
@@ -147,7 +147,7 @@ stub.GetDataAsync
 Use async lambdas with the Tier 3 API to simulate asynchronous delays:
 
 ```csharp
-stub.GetDataAsync.Returns(async (id) =>
+stub.GetDataAsync.Return(async (id) =>
 {
     await Task.Delay(50);
     return $"Delayed-{id}";
@@ -163,7 +163,7 @@ stub.GetDataAsync.Returns(async (id) =>
 Return a faulted task using `Task.FromException<T>`:
 
 ```csharp
-stub.GetDataAsync.Returns((id) =>
+stub.GetDataAsync.Return((id) =>
     Task.FromException<string?>(new NotFoundException($"Item {id} not found")));
 ```
 
@@ -172,7 +172,7 @@ stub.GetDataAsync.Returns((id) =>
 Throw exceptions directly in the callback. The exception is thrown when the method is awaited:
 
 ```csharp
-stub.GetDataAsync.Returns((int id) =>
+stub.GetDataAsync.Return((int id) =>
     throw new NotFoundException($"Item {id} not found"));
 ```
 
@@ -184,11 +184,11 @@ When throwing directly in a simplified callback (Tier 2), you may need to specif
 
 | Scenario | Recommended Tier | Example |
 |----------|-----------------|---------|
-| Constant return value | Tier 1: `Returns` | `stub.Method.Returns("value")` |
-| Value depends on args | Tier 2: Simplified callback | `stub.Method.Returns((id) => ...)` |
-| Need async/await in callback | Tier 3: Full delegate | `stub.Method.Returns(async (id) => ...)` |
-| Simulating failures | Tier 3: Full delegate | `stub.Method.Returns((id) => Task.FromException<T>(...))` |
-| Delegate stubs | Same 3 tiers | `stub.Interceptor.Returns(42)` (auto-wraps) |
+| Constant return value | Tier 1: `Return` | `stub.Method.Return("value")` |
+| Value depends on args | Tier 2: Simplified callback | `stub.Method.Return((id) => ...)` |
+| Need async/await in callback | Tier 3: Full delegate | `stub.Method.Return(async (id) => ...)` |
+| Simulating failures | Tier 3: Full delegate | `stub.Method.Return((id) => Task.FromException<T>(...))` |
+| Delegate stubs | Same 3 tiers | `stub.Interceptor.Return(42)` (auto-wraps) |
 
 ---
 
@@ -204,4 +204,4 @@ When throwing directly in a simplified callback (Tier 2), you may need to specif
 
 ---
 
-**UPDATED:** 2026-02-05
+**UPDATED:** 2026-02-18

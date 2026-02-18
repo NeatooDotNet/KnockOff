@@ -47,7 +47,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Use simplified callback - returns unwrapped value, auto-wrapped in Task.FromResult
-		stub.GetStringAsync.Return((id) => $"Result-{id}");
+		stub.GetStringAsync.Call((id) => $"Result-{id}");
 
 		var result = await service.GetStringAsync(42);
 
@@ -60,7 +60,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetNullableIntAsync.Return((key) => (int?)null);
+		stub.GetNullableIntAsync.Call((key) => (int?)null);
 
 		var result = await service.GetNullableIntAsync("test");
 
@@ -73,7 +73,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetUserAsync.Return((id, name) => new User { Id = id, Name = name });
+		stub.GetUserAsync.Call(args => new User { Id = args.id, Name = args.name });
 
 		var result = await service.GetUserAsync(99, "Alice");
 
@@ -91,7 +91,7 @@ public partial class AsyncCallbackSimplificationTests
 		// Func<T> is useful when value must be computed each call
 		// For static values, use OnCall(value) instead
 		var callCount = 0;
-		stub.GetDefaultStringAsync.Return(() => $"call-{++callCount}");
+		stub.GetDefaultStringAsync.Call(() => $"call-{++callCount}");
 
 		var result1 = await service.GetDefaultStringAsync();
 		var result2 = await service.GetDefaultStringAsync();
@@ -108,7 +108,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetStringAsync.Return((id) => "repeated");
+		stub.GetStringAsync.Call((id) => "repeated");
 
 		Assert.Equal("repeated", await service.GetStringAsync(1));
 		Assert.Equal("repeated", await service.GetStringAsync(2));
@@ -126,7 +126,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Use simplified callback - returns unwrapped value, auto-wrapped in new ValueTask<T>()
-		stub.GetCachedStringAsync.Return((id) => $"Cached-{id}");
+		stub.GetCachedStringAsync.Call((id) => $"Cached-{id}");
 
 		var result = await service.GetCachedStringAsync(7);
 
@@ -139,7 +139,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetDoubleAsync.Return((a, b, c) => (double)(a + b + c));
+		stub.GetDoubleAsync.Call(args => (double)(args.a + args.b + args.c));
 
 		var result = await service.GetDoubleAsync(1, 2, 3);
 
@@ -155,7 +155,7 @@ public partial class AsyncCallbackSimplificationTests
 		// Func<T> is useful when value must be computed each call
 		// For static values, use OnCall(value) instead
 		var callCount = 0;
-		stub.GetDefaultIntAsync.Return(() => ++callCount * 10);
+		stub.GetDefaultIntAsync.Call(() => ++callCount * 10);
 
 		var result1 = await service.GetDefaultIntAsync();
 		var result2 = await service.GetDefaultIntAsync();
@@ -192,10 +192,10 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		string? capturedName = null;
-		stub.ProcessAsync.Call((id, name) =>
+		stub.ProcessAsync.Call(args =>
 		{
-			capturedId = id;
-			capturedName = name;
+			capturedId = args.id;
+			capturedName = args.name;
 		});
 
 		await service.ProcessAsync(42, "Alice");
@@ -259,10 +259,10 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		int capturedCount = 0;
-		stub.RecordAsync.Call((id, count) =>
+		stub.RecordAsync.Call(args =>
 		{
-			capturedId = id;
-			capturedCount = count;
+			capturedId = args.id;
+			capturedCount = args.count;
 		});
 
 		await service.RecordAsync(5, 10);
@@ -295,7 +295,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.GetStringAsync.Return((id) => "test");
+		var tracking = stub.GetStringAsync.Call((id) => "test");
 
 		await service.GetStringAsync(1);
 		await service.GetStringAsync(2);
@@ -310,7 +310,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.GetStringAsync.Return((id) => "test");
+		var tracking = stub.GetStringAsync.Call((id) => "test");
 
 		await service.GetStringAsync(1);
 		await service.GetStringAsync(42);
@@ -325,7 +325,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.GetUserAsync.Return((id, name) => new User { Id = id, Name = name });
+		var tracking = stub.GetUserAsync.Call(args => new User { Id = args.id, Name = args.name });
 
 		await service.GetUserAsync(1, "A");
 		await service.GetUserAsync(2, "B");
@@ -368,7 +368,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.GetStringAsync.Return((id) => "test").Verifiable();
+		stub.GetStringAsync.Call((id) => "test").Verifiable();
 
 		await service.GetStringAsync(1);
 
@@ -399,11 +399,11 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Configure with async callback first
-		stub.GetStringAsync.Return((id) => Task.FromResult("async"));
+		stub.GetStringAsync.Call((id) => Task.FromResult("async"));
 		Assert.Equal("async", await service.GetStringAsync(1));
 
 		// Configure with simplified callback - should clear async callback
-		stub.GetStringAsync.Return((id) => "simplified");
+		stub.GetStringAsync.Call((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(2));
 	}
 
@@ -414,11 +414,11 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Configure with simplified callback first
-		stub.GetStringAsync.Return((id) => "simplified");
+		stub.GetStringAsync.Call((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(1));
 
 		// Configure with async callback - should clear simplified callback
-		stub.GetStringAsync.Return((id) => Task.FromResult("async"));
+		stub.GetStringAsync.Call((id) => Task.FromResult("async"));
 		Assert.Equal("async", await service.GetStringAsync(2));
 	}
 
@@ -429,7 +429,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Configure with simplified callback first
-		stub.GetStringAsync.Return((id) => "simplified");
+		stub.GetStringAsync.Call((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(1));
 
 		// Configure with value - should clear simplified callback
@@ -448,7 +448,7 @@ public partial class AsyncCallbackSimplificationTests
 		Assert.Equal("value", await service.GetStringAsync(1));
 
 		// Configure with simplified callback - should clear value
-		stub.GetStringAsync.Return((id) => "simplified");
+		stub.GetStringAsync.Call((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(2));
 	}
 
@@ -459,11 +459,11 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Configure with simplified callback first
-		stub.GetStringAsync.Return((id) => "simplified");
+		stub.GetStringAsync.Call((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(1));
 
 		// Configure with OnCall().ThenReturn() sequence - should clear simplified callback
-		stub.GetStringAsync.Return((id) => Task.FromResult("seq1"))
+		stub.GetStringAsync.Call((id) => Task.FromResult("seq1"))
 			.ThenReturn((id) => Task.FromResult("seq2"));
 		Assert.Equal("seq1", await service.GetStringAsync(2));
 		Assert.Equal("seq2", await service.GetStringAsync(3));
@@ -478,8 +478,8 @@ public partial class AsyncCallbackSimplificationTests
 		bool asyncCalled = false;
 		bool simplifiedCalled = false;
 
-		// Configure with async callback first
-		stub.SaveAsync.Call((data) => { asyncCalled = true; return Task.CompletedTask; });
+		// Configure with async callback first (using full delegate that returns Task)
+		stub.SaveAsync.Call((Func<string, Task>)((data) => { asyncCalled = true; return Task.CompletedTask; }));
 		await service.SaveAsync("test1");
 		Assert.True(asyncCalled);
 
@@ -508,8 +508,8 @@ public partial class AsyncCallbackSimplificationTests
 
 		simplifiedCalled = false;
 
-		// Configure with async callback - should clear simplified void callback
-		stub.SaveAsync.Call((data) => { asyncCalled = true; return Task.CompletedTask; });
+		// Configure with async callback - should clear simplified void callback (using full delegate)
+		stub.SaveAsync.Call((Func<string, Task>)((data) => { asyncCalled = true; return Task.CompletedTask; }));
 		await service.SaveAsync("test2");
 		Assert.True(asyncCalled);
 		Assert.False(simplifiedCalled); // simplified callback should not be called
@@ -546,7 +546,7 @@ public partial class AsyncCallbackSimplificationTests
 		stub.Source(source);
 
 		// Configure simplified callback
-		stub.GetStringAsync.Return((id) => "Callback");
+		stub.GetStringAsync.Call((id) => "Callback");
 
 		// Callback should take priority over source
 		var result = await service.GetStringAsync(42);
@@ -585,7 +585,7 @@ public partial class AsyncCallbackSimplificationTests
 	{
 		var stub = new InlineInterfaceAsyncStub.Stubs.ISimplifiedAsyncService();
 
-		stub.GetStringAsync.Return((id) => $"Inline-{id}");
+		stub.GetStringAsync.Call((id) => $"Inline-{id}");
 
 		ISimplifiedAsyncService service = stub;
 		var result = await service.GetStringAsync(5);

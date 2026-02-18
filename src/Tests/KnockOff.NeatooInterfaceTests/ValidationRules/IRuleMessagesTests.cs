@@ -71,10 +71,10 @@ public partial class IRuleMessagesTests
         string? capturedProp = null;
         string? capturedMsg = null;
 
-        stub.Add.Call((prop, msg) =>
+        stub.Add.Call(((string propertyName, string message) args) =>
         {
-            capturedProp = prop;
-            capturedMsg = msg;
+            capturedProp = args.propertyName;
+            capturedMsg = args.message;
         });
 
         messages.Add("Name", "Required");
@@ -143,7 +143,7 @@ public partial class IRuleMessagesTests
         IList<IRuleMessage> list = stub;
 
         var messageStub = new RuleMessageStubForList();
-        stub.Contains.Return((item) => true);
+        stub.Contains.Call((item) => true);
 
         var result = list.Contains(messageStub);
 
@@ -158,7 +158,7 @@ public partial class IRuleMessagesTests
         IList<IRuleMessage> list = stub;
 
         var messageStub = new RuleMessageStubForList();
-        stub.IndexOf.Return((item) => 3);
+        stub.IndexOf.Call((item) => 3);
 
         var result = list.IndexOf(messageStub);
 
@@ -239,7 +239,7 @@ public partial class IRuleMessagesTests
         IEnumerable<IRuleMessage> enumerable = stub;
 
         var emptyEnumerator = new List<IRuleMessage>().GetEnumerator();
-        stub.GetEnumerator.Return(() => emptyEnumerator);
+        stub.GetEnumerator.Call(() => emptyEnumerator);
 
         var enumerator = enumerable.GetEnumerator();
 
@@ -315,7 +315,7 @@ public class IRuleMessagesStandaloneTests
         IRuleMessages messages = stub;
 
         // Configure callback to enable tracking (string overload)
-        var tracking = stub.Add.Call((string propertyName, string message) => { });
+        var tracking = stub.Add.Call(((string propertyName, string message) args) => { });
 
         messages.Add("Property", "Message");
 

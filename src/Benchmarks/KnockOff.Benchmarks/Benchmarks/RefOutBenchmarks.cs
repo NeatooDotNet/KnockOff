@@ -31,7 +31,7 @@ public class RefOutInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new ParserStub();
-        stub.TryParse.Return((string input, out int result) =>
+        stub.TryParse.Call((string input, out int result) =>
         {
             result = 42;
             return true;
@@ -95,7 +95,7 @@ public class RefOutSetupBenchmarks
     public ParserStub KnockOff_SetupRefOut()
     {
         var stub = new ParserStub();
-        stub.TryParse.Return((string input, out int result) =>
+        stub.TryParse.Call((string input, out int result) =>
         {
             result = 42;
             return true;

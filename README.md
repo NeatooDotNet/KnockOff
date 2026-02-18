@@ -128,7 +128,7 @@ myRepoKO.Verify();
 - **[Ref/out parameters](docs/guides/ref-out-parameters.md)** — Natural lambda syntax with `ref`/`out` keywords. No special matchers or index-based access.
 - **[Multiple interfaces](docs/guides/multiple-interfaces.md)** — Unified interceptors on one stub. No `.As<T>()` references or casting.
 - **[Tighter type safety](docs/type-safety.md)** — Each Return/Call/When call is complete in one step — no forgotten `.Returns()` that silently breaks at runtime.
-- **[Parameter matching](docs/guides/parameter-matching-comparison.md)** — `Return((a, b) => a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter.
+- **[Parameter matching](docs/guides/parameter-matching-comparison.md)** — `Call(args => args.a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter.
 - **Built-in argument capture** — `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup.
 - **Event verification** — `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute.
 - **Explicit Get/Set verification** — `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers.
@@ -205,7 +205,7 @@ public void ConfigureStub_WithReturn()
 {
     var stub = new QuickStartRepoStub();
 
-    stub.GetUser.Return((id) => new User { Id = id, Name = "Test User" });
+    stub.GetUser.Call((id) => new User { Id = id, Name = "Test User" });
 
     IQuickStartRepo repository = stub;
     var user = repository.GetUser(42);
@@ -223,7 +223,7 @@ public void ConfigureStub_WithReturn()
 public void VerifyCalls_WithVerifiable()
 {
     var stub = new QuickStartRepoStub();
-    stub.GetUser.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+    stub.GetUser.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 
     IQuickStartRepo repository = stub;
 
@@ -257,7 +257,7 @@ repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>(
 <!-- snippet: readme-hero-knockoff -->
 ```cs
 var stub = new CompareUserRepoStub();
-stub.GetUser.Return((id) => id > 0 ? new User { Id = id } : null);
+stub.GetUser.Call((id) => id > 0 ? new User { Id = id } : null);
 ```
 <!-- endSnippet -->
 
@@ -289,14 +289,14 @@ calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
 <!-- snippet: readme-argmatch-knockoff-oncall -->
 ```cs
 // KnockOff - Returns with conditional (permanent, matches all calls)
-stub.Add.Return((a, b) => a > 0 ? 100 : 0);
+stub.Add.Call(args => args.a > 0 ? 100 : 0);
 ```
 <!-- endSnippet -->
 
 <!-- snippet: readme-argmatch-knockoff-when -->
 ```cs
 // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-stub.Add.When(args => args.a > 0).Return(100).ThenCall((a, b) => a + b);
+stub.Add.When(args => args.a > 0).Return(100).ThenCall(args => args.a + args.b);
 ```
 <!-- endSnippet -->
 
@@ -318,12 +318,12 @@ calc.Add(3, 4).Returns(200);
 
 <!-- snippet: readme-argmatch-knockoff-specific -->
 ```cs
-stub.Add.When((1, 2)).Return(100);
-stub.Add.When((3, 4)).Return(200);
+stub.Add.When(1, 2).Return(100);
+stub.Add.When(3, 4).Return(200);
 ```
 <!-- endSnippet -->
 
-**Note:** Moq and NSubstitute matchers are permanent -- they match all qualifying calls. KnockOff's `When()` is sequential -- matchers are consumed in order. Use `Return(callback)` with conditionals for permanent matching behavior.
+**Note:** Moq and NSubstitute matchers are permanent -- they match all qualifying calls. KnockOff's `When()` is sequential -- matchers are consumed in order. Use `Call(callback)` with conditionals for permanent matching behavior.
 
 ### Argument Capture
 
@@ -350,10 +350,10 @@ calc.Add(1, 2);
 <!-- snippet: readme-argcapture-knockoff -->
 ```cs
 // KnockOff - built-in, no pre-setup
-var tracking = stub.Add.Return((a, b) => a + b);
+var tracking = stub.Add.Call(args => args.a + args.b);
 ICalculator calc = stub;
 calc.Add(1, 2);
-var (a, b) = tracking.LastArgs!.Value;  // Named tuple: a = 1, b = 2
+var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
 ```
 <!-- endSnippet -->
 
@@ -397,8 +397,8 @@ formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
 <!-- snippet: readme-knockoff-any-value -->
 ```cs
 // Explicit parameter types resolve the overload - standard C# syntax
-stub.Format.Return((string input, bool uppercase) => "bool overload");
-stub.Format.Return((string input, int maxLength) => "int overload");
+stub.Format.Call(((string input, bool uppercase) args) => "bool overload");
+stub.Format.Call(((string input, int maxLength) args) => "int overload");
 ```
 <!-- endSnippet -->
 
@@ -417,8 +417,8 @@ formatter.Format("test", 10).Returns("truncated");
 <!-- snippet: readme-knockoff-specific-value -->
 ```cs
 // Specific value matching - parameter types resolve the overload
-stub.Format.When(("test", true)).Return("UPPERCASE");
-stub.Format.When(("test", 10)).Return("truncated");
+stub.Format.When("test", true).Return("UPPERCASE");
+stub.Format.When("test", 10).Return("truncated");
 ```
 <!-- endSnippet -->
 
@@ -444,7 +444,7 @@ formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
 <!-- snippet: readme-knockoff-argument-access -->
 ```cs
 // Arguments are directly available with names and types:
-stub.Format.Return((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
 ```
 <!-- endSnippet -->
 
@@ -474,7 +474,7 @@ public partial class ReadmeStandaloneStub : IUserRepo { }
 public void InlineInterface_Pattern()
 {
     var stub = new Stubs.IUserRepo();
-    stub.GetUser.Return((id) => new User { Id = id });
+    stub.GetUser.Call((id) => new User { Id = id });
 
     IUserRepo repo = stub;
     Assert.NotNull(repo.GetUser(1));
@@ -489,7 +489,7 @@ public void InlineInterface_Pattern()
 public void InlineClass_Pattern()
 {
     var stub = new Stubs.MyService();
-    stub.GetUser.Return((id) => new User { Id = id });
+    stub.GetUser.Call((id) => new User { Id = id });
 
     MyService service = stub.Object;
     Assert.NotNull(service.GetUser(1));
@@ -533,11 +533,12 @@ The skill includes slash commands:
 
 - **[Getting Started](docs/getting-started.md)** - Installation and first stub
 - **[Stub Patterns](docs/guides/stub-patterns.md)** - Standalone, inline interface, inline class
-- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `Returns`, `Execute`, `Get`, `Set` reference
+- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `Return`, `Call`, `Get`, `Set` reference
 - **[Source Delegation](docs/guides/source-delegation.md)** - Delegate to real implementations
 - **[Full Comparison Guide](docs/comparison.md)** - Properties, events, delegates, indexers vs Moq and NSubstitute
 - **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step migration guide
 - **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Comparison and migration guide
+- **[Migration to v0.52](docs/guides/migration-v0.52.md)** - API rename guide (Return/Call/When)
 
 ---
 

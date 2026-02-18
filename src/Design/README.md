@@ -46,8 +46,8 @@ StubPatterns/          # Four stub patterns
   AllPatterns.cs       # All patterns in one file (standalone, inline interface, inline class, inline delegate)
 
 Methods/               # Method stubbing
-  BasicMethods.cs      # Returns, OnCall, verification
-  MethodSequences.cs   # OnCall().ThenCall()
+  BasicMethods.cs      # Return, Call, verification
+  MethodSequences.cs   # Call().ThenCall()
   WhenMatching.cs      # When() API
 
 Properties/            # Property stubbing

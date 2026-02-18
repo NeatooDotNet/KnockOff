@@ -64,7 +64,7 @@ public class StrictModeTests
 	public void StandaloneStub_Strict_WithOnCall_DoesNotThrow()
 	{
 		var stub = new StrictModeTestStub().Strict();
-		stub.GetValue.Return((x) => x * 2);
+		stub.GetValue.Call((x) => x * 2);
 		IStrictModeTest service = stub;
 
 		// Callback configured - should work even in strict mode
@@ -167,7 +167,7 @@ public class StrictModeTests
 	public void InlineStub_Strict_WithOnCall_DoesNotThrow()
 	{
 		var stub = new StrictModeInlineTests.Stubs.IStrictModeTest(strict: true);
-		stub.GetValue.Return((x) => x * 2);
+		stub.GetValue.Call((x) => x * 2);
 		IStrictModeTest service = stub;
 
 		var result = service.GetValue(5);
@@ -243,7 +243,7 @@ public class StrictModeTests
 	{
 		// Test that .Strict() can be used in a fluent chain
 		var stub = new StrictModeTestStub().Strict();
-		stub.GetValue.Return((x) => x * 2);
+		stub.GetValue.Call((x) => x * 2);
 		IStrictModeTest service = stub;
 
 		// Should not throw because OnCall is configured

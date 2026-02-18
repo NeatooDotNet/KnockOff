@@ -41,7 +41,7 @@ public class StandAlonePatternTests
         var stub = new DataServiceStub();
 
         // Configure return value
-        stub.GetById.Return((id) => new User { Id = id, Name = "Test" });
+        stub.GetById.Call((id) => new User { Id = id, Name = "Test" });
 
         // Use through interface
         IDataService service = stub;
@@ -114,7 +114,7 @@ public partial class CmdInlineClassTests
         var stub = new Stubs.PaymentProcessor();
 
         // Configure virtual member
-        stub.ProcessPayment.Return((amount) => amount > 0);
+        stub.ProcessPayment.Call((amount) => amount > 0);
 
         // Access class instance via .Object
         PaymentProcessor processor = stub.Object;

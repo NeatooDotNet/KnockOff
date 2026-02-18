@@ -32,7 +32,7 @@ internal static class ModelAdapters
 			ParameterDeclarations: m.ParameterDeclarations,
 			ReturnType: m.ReturnType,
 			IsVoid: m.IsVoid,
-			HasRefOrOutParams: m.NeedsCustomDelegate && m.CustomDelegateName != null, // Approximation
+			HasRefOrOutParams: m.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out),
 			DefaultExpression: m.DefaultExpression,
 			ThrowsOnDefault: m.ThrowsOnDefault,
 			ReturnsByRef: m.ReturnsByRef,
@@ -65,8 +65,29 @@ internal static class ModelAdapters
 			? className
 			: $"{className}{typeParameters}";
 
+		// Recompute delegate types using UnifiedInterceptorBuilder for consistency.
+		// The FlatModelBuilder may compute these differently (e.g., old NeedsCustomDelegate logic).
+		var hasRefOrOut = first.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+		var sig = new MethodSignatureInfo(
+			Parameters: first.Parameters,
+			TrackableParameters: first.TrackableParameters,
+			ParameterDeclarations: first.ParameterDeclarations,
+			ReturnType: first.ReturnType,
+			IsVoid: first.IsVoid,
+			HasRefOrOutParams: hasRefOrOut,
+			DefaultExpression: first.DefaultExpression,
+			ThrowsOnDefault: first.ThrowsOnDefault,
+			ReturnsByRef: first.ReturnsByRef,
+			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
+			XmlDocSummary: first.XmlDocSummary);
+
+		var needsCustomDelegate = UnifiedInterceptorBuilder.NeedsCustomDelegate(sig);
+		var callDelegateType = UnifiedInterceptorBuilder.BuildCallDelegateType(first.MethodName, sig, className, typeParameters);
+		var customDelegateSignature = UnifiedInterceptorBuilder.BuildCustomDelegateSignature(first.MethodName, sig, className, typeParameters);
+		var usesTuple = !needsCustomDelegate && first.Parameters.Count >= 2;
+
 		// Get delegate type without nullable marker for builder interface
-		var delegateTypeForBuilder = first.CallDelegateType.TrimEnd('?');
+		var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
@@ -79,9 +100,9 @@ internal static class ModelAdapters
 			ParameterDeclarations: first.ParameterDeclarations,
 			ReturnType: first.ReturnType,
 			IsVoid: first.IsVoid,
-			CallDelegateType: first.CallDelegateType,
-			NeedsCustomDelegate: first.NeedsCustomDelegate,
-			CustomDelegateSignature: first.CustomDelegateSignature,
+			CallDelegateType: callDelegateType,
+			NeedsCustomDelegate: needsCustomDelegate,
+			CustomDelegateSignature: customDelegateSignature,
 			LastArgType: GetLastArgType(first.TrackableParameters),
 			LastArgsType: GetLastArgsType(first.TrackableParameters, first.LastCallType),
 			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder, first.IsVoid),
@@ -91,7 +112,9 @@ internal static class ModelAdapters
 			StubOverrideName: first.HasStubOverride ? $"{first.MethodName}_" : null,
 			Overloads: EquatableArray<MethodOverloadSignature>.Empty,
 			ReturnsByRef: first.ReturnsByRef,
-			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
+			XmlDocSummary: first.XmlDocSummary,
+			UsesTupleCallDelegate: usesTuple);
 	}
 
 	private static UnifiedMethodInterceptorModel BuildMultiOverloadModel(
@@ -116,11 +139,28 @@ internal static class ModelAdapters
 			if (!seenSuffixes.Add(suffix))
 				continue;
 
-			var delegateName = $"{method.MethodName}Delegate_{suffix}";
-			var delegateParamList = BuildDelegateParamList(method.Parameters);
-			var delegateSignature = method.IsVoid
-				? $"public delegate void {delegateName}({delegateParamList});"
-				: $"public delegate {method.ReturnType} {delegateName}({delegateParamList});";
+			// Use Func/Action for non-ref/out overloads (same as single-signature),
+			// only fall back to custom delegates for ref/out.
+			var hasRefOrOut = method.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+			string delegateName;
+			string? delegateSignature;
+			bool usesTuple;
+
+			if (hasRefOrOut)
+			{
+				delegateName = $"{method.MethodName}Delegate_{suffix}";
+				var delegateParamList = BuildDelegateParamList(method.Parameters);
+				delegateSignature = method.IsVoid
+					? $"public delegate void {delegateName}({delegateParamList});"
+					: $"public delegate {method.ReturnType} {delegateName}({delegateParamList});";
+				usesTuple = false;
+			}
+			else
+			{
+				delegateName = BuildFuncActionDelegateType(method.Parameters, method.ReturnType, method.IsVoid);
+				delegateSignature = null;
+				usesTuple = method.Parameters.Count >= 2;
+			}
 
 			overloads.Add(new MethodOverloadSignature(
 				SignatureSuffix: suffix,
@@ -139,7 +179,9 @@ internal static class ModelAdapters
 				// Per-signature stub override name for mixed overload groups
 				StubOverrideName: method.HasStubOverride ? $"{method.MethodName}_" : null,
 				ReturnsByRef: method.ReturnsByRef,
-				ReturnsByRefReadonly: method.ReturnsByRefReadonly));
+				ReturnsByRefReadonly: method.ReturnsByRefReadonly,
+				XmlDocSummary: method.XmlDocSummary,
+				UsesTupleCallDelegate: usesTuple));
 		}
 
 		// For overload groups, check if any method has stub override (for model-level tracking)
@@ -170,7 +212,8 @@ internal static class ModelAdapters
 			StubOverrideName: anyHasStubOverride ? $"{first.MethodName}_" : null,
 			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()),
 			ReturnsByRef: first.ReturnsByRef,
-			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
+			XmlDocSummary: first.XmlDocSummary);
 	}
 
 	private static List<MethodSignatureInfo> GetUniqueSignatures(List<MethodSignatureInfo> signatures)
@@ -241,6 +284,33 @@ internal static class ModelAdapters
 			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");
 		}
 		return string.Join(", ", parts);
+	}
+
+	/// <summary>
+	/// Builds the Func/Action type string for a non-ref/out method signature.
+	/// For 2+ params, uses a named tuple as a single parameter.
+	/// Returns the type without trailing ?.
+	/// </summary>
+	private static string BuildFuncActionDelegateType(EquatableArray<ParameterModel> parameters, string returnType, bool isVoid)
+	{
+		if (isVoid)
+		{
+			if (parameters.Count == 0)
+				return "global::System.Action";
+			if (parameters.Count == 1)
+				return $"global::System.Action<{parameters.GetArray()![0].Type}>";
+			var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+			return $"global::System.Action<{tupleType}>";
+		}
+		else
+		{
+			if (parameters.Count == 0)
+				return $"global::System.Func<{returnType}>";
+			if (parameters.Count == 1)
+				return $"global::System.Func<{parameters.GetArray()![0].Type}, {returnType}>";
+			var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+			return $"global::System.Func<{tupleType}, {returnType}>";
+		}
 	}
 
 	#region Property Adapters

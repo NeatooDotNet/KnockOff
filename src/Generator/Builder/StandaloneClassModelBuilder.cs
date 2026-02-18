@@ -387,7 +387,8 @@ internal static class StandaloneClassModelBuilder
                 Type: p.Type,
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
-                RefPrefix: GetRefKindPrefix(p.RefKind)))
+                RefPrefix: GetRefKindPrefix(p.RefKind),
+                XmlDoc: p.XmlDoc))
             .ToEquatableArray();
 
         var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
@@ -405,7 +406,8 @@ internal static class StandaloneClassModelBuilder
             DefaultExpression: defaultExpr,
             ThrowsOnDefault: false,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            XmlDocSummary: member.XmlDocSummary);
     }
 
     #endregion
@@ -760,7 +762,8 @@ internal static class StandaloneClassModelBuilder
                 Type: p.Type,
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
-                RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+                RefPrefix: GetRefKindPrefix(p.RefKind),
+                XmlDoc: p.XmlDoc)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{methodName}TypedHandler";

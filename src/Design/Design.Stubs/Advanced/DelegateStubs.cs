@@ -5,7 +5,7 @@
 // - [KnockOff<DelegateType>] for delegate stubs
 // - Implicit conversion to delegate type
 // - Interceptor for configuration and verification
-// - Returns, Execute, When matching
+// - Return, Call, When matching
 // - Void vs returning delegates
 // -----------------------------------------------------------------------------
 
@@ -62,12 +62,12 @@ public partial class DelegateStubsDemo
     // =========================================================================
     // Interceptor.Return(value) - Constant Return Value
     // =========================================================================
-    // DESIGN DECISION: Returns(value) configures a constant return value.
+    // DESIGN DECISION: Return(value) configures a constant return value.
     // The delegate always returns this value regardless of arguments.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Returns(int value) { _call = (_, _) => value; }
+    //   public InterceptorInterceptor Return(int value) { ... }
     // =========================================================================
 
     public void Returns_ConstantValue()
@@ -83,14 +83,15 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // Interceptor.Return(callback) - Dynamic Behavior
+    // Interceptor.Call(callback) - Dynamic Behavior
     // =========================================================================
-    // DESIGN DECISION: Returns(callback) allows full control over delegate
+    // DESIGN DECISION: Call(callback) allows full control over delegate
     // behavior. The callback receives the same arguments as the delegate.
     //
-    // GENERATOR BEHAVIOR:
+    // GENERATOR BEHAVIOR: The fully generated interceptor class provides typed
+    // Call methods:
     //
-    //   public void Returns(Func<int, int, int> callback) { _call = callback; }
+    //   public MethodCallBuilderImpl Call(Func<(int a, int b), int> callback) { ... }
     // =========================================================================
 
     public void Returns_DynamicBehavior()
@@ -98,7 +99,7 @@ public partial class DelegateStubsDemo
         var stub = new Stubs.ArithmeticOperation();
 
         // Configure to actually add the numbers
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 
@@ -138,12 +139,13 @@ public partial class DelegateStubsDemo
     // =========================================================================
     // Void Delegates - LogAction Example
     // =========================================================================
-    // DESIGN DECISION: Void delegates don't have Returns(). They only have
-    // Execute(callback) for configuring behavior.
+    // DESIGN DECISION: Void delegates don't have Return(). They only have
+    // Call(callback) for configuring behavior.
     //
-    // GENERATOR BEHAVIOR:
+    // GENERATOR BEHAVIOR: The fully generated interceptor class provides typed
+    // Call methods:
     //
-    //   public void Execute(Action<string> callback) { _call = callback; }
+    //   public MethodCallBuilderImpl Call(Action<string> callback) { ... }
     // =========================================================================
 
     public void VoidDelegate_ExecuteOnly()
@@ -305,7 +307,7 @@ public partial class DelegateStubsDemo
     // Reset for Delegates
     // =========================================================================
     // DESIGN DECISION: Reset() clears tracking (call count, LastArgs)
-    // but preserves configuration (Returns, Execute).
+    // but preserves configuration (Return, Call).
     // =========================================================================
 
     public void Delegate_Reset()

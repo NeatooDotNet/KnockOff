@@ -400,7 +400,7 @@ public partial class IAttributeToRuleTests
         IAttributeToRule converter = stub;
 
         var ruleStub = new RuleStubForAttr();
-        stub.GetRule.Of<ValidateBaseStubForAttr>().Return((propInfo, attr) => ruleStub);
+        stub.GetRule.Of<ValidateBaseStubForAttr>().Call((_, _) => ruleStub);
 
         var propertyInfoStub = new PropertyInfoStubForAttr();
         var result = converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, null);
@@ -414,7 +414,7 @@ public partial class IAttributeToRuleTests
         var stub = new Stubs.IAttributeToRule();
         IAttributeToRule converter = stub;
 
-        stub.GetRule.Of<ValidateBaseStubForAttr>().Return((propInfo, attr) => null);
+        stub.GetRule.Of<ValidateBaseStubForAttr>().Call((_, _) => null);
 
         var propertyInfoStub = new PropertyInfoStubForAttr();
         var result = converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, new object());

@@ -32,12 +32,12 @@ stub.LogMessage.Call((message) => logged.Add(message));
 
 #### Using a Callback
 
-Configure methods that return values using `Return` with a `Func`:
+Configure methods that return values using `Call` with a `Func`:
 
 <!-- snippet: methods-oncall-return -->
 ```cs
 // Return with return value: Func<...params, TReturn>
-stub.GetUserName.Return((userId) => "TestUser");
+stub.GetUserName.Call((userId) => "TestUser");
 ```
 <!-- endSnippet -->
 
@@ -63,7 +63,7 @@ stub.GetUserName.Return("Alice");
 // - Dynamic values based on arguments
 // - Side effects
 // - Conditional logic
-stub.GetUserName.Return((userId) => userId > 100 ? "Admin" : "User");
+stub.GetUserName.Call((userId) => userId > 100 ? "Admin" : "User");
 
 // Both return tracking objects for verification
 ```
@@ -73,20 +73,29 @@ stub.GetUserName.Return((userId) => userId > 100 ? "Admin" : "User");
 |----------|-------------------|
 | Fixed value (always same) | `Return(value)` |
 | Constant sequence | `Return(first, second, ...)` |
-| Dynamic based on args | `Return((args) => computed)` |
-| Callback then constants | `Return(cb).ThenReturn(x, y, z)` |
+| Dynamic based on args | `Call((args) => computed)` |
+| Callback then constants | `Call(cb).ThenReturn(x, y, z)` |
 
-### Methods with Multiple Parameters
+### Methods with Multiple Parameters (Named Tuples)
 
-Methods with multiple parameters include all parameters in the callback:
+Methods with 2+ parameters receive a **named tuple** in the callback. The tuple field names match the original parameter names, providing IntelliSense:
 
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-stub.ValidateCredentials.Return((username, password) =>
-    username == "admin" && password == "secret");
+stub.ValidateCredentials.Call(args =>
+    args.username == "admin" && args.password == "secret");
 ```
 <!-- endSnippet -->
+
+**Parameter conventions by count:**
+
+| Params | Callback Style | Example |
+|--------|---------------|---------|
+| 0 | No args | `stub.Reset.Call(() => { })` |
+| 1 | Raw type | `stub.GetUser.Call((id) => new User { Id = id })` |
+| 2+ | Named tuple | `stub.Add.Call(args => args.a + args.b)` |
+| ref/out | Custom delegate | `stub.RefArg.Call((ref int a) => { a++; })` |
 
 ---
 
@@ -158,12 +167,12 @@ int capturedId = tracking.LastArg;
 
 ### Multiple Parameter Methods
 
-Access arguments using the `LastArgs` named tuple:
+Access arguments using the `LastArgs` named tuple. Field names match the original parameter names:
 
 <!-- snippet: methods-capture-multiple -->
 ```cs
 // LastArgs is a named tuple with all parameters
-var (username, password) = tracking.LastArgs!.Value;
+var (username, password) = tracking.LastArgs;
 ```
 <!-- endSnippet -->
 
@@ -171,18 +180,53 @@ var (username, password) = tracking.LastArgs!.Value;
 
 ## Handling Overloaded Methods
 
-When an interface has overloaded methods, KnockOff distinguishes them by the callback signature. The fully-typed lambda tells KnockOff which overload to configure:
+When an interface has overloaded methods, KnockOff generates a **single interceptor property** with multiple overloads of `Call`, `When`, etc. The lambda signature disambiguates which overload is configured.
+
+### Disambiguation Rules
+
+- **1-param overloads:** Use explicit parameter type: `(string input) => ...`
+- **2+ param overloads:** Use named tuple type: `((string input, FormatOptions options) args) => args.input`
+- **Different param counts:** Compiler resolves automatically by lambda arity
 
 <!-- snippet: methods-overloads -->
 ```cs
 // Fully-typed lambda tells KnockOff which overload to configure
-stub.Find.Return(() => new List<User>());
-stub.Find.Return((int id) => new User { Id = id, Name = "ById" });
-stub.Find.Return((string name) => new User { Id = 1, Name = name });
+stub.Find.Call(() => new List<User>());
+stub.Find.Call((int id) => new User { Id = id, Name = "ById" });
+stub.Find.Call((string name) => new User { Id = 1, Name = name });
 ```
 <!-- endSnippet -->
 
-**Important:** The callback signature determines which overload is configured. Use explicit types in lambdas when parameter types are ambiguous.
+### Tracking Handles for Overloaded Methods
+
+`Call()` returns a tracking handle specific to that overload. Use it for per-overload verification, argument capture, and sequences:
+
+```csharp
+// Each Call returns a separate tracking handle
+var tracking1 = stub.Format.Call((string input) => input);
+var tracking2 = stub.Format.Call(((string input, FormatOptions options) args) => args.input);
+
+formatter.Format("a");
+formatter.Format("b", new FormatOptions());
+
+tracking1.Verify(Called.Once);   // Only counts 1-param calls
+tracking2.Verify(Called.Once);   // Only counts 2-param calls
+
+// Interceptor-level Verify counts ALL overloads
+stub.Format.Verify(Called.Exactly(2));
+```
+
+### Not Available on Overloaded Interceptors
+
+For overloaded methods, `Return(value)` and `Return(v1, v2, ...)` are **not available** at the interceptor level because it would be ambiguous which overload to configure. Use `Call(callback)` instead, which disambiguates by lambda signature.
+
+```csharp
+// NOT available for overloaded methods:
+// stub.Format.Return("constant");  // Which overload?
+
+// Use Call with explicit overload targeting:
+stub.Format.Call((string input) => "constant");
+```
 
 ---
 
@@ -207,10 +251,14 @@ stub.ProcessData.Reset();
 
 | Task | Code |
 |------|------|
-| Configure void method | `stub.Method.Call((args) => { })` |
-| Configure method with callback | `stub.Method.Return((args) => returnValue)` |
+| Configure void method (0-1 params) | `stub.Method.Call((arg) => { })` |
+| Configure void method (2+ params) | `stub.Method.Call(args => { })` (named tuple) |
+| Configure method with callback (1 param) | `stub.Method.Call((arg) => result)` |
+| Configure method with callback (2+ params) | `stub.Method.Call(args => args.a + args.b)` |
 | Configure method with value | `stub.Method.Return(fixedValue)` |
 | Configure async Task<T> (auto-wrap) | `stub.AsyncMethod.Return(value)` |
+| Configure overloaded method | `stub.Method.Call((string input) => result)` |
+| Get tracking handle (overloads) | `var t = stub.Method.Call((string x) => x)` |
 | Verify method was called | `stub.Method.Verify()` |
 | Verify call count | `stub.Method.Verify(Called.Exactly(n))` |
 | Get last single arg | `stub.Method.LastArg` |

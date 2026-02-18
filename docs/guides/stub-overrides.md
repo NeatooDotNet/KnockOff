@@ -96,7 +96,7 @@ Use `Return(callback)` or `Call(callback)` to override the stub override for spe
 <!-- snippet: stub-overrides-oncall -->
 ```cs
 // Return supersedes the stub override
-stub.GetUserById.Return(id => new User { Id = id, Name = "Overridden" });
+stub.GetUserById.Call(id => new User { Id = id, Name = "Overridden" });
 
 var user = repository.GetUserById(42);
 Assert.Equal("Overridden", user!.Name);
@@ -219,7 +219,7 @@ var user = repository.GetUserById(42);
 stub.GetUserById.Verify(Called.Once);
 
 // Override for next call
-stub.GetUserById.Return(id => new User { Id = id, Name = "Custom" });
+stub.GetUserById.Call(id => new User { Id = id, Name = "Custom" });
 var customUser = repository.GetUserById(99);
 Assert.Equal("Custom", customUser!.Name);
 ```
@@ -273,4 +273,4 @@ Next: [Source Delegation](source-delegation.md) for partial stubbing patterns wh
 
 ---
 
-**UPDATED:** 2026-02-06
+**UPDATED:** 2026-02-18

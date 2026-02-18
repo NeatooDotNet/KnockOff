@@ -30,7 +30,7 @@ public class StandalonePatternTests
     {
         var stub = new CalculatorStub();
 
-        // Returns() sets a constant return value for all calls
+        // Return() sets a constant return value for all calls
         stub.Add.Return(42);
 
         // Call the method and verify
@@ -44,8 +44,8 @@ public class StandalonePatternTests
     {
         var stub = new CalculatorStub();
 
-        // OnCall() sets a callback that receives the arguments
-        stub.Add.Return((a, b) => a + b);
+        // Call() sets a callback that receives the arguments
+        stub.Add.Call(args => args.a + args.b);
 
         var result = ((Design.Domain.Services.ICalculator)stub).Add(5, 3);
 

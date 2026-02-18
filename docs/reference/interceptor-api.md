@@ -95,11 +95,11 @@ When a callback is configured, it is invoked instead of user-defined methods. Fo
 stub.Save.Call((user) => { }).Verifiable();
 
 // Configure return method with Returns
-var getTracking = stub.GetById.Return((id) =>
+var getTracking = stub.GetById.Call((id) =>
     new User { Id = id, Name = $"User{id}" }).Verifiable();
 
 // Configure multi-parameter method
-var updateTracking = stub.Update.Call((id, name) => { }).Verifiable();
+var updateTracking = stub.Update.Call(_ => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -359,10 +359,10 @@ The callback delegate type follows the same signature rules as non-generic metho
 <!-- snippet: generic-method-interceptor-complete-api-demo -->
 ```cs
 // Of<T>(): access typed interceptor for specific type argument
-stub.GetById.Of<User>().Return((id) =>
+stub.GetById.Of<User>().Call((id) =>
     new User { Id = id, Name = $"User{id}" });
 
-stub.GetById.Of<Product>().Return((id) =>
+stub.GetById.Of<Product>().Call((id) =>
     new Product { Id = id, Name = $"Product{id}" });
 
 // CalledTypeArguments: list of all type arguments used
@@ -388,7 +388,7 @@ var stub = new Stubs.ArithmeticOperation();
 
 // All configuration goes through stub.Interceptor
 stub.Interceptor.Return(42);
-stub.Interceptor.Return((a, b) => a + b);
+stub.Interceptor.Call((a, b) => a + b);
 
 // Implicit conversion to delegate type
 ArithmeticOperation op = stub;
@@ -420,10 +420,10 @@ var stub = new Stubs.AsyncOperation();
 stub.Interceptor.Return(42);
 
 // Tier 2: Simplified callback returns int — auto-wrapped
-stub.Interceptor.Return((int x) => x * 2);
+stub.Interceptor.Call((int x) => x * 2);
 
 // Tier 3: Full delegate returns Task<int> directly
-stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
+stub.Interceptor.Call((int x) => Task.FromResult(x * 2));
 ```
 <!-- endSnippet -->
 
@@ -475,7 +475,7 @@ Delegate stubs implicitly convert to the delegate type:
 <!-- snippet: delegate-api-implicit-conversion -->
 ```cs
 var stub = new Stubs.ArithmeticOperation();
-stub.Interceptor.Return((a, b) => a + b);
+stub.Interceptor.Call((a, b) => a + b);
 
 // Implicit conversion — no cast needed
 ArithmeticOperation op = stub;
@@ -526,10 +526,10 @@ When() returns `IWhenBuilder<TDelegate, TReturn>` which requires calling `.Retur
 <!-- snippet: when-chain-return-method-api -->
 ```cs
 // When() returns IWhenBuilder, which requires .Return() to complete
-var chain = stub.Calculate.When((5, 10)).Return(50);
+var chain = stub.Calculate.When(5, 10).Return(50);
 
 // chain is IWhenChain - can continue chaining or verify
-chain.ThenWhen((1, 2)).Return(100);
+chain.ThenWhen(1, 2).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -559,10 +559,10 @@ When() returns `IVoidWhenChain<TDelegate>` directly - no builder step needed sin
 <!-- snippet: when-chain-void-method-api -->
 ```cs
 // Void methods: When() returns IVoidWhenChain directly
-var chain = stub.Process.When((1, 2));
+var chain = stub.Process.When(1, 2);
 
 // .Call() is optional - adds callback for side effects
-chain.Call((a, b) => called = true);
+chain.Call(_ => called = true);
 ```
 <!-- endSnippet -->
 
@@ -650,7 +650,7 @@ var stub = new ApiMethodRepoStub();
 
 // Interceptor: stub.GetById
 // Tracking object: getTracking
-var getTracking = stub.GetById.Return((id) => new User { Id = id });
+var getTracking = stub.GetById.Call((id) => new User { Id = id });
 
 // Call the method
 IApiMethodRepo repo = stub;

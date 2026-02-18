@@ -62,12 +62,9 @@ internal static class InlineRenderer
         }
 
         // Render interface stubs
-        // Track emitted compositor delegate names across all stubs to avoid CS0102
-        // when multiple stubs share a base interface with overloaded methods
-        var emittedCompositorDelegates = new HashSet<string>();
         foreach (var ifaceStub in unit.InterfaceStubs)
         {
-            RenderInterfaceStub(w, ifaceStub, emittedCompositorDelegates);
+            RenderInterfaceStub(w, ifaceStub);
         }
 
         // Render delegate stubs
@@ -79,7 +76,7 @@ internal static class InlineRenderer
         // Render class stubs
         foreach (var classStub in unit.ClassStubs)
         {
-            RenderClassStub(w, classStub, emittedCompositorDelegates);
+            RenderClassStub(w, classStub);
         }
 
         w.Line("\t}"); // Close Stubs class
@@ -103,7 +100,7 @@ internal static class InlineRenderer
 
     #region Interface Stub Rendering
 
-    private static void RenderInterfaceStub(CodeWriter w, InlineInterfaceStubModel iface, HashSet<string> emittedCompositorDelegates)
+    private static void RenderInterfaceStub(CodeWriter w, InlineInterfaceStubModel iface)
     {
         // Use shared renderers for property and indexer interceptors
         var typeParams = FormatTypeParameterList(iface.TypeParameters);
@@ -113,7 +110,6 @@ internal static class InlineRenderer
         var preCompiledInterceptors = new Dictionary<string, string>(); // interceptorName -> pre-compiled type
         var preCompiledDelegateDecls = new Dictionary<string, string>(); // interceptorName -> delegate declaration
         var preCompiledSyncDelegateDecls = new Dictionary<string, string>(); // interceptorName -> sync delegate declaration
-        var compositorGroups = new Dictionary<string, UnifiedMethodInterceptorModel>(); // interceptorName -> model
         var renderedInterceptorClasses = new HashSet<string>();
 
         var previousIndent = w.Indent;
@@ -177,45 +173,19 @@ internal static class InlineRenderer
         var methodConstraints = FormatConstraints(iface.TypeParameters);
         previousIndent = w.Indent;
         w.SetIndent(2);  // Inline stubs are nested 2 levels deep
+        // All method interceptors are fully generated classes inheriting from MethodInterceptorRuntime.
+        // No pre-compiled method interceptor types are used (Phase 2 redesign).
         foreach (var method in iface.Methods)
         {
             if (renderedInterceptorClasses.Add(method.InterceptorClassName))
             {
-                if (PreCompiledInterceptorRenderer.CanUsePreCompiled(method))
-                {
-                    preCompiledInterceptors[method.MethodName] = PreCompiledInterceptorRenderer.GetMethodInterceptorType(method);
-                    // Track delegate declaration for TTuple types (1+ params)
-                    if (method.Parameters.Count > 0)
-                    {
-                        preCompiledDelegateDecls[method.MethodName] = PreCompiledInterceptorRenderer.BuildDelegateDeclaration(
-                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
-                        var syncDecl = PreCompiledInterceptorRenderer.BuildSyncDelegateDeclaration(
-                            method.MethodName, method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid);
-                        if (syncDecl != null)
-                            preCompiledSyncDelegateDecls[method.MethodName] = syncDecl;
-                    }
-                }
-                else if (PreCompiledInterceptorRenderer.CanOverloadGroupUsePreCompiled(method))
-                {
-                    var options = new InterceptorRenderOptions(
-                        BaseIndent: 2,
-                        IncludeStrictParameter: true,
-                        StrictAccessExpression: "strict",
-                        InterceptorTypeParameters: methodTypeParams,
-                        InterceptorConstraints: methodConstraints);
-                    PreCompiledInterceptorRenderer.RenderOverloadCompositorClass(w, method, options, emittedCompositorDelegates);
-                    compositorGroups[method.MethodName] = method;
-                }
-                else
-                {
-                    var options = new InterceptorRenderOptions(
-                        BaseIndent: 2,
-                        IncludeStrictParameter: true,
-                        StrictAccessExpression: "strict",
-                        InterceptorTypeParameters: methodTypeParams,
-                        InterceptorConstraints: methodConstraints);
-                    MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
-                }
+                var options = new InterceptorRenderOptions(
+                    BaseIndent: 2,
+                    IncludeStrictParameter: true,
+                    StrictAccessExpression: "strict",
+                    InterceptorTypeParameters: methodTypeParams,
+                    InterceptorConstraints: methodConstraints);
+                MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
             }
         }
         w.SetIndent(previousIndent);
@@ -231,40 +201,42 @@ internal static class InlineRenderer
                 RenderEventInterceptorClass(w, evt, iface.StubClassName);
         }
 
-        // Build smart default factory constructor args for pre-compiled interceptors.
-        // The DefaultStrategy and ConcreteTypeForNew live on InlineInterfaceImplementation,
-        // so we iterate implementations to compute constructor args for each pre-compiled interceptor.
+        // Build smart default factory constructor args for pre-compiled interceptors (properties/indexers only now).
+        // Method interceptors are fully generated classes with parameterless constructors - no factory needed.
         var preCompiledCtorArgs = new Dictionary<string, string>(); // interceptorName -> ctor args string
         foreach (var impl in iface.Implementations)
         {
+            if (impl.Kind == InlineMemberKind.Method)
+            {
+                // Methods are fully generated classes inheriting MethodInterceptorRuntime.
+                // Constructor takes no arguments; member name is hardcoded via base("MethodName").
+                continue;
+            }
+
             if (!preCompiledInterceptors.ContainsKey(impl.InterceptorName))
                 continue;
             // Skip if already computed (dedup for diamond inheritance)
             if (preCompiledCtorArgs.ContainsKey(impl.InterceptorName))
                 continue;
 
-            string? factory = null;
+            string? propFactory = null;
             switch (impl.Kind)
             {
                 case InlineMemberKind.Property:
                     if (impl.HasGetter) // set-only properties don't need defaults
                     {
-                        factory = PreCompiledInterceptorRenderer.GetPropertySmartDefaultFactory(
+                        propFactory = PreCompiledInterceptorRenderer.GetPropertySmartDefaultFactory(
                             impl.ReturnType, impl.DefaultStrategy, impl.ConcreteTypeForNew, impl.MemberName);
                     }
                     break;
                 case InlineMemberKind.Indexer:
-                    factory = PreCompiledInterceptorRenderer.GetIndexerSmartDefaultFactory(
+                    propFactory = PreCompiledInterceptorRenderer.GetIndexerSmartDefaultFactory(
                         impl.ReturnType, impl.DefaultStrategy, impl.ConcreteTypeForNew, impl.MemberName);
-                    break;
-                case InlineMemberKind.Method:
-                    factory = PreCompiledInterceptorRenderer.GetMethodSmartDefaultFactory(
-                        impl.ReturnType, impl.IsVoid, impl.DefaultStrategy, impl.ConcreteTypeForNew, impl.MemberName);
                     break;
             }
 
             preCompiledCtorArgs[impl.InterceptorName] = PreCompiledInterceptorRenderer.GetFieldConstructorArgs(
-                impl.InterceptorName, factory);
+                impl.InterceptorName, propFactory);
         }
 
         // Render the stub class
@@ -298,14 +270,9 @@ internal static class InlineRenderer
                     : $"(\"{interceptorProp.PropertyName}\")";
                 w.Line($"\t\t\tpublic {newKeyword}{preCompiledType} {interceptorProp.PropertyName} {{ get; }} = new{ctorArgs};");
             }
-            else if (compositorGroups.ContainsKey(interceptorProp.PropertyName))
-            {
-                // Overload compositor: use the generated compositor class with = new()
-                w.Line($"\t\t\tpublic {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
-            }
             else
             {
-                // Fallback: generated class with = new()
+                // Generated class (method interceptors, etc.): parameterless constructor
                 w.Line($"\t\t\tpublic {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
             }
             w.Line();
@@ -314,7 +281,7 @@ internal static class InlineRenderer
         // Explicit interface implementations
         foreach (var impl in iface.Implementations)
         {
-            RenderImplementation(w, impl, preCompiledInterceptors, compositorGroups);
+            RenderImplementation(w, impl, preCompiledInterceptors);
         }
 
         // Object property
@@ -336,7 +303,7 @@ internal static class InlineRenderer
         w.Line();
 
         // Source(T) methods for Source feature
-        RenderSourceMethods(w, iface, preCompiledInterceptors, compositorGroups);
+        RenderSourceMethods(w, iface, preCompiledInterceptors);
 
         // SmartDefault helper if interface has generic methods
         if (iface.HasGenericMethods)
@@ -738,7 +705,7 @@ internal static class InlineRenderer
         }
 
         // Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
-        var typedHandlerEntryPoint = arity.IsVoid ? "Call" : "Return";
+        var typedHandlerEntryPoint = "Call";
         w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
         w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({methodName}Delegate callback) {{ _call = callback; return this; }}");
         w.Line();
@@ -1014,8 +981,7 @@ internal static class InlineRenderer
     private static void RenderImplementation(
         CodeWriter w,
         InlineInterfaceImplementation impl,
-        Dictionary<string, string> preCompiledInterceptors,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, string> preCompiledInterceptors)
     {
         switch (impl.Kind)
         {
@@ -1026,7 +992,7 @@ internal static class InlineRenderer
                 RenderIndexerImplementation(w, impl);
                 break;
             case InlineMemberKind.Method:
-                RenderMethodImplementation(w, impl, preCompiledInterceptors, compositorGroups);
+                RenderMethodImplementation(w, impl, preCompiledInterceptors);
                 break;
             case InlineMemberKind.Event:
                 RenderEventImplementation(w, impl);
@@ -1142,8 +1108,7 @@ internal static class InlineRenderer
     private static void RenderMethodImplementation(
         CodeWriter w,
         InlineInterfaceImplementation impl,
-        Dictionary<string, string> preCompiledInterceptors,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, string> preCompiledInterceptors)
     {
         if (impl.DelegationTarget != null)
         {
@@ -1164,16 +1129,14 @@ internal static class InlineRenderer
         else
         {
             var isPreCompiled = preCompiledInterceptors.ContainsKey(impl.InterceptorName);
-            var isCompositor = compositorGroups.ContainsKey(impl.InterceptorName);
-            RenderNonGenericMethodImplementation(w, impl, isPreCompiled, isCompositor ? compositorGroups[impl.InterceptorName] : null);
+            RenderNonGenericMethodImplementation(w, impl, isPreCompiled);
         }
     }
 
     private static void RenderNonGenericMethodImplementation(
         CodeWriter w,
         InlineInterfaceImplementation impl,
-        bool isPreCompiled,
-        UnifiedMethodInterceptorModel? compositorModel)
+        bool isPreCompiled)
     {
         w.Line($"\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
         w.Line("\t\t\t{");
@@ -1209,23 +1172,6 @@ internal static class InlineRenderer
             {
                 w.Line($"\t\t\t\treturn {impl.InterceptorName}.Invoke({invokeArgs});");
             }
-        }
-        else if (compositorModel != null)
-        {
-            // Compositor: uses InvokeSuffix for overload disambiguation
-            // Compositor Invoke methods already handle ValueTask wrapping,
-            // so NO additional wrapping is needed here.
-            var cleanArgs = StripRefPrefixes(impl.ArgumentList);
-            // TTuple types: wrap 2+ params in tuple literal for Invoke(bool strict, TArgs args)
-            var wrappedArgs = PreCompiledInterceptorRenderer.WrapInvokeArgs(cleanArgs);
-            var invokeArgs = string.IsNullOrEmpty(wrappedArgs)
-                ? "Strict"
-                : $"Strict{wrappedArgs}";
-
-            if (impl.IsVoid)
-                w.Line($"\t\t\t\t{impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
-            else
-                w.Line($"\t\t\t\treturn {impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
         }
         else
         {
@@ -1421,10 +1367,10 @@ internal static class InlineRenderer
 
     #region Class Stub Rendering
 
-    private static void RenderClassStub(CodeWriter w, InlineClassStubModel cls, HashSet<string> emittedCompositorDelegates)
+    private static void RenderClassStub(CodeWriter w, InlineClassStubModel cls)
     {
         // Delegate to ClassRenderer for full rendering
-        ClassRenderer.Render(w, cls, baseIndent: 2, emittedCompositorDelegates: emittedCompositorDelegates);
+        ClassRenderer.Render(w, cls, baseIndent: 2);
     }
 
     #endregion
@@ -1448,8 +1394,7 @@ internal static class InlineRenderer
     private static void RenderSourceMethods(
         CodeWriter w,
         InlineInterfaceStubModel iface,
-        Dictionary<string, string> preCompiledInterceptors,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, string> preCompiledInterceptors)
     {
         // Skip if no source providers
         if (iface.SourceProviders.Count == 0)
@@ -1481,10 +1426,10 @@ internal static class InlineRenderer
 
             foreach (var mapping in provider.MemberMappings)
             {
-                if (preCompiledInterceptors.ContainsKey(mapping.InterceptorName) || compositorGroups.ContainsKey(mapping.InterceptorName))
+                if (preCompiledInterceptors.ContainsKey(mapping.InterceptorName))
                 {
-                    // Pre-compiled or compositor: use SetSourceFallback
-                    RenderPreCompiledSourceMapping(w, mapping, provider.InterfaceType, methodInfoByName, propertyInfoByName, indexerInfoByName, compositorGroups);
+                    // Pre-compiled: use SetSourceFallback
+                    RenderPreCompiledSourceMapping(w, mapping, provider.InterfaceType, methodInfoByName, propertyInfoByName, indexerInfoByName);
                 }
                 else
                 {
@@ -1514,8 +1459,7 @@ internal static class InlineRenderer
         string providerInterface,
         Dictionary<string, UnifiedMethodInterceptorModel> methodInfoByName,
         Dictionary<string, InlinePropertyModel> propertyInfoByName,
-        Dictionary<string, InlineIndexerModel> indexerInfoByName,
-        Dictionary<string, UnifiedMethodInterceptorModel> compositorGroups)
+        Dictionary<string, InlineIndexerModel> indexerInfoByName)
     {
         var interceptorName = mapping.InterceptorName;
 
@@ -1524,23 +1468,9 @@ internal static class InlineRenderer
             // Clear source: need to handle async ambiguity
             if (methodInfoByName.TryGetValue(interceptorName, out var methodModel))
             {
-                if (compositorGroups.TryGetValue(interceptorName, out var compositorModel))
-                {
-                    // Compositor: clear each overload's source fallback
-                    for (int i = 0; i < compositorModel.Overloads.Count; i++)
-                    {
-                        var overload = compositorModel.Overloads.GetArray()![i];
-                        var clearExpr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackClearExpression(
-                            $"{interceptorName}._ov{i + 1}", overload.Parameters.AsEnumerable(), overload.ReturnType, overload.IsVoid);
-                        w.Line($"\t\t\t\t{clearExpr}");
-                    }
-                }
-                else
-                {
-                    var clearExpr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackClearExpression(
-                        interceptorName, methodModel.Parameters.AsEnumerable(), methodModel.ReturnType, methodModel.IsVoid);
-                    w.Line($"\t\t\t\t{clearExpr}");
-                }
+                var clearExpr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackClearExpression(
+                    interceptorName, methodModel.Parameters.AsEnumerable(), methodModel.ReturnType, methodModel.IsVoid);
+                w.Line($"\t\t\t\t{clearExpr}");
             }
             else if (propertyInfoByName.TryGetValue(interceptorName, out var clearProp))
             {
@@ -1569,27 +1499,11 @@ internal static class InlineRenderer
         // Set source
         if (methodInfoByName.TryGetValue(interceptorName, out var method))
         {
-            if (compositorGroups.TryGetValue(interceptorName, out var compositorModel2))
-            {
-                // Compositor: set source on each overload's interceptor
-                for (int i = 0; i < compositorModel2.Overloads.Count; i++)
-                {
-                    var overload = compositorModel2.Overloads.GetArray()![i];
-                    // Compositor always uses lambdas (same as FlatRenderer)
-                    var ovFieldPath = $"{interceptorName}._ov{i + 1}";
-                    var lambdaExpr = GetCompositorSourceFallbackExpression(
-                        ovFieldPath, method.MethodName, "source", overload, providerInterface);
-                    w.Line($"\t\t\t\t{lambdaExpr}");
-                }
-            }
-            else
-            {
-                var expr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackExpression(
-                    interceptorName, method.MethodName, "source",
-                    method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid,
-                    delegateBaseName: interceptorName);
-                w.Line($"\t\t\t\t{expr}");
-            }
+            var expr = PreCompiledInterceptorRenderer.GetMethodSourceFallbackExpression(
+                interceptorName, method.MethodName, "source",
+                method.Parameters.AsEnumerable(), method.ReturnType, method.IsVoid,
+                delegateBaseName: interceptorName);
+            w.Line($"\t\t\t\t{expr}");
         }
         else if (propertyInfoByName.TryGetValue(interceptorName, out var prop))
         {
@@ -1604,55 +1518,6 @@ internal static class InlineRenderer
                 "a", indexer.HasGetter, indexer.HasSetter);
             w.Line($"\t\t\t\t{expr}");
         }
-    }
-
-    /// <summary>
-    /// Generates a SetSourceFallback expression for compositor overloads in inline stubs.
-    /// Always uses lambdas (same approach as FlatRenderer.GetCompositorSourceFallbackExpression).
-    /// </summary>
-    private static string GetCompositorSourceFallbackExpression(
-        string ovFieldPath,
-        string methodName,
-        string sourceParamName,
-        MethodOverloadSignature overload,
-        string providerInterface)
-    {
-        var paramList = overload.Parameters.ToList();
-        var lambdaParams = paramList.Count > 0
-            ? string.Join(", ", paramList.Select(p => p.EscapedName))
-            : "";
-
-        var argList = paramList.Count > 0
-            ? string.Join(", ", paramList.Select(p => p.EscapedName))
-            : "";
-
-        var invocation = $"(({providerInterface}){sourceParamName}).{methodName}({argList})";
-
-        var (_, _, isAsyncValueTaskT) = PreCompiledInterceptorRenderer.GetAsyncTypeInfoPublic(overload.ReturnType);
-        var (_, isVoidValueTask) = PreCompiledInterceptorRenderer.GetVoidAsyncInfoPublic(overload.ReturnType);
-
-        if (isVoidValueTask || isAsyncValueTaskT)
-        {
-            var asyncLambda = paramList.Count > 0
-                ? $"async ({lambdaParams}) => await {invocation}"
-                : $"async () => await {invocation}";
-            return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {asyncLambda} : null);";
-        }
-
-        if (overload.IsVoid)
-        {
-            // Void overload with potential return-value mismatch: use statement lambda to discard return
-            var lambda = paramList.Count > 0
-                ? $"({lambdaParams}) => {{ {invocation}; }}"
-                : $"() => {{ {invocation}; }}";
-            return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {lambda} : null);";
-        }
-
-        // Non-void sync or Task<T>/Task
-        var syncLambda = paramList.Count > 0
-            ? $"({lambdaParams}) => {invocation}"
-            : $"() => {invocation}";
-        return $"{ovFieldPath}.SetSourceFallback({sourceParamName} != null ? {syncLambda} : null);";
     }
 
     #endregion

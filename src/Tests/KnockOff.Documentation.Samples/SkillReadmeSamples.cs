@@ -35,7 +35,7 @@ public class SkillReadmeStubOverridesTests
         var stub = new RepoStub();
 
         // Stub override is fallback; Return supersedes it
-        stub.GetById.Return(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Call(id => new User { Id = id, Name = "Override" });
 
         // Returns for constant values (auto-wraps for async)
         stub.GetById.Return(new User { Id = 99 });
@@ -92,7 +92,7 @@ public class SkillReadmeMethodConfigTests
         stub.GetUser.Return(new User { Id = 1, Name = "Alice" });
 
         // Dynamic callback
-        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = $"User{id}" });
 
         // Argument matching
         stub.GetUser.When(42).Return(adminUser);
@@ -103,7 +103,7 @@ public class SkillReadmeMethodConfigTests
         // Returns: 1, 2, 3, 3, 3... (repeats last value)
 
         // Mix callbacks with value sequences
-        stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
+        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
         // First call: computed. Then: 100, 200, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating
@@ -139,7 +139,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Call((id) => new User { Id = id, Name = $"User{id}" });
 
         IMethodConfigService svc = stub;
         var user = svc.GetUser(42);
@@ -188,7 +188,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
+        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
 
         IMethodConfigService svc = stub;
 

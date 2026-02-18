@@ -43,7 +43,7 @@ public class ProtectedMethodBehaviorTests
         var stub = new ProtectedMemberServiceStub();
 
         var callCount = 0;
-        stub.GetInternalId.Return(() =>
+        stub.GetInternalId.Call(() =>
         {
             callCount++;
             return $"ID-{callCount}";
@@ -114,7 +114,7 @@ public class ProtectedMethodBehaviorTests
     {
         var stub = new ProtectedMemberServiceStub();
 
-        stub.FormatTag.Return(() => "<<override>>");
+        stub.FormatTag.Call(() => "<<override>>");
         stub.GetInternalId.Return("id");
         stub.Name.Get("test");
 
@@ -282,7 +282,7 @@ public class ProtectedMethodBehaviorTests
         // Note: Use callback form for sequences — Return(value).ThenReturn()
         // has a known bug where the first sequence entry gets a null callback.
         stub.GetInternalId
-            .Return(() => "first-id")
+            .Call(() => "first-id")
             .ThenReturn(() => "second-id");
 
         // FormatTag unconfigured -> falls back to base -> $"[{Tag}]"
@@ -307,7 +307,7 @@ public class ProtectedMethodBehaviorTests
 
         // Note: Use callback form for sequences (see note above)
         stub.FormatTag
-            .Return(() => "first-format")
+            .Call(() => "first-format")
             .ThenReturn(() => "second-format");
 
         ServiceBase service = stub.Object;

@@ -60,7 +60,7 @@ public class OpenGenericInlineStubTests
 	public void OpenGenericInterface_OnCall_Works()
 	{
 		var stub = new OpenGenericInterfaceTest.Stubs.IOGRepository<string>();
-		stub.GetById.Return((id) => $"Item-{id}");
+		stub.GetById.Call((id) => $"Item-{id}");
 
 		IOGRepository<string> repo = stub;
 		var result = repo.GetById(123);
@@ -167,7 +167,7 @@ public partial class OpenGenericDelegateTests
 	public void SingleTypeParam_InterceptorTracksInvocations()
 	{
 		var stub = new Stubs.OGFactory<string>();
-		stub.Interceptor.Return(() => "test-value");
+		stub.Interceptor.Call(() => "test-value");
 
 		OGFactory<string> factory = stub;
 		var result = factory();
@@ -181,7 +181,7 @@ public partial class OpenGenericDelegateTests
 	{
 		// TResult has 'class' constraint - string satisfies it
 		var stub = new Stubs.OGConverter<int, bool, string>();
-		stub.Interceptor.Return((input) => input.ToString());
+		stub.Interceptor.Call((input) => input.ToString());
 
 		OGConverter<int, bool, string> converter = stub;
 		var result = converter(42);
@@ -227,7 +227,7 @@ public partial class OpenGenericClassTests
 	public void SingleTypeParam_InterceptorTracksInvocations()
 	{
 		var stub = new Stubs.OGRepository<User>();
-		stub.GetById.Return((id) => new User { Id = id });
+		stub.GetById.Call((id) => new User { Id = id });
 
 		OGRepository<User> repo = stub.Object;
 		var user = repo.GetById(42);
@@ -253,7 +253,7 @@ public partial class OpenGenericClassTests
 	{
 		// TKey: notnull, TValue: new()
 		var stub = new Stubs.OGCache<string, List<int>>();
-		stub.Get.Return((key) => new List<int> { 1, 2, 3 });
+		stub.Get.Call((key) => new List<int> { 1, 2, 3 });
 
 		OGCache<string, List<int>> cache = stub.Object;
 		var result = cache.Get("test");

@@ -21,7 +21,7 @@ public class ReturnTypeMismatchBugTests
 		var entity = new SampleEntity { Id = 1 };
 
 		// Set up sync callback - compiler resolves based on lambda parameter type (SampleEntity vs long)
-		var trackingSync = stub.Fetch.Return((e) => new SampleArea { Id = e.Id });
+		var trackingSync = stub.Fetch.Call((e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
@@ -38,7 +38,7 @@ public class ReturnTypeMismatchBugTests
 		IFactoryWithMixedReturnTypes factory = stub;
 
 		// Set up async callback
-		var trackingAsync = stub.Fetch.Return((id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
+		var trackingAsync = stub.Fetch.Call((id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
 		var result = await factory.Fetch(42L);
@@ -57,8 +57,8 @@ public class ReturnTypeMismatchBugTests
 		var entity = new SampleEntity { Id = 99 };
 
 		// Set up callbacks for both - different parameter types resolve to different OnCall overloads
-		var trackingAsync = stub.Fetch.Return((id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
-		var trackingSync = stub.Fetch.Return((e) => new SampleArea { Id = e.Id });
+		var trackingAsync = stub.Fetch.Call((id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
+		var trackingSync = stub.Fetch.Call((e) => new SampleArea { Id = e.Id });
 
 		// Call both overloads
 		_ = factory.Fetch(1L);     // Async overload

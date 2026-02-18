@@ -13,4 +13,9 @@ internal sealed record ParameterModel(
     string Type,
     string NullableType,
     RefKind RefKind,
-    string RefPrefix);
+    string RefPrefix,
+    /// <summary>
+    /// XML documentation text for this parameter, extracted from the original interface/class.
+    /// Null if no documentation was provided. Already XML-escaped.
+    /// </summary>
+    string? XmlDoc = null);

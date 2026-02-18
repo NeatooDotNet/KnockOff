@@ -2,7 +2,7 @@
 
 # Source Delegation
 
-`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (Returns, Execute, When) still take priority — the source is only consulted when nothing else is configured for that member.
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (Return, Call, When) still take priority — the source is only consulted when nothing else is configured for that member.
 
 KnockOff generates a separate `Source()` overload for each interface in the hierarchy. **You don't need a complete implementation** — pass an object that implements any interface in the hierarchy, and only the matching methods get delegated.
 
@@ -116,6 +116,6 @@ The first match wins. This makes Source ideal as a baseline: set it once, then s
 ---
 
 **Next Steps:**
-- [Methods Guide](methods.md) - Complete guide to Returns, Execute, and When chains
+- [Methods Guide](methods.md) - Complete guide to Return, Call, and When chains
 - [Stub Overrides Guide](stub-overrides.md) - Default behavior through override methods
 - [Verification Guide](verification.md) - Assert on stub interactions

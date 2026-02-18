@@ -2,7 +2,7 @@
 
 # Advanced Callback Patterns
 
-When simple `Returns`/`Execute` configuration isn't enough, callbacks give you complete control over stub behavior. This guide covers practical patterns for sequential returns, conditional logic, exceptions, state tracking, and side effects.
+When simple `Return`/`Call` configuration isn't enough, callbacks give you complete control over stub behavior. This guide covers practical patterns for sequential returns, conditional logic, exceptions, state tracking, and side effects.
 
 ## When You Need Advanced Callbacks
 
@@ -27,7 +27,7 @@ Return different values on successive calls by maintaining a queue:
 ```cs
 // Queue of results: first succeeds, second fails
 var results = new Queue<bool>(new[] { true, false });
-stub.Send.Return((to, message) => results.Dequeue());
+stub.Send.Call(_ => results.Dequeue());
 ```
 <!-- endSnippet -->
 
@@ -39,7 +39,7 @@ Control behavior based on call count using a simple counter:
 ```cs
 // Counter tracks call count for conditional behavior
 var attempts = 0;
-stub.Attempt.Return(() =>
+stub.Attempt.Call(() =>
 {
     attempts++;
     return attempts > 3; // Succeed on 4th attempt
@@ -56,7 +56,7 @@ Return different values based on method arguments using pattern matching:
 <!-- snippet: advanced-conditional-switch -->
 ```cs
 // Pattern matching for argument-based return values
-stub.FindById.Return((id) => id switch
+stub.FindById.Call((id) => id switch
 {
     1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
     2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -108,7 +108,7 @@ Enforce ordering requirements by checking state in callbacks:
 // Enforce method ordering with shared state
 var isInitialized = false;
 stub.Initialize.Call(() => { isInitialized = true; });
-stub.Query.Return((sql) =>
+stub.Query.Call((sql) =>
 {
     if (!isInitialized)
         throw new InvalidOperationException("Must call Initialize() first");
@@ -126,7 +126,7 @@ Callbacks can perform actions beyond returning values. Use this to simulate depe
 <!-- snippet: advanced-side-effects -->
 ```cs
 // Callbacks can track state and perform side effects
-stub.PlaceOrder.Return((order) =>
+stub.PlaceOrder.Call((order) =>
 {
     placedOrders.Add(order);
     notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
@@ -144,7 +144,7 @@ This example combines multiple patterns to create a realistic cache simulation w
 <!-- snippet: advanced-complete-example -->
 ```cs
 // Get: Check expiration, track hits/misses
-stub.Get.Return((key) =>
+stub.Get.Call((key) =>
 {
     if (cache.TryGetValue(key, out var entry))
     {
@@ -160,14 +160,14 @@ stub.Get.Return((key) =>
 });
 
 // Set: Enforce capacity, evict oldest if needed
-stub.Set.Call((key, value) =>
+stub.Set.Call(args =>
 {
-    if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
+    if (cache.Count >= maxCapacity && !cache.ContainsKey(args.key))
     {
         var oldest = cache.OrderBy(kvp => kvp.Value.Added).First();
         cache.Remove(oldest.Key);
     }
-    cache[key] = (value, DateTime.UtcNow);
+    cache[args.key] = (args.value, DateTime.UtcNow);
 });
 
 // Clear: Reset everything
@@ -196,4 +196,4 @@ These patterns let you simulate sophisticated dependency behavior without needin
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-18

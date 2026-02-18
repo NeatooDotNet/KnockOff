@@ -35,7 +35,7 @@ public class RefReturnTests
 		var stub = new RefReturnServiceStub();
 		IRefReturnService service = stub;
 
-		stub.GetValueRef.Return(() => 100);
+		stub.GetValueRef.Call(() => 100);
 		ref int result = ref service.GetValueRef();
 
 		Assert.Equal(100, result);
@@ -59,7 +59,7 @@ public class RefReturnTests
 		var stub = new RefReturnServiceStub();
 		IRefReturnService service = stub;
 
-		stub.GetItemRef.Return((index) => $"item-{index}");
+		stub.GetItemRef.Call((index) => $"item-{index}");
 		ref string result = ref service.GetItemRef(3);
 
 		Assert.Equal("item-3", result);
@@ -137,7 +137,7 @@ public class RefReturnTests
 		IRefReturnService service = stub;
 
 		// Configure normal method
-		stub.GetNormal.Return((x) => x * 2);
+		stub.GetNormal.Call((x) => x * 2);
 
 		// Configure ref return method
 		stub.GetValueRef.Return(42);

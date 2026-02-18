@@ -161,7 +161,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        var tracking = stub.Save.Return(() => Task.FromResult<IEntityBase>(stub));
+        var tracking = stub.Save.Call(() => Task.FromResult<IEntityBase>(stub));
 
         var result = await entity.Save();
 
@@ -177,7 +177,7 @@ public class EntityBaseStandaloneTests
         var savedStub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Save.Return(() => Task.FromResult<IEntityBase>(savedStub));
+        stub.Save.Call(() => Task.FromResult<IEntityBase>(savedStub));
 
         var result = await entity.Save();
 
@@ -323,7 +323,7 @@ public class ValidateBaseStandaloneTests
     {
         var stub = new ValidateBaseStub();
         // RunRules is overloaded - disambiguate via generated delegate type
-        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propertyName, token) => Task.CompletedTask));
+        var tracking = stub.RunRules.Call(((string propertyName, CancellationToken? token) args) => Task.CompletedTask);
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
@@ -336,8 +336,8 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithFlag_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        // RunRules is overloaded - disambiguate via generated delegate type
-        var tracking = stub.RunRules.Call((ValidateBaseStub.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((flag, token) => Task.CompletedTask));
+        // RunRules is overloaded - disambiguate via named tuple type
+        var tracking = stub.RunRules.Call(((RunRulesFlag flag, CancellationToken? token) args) => Task.CompletedTask);
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
@@ -375,7 +375,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        var tracking = stub.GetProperty.Return((name) => null!);
+        var tracking = stub.GetProperty.Call((name) => null!);
 
         _ = validate.GetProperty("Age");
 
@@ -483,7 +483,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.GetProperty.Return((name) => null!);
+        stub.GetProperty.Call((name) => null!);
 
         _ = validate.GetProperty("TestProp");
 
@@ -497,7 +497,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.TryGetProperty.Return((InlineValidateBaseTests.Stubs.IValidateBase_TryGetPropertyInterceptor.TryGetPropertyDelegate)((string name, out IValidateProperty prop) => { prop = default!; return true; }));
+        stub.TryGetProperty.Call((InlineValidateBaseTests.Stubs.IValidateBase_TryGetPropertyInterceptor.TryGetPropertyDelegate)((string name, out IValidateProperty prop) => { prop = default!; return true; }));
 
         var result = validate.TryGetProperty("TestProp", out _);
 
@@ -535,11 +535,11 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Call((InlineValidateBaseTests.Stubs.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
+        stub.RunRules.Call(((string propertyName, CancellationToken? token) args) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
-        }));
+        });
 
         await validate.RunRules("Property", null);
 
@@ -756,7 +756,7 @@ public partial class InlineDelegateTests
 
         // Must set OnCall to return Task.CompletedTask, otherwise await on null
         // TODO: Generator should return Task.CompletedTask for async delegates by default
-        stub.Interceptor.Return((args) => Task.CompletedTask);
+        stub.Interceptor.Call((args) => Task.CompletedTask);
 
         // NeatooPropertyChanged takes only 1 arg: NeatooPropertyChangedEventArgs
         // EventArgs constructor: (propertyName, source)
@@ -773,7 +773,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.Return((args) => Task.CompletedTask);
+        stub.Interceptor.Call((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop1", this));
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
@@ -791,7 +791,7 @@ public partial class InlineDelegateTests
         string? capturedPropertyName = null;
 
         // OnCall takes (stub, args) - only 2 parameters
-        stub.Interceptor.Return((args) =>
+        stub.Interceptor.Call((args) =>
         {
             callbackExecuted = true;
             capturedPropertyName = args.PropertyName;
@@ -811,7 +811,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.Return((args) => Task.CompletedTask);
+        stub.Interceptor.Call((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop", this));
 

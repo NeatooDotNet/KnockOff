@@ -244,7 +244,7 @@ public class RocksGapReproductionTests
 	public void Gap30_MultipleClosedGenerics_ReturnValues()
 	{
 		var intStringStub = new Gap30ClosedGenericTest.Stubs.IGap30_GenericServiceInt32String();
-		intStringStub.Service.Return((data) => $"value:{data}");
+		intStringStub.Service.Call((data) => $"value:{data}");
 
 		IGap30_GenericService<int, string> service = intStringStub;
 		Assert.Equal("value:3", service.Service(3));
@@ -289,9 +289,9 @@ public class RocksGapReproductionTests
 	{
 		var stub = new Gap31InlineTest.Stubs.IGap31_GenericMethods();
 		// Single-type-param arity: Run<TReturn>()
-		stub.Run.Of<int>().Return(() => 42);
+		stub.Run.Of<int>().Call(() => 42);
 		// Two-type-param arity: Run<TInput, TReturn>(TInput input)
-		stub.Run.Of<string, int>().Return((input) => 99);
+		stub.Run.Of<string, int>().Call((input) => 99);
 		IGap31_GenericMethods service = stub;
 		Assert.Equal(42, service.Run<int>());
 		Assert.Equal(99, service.Run<string, int>("hello"));
@@ -302,9 +302,9 @@ public class RocksGapReproductionTests
 	{
 		var knockOff = new Gap31StandaloneKnockOff();
 		// Single-type-param arity: Run<TReturn>()
-		knockOff.Run.Of<int>().Return(() => 42);
+		knockOff.Run.Of<int>().Call(() => 42);
 		// Two-type-param arity: Run<TInput, TReturn>(TInput input)
-		knockOff.Run.Of<string, int>().Return((input) => 99);
+		knockOff.Run.Of<string, int>().Call((input) => 99);
 		IGap31_GenericMethods service = knockOff;
 		Assert.Equal(42, service.Run<int>());
 		Assert.Equal(99, service.Run<string, int>("hello"));

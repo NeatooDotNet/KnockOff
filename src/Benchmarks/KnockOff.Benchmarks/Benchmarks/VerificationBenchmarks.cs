@@ -23,7 +23,7 @@ public class VerificationBenchmarks
     private ICalculatorCreateExpectations _rocksCalculator = null!;
     #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private IMethodTracking _knockOffSimpleTracking = null!;
-    private IMethodTrackingArgs<(int, int)?> _knockOffCalculatorTracking = null!;
+    private IMethodTrackingArgs<(int? a, int? b)> _knockOffCalculatorTracking = null!;
 #pragma warning restore CA1859
 
     [GlobalSetup]
@@ -54,7 +54,7 @@ public class VerificationBenchmarks
         _ = _moqCalculator.Object.Add(3, 4);
 
         _knockOffCalculator = new CalculatorStub();
-        _knockOffCalculatorTracking = _knockOffCalculator.Add.Return((a, b) => 0);
+        _knockOffCalculatorTracking = _knockOffCalculator.Add.Call(_ => 0);
         _ = ((ICalculator)_knockOffCalculator).Add(1, 2);
         _ = ((ICalculator)_knockOffCalculator).Add(3, 4);
 
@@ -116,7 +116,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyWithArgs()
     {
-        var args = _knockOffCalculatorTracking.LastArgs!.Value;
+        var args = _knockOffCalculatorTracking.LastArgs;
         _ = args.Item1 == 1 && args.Item2 == 2;
     }
 

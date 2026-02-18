@@ -6,12 +6,12 @@ When chains provide parameter-specific matching. When the method is called with 
 
 ## Value Equality Matching
 
-Match specific argument values using equality. For 2+ parameter methods, pass values as a tuple (double parentheses):
+Match specific argument values using equality. For 2+ parameter methods, pass values as individual arguments:
 
 <!-- snippet: when-chains-ref-value -->
 ```cs
-stub.Add.When((1, 2)).Return(100)
-    .ThenWhen((5, 5)).Return(500);
+stub.Add.When(1, 2).Return(100)
+    .ThenWhen(5, 5).Return(500);
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2);  // 100 (matched)
@@ -24,7 +24,7 @@ calc.Add(3, 4);  // falls to Return/default
 
 ## Predicate Matching
 
-Match using a predicate function for complex conditions:
+Match using a predicate function for complex conditions. For 2+ params, the predicate receives a named tuple:
 
 <!-- snippet: when-chains-ref-predicate -->
 ```cs
@@ -42,9 +42,9 @@ Chain multiple matchers as a logical group:
 <!-- snippet: when-chains-ref-thenwhen -->
 ```cs
 stub.Add
-    .When((1, 1)).Return(1)
-    .ThenWhen((2, 2)).Return(2)
-    .ThenWhen((3, 3)).Return(3);
+    .When(1, 1).Return(1)
+    .ThenWhen(2, 2).Return(2)
+    .ThenWhen(3, 3).Return(3);
 
 IWhenCalculator calc = stub;
 calc.Add(1, 1); // 1
@@ -73,13 +73,13 @@ When chains use `Return(value)` -- there is **no** `Return(callback)` on When ch
 
 ```csharp
 // This works:
-stub.Add.When((10, 10)).Return(100);
+stub.Add.When(10, 10).Return(100);
 
 // This does NOT exist:
-// stub.Add.When((10, 10)).Return((a, b) => a * b);  // No Return(callback) on When
+// stub.Add.When(10, 10).Return(args => args.a * args.b);  // No Return(callback) on When
 
-// For dynamic behavior on all calls, use Return(callback) without When:
-stub.Add.Return((a, b) => a * b);
+// For dynamic behavior on all calls, use Call(callback) without When:
+stub.Add.Call(args => args.a * args.b);
 ```
 
 ---
@@ -90,7 +90,7 @@ Void methods use `Call(callback)` instead of `Return(value)`:
 
 <!-- snippet: when-chains-ref-void-call -->
 ```cs
-stub.Process.When((1, 2)).Call((a, b) => errors.Add($"{a},{b}"));
+stub.Process.When(1, 2).Call(args => errors.Add($"{args.a},{args.b}"));
 ```
 <!-- endSnippet -->
 
@@ -101,9 +101,9 @@ Use `.ThenCall()` as a terminal fallback for non-void When chains:
 <!-- snippet: when-chains-ref-thencall -->
 ```cs
 stub.Add
-    .When((1, 2)).Return(100)
-    .ThenWhen((3, 4)).Return(200)
-    .ThenCall((a, b) => a + b);  // Fallback for unmatched
+    .When(1, 2).Return(100)
+    .ThenWhen(3, 4).Return(200)
+    .ThenCall(args => args.a + args.b);  // Fallback for unmatched
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2); // 100
@@ -138,8 +138,8 @@ Mark When chains for batch verification:
 
 <!-- snippet: when-chains-ref-verifiable -->
 ```cs
-stub.Add.When((1, 2)).Return(100).Verifiable();
-stub.Add.When((5, 5)).Return(500).Verifiable();
+stub.Add.When(1, 2).Return(100).Verifiable();
+stub.Add.When(5, 5).Return(500).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -149,9 +149,9 @@ When chains have their own `Verify()` for checking consumption:
 
 <!-- snippet: when-chains-ref-chain-verify -->
 ```cs
-var chain = stub.Add.When((1, 2)).Return(10)
-    .ThenWhen((3, 4)).Return(20)
-    .ThenCall((a, b) => 999);
+var chain = stub.Add.When(1, 2).Return(10)
+    .ThenWhen(3, 4).Return(20)
+    .ThenCall(_ => 999);
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2);
@@ -180,7 +180,7 @@ When a When chain is configured, Return/Call becomes the fallback for unmatched 
 <!-- snippet: when-chains-ref-priority -->
 ```cs
 stub.Add.Return(0);                     // Default for unmatched
-stub.Add.When((1, 2)).Return(100);        // Specific match
+stub.Add.When(1, 2).Return(100);        // Specific match
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2); // 100 (When matched)

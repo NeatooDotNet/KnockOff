@@ -52,7 +52,7 @@ public partial class RefOutDemo
         var stub = new Stubs.IOutParameterService();
 
         // Must provide delegate that handles both return value AND out parameter
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "found-" + key;
             return true;
@@ -68,7 +68,7 @@ public partial class RefOutDemo
         var stub = new Stubs.IOutParameterService();
 
         // Simulate "not found" - must still set the out parameter
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;
@@ -88,7 +88,7 @@ public partial class RefOutDemo
         var stub = new Stubs.IOutParameterService();
         var data = new Dictionary<string, string> { ["key1"] = "value1" };
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
             data.TryGetValue(key, out value!));
 
         IOutParameterService service = stub;
@@ -131,7 +131,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IOutParameterService();
 
-        stub.Parse.Return((string input, out string error) =>
+        stub.Parse.Call((string input, out string error) =>
         {
             if (int.TryParse(input, out var parsed))
             {
@@ -179,7 +179,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IRefParameterService();
 
-        stub.TryUpdate.Return((string key, ref string value) =>
+        stub.TryUpdate.Call((string key, ref string value) =>
         {
             value = value.ToUpperInvariant();
             return true;
@@ -223,7 +223,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IMixedRefOutService();
 
-        stub.Process.Return((string input, out string output, ref int counter) =>
+        stub.Process.Call((string input, out string output, ref int counter) =>
         {
             output = input.ToUpperInvariant();
             counter++;
@@ -240,7 +240,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IMixedRefOutService();
 
-        stub.Transform.Return((string input, out string transformed, out bool wasModified) =>
+        stub.Transform.Call((string input, out string transformed, out bool wasModified) =>
         {
             transformed = input.Trim();
             wasModified = transformed != input;
@@ -262,7 +262,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = default!;
             return false;
@@ -296,7 +296,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IOutParameterService();
 
-        stub.TryGetValue.Return((string key, out string value) =>
+        stub.TryGetValue.Call((string key, out string value) =>
         {
             value = "found";
             return true;
@@ -314,7 +314,7 @@ public partial class RefOutDemo
     {
         var stub = new Stubs.IRefParameterService();
 
-        stub.TryUpdate.Return((string key, ref string value) =>
+        stub.TryUpdate.Call((string key, ref string value) =>
         {
             value = value.ToUpperInvariant();
             return true;
@@ -367,7 +367,7 @@ public partial class RefOutDemo
         var stub = new Stubs.IOutParameterService();
 
         stub.TryGetValue
-            .Return((string key, out string value) => { value = "first"; return true; })
+            .Call((string key, out string value) => { value = "first"; return true; })
             .ThenReturn((string key, out string value) => { value = "second"; return true; });
 
         IOutParameterService service = stub;

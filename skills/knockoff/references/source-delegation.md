@@ -57,7 +57,7 @@ Source delegation sits below configuration but above defaults:
 <!-- snippet: source-delegation-ref-priority -->
 ```cs
 stub.Source(realCalculator);
-stub.Divide.When((10, 2)).Return(5);
+stub.Divide.When(10, 2).Return(5);
 
 ISourceCalc calc = stub;
 calc.Divide(10, 2);  // 5 (When chain matched)
@@ -111,7 +111,7 @@ stub.Source(readOnly);
 <!-- snippet: source-partial-override -->
 ```cs
 // Override specific member while source handles the rest
-stub.GetById.Return((id) => new User { Id = id, Name = "Test User" });
+stub.GetById.Call((id) => new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
 

@@ -1,6 +1,6 @@
 # Migrate Method API to Singular Naming (Return/Call)
 
-**Status:** In Progress
+**Status:** Superseded by [IntelliSense API Redesign](intellisense-api-redesign.md)
 **Priority:** High
 **Created:** 2026-02-07
 **Last Updated:** 2026-02-07 (Phases 1-4 implemented, awaiting architect verification)

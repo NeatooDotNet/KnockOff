@@ -9,7 +9,7 @@ using KnockOff;
 namespace Design.Tests.MethodTests;
 
 /// <summary>
-/// Tests for method overload stubbing: OnCall disambiguation, When targeting,
+/// Tests for method overload stubbing: Call disambiguation, When targeting,
 /// per-overload tracking, and sequences.
 /// </summary>
 public class MethodOverloadTests
@@ -19,9 +19,9 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Return((input) => "one-param");
-        stub.Format.Return((input, options) => "two-params");
-        stub.Format.Return((input, options, maxLength) => "three-params");
+        stub.Format.Call((string input) => "one-param");
+        stub.Format.Call(((string input, FormatOptions options) args) => "two-params");
+        stub.Format.Call(((string input, FormatOptions options, int maxLength) args) => "three-params");
 
         IFormatter formatter = stub;
 
@@ -36,8 +36,8 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // All overloads return same constant
-        stub.Format.Return((input) => "constant");
-        stub.Format.Return((input, options) => "constant");
+        stub.Format.Call((string input) => "constant");
+        stub.Format.Call(((string input, FormatOptions options) args) => "constant");
 
         IFormatter formatter = stub;
 
@@ -51,12 +51,12 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Defaults
-        stub.Format.Return((input) => "default-1");
-        stub.Format.Return((input, options) => "default-2");
+        stub.Format.Call((string input) => "default-1");
+        stub.Format.Call(((string input, FormatOptions options) args) => "default-2");
 
         // Specific matches
         stub.Format.When("special").Return("SPECIAL-1");
-        stub.Format.When(("special", new FormatOptions(Uppercase: true))).Return("SPECIAL-2");
+        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -71,8 +71,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Return((input) => "default");
-        stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
+        stub.Format.Call((string input) => "default");
+        stub.Format.When((string input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
 
         IFormatter formatter = stub;
 
@@ -85,8 +85,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Format.Return((input) => input);
-        var tracking2 = stub.Format.Return((input, options) => input);
+        var tracking1 = stub.Format.Call((string input) => input);
+        var tracking2 = stub.Format.Call(((string input, FormatOptions options) args) => args.input);
 
         IFormatter formatter = stub;
 
@@ -106,8 +106,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Return((input) => input);
-        stub.Format.Return((input, options) => input);
+        stub.Format.Call((string input) => input);
+        stub.Format.Call(((string input, FormatOptions options) args) => args.input);
 
         IFormatter formatter = stub;
 
@@ -124,9 +124,9 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
         var logs = new List<string>();
 
-        stub.Log.Call((msg) => logs.Add($"1:{msg}"));
-        stub.Log.Call((msg, level) => logs.Add($"2:{msg}:{level}"));
-        stub.Log.Call((msg, level, cat) => logs.Add($"3:{msg}:{level}:{cat}"));
+        stub.Log.Call((string msg) => logs.Add($"1:{msg}"));
+        stub.Log.Call(((string message, int level) args) => logs.Add($"2:{args.message}:{args.level}"));
+        stub.Log.Call(((string message, int level, string category) args) => logs.Add($"3:{args.message}:{args.level}:{args.category}"));
 
         IFormatter formatter = stub;
 
@@ -142,8 +142,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Log.Call((msg) => { });
-        var tracking2 = stub.Log.Call((msg, level) => { });
+        var tracking1 = stub.Log.Call((string msg) => { });
+        var tracking2 = stub.Log.Call(((string message, int level) args) => { });
 
         IFormatter formatter = stub;
 
@@ -161,11 +161,11 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.TransformAsync.Return((string input) => $"[{input}]");
-        var tracking2 = stub.TransformAsync.Return((input, cancellationToken) =>
+        var tracking1 = stub.TransformAsync.Call((string input) => $"[{input}]");
+        var tracking2 = stub.TransformAsync.Call(((string input, CancellationToken cancellationToken) args) =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            return $"[{input}:ct]";
+            args.cancellationToken.ThrowIfCancellationRequested();
+            return $"[{args.input}:ct]";
         });
 
         IFormatter formatter = stub;
@@ -187,11 +187,11 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         stub.Format
-            .Return((input) => "first")
+            .Call((string input) => "first")
             .ThenReturn("second");
 
         stub.Format
-            .Return((input, options) => "A")
+            .Call(((string input, FormatOptions options) args) => "A")
             .ThenReturn("B");
 
         IFormatter formatter = stub;
@@ -213,8 +213,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Format.Return((input) => input);
-        var tracking2 = stub.Format.Return((input, options) => input);
+        var tracking1 = stub.Format.Call((string input) => input);
+        var tracking2 = stub.Format.Call(((string input, FormatOptions options) args) => args.input);
 
         IFormatter formatter = stub;
 

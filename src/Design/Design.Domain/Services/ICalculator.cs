@@ -17,19 +17,19 @@ public interface ICalculator
 {
     /// <summary>
     /// Adds two integers and returns the result.
-    /// Used to demonstrate: Returns(), OnCall(), When()
+    /// Used to demonstrate: Return(), Call(), When()
     /// </summary>
     int Add(int a, int b);
 
     /// <summary>
     /// Subtracts b from a and returns the result.
-    /// Used to demonstrate method sequences: OnCall().ThenCall()
+    /// Used to demonstrate method sequences: Call().ThenCall()
     /// </summary>
     int Subtract(int a, int b);
 
     /// <summary>
     /// Divides a by b. May throw DivideByZeroException.
-    /// Used to demonstrate: OnCall() with exception throwing
+    /// Used to demonstrate: Call() with exception throwing
     /// </summary>
     int Divide(int a, int b);
 

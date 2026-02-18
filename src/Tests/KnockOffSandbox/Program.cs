@@ -48,11 +48,11 @@ Console.WriteLine();
 
 // Test method with multiple params - uses Call API
 Console.WriteLine("Method with multiple params:");
-var processTracking = knockOff.Process.Call((id, count, urgent) => { });
+var processTracking = knockOff.Process.Call(_ => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
-var processArgs = processTracking.LastArgs!.Value;
+var processArgs = processTracking.LastArgs;
 // Verify method was called twice (throws if not)
 processTracking.Verify(Called.Exactly(2));
 Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");

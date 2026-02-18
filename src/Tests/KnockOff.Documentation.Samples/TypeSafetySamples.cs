@@ -129,7 +129,7 @@ public class KnockOffTypeSafetyTests
 
         // (int a, int b) — types and names come from Add(int a, int b)
         // Wrong types here cause a COMPILE error, not a runtime error
-        stub.Add.Return((a, b) => a + b);
+        stub.Add.Call(args => args.a + args.b);
 
         ITypeSafeCalc calc = stub;
         Assert.Equal(3, calc.Add(1, 2));

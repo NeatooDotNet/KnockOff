@@ -56,7 +56,7 @@ public partial class TroubleshootEmailServiceTests
     public void ClassStub_RequiresObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Return((to, subject) => true);
+        stub.Send.Call(_ => true);
 
         #region troubleshoot-object
         // Use .Object to get the typed instance for class stubs
@@ -76,7 +76,7 @@ public partial class TroubleshootEmailServiceTests
     public void PassingStubObjectToMethod()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Return((to, subject) => true);
+        stub.Send.Call(_ => true);
         UseEmailService(stub.Object);
         stub.Send.Verify();
     }
@@ -95,7 +95,7 @@ public class ReturnSignatureTests
 
         #region troubleshoot-oncall-signature
         // Return signature must match method parameters exactly
-        stub.GetByIdAsync.Return((int id) =>
+        stub.GetByIdAsync.Call((int id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
         #endregion
 
@@ -151,7 +151,7 @@ public class NoCallbackTests
 
         #region troubleshoot-no-callback
         // Configure required (non-nullable) return values explicitly
-        stub.GetName.Return(() => "Configured Name");
+        stub.GetName.Call(() => "Configured Name");
         #endregion
 
         var name = repository.GetName();
@@ -360,16 +360,16 @@ public class ReturnSignatureAdditionalTests
         // Interface method: User GetUser(int id, bool includeDeleted)
 
         // ERROR: Wrong - no parameters (CS1593)
-        // stub.GetUser.Return(() => new User());
+        // stub.GetUser.Call(() => new User());
 
         // ERROR: Wrong - only one parameter (CS1593)
-        // stub.GetUser.Return((id) => new User());
+        // stub.GetUser.Call((id) => new User());
         #endregion
 
         #region troubleshoot-oncall-signature-correct
         // CORRECT: Match all parameters from method signature
-        stub.GetUser.Return((int id, bool includeDeleted) =>
-            new User { Id = id, Name = includeDeleted ? "All" : "Active" });
+        stub.GetUser.Call(args =>
+            new User { Id = args.id, Name = args.includeDeleted ? "All" : "Active" });
         #endregion
 
         IUserService service = stub;
@@ -396,7 +396,7 @@ public partial class EmailServiceAdditionalTests
     public void ClassStub_UseObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Return((to, subject) => true);
+        stub.Send.Call(_ => true);
 
         // Use .Object to get the typed instance
         EmailService service = stub.Object;
@@ -418,12 +418,12 @@ public class AsyncReturnTests
         // Interface: Task<User?> GetUserAsync(int id)
 
         // ERROR: Returning unwrapped value (CS0029)
-        // stub.GetUserAsync.Return((id) => new User());
+        // stub.GetUserAsync.Call((id) => new User());
         #endregion
 
         #region troubleshoot-async-return-correct
         // CORRECT: Return Task.FromResult for async methods
-        stub.GetUserAsync.Return((int id) =>
+        stub.GetUserAsync.Call((int id) =>
             Task.FromResult<User?>(new User { Id = id }));
 
         // For Task (void async), use Return with Action callback:
@@ -435,7 +435,7 @@ public class AsyncReturnTests
         stub.GetUserAsync.Return(new User { Id = 1, Name = "Alice" });
 
         // Simplified Return also auto-wraps
-        stub.GetUserAsync.Return((id) => new User { Id = id });
+        stub.GetUserAsync.Call((id) => new User { Id = id });
         #endregion
 
         IUserService service = stub;
@@ -453,7 +453,7 @@ public class VerificationTests
         var stub = new UserServiceStub();
 
         // ARRANGE: Configure Return with Verifiable BEFORE acting
-        stub.GetUserAsync.Return((id) =>
+        stub.GetUserAsync.Call((id) =>
             Task.FromResult<User?>(new User { Id = id }))
             .Verifiable();
 
@@ -475,7 +475,7 @@ public class VerificationTests
         var stub = new UserServiceStub();
 
         // Configure the stub
-        stub.GetUserAsync.Return((id) =>
+        stub.GetUserAsync.Call((id) =>
             Task.FromResult<User?>(new User { Id = id }))
             .Verifiable();
 
@@ -604,10 +604,10 @@ public partial class CalcDelegateTests
 
         #region troubleshoot-delegate-interceptor-pattern
         // Interface stub pattern:
-        interfaceStub.GetById.Return((id) => user);
+        interfaceStub.GetById.Call((id) => user);
 
         // Delegate stub pattern (different!):
-        delegateStub.Interceptor.Return((a, b) => a + b);
+        delegateStub.Interceptor.Call((a, b) => a + b);
         delegateStub.Interceptor.Return(42);
         #endregion
 
@@ -625,17 +625,17 @@ public partial class CalcDelegateTests
         // Delegate: int CalcOperation(int a, int b)
 
         // Wrong: missing parameter
-        // stub.Interceptor.Return((a) => a);
+        // stub.Interceptor.Call((a) => a);
 
         // Wrong: wrong parameter type
-        // stub.Interceptor.Return((string a, string b) => 0);
+        // stub.Interceptor.Call((string a, string b) => 0);
         #endregion
 
         #region troubleshoot-delegate-oncall-correct
         // Correct: matches delegate signature
-        stub.Interceptor.Return((int a, int b) => a + b);
+        stub.Interceptor.Call((int a, int b) => a + b);
         // Or with inferred types:
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
         #endregion
 
         CalcOperation op = stub;
@@ -688,7 +688,7 @@ public class StubOverrideExampleTests
         var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
         // You can still override per-test with Return
-        stub.GetById.Return(id => new User { Id = id, Name = "Test User" });
+        stub.GetById.Call(id => new User { Id = id, Name = "Test User" });
         #endregion
 
         Assert.Equal("Default User", user!.Name);

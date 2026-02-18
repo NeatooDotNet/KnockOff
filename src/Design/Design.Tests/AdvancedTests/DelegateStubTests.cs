@@ -40,7 +40,7 @@ public class DelegateStubTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 

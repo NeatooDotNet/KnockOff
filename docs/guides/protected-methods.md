@@ -75,7 +75,7 @@ Sequences work too:
 <!-- snippet: protected-sequences -->
 ```cs
 stub.GetInternalId
-    .Return(() => "first-id")
+    .Call(() => "first-id")
     .ThenReturn(() => "second-id");
 ```
 <!-- endSnippet -->
@@ -147,6 +147,6 @@ var desc = testService.GetDescription();
 | Configure protected methods | `stub.GetInternalId.Return(...)` | `mock.Protected().Setup<T>("name")` | Manual subclass |
 | Compile-time safety | Yes — interceptor is typed | No — string method names | N/A |
 | Verification | `stub.GetInternalId.Verify(Called.Once)` | `mock.Protected().Verify("name", Times.Once())` | Not available |
-| Sequences | `.Return(...).ThenReturn(...)` | Limited (Moq 4.18+, string-based) | Not available |
+| Sequences | `.Return().ThenReturn()` | Limited (Moq 4.18+, string-based) | Not available |
 | Virtual base fallback | Automatic when unconfigured | Must configure explicitly | Manual in subclass |
 | Properties / Indexers / Events | Same API | Limited Protected() support | Manual in subclass |

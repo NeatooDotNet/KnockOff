@@ -72,7 +72,7 @@ public interface IMixedStubOverrideService
     /// <summary>Will have stub override implementation.</summary>
     string WithStubOverride(string input);
 
-    /// <summary>Will NOT have stub override - uses OnCall instead.</summary>
+    /// <summary>Will NOT have stub override - uses Call instead.</summary>
     string WithoutStubOverride(string input);
 
     /// <summary>Will have stub override implementation.</summary>

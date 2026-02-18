@@ -17,7 +17,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x * 100); // Override stub override (which does x * 10)
+        stub.GetValue.Call(x => x * 100); // Override stub override (which does x * 10)
 
         // Act
         IStrictModeStubOverrideTest service = stub;
@@ -105,7 +105,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x * 100);
+        stub.GetValue.Call(x => x * 100);
 
         IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
@@ -148,7 +148,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new MultiParamStubOverrideStub();
-        stub.Calculate.Return((a, b) => a - b); // Override stub override (which does a + b)
+        stub.Calculate.Call(args => args.a - args.b); // Override stub override (which does a + b)
 
         // Act
         IMultiParamStubOverrideService service = stub;
@@ -182,7 +182,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x * 100);
+        stub.GetValue.Call(x => x * 100);
 
         // Act
         IStrictModeStubOverrideTest service = stub;
@@ -197,7 +197,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => 42).Verifiable();
+        stub.GetValue.Call(x => 42).Verifiable();
 
         // Act - Don't call the method
 
@@ -210,7 +210,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new StrictModeStubOverrideStub();
-        stub.GetValue.Return(x => x);
+        stub.GetValue.Call(x => x);
 
         // Act
         IStrictModeStubOverrideTest service = stub;
@@ -230,7 +230,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new AsyncStubOverrideTestStub();
-        stub.ProcessAsync.Return(input => Task.FromResult($"[OnCall: {input}]"));
+        stub.ProcessAsync.Call(input => Task.FromResult($"[OnCall: {input}]"));
 
         // Act
         IAsyncStubOverrideTestService service = stub;

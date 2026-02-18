@@ -42,6 +42,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 4. **Events** - Event add/remove handlers
 
 
+## Interceptor-as-Property Principle
+
+**`stub.Method` must remain a property that returns an interceptor object.** This is non-negotiable. The interceptor property is the handle that enables `stub.Method.Verify()`, `stub.Method.LastArgs`, `stub.Method.Reset()`, and `stub.Method.Verifiable()`. It is also what stub overrides wire into as fallback behavior. Any API redesign (including Arg-style matching) must preserve interceptor-as-property. If a proposed change would turn `stub.Method` into a method call, **push back**.
+
 ## API Consistency Principle
 
 **All patterns should provide identical APIs except for intentional variations.** The only intentional variation is `.Object` for class stubs (patterns 3, 4, 6, 9). Everything else—methods, properties, indexers, events, sequences, verification, When chains—should work identically across all applicable patterns.

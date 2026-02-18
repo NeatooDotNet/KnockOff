@@ -54,7 +54,7 @@ The compiler enforces signature correctness -- typos or wrong parameter types pr
 service.GetUserById(1); // "Default User"
 
 // Supersede with Return for this test
-stub.GetUserById.Return(id => new User { Id = id, Name = "Override" });
+stub.GetUserById.Call(id => new User { Id = id, Name = "Override" });
 service.GetUserById(1); // "Override"
 ```
 <!-- endSnippet -->
@@ -86,7 +86,7 @@ Override some methods, configure others:
 service.WithOverride("test");    // "[User: test]"
 
 // Methods WITHOUT override need configuration or return default
-stub.WithoutOverride.Return((input) => $"[Configured: {input}]");
+stub.WithoutOverride.Call((input) => $"[Configured: {input}]");
 service.WithoutOverride("test"); // "[Configured: test]"
 ```
 <!-- endSnippet -->
@@ -174,7 +174,7 @@ stub.GetBalance.Verify(Called.Never);
 |------|------|
 | Define override | `protected override string Process_(string input) => result;` |
 | Supersede with Return | `stub.Process.Return(value)` |
-| Supersede with callback | `stub.Process.Return((input) => result)` |
+| Supersede with callback | `stub.Process.Call((input) => result)` |
 | When chain override | `stub.Process.When("x").Return("y")` |
 | Strict mode bypass | Override IS the configuration |
 | Reset | `stub.Process.Reset()` clears counts, preserves config |

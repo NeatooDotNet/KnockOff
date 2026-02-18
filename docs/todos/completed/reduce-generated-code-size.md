@@ -1,6 +1,6 @@
 # Reduce Generated Code Size
 
-**Status:** In Progress
+**Status:** Superseded by [IntelliSense API Redesign](intellisense-api-redesign.md) — direction reversed (fully generated classes prioritized over build time)
 **Priority:** Medium
 **Created:** 2026-02-13
 **Last Updated:** 2026-02-13 (generic inner classes plan added)

@@ -27,59 +27,39 @@ internal static class MethodInterceptorRenderer
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
 
-		// Determine emission mode for single-signature methods
-		var useBaseClass = false;
-		if (model.Overloads.Count == 0)
-		{
-			var hasRefOrOut = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
-			var (_, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
-			var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
-			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(model.ReturnType);
-			var isVoidAsync = isVoidTask || isVoidValueTask;
-			useBaseClass = !hasRefOrOut && !isAsyncWithInnerType && !isVoidAsync && !model.IsRefReturn;
-		}
-
+		// All single-signature methods now inherit from MethodInterceptorRuntime (non-generic base).
+		// Overload groups remain self-contained (Phase 4 will migrate them).
 		string classDecl;
-		if (useBaseClass)
-		{
-			var delegateType = model.CallDelegateType.TrimEnd('?');
-			var tArgs = ComputeTArgsType(model.Parameters);
-			// Custom delegates are nested types inside the interceptor class.
-			// In the base class list, they must be qualified with the interceptor class name
-			// because nested types are not in scope in the class header.
-			var qualifiedDelegateType = model.NeedsCustomDelegate
-				? $"{model.InterceptorClassName}{typeParams}.{delegateType}"
-				: delegateType;
-			string baseClassName;
-			if (model.IsVoid)
-			{
-				baseClassName = $"global::KnockOff.Interceptors.VoidMethodInterceptorBase<{qualifiedDelegateType}, {tArgs}>";
-			}
-			else
-			{
-				baseClassName = $"global::KnockOff.Interceptors.MethodInterceptorBase<{qualifiedDelegateType}, {tArgs}, {model.ReturnType}>";
-			}
-			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams} : {baseClassName}{constraints}";
-		}
-		else
+		if (model.Overloads.Count > 0)
 		{
 			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams}{constraints}";
 		}
+		else
+		{
+			classDecl = $"public sealed class {model.InterceptorClassName}{typeParams} : global::KnockOff.Interceptors.MethodInterceptorRuntime{constraints}";
+		}
 
-		w.Line($"/// <summary>Tracks and configures behavior for {model.MethodName}.</summary>");
+		if (model.Overloads.Count == 0)
+		{
+			var classSig = FormatMethodSignatureForDoc(model.MethodName, model.Parameters);
+			var classSummary = model.XmlDocSummary != null
+				? $"Tracks and configures behavior for {classSig}. {model.XmlDocSummary}"
+				: $"Tracks and configures behavior for {classSig}.";
+			w.Line($"/// <summary>{classSummary}</summary>");
+		}
+		else
+		{
+			w.Line($"/// <summary>Tracks and configures behavior for {model.MethodName} (overloaded).</summary>");
+		}
 		using (w.Block(classDecl))
 		{
 			if (model.Overloads.Count > 0)
 			{
 				RenderOverloadGroupContent(w, model, options);
 			}
-			else if (useBaseClass)
-			{
-				RenderBaseClassContent(w, model, options);
-			}
 			else
 			{
-				RenderSingleSignatureContent(w, model, options);
+				RenderBaseClassContent(w, model, options);
 			}
 		}
 		w.Line();
@@ -224,7 +204,7 @@ internal static class MethodInterceptorRenderer
 
 		// Return()/Call() - repeating callback, returns concrete builder for sequence chaining
 		var entryPointName = model.IsVoid ? "Call" : "Return";
-		w.Line($"/// <summary>Configures callback that repeats indefinitely. Returns builder for sequence chaining.</summary>");
+		EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, "Returns builder for sequence chaining.");
 		w.Line($"public MethodCallBuilderImpl {entryPointName}({delegateType} callback)");
 		using (w.Braces())
 		{
@@ -260,7 +240,7 @@ internal static class MethodInterceptorRenderer
 		if (canHaveValueOverload)
 		{
 			var (valueStorageType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
-			w.Line($"/// <summary>Configures return value that repeats indefinitely. Return builder for sequence chaining.</summary>");
+			EmitReturnXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, "Returns builder for sequence chaining.");
 			w.Line($"public MethodCallBuilderImpl Return({valueStorageType} value)");
 			using (w.Braces())
 			{
@@ -277,9 +257,14 @@ internal static class MethodInterceptorRenderer
 					w.Line("_callSimplified = null;");
 					w.Line("_callSimplifiedTracking = null;");
 				}
-				// Set value storage
+				// Set value storage (async methods wrap the value in Task/ValueTask)
 				w.Line("_hasReturnValue = true;");
-				w.Line("_returnValue = value;");
+				if (isTaskT)
+					w.Line($"_returnValue = global::System.Threading.Tasks.Task.FromResult(value);");
+				else if (isValueTaskT)
+					w.Line($"_returnValue = new global::System.Threading.Tasks.ValueTask<{valueStorageType}>(value);");
+				else
+					w.Line("_returnValue = value;");
 				w.Line("_returnValueTracking = new MethodCallBuilderImpl(this);");
 				w.Line("return _returnValueTracking;");
 			}
@@ -327,7 +312,7 @@ internal static class MethodInterceptorRenderer
 		if (isAsyncWithInnerType && !hasRefOrOut)
 		{
 			var simplifiedDelegateType = BuildSimplifiedDelegateType(model.Parameters, innerType);
-			w.Line($"/// <summary>Configures callback returning unwrapped value. Result auto-wrapped in {(isAsyncTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+			EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, $"Result auto-wrapped in {(isAsyncTaskT ? "Task.FromResult" : "new ValueTask")}.");
 			w.Line($"public MethodCallBuilderImpl Return({simplifiedDelegateType} callback)");
 			using (w.Braces())
 			{
@@ -357,7 +342,7 @@ internal static class MethodInterceptorRenderer
 		if (isVoidAsync && !hasRefOrOut)
 		{
 			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
-			w.Line($"/// <summary>Configures callback action. {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
+			EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, $"{(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.");
 			w.Line($"public MethodCallBuilderImpl Return({voidDelegateType} callback)");
 			using (w.Braces())
 			{
@@ -382,11 +367,11 @@ internal static class MethodInterceptorRenderer
 		// When() entry points for parameter-specific matching
 		if (canHaveWhenChain)
 		{
-			RenderWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, null);
+			RenderWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, null, methodName: model.MethodName, xmlDocSummary: model.XmlDocSummary);
 		}
 		if (canHaveVoidWhenChain)
 		{
-			RenderVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, null);
+			RenderVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, null, methodName: model.MethodName, xmlDocSummary: model.XmlDocSummary);
 		}
 
 		// Ref return backing field (for ref return methods, must be emitted inside the interceptor class)
@@ -446,17 +431,28 @@ internal static class MethodInterceptorRenderer
 	#region Base Class Mode Interceptor
 
 	/// <summary>
-	/// Renders a thin interceptor that inherits from MethodInterceptorBase or VoidMethodInterceptorBase.
-	/// Only emitted for single-signature methods without ref/out, async simplified, or ref return.
+	/// Renders a fully generated interceptor class that inherits from MethodInterceptorRuntime.
+	/// Handles all method types: sync, async (Task/ValueTask), ref/out, ref return.
+	/// Generated class provides typed Call/Return/When API methods and abstract overrides.
 	/// </summary>
 	private static void RenderBaseClassContent(
 		CodeWriter w,
 		UnifiedMethodInterceptorModel model,
 		InterceptorRenderOptions options)
 	{
+		// The delegate type from the model is always the full-signature custom delegate for non-void,
+		// or Action for void methods. We keep using this as the storage/API delegate type.
+		// The Func<>/Action<> migration to the user-facing API is a later phase.
 		var delegateType = model.CallDelegateType.TrimEnd('?');
 		var tArgs = ComputeTArgsType(model.Parameters);
 		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+		var hasRefOrOut = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+
+		// Async type info
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
+		var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(model.ReturnType);
+		var isVoidAsync = isVoidTask || isVoidValueTask;
 
 		// Source field for Source(T) feature
 		if (!string.IsNullOrEmpty(model.DeclaringInterface))
@@ -466,7 +462,7 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// Custom delegate if needed
+		// Custom delegate if needed (non-void and ref/out methods)
 		if (model.NeedsCustomDelegate && model.CustomDelegateSignature != null)
 		{
 			w.Line($"/// <summary>Delegate for {model.MethodName}.</summary>");
@@ -474,134 +470,278 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// Constructor
+		// Constructor (with optional smart default factory)
 		w.Line($"public {model.InterceptorClassName}() : base(\"{model.MethodName}\") {{ }}");
+		if (!model.IsVoid && !string.IsNullOrEmpty(model.DefaultExpression) && model.DefaultExpression != "default!")
+		{
+			w.Line($"public {model.InterceptorClassName}(global::System.Func<object> smartDefaultFactory) : base(\"{model.MethodName}\", smartDefaultFactory) {{ }}");
+		}
 		w.Line();
 
-		// Abstract overrides
-		if (model.IsVoid)
+		// Ref return backing field
+		if (model.IsRefReturn)
 		{
-			// InvokeVoidDelegate
-			RenderBaseClassInvokeVoidDelegate(w, delegateType, tArgs, model.Parameters);
+			w.Line($"internal {model.ReturnType} _refReturnBacking = default!;");
+			w.Line();
+		}
+
+		// Abstract overrides for MethodInterceptorRuntime
+		// Both InvokeDelegate and InvokeVoidDelegate are abstract and MUST be overridden by all subclasses.
+		var isEffectivelyVoid = model.IsVoid && !isVoidAsync;
+
+		// InvokeVoidDelegate: typed cast + void invocation
+		RenderBaseClassInvokeVoidDelegate(w, delegateType, tArgs, model.Parameters, model.UsesTupleCallDelegate);
+
+		// InvokeDelegate: typed cast + return boxed result
+		if (isEffectivelyVoid)
+		{
+			// Sync void: InvokeDelegate forwards to InvokeVoidDelegate and returns null
+			w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args) { InvokeVoidDelegate(del, args); return null; }");
 		}
 		else
 		{
-			// InvokeDelegate
-			RenderBaseClassInvokeDelegate(w, delegateType, tArgs, model.ReturnType, model.Parameters);
-			// CreateValueDelegate
-			RenderBaseClassCreateValueDelegate(w, delegateType, model.ReturnType, model.Parameters);
+			RenderBaseClassInvokeDelegate(w, delegateType, tArgs, model.ReturnType, model.Parameters, model.UsesTupleCallDelegate);
 		}
+
+		// CreateValueDelegate (non-void only, including async)
+		if (!model.IsVoid)
+		{
+			RenderBaseClassCreateValueDelegate(w, delegateType, model.ReturnType, model.Parameters, model.UsesTupleCallDelegate);
+		}
+
 		// RecordArgs
-		RenderBaseClassRecordArgs(w, tArgs, model.TrackableParameters);
+		RenderBaseClassRecordArgs(w, tArgs, model.TrackableParameters, model.Parameters);
 		// RecordUnconfiguredArgs
-		RenderBaseClassRecordUnconfiguredArgs(w, tArgs, model.LastArgType, model.LastArgsType, model.TrackableParameters);
+		RenderBaseClassRecordUnconfiguredArgs(w, tArgs, model.LastArgType, model.LastArgsType, model.TrackableParameters, model.Parameters);
 		w.Line();
 
-		// Unconfigured last arg/args fields + LastArg/LastArgs property using FindLastArgInTracking
+		// Unconfigured last arg/args fields + LastArg/LastArgs property
 		RenderBaseClassUnconfiguredArgFields(w, model.LastArgType, model.LastArgsType, model.TrackableParameters, model.IsVoid);
 
-		// Return/Call entry points using SetupReturn helpers
-		RenderBaseClassEntryPoints(w, model, delegateType, fullInterceptorClassName);
+		// Call/Return entry points (API rename: callback entry is always "Call", value is "Return")
+		RenderBaseClassEntryPoints(w, model, delegateType, fullInterceptorClassName, hasRefOrOut, isAsyncWithInnerType, isVoidAsync, isAsyncTaskT, isAsyncValueTaskT, isVoidTask, innerType);
 
-		// When entry points
-		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0;
-		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0;
+		// When entry points (no ref/out)
+		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
 		if (canHaveWhenChain)
 		{
-			RenderBaseClassWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs);
+			RenderBaseClassWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs, methodName: model.MethodName, xmlDocSummary: model.XmlDocSummary);
 		}
 		if (canHaveVoidWhenChain)
 		{
-			RenderBaseClassVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs);
+			RenderBaseClassVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs, methodName: model.MethodName, xmlDocSummary: model.XmlDocSummary);
 		}
 
-		// Thin Invoke method
+		// Invoke method
 		RenderBaseClassInvokeMethod(w, model, options, tArgs);
+
+		// InvokeRef method (for ref return methods)
+		if (model.IsRefReturn)
+		{
+			RenderBaseClassInvokeRefMethod(w, model, options, tArgs);
+		}
 
 		// Reset override
 		RenderBaseClassResetMethod(w, model.LastArgType, model.LastArgsType,
 			hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
 
-		// Thin inner classes (builder only -- sequence is handled by base class)
+		// Inner classes
 		RenderBaseClassMethodCallBuilderImpl(w, model, fullInterceptorClassName, delegateType, tArgs);
+		RenderBaseClassMethodSequenceImpl(w, model, fullInterceptorClassName, delegateType, tArgs);
 
 		if (canHaveWhenChain)
 		{
+			RenderBaseClassNonVoidWhenMatcherClasses(w, tArgs, model.Parameters, model.ReturnType);
 			RenderBaseClassWhenBuilder(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs);
-			RenderBaseClassWhenChain(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, tArgs);
+			RenderBaseClassWhenChain(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, tArgs, model.UsesTupleCallDelegate);
 		}
 		if (canHaveVoidWhenChain)
 		{
-			RenderBaseClassVoidWhenChain(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs);
+			RenderBaseClassVoidWhenMatcherClasses(w, tArgs, model.Parameters);
+			RenderBaseClassVoidWhenChain(w, fullInterceptorClassName, model.Parameters, delegateType, tArgs, model.UsesTupleCallDelegate);
 		}
 	}
 
-	// --- Base class abstract overrides ---
+	// --- MethodInterceptorRuntime abstract overrides ---
 
-	private static void RenderBaseClassInvokeDelegate(CodeWriter w, string delegateType, string tArgs, string returnType, EquatableArray<ParameterModel> parameters)
+	/// <summary>
+	/// Renders the InvokeDelegate override for MethodInterceptorRuntime.
+	/// Casts the Delegate and object? args to typed forms, invokes, returns boxed result.
+	/// For async methods, the delegate is always the full async type (simplified callbacks are wrapped at registration).
+	/// </summary>
+	private static void RenderBaseClassInvokeDelegate(CodeWriter w, string delegateType, string tArgs, string returnType, EquatableArray<ParameterModel> parameters, bool usesTupleCallDelegate)
 	{
-		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs);
-		w.Line($"protected override {returnType} InvokeDelegate({delegateType} del, {tArgs} args) => del({callArgs});");
-	}
-
-	private static void RenderBaseClassInvokeVoidDelegate(CodeWriter w, string delegateType, string tArgs, EquatableArray<ParameterModel> parameters)
-	{
-		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs);
-		w.Line($"protected override void InvokeVoidDelegate({delegateType} del, {tArgs} args) => del({callArgs});");
-	}
-
-	private static void RenderBaseClassCreateValueDelegate(CodeWriter w, string delegateType, string returnType, EquatableArray<ParameterModel> parameters)
-	{
-		var discards = BuildDiscardLambdaPrefix(parameters.Count);
-		w.Line($"protected override {delegateType} CreateValueDelegate({returnType} value) => {discards} => value;");
-	}
-
-	private static void RenderBaseClassRecordArgs(CodeWriter w, string tArgs, EquatableArray<ParameterModel> trackableParams)
-	{
-		if (trackableParams.Count == 0)
+		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs, usesTupleCallDelegate);
+		// Args unpacking: cast object? to the TArgs type
+		var argsCast = BuildArgsCast(parameters, tArgs);
+		w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args)");
+		using (w.Braces())
 		{
-			// No args to record, but we need the override
-			w.Line($"protected override void RecordArgs({tArgs} args, MethodCallBuilderBase tracking) {{ }}");
-		}
-		else
-		{
-			w.Line($"protected override void RecordArgs({tArgs} args, MethodCallBuilderBase tracking)");
-			using (w.Braces())
-			{
-				w.Line("if (tracking is MethodCallBuilderImpl impl) impl.RecordArg(args);");
-			}
-		}
-	}
-
-	private static void RenderBaseClassRecordUnconfiguredArgs(CodeWriter w, string tArgs, string? lastArgType, string? lastArgsType, EquatableArray<ParameterModel> trackableParams)
-	{
-		if (lastArgType != null && trackableParams.Count == 1)
-		{
-			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) => _unconfiguredLastArg = args;");
-		}
-		else if (lastArgsType != null && trackableParams.Count > 1)
-		{
-			// Multi-param: store as nullable tuple
-			var tupleParts = string.Join(", ", trackableParams.Select(p => $"args.{p.EscapedName}"));
-			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) => _unconfiguredLastArgs = ({tupleParts});");
-		}
-		else
-		{
-			// 0 params
-			w.Line($"protected override void RecordUnconfiguredArgs({tArgs} args) {{ }}");
+			if (parameters.Count > 0)
+				w.Line($"{argsCast}");
+			w.Line($"return (({delegateType})del)({callArgs});");
 		}
 	}
 
 	/// <summary>
-	/// Builds the delegate call args from TArgs. For single param: "args", for multi-param: "args.a, args.b".
+	/// Renders the InvokeVoidDelegate override for MethodInterceptorRuntime.
+	/// For async void (Task/ValueTask), the delegate returns Task/ValueTask but we treat it as void invocation.
 	/// </summary>
-	private static string BuildBaseClassDelegateCallArgs(EquatableArray<ParameterModel> parameters, string tArgs)
+	private static void RenderBaseClassInvokeVoidDelegate(CodeWriter w, string delegateType, string tArgs, EquatableArray<ParameterModel> parameters, bool usesTupleCallDelegate)
+	{
+		var callArgs = BuildBaseClassDelegateCallArgs(parameters, tArgs, usesTupleCallDelegate);
+		var argsCast = BuildArgsCast(parameters, tArgs);
+		w.Line("protected override void InvokeVoidDelegate(global::System.Delegate del, object? args)");
+		using (w.Braces())
+		{
+			if (parameters.Count > 0)
+				w.Line($"{argsCast}");
+			w.Line($"(({delegateType})del)({callArgs});");
+		}
+	}
+
+	/// <summary>
+	/// Renders the CreateValueDelegate override for MethodInterceptorRuntime.
+	/// Returns a Delegate (typed as the full delegate type) that ignores args and returns the value.
+	/// </summary>
+	private static void RenderBaseClassCreateValueDelegate(CodeWriter w, string delegateType, string returnType, EquatableArray<ParameterModel> parameters, bool usesTupleCallDelegate)
+	{
+		var hasRefOrOut = parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+		if (hasRefOrOut)
+		{
+			// ref/out methods can't have value overloads, so CreateValueDelegate should never be called.
+			// Provide an override that throws to satisfy the abstract requirement.
+			w.Line("protected override global::System.Delegate CreateValueDelegate(object? value) => throw new global::System.NotSupportedException(\"Value delegates not supported for ref/out methods.\");");
+		}
+		else
+		{
+			var discards = BuildDiscardLambdaPrefix(parameters.Count, isTupleDelegate: usesTupleCallDelegate);
+			w.Line($"protected override global::System.Delegate CreateValueDelegate(object? value) => ({delegateType})({discards} => ({returnType})value!);");
+		}
+	}
+
+	/// <summary>
+	/// Renders the RecordArgs override for MethodInterceptorRuntime.
+	/// Casts object? args to typed form and records on the typed builder.
+	/// </summary>
+	private static void RenderBaseClassRecordArgs(CodeWriter w, string tArgs, EquatableArray<ParameterModel> trackableParams, EquatableArray<ParameterModel> parameters)
+	{
+		if (trackableParams.Count == 0)
+		{
+			// No args to record, but we need the override
+			w.Line("protected override void RecordArgs(object? args, MethodCallBuilderBase tracking) { }");
+		}
+		else
+		{
+			w.Line("protected override void RecordArgs(object? args, MethodCallBuilderBase tracking)");
+			using (w.Braces())
+			{
+				var argsCast = BuildArgsCastForRecord(parameters, tArgs);
+				w.Line($"if (tracking is MethodCallBuilderImpl impl) impl.RecordArg({argsCast});");
+			}
+		}
+	}
+
+	/// <summary>
+	/// Renders the RecordUnconfiguredArgs override for MethodInterceptorRuntime.
+	/// </summary>
+	private static void RenderBaseClassRecordUnconfiguredArgs(CodeWriter w, string tArgs, string? lastArgType, string? lastArgsType, EquatableArray<ParameterModel> trackableParams, EquatableArray<ParameterModel> parameters)
+	{
+		if (lastArgType != null && trackableParams.Count == 1)
+		{
+			if (parameters.Count == 1)
+			{
+				// Single param total: cast directly
+				w.Line($"protected override void RecordUnconfiguredArgs(object? args) => _unconfiguredLastArg = ({parameters.GetArray()![0].Type})args!;");
+			}
+			else
+			{
+				// Multiple total params but only 1 trackable (others are out/ref): extract from tuple
+				var trackable = trackableParams.GetArray()![0];
+				w.Line($"protected override void RecordUnconfiguredArgs(object? args) => _unconfiguredLastArg = (({tArgs})args!).{trackable.EscapedName};");
+			}
+		}
+		else if (lastArgsType != null && trackableParams.Count > 1)
+		{
+			// Multi-param: cast to tuple, then extract fields
+			w.Line($"protected override void RecordUnconfiguredArgs(object? args)");
+			using (w.Braces())
+			{
+				w.Line($"var typedArgs = ({tArgs})args!;");
+				var tupleParts = string.Join(", ", trackableParams.Select(p => $"typedArgs.{p.EscapedName}"));
+				w.Line($"_unconfiguredLastArgs = ({tupleParts});");
+			}
+		}
+		else
+		{
+			// 0 params
+			w.Line("protected override void RecordUnconfiguredArgs(object? args) { }");
+		}
+	}
+
+	/// <summary>
+	/// Builds an args cast statement from object? to the typed TArgs form.
+	/// For 0 params: no cast needed (args is Unit/default).
+	/// For 1 param: "var typedArgs = (int)args!;"
+	/// For 2+ params: "var typedArgs = ((int a, string b))args!;"
+	/// </summary>
+	private static string BuildArgsCast(EquatableArray<ParameterModel> parameters, string tArgs)
+	{
+		if (parameters.Count == 0)
+			return "";
+		return $"var typedArgs = ({tArgs})args!;";
+	}
+
+	/// <summary>
+	/// Builds the args cast expression for RecordArg. Returns the expression to pass to RecordArg.
+	/// </summary>
+	private static string BuildArgsCastForRecord(EquatableArray<ParameterModel> parameters, string tArgs)
+	{
+		if (parameters.Count == 0) return "default";
+		if (parameters.Count == 1) return $"({parameters.GetArray()![0].Type})args!";
+		return $"({tArgs})args!";
+	}
+
+	/// <summary>
+	/// Builds the delegate call args for InvokeDelegate/InvokeVoidDelegate.
+	/// Uses "typedArgs" variable from BuildArgsCast.
+	/// For 0 params: "", for 1 param: "typedArgs",
+	/// for 2+ params without ref/out: "typedArgs" (tuple passed as single arg to Func/Action),
+	/// for 2+ params with ref/out: "typedArgs.a, typedArgs.b" (unpacked for custom delegate).
+	/// </summary>
+	/// <summary>
+	/// Builds the arguments for invoking the stored delegate from InvokeDelegate/InvokeVoidDelegate.
+	/// For tuple delegates (2+ params, no ref/out, non-delegate stubs): passes typedArgs as single tuple.
+	/// For individual-param delegates (ref/out, delegate stubs, 0-1 params): unpacks tuple fields.
+	/// </summary>
+	private static string BuildBaseClassDelegateCallArgs(EquatableArray<ParameterModel> parameters, string tArgs, bool usesTupleCallDelegate)
 	{
 		if (parameters.Count == 0)
 			return ""; // Action with no params -- delegate takes no args
+		// Only add ref/out prefix (not "in " -- delegates don't use "in" modifier)
+		static string GetDelegateRefPrefix(ParameterModel p)
+		{
+			return p.RefKind switch
+			{
+				Microsoft.CodeAnalysis.RefKind.Ref => "ref ",
+				Microsoft.CodeAnalysis.RefKind.Out => "out ",
+				_ => "" // "in" and none both pass by value to delegate
+			};
+		}
 		if (parameters.Count == 1)
-			return "args";
-		return string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+		{
+			var p = parameters.GetArray()![0];
+			return $"{GetDelegateRefPrefix(p)}typedArgs";
+		}
+		// For 2+ params, check if it's a tuple delegate or individual-param delegate
+		if (usesTupleCallDelegate)
+		{
+			// Func/Action with tuple param -- pass tuple directly
+			return "typedArgs";
+		}
+		// Individual-param delegate (ref/out, or delegate stubs) -- unpack from tuple
+		return string.Join(", ", parameters.Select(p => $"{GetDelegateRefPrefix(p)}typedArgs.{p.EscapedName}"));
 	}
 
 	// --- Unconfigured arg fields and LastArg/LastArgs properties ---
@@ -610,8 +750,8 @@ internal static class MethodInterceptorRenderer
 	{
 		// Manual cast approach for LastArg/LastArgs: FindLastArgInTracking doesn't work for value types
 		// because TResult? doesn't become Nullable<T> without a struct constraint.
-		// Non-void interceptors check _returnValueTracking first (from MethodInterceptorBase).
-		// Void interceptors only have _callTracking and _sequence (from VoidMethodInterceptorBase).
+		// Non-void interceptors check _returnValueTracking first.
+		// Void interceptors only have _callTracking and _sequence.
 
 		if (lastArgType != null && trackableParams.Count == 1)
 		{
@@ -659,52 +799,103 @@ internal static class MethodInterceptorRenderer
 		}
 	}
 
-	// --- Return/Call entry points ---
+	// --- Call/Return entry points ---
 
+	/// <summary>
+	/// Renders Call/Return entry points for single-signature interceptors in base-class mode.
+	/// API: Call(callback) for ALL callbacks (void and non-void), Return(value) for values only.
+	/// For async methods (Task&lt;T&gt;/ValueTask&lt;T&gt;), also generates simplified Call overloads.
+	/// </summary>
 	private static void RenderBaseClassEntryPoints(
 		CodeWriter w,
 		UnifiedMethodInterceptorModel model,
 		string delegateType,
-		string fullInterceptorClassName)
+		string fullInterceptorClassName,
+		bool hasRefOrOut,
+		bool isAsyncWithInnerType,
+		bool isVoidAsync,
+		bool isAsyncTaskT,
+		bool isAsyncValueTaskT,
+		bool isVoidTask,
+		string innerType)
 	{
-		var entryPointName = model.IsVoid ? "Call" : "Return";
-		var hasValueOverload = !model.IsVoid;
+		var hasValueOverload = !model.IsVoid && !hasRefOrOut;
+		var isEffectivelyVoid = model.IsVoid && !isVoidAsync;
 
-		// Return(callback) / Call(callback)
-		w.Line($"/// <summary>Configures callback that repeats indefinitely. Returns builder for sequence chaining.</summary>");
-		w.Line($"public MethodCallBuilderImpl {entryPointName}({delegateType} callback)");
+		// Call(callback) - full signature callback, for ALL methods (void and non-void)
+		EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary);
+		w.Line($"public MethodCallBuilderImpl Call({delegateType} callback)");
 		using (w.Braces())
 		{
 			w.Line("var builder = new MethodCallBuilderImpl(this);");
-			if (model.IsVoid)
-				w.Line("SetupCallback(callback, builder);");
+			if (isEffectivelyVoid)
+				w.Line("SetupVoidCallback(callback, builder);");
 			else
 				w.Line("SetupReturnCallback(callback, builder);");
 			w.Line("return builder;");
 		}
 		w.Line();
 
-		// Return(value) for non-void
+		// Call(simplifiedCallback) - for Task<T>/ValueTask<T> methods: accepts Func<..., TInnerType>
+		if (isAsyncWithInnerType && !hasRefOrOut)
+		{
+			var simplifiedDelegateType = BuildSimplifiedDelegateType(model.Parameters, innerType);
+			EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, $"Result auto-wrapped in {(isAsyncTaskT ? "Task" : "ValueTask")}.");
+			w.Line($"public MethodCallBuilderImpl Call({simplifiedDelegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("var builder = new MethodCallBuilderImpl(this);");
+				var wrapExpr = BuildAsyncWrapExpression(model.Parameters, innerType, isAsyncTaskT);
+				w.Line($"SetupReturnCallback(({delegateType})({wrapExpr}), builder);");
+				w.Line("return builder;");
+			}
+			w.Line();
+		}
+
+		// Call(simplifiedVoidCallback) - for Task/ValueTask void methods: accepts Action<...>
+		if (isVoidAsync && !hasRefOrOut)
+		{
+			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
+			EmitCallXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary, $"{(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.");
+			w.Line($"public MethodCallBuilderImpl Call({voidDelegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("var builder = new MethodCallBuilderImpl(this);");
+				var wrapExpr = BuildVoidAsyncWrapExpression(model.Parameters, isVoidTask);
+				w.Line($"SetupReturnCallback(({delegateType})({wrapExpr}), builder);");
+				w.Line("return builder;");
+			}
+			w.Line();
+		}
+
+		// Return(value) for non-void (value only, never lambda)
 		if (hasValueOverload)
 		{
 			var (valueStorageType, _, _) = GetAsyncTypeInfo(model.ReturnType);
-			w.Line($"/// <summary>Configures return value that repeats indefinitely. Returns builder for sequence chaining.</summary>");
+			EmitReturnXmlDoc(w, model.MethodName, model.Parameters, model.XmlDocSummary);
 			w.Line($"public MethodCallBuilderImpl Return({valueStorageType} value)");
 			using (w.Braces())
 			{
 				w.Line("var builder = new MethodCallBuilderImpl(this);");
-				w.Line("SetupReturnValue(value, builder);");
+				if (isAsyncTaskT || isAsyncValueTaskT)
+				{
+					if (isAsyncTaskT)
+						w.Line("SetupReturnValue(global::System.Threading.Tasks.Task.FromResult(value), builder);");
+					else
+						w.Line($"SetupReturnValue(new global::System.Threading.Tasks.ValueTask<{innerType}>(value), builder);");
+				}
+				else
+					w.Line("SetupReturnValue(value, builder);");
 				w.Line("return builder;");
 			}
 			w.Line();
 
 			// Return(first, params rest) - creates sequence from multiple values
-			var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
 			w.Line($"/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>");
-			w.Line($"public ReturnMethodSequenceBase Return({valueStorageType} first, params {valueStorageType}[] rest)");
+			w.Line($"public MethodSequenceImpl Return({valueStorageType} first, params {valueStorageType}[] rest)");
 			using (w.Braces())
 			{
-				w.Line($"var builder = Return({discardPrefix} => first);");
+				w.Line("var builder = Return(first);");
 				w.Line("if (rest.Length == 0)");
 				using (w.Braces())
 				{
@@ -722,6 +913,70 @@ internal static class MethodInterceptorRenderer
 		}
 	}
 
+	/// <summary>
+	/// Builds the lambda expression to wrap a simplified async callback into the full async delegate.
+	/// For base-class mode: both full and simplified delegates use tuple for 2+ params, so wrapping is simple.
+	/// E.g., for 2+ params: "(args) =&gt; Task.FromResult(callback(args))"
+	/// E.g., for 1 param: "(int id) =&gt; Task.FromResult(callback(id))"
+	/// </summary>
+	private static string BuildAsyncWrapExpression(EquatableArray<ParameterModel> parameters, string innerType, bool isTaskT)
+	{
+		// Both the full delegate (Func<(tuple), Task<T>>) and simplified delegate (Func<(tuple), T>)
+		// use the same parameter shape, so the wrapping lambda just forwards:
+		var paramDecls = BuildLambdaParamDecls(parameters);
+		var callArgs = BuildLambdaCallArgs(parameters);
+		var wrapCall = isTaskT
+			? $"global::System.Threading.Tasks.Task.FromResult(callback({callArgs}))"
+			: $"new global::System.Threading.Tasks.ValueTask<{innerType}>(callback({callArgs}))";
+		return $"{paramDecls} => {wrapCall}";
+	}
+
+	/// <summary>
+	/// Builds the lambda expression to wrap a void async callback (Action) into Func&lt;Task&gt;/Func&lt;ValueTask&gt;.
+	/// For base-class mode: both full and simplified delegates use tuple for 2+ params.
+	/// </summary>
+	private static string BuildVoidAsyncWrapExpression(EquatableArray<ParameterModel> parameters, bool isVoidTask)
+	{
+		var paramDecls = BuildLambdaParamDecls(parameters);
+		var callArgs = BuildLambdaCallArgs(parameters);
+		var completedExpr = isVoidTask
+			? "global::System.Threading.Tasks.Task.CompletedTask"
+			: "default(global::System.Threading.Tasks.ValueTask)";
+		return $"{paramDecls} => {{ callback({callArgs}); return {completedExpr}; }}";
+	}
+
+	/// <summary>Builds individual parameter declarations matching the custom delegate signature (for ref/out or overload delegates): "()" for 0, "(int x)" for 1, "(int a, int b)" for 2+.</summary>
+	private static string BuildDelegateMatchingParamDecls(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "()";
+		var decls = string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}"));
+		return $"({decls})";
+	}
+
+	/// <summary>Builds individual call args matching custom delegate params: "" for 0, "x" for 1, "a, b" for 2+.</summary>
+	private static string BuildDelegateMatchingCallArgs(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		return string.Join(", ", parameters.Select(p => p.EscapedName));
+	}
+
+	/// <summary>Builds lambda parameter declarations: "()" for 0, "(int x)" for 1, "((int a, int b) args)" for 2+.</summary>
+	private static string BuildLambdaParamDecls(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "()";
+		if (parameters.Count == 1) return $"({parameters.GetArray()![0].Type} {parameters.GetArray()![0].EscapedName})";
+		var tArgs = ComputeTArgsType(parameters);
+		return $"({tArgs} args)";
+	}
+
+	/// <summary>Builds the call args to pass to callback: "" for 0, "x" for 1, "args" for 2+ (tuple passed as-is).</summary>
+	private static string BuildLambdaCallArgs(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		if (parameters.Count == 1) return parameters.GetArray()![0].EscapedName;
+		return "args";
+	}
+
 	// --- When entry points (base class mode) ---
 
 	private static void RenderBaseClassWhenEntryPoints(
@@ -729,18 +984,20 @@ internal static class MethodInterceptorRenderer
 		string interceptorClassName,
 		EquatableArray<ParameterModel> parameters,
 		string returnType,
-		string tArgs)
+		string tArgs,
+		string? methodName = null,
+		string? xmlDocSummary = null)
 	{
 		if (parameters.Count == 0) return;
 
 		var paramTypeList = BuildParamTypeList(parameters);
 
 		// When() value overload - exact value matching
-		w.Line($"/// <summary>Configures parameter-specific matching with exact values. Returns builder for Return().</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches exact values using Object.Equals. Returns builder for Return().");
 		w.Line($"public WhenBuilder When({paramTypeList})");
 		using (w.Braces())
 		{
-			w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+			w.Line("_whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
 			// Build predicate that bridges individual params to TArgs predicate
 			if (parameters.Count == 1)
 			{
@@ -756,31 +1013,17 @@ internal static class MethodInterceptorRenderer
 		}
 		w.Line();
 
-		// When() predicate overload
-		if (parameters.Count == 1)
+		// When() predicate overload - predicate uses same tuple shape as tArgs
 		{
-			var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
-			w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>");
+			var predicateType = BuildPredicateType(parameters);
+			EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches using predicate. Returns builder for Return().");
 			w.Line($"public WhenBuilder When({predicateType} predicate)");
 			using (w.Braces())
 			{
-				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
+				// No bridging needed - predicate already uses the same type as tArgs
+				// (single param: Func<T, bool> matches Func<TArgs, bool>; tuple: Func<(tuple), bool> matches)
 				w.Line("return new WhenBuilder(this, predicate);");
-			}
-			w.Line();
-		}
-		else
-		{
-			// Multi-param predicate: Func<T1, T2, bool> -> need to bridge to Func<TArgs, bool>
-			var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-			var predicateType = $"global::System.Func<{paramTypes}, bool>";
-			w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>");
-			w.Line($"public WhenBuilder When({predicateType} predicate)");
-			using (w.Braces())
-			{
-				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
-				var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-				w.Line($"return new WhenBuilder(this, (args) => predicate({tupleAccess}));");
 			}
 			w.Line();
 		}
@@ -791,18 +1034,20 @@ internal static class MethodInterceptorRenderer
 		string interceptorClassName,
 		EquatableArray<ParameterModel> parameters,
 		string delegateType,
-		string tArgs)
+		string tArgs,
+		string? methodName = null,
+		string? xmlDocSummary = null)
 	{
 		if (parameters.Count == 0) return;
 
 		var paramTypeList = BuildParamTypeList(parameters);
 
 		// When() value overload
-		w.Line($"/// <summary>Configures parameter-specific matching with exact values for void method. Returns chain directly.</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches exact values using Object.Equals. Returns chain directly.");
 		w.Line($"public VoidWhenChain When({paramTypeList})");
 		using (w.Braces())
 		{
-			w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+			w.Line("_whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
 			if (parameters.Count == 1)
 			{
 				var p = parameters.GetArray()![0];
@@ -818,32 +1063,16 @@ internal static class MethodInterceptorRenderer
 		}
 		w.Line();
 
-		// When() predicate overload
-		if (parameters.Count == 1)
+		// When() predicate overload - predicate uses same tuple shape as tArgs
 		{
-			var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
-			w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
+			var predicateType = BuildPredicateType(parameters);
+			EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches using predicate. Returns chain directly.");
 			w.Line($"public VoidWhenChain When({predicateType} predicate)");
 			using (w.Braces())
 			{
-				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+				w.Line("_whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
+				// No bridging needed - predicate already uses the same type as tArgs
 				w.Line("var matcher = new VoidWhenMatcherPredicateBase(predicate);");
-				w.Line("_whenChain.Add(matcher);");
-				w.Line("return new VoidWhenChain(this, matcher);");
-			}
-			w.Line();
-		}
-		else
-		{
-			var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-			var predicateType = $"global::System.Func<{paramTypes}, bool>";
-			w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
-			w.Line($"public VoidWhenChain When({predicateType} predicate)");
-			using (w.Braces())
-			{
-				w.Line("_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
-				var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-				w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => predicate({tupleAccess}));");
 				w.Line("_whenChain.Add(matcher);");
 				w.Line("return new VoidWhenChain(this, matcher);");
 			}
@@ -851,7 +1080,7 @@ internal static class MethodInterceptorRenderer
 		}
 	}
 
-	// --- Thin Invoke method (base class mode) ---
+	// --- Invoke method (MethodInterceptorRuntime mode) ---
 
 	private static void RenderBaseClassInvokeMethod(
 		CodeWriter w,
@@ -862,66 +1091,293 @@ internal static class MethodInterceptorRenderer
 		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
 		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = model.IsVoid ? "void" : model.ReturnType;
+		var hasRefOrOut = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+
+		// Check async info
+		var (_, isVoidTask, isVoidValueTask) = (false, false, false);
+		{
+			var vi = GetVoidAsyncInfo(model.ReturnType);
+			isVoidTask = vi.IsTask;
+			isVoidValueTask = vi.IsValueTask;
+		}
+		var isVoidAsync = isVoidTask || isVoidValueTask;
+		// For void async methods, the priority chain treats them as non-void (delegates return Task/ValueTask)
+		var useVoidPriorityChain = model.IsVoid && !isVoidAsync;
 
 		w.Line($"/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>");
 		w.Line($"internal {returnType} Invoke({invokeParams})");
 		using (w.Braces())
 		{
-			// Build the args value for the priority chain
-			string argsExpr;
-			if (model.Parameters.Count == 0)
-				argsExpr = "default";
-			else if (model.Parameters.Count == 1)
-				argsExpr = model.Parameters.GetArray()![0].EscapedName;
-			else
-				argsExpr = "(" + string.Join(", ", model.Parameters.Select(p => p.EscapedName)) + ")";
-
-			if (model.Parameters.Count > 1)
+			// Assign defaults to out parameters (they can't be read before assignment)
+			foreach (var p in model.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out))
 			{
-				w.Line($"var args = {argsExpr};");
-				argsExpr = "args";
+				w.Line($"{p.EscapedName} = default!;");
 			}
 
-			// Run priority chain
+			if (hasRefOrOut)
+			{
+				// Ref/out methods: inline the priority chain to invoke delegates directly with
+				// the original ref/out parameters. Boxing into object? would lose ref modifications.
+				// Note: ref/out methods never have When chains or Return(value) overloads.
+				var delegateType = model.CallDelegateType.TrimEnd('?');
+				var callbackArgs = BuildCallbackArgs(model.Parameters);
+
+				// Build boxed args for tracking only (RecordArgs/RecordUnconfiguredArgs)
+				string argsExpr;
+				if (model.Parameters.Count == 1)
+				{
+					argsExpr = model.Parameters.GetArray()![0].EscapedName;
+					w.Line($"object? __args = {argsExpr};");
+					argsExpr = "__args";
+				}
+				else
+				{
+					var tupleExpr = "(" + string.Join(", ", model.Parameters.Select(p => p.EscapedName)) + ")";
+					w.Line($"object __args = ({tArgs}){tupleExpr};");
+					argsExpr = "__args";
+				}
+
+				// Sequence (highest priority after When chain, which ref/out doesn't have)
+				w.Line("if (_sequence != null && _sequenceIndex < _sequence.Count)");
+				using (w.Braces())
+				{
+					w.Line("var (__callback, __tracking) = _sequence[_sequenceIndex];");
+					w.Line("__tracking.RecordCallBase();");
+					w.Line($"RecordArgs({argsExpr}, __tracking);");
+					w.Line("_sequenceIndex++;");
+					if (model.IsVoid)
+					{
+						w.Line($"(({delegateType})__callback)({callbackArgs});");
+						w.Line("return;");
+					}
+					else
+					{
+						w.Line($"return (({delegateType})__callback)({callbackArgs});");
+					}
+				}
+				w.Line();
+
+				// Callback
+				w.Line("if (_call != null && _callTracking != null)");
+				using (w.Braces())
+				{
+					w.Line("_callTracking.RecordCallBase();");
+					w.Line($"RecordArgs({argsExpr}, _callTracking);");
+					if (model.IsVoid)
+					{
+						w.Line($"(({delegateType})_call)({callbackArgs});");
+						w.Line("return;");
+					}
+					else
+					{
+						w.Line($"return (({delegateType})_call)({callbackArgs});");
+					}
+				}
+				w.Line();
+
+				// Unconfigured tail
+				w.Line("_unconfiguredCallCount++;");
+				w.Line($"RecordUnconfiguredArgs({argsExpr});");
+
+				// Sequence exhausted repeat
+				w.Line("if (_sequence != null && _sequenceIndex >= _sequence.Count)");
+				using (w.Braces())
+				{
+					w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.MethodName}\");");
+					w.Line("if (_repeatLastValue && _sequence.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line("var (__callback, __tracking) = _sequence[_sequence.Count - 1];");
+						w.Line("__tracking.RecordCallBase();");
+						w.Line($"RecordArgs({argsExpr}, __tracking);");
+						if (model.IsVoid)
+						{
+							w.Line($"(({delegateType})__callback)({callbackArgs});");
+							w.Line("return;");
+						}
+						else
+						{
+							w.Line($"return (({delegateType})__callback)({callbackArgs});");
+						}
+					}
+					// Exhausted, no repeat (ThenDefault or empty) -> fall through to default
+					if (model.IsVoid)
+						w.Line("return;");
+					else
+					{
+						var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
+						w.Line($"return {defaultExpr};");
+					}
+				}
+				w.Line();
+
+				// Final fallback: Stub Override > Source > Strict > Default
+				RenderInvokeFinalFallback(w, model, options);
+			}
+			else
+			{
+				// Non-ref/out methods: use the base class priority chain (boxed args)
+				// Build the args value for the priority chain (boxed as object?)
+				// Use __args prefix to avoid collision with parameter names
+				string argsExpr;
+				if (model.Parameters.Count == 0)
+					argsExpr = "null";
+				else if (model.Parameters.Count == 1)
+				{
+					// Box single param
+					argsExpr = model.Parameters.GetArray()![0].EscapedName;
+				}
+				else
+				{
+					// Create tuple and box
+					var tupleExpr = "(" + string.Join(", ", model.Parameters.Select(p => p.EscapedName)) + ")";
+					w.Line($"object __args = ({tArgs}){tupleExpr};");
+					argsExpr = "__args";
+				}
+
+				// For single params, create a local to avoid multiple boxing
+				if (model.Parameters.Count == 1)
+				{
+					w.Line($"object? __args = {argsExpr};");
+					argsExpr = "__args";
+				}
+
+				// Run priority chain (use __ prefix to avoid collision with out/ref parameter names)
+				if (useVoidPriorityChain)
+				{
+					w.Line($"if (RunVoidPriorityChain({argsExpr})) return;");
+				}
+				else
+				{
+					w.Line($"var (__handled, __result) = RunPriorityChain({argsExpr});");
+					w.Line($"if (__handled) return ({model.ReturnType})__result!;");
+				}
+
+				// Unconfigured tail
+				w.Line("_unconfiguredCallCount++;");
+				w.Line($"RecordUnconfiguredArgs({argsExpr});");
+
+				// Sequence exhausted repeat
+				if (useVoidPriorityChain)
+				{
+					w.Line($"if (HandleVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr})) return;");
+				}
+				else
+				{
+					w.Line($"var (__seqHandled, __seqResult) = HandleNonVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr});");
+					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? $"default({model.ReturnType})!" : model.DefaultExpression;
+					w.Line($"if (__seqHandled) return __seqResult is null ? {defaultExpr} : ({model.ReturnType})__seqResult;");
+				}
+
+				// Final fallback: Stub Override > Source > Strict > Default
+				RenderInvokeFinalFallback(w, model, options);
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the final fallback section of the Invoke method: Stub Override > Source > Strict > Default.
+	/// Shared between ref/out and non-ref/out paths.
+	/// </summary>
+	private static void RenderInvokeFinalFallback(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		InterceptorRenderOptions options)
+	{
+		if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
+		{
+			var stubOverrideCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+			var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
 			if (model.IsVoid)
 			{
-				w.Line($"if (RunVoidPriorityChain({argsExpr})) return;");
+				w.Line($"{methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
+				w.Line("return;");
 			}
 			else
 			{
-				w.Line($"var (handled, result) = RunPriorityChain({argsExpr});");
-				w.Line("if (handled) return result;");
+				w.Line($"return {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
+			}
+		}
+		else
+		{
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				w.Line("#pragma warning disable CS8601, SYSLIB0050");
+				var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				if (model.IsVoid)
+				{
+					w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+				}
+				else
+				{
+					w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+				}
+				w.Line("#pragma warning restore CS8601, SYSLIB0050");
 			}
 
-			// Unconfigured tail
+			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+			if (model.IsVoid)
+				w.Line("return;");
+			else if (model.ThrowsOnDefault)
+				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via Call or Return.\");");
+			else
+			{
+				var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
+				w.Line($"return {defaultExpr};");
+			}
+		}
+	}
+
+	/// <summary>
+	/// Renders InvokeRef method for ref return methods. Stores result in _refReturnBacking.
+	/// </summary>
+	private static void RenderBaseClassInvokeRefMethod(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		InterceptorRenderOptions options,
+		string tArgs)
+	{
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
+		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
+
+		w.Line($"/// <summary>Invokes and stores result for ref return. Called by explicit interface implementation.</summary>");
+		w.Line($"internal void InvokeRef({invokeParams})");
+		using (w.Braces())
+		{
+			string argsExpr;
+			if (model.Parameters.Count == 0)
+				argsExpr = "null";
+			else if (model.Parameters.Count == 1)
+			{
+				argsExpr = model.Parameters.GetArray()![0].EscapedName;
+				w.Line($"object? __args = {argsExpr};");
+				argsExpr = "__args";
+			}
+			else
+			{
+				var tupleExpr = "(" + string.Join(", ", model.Parameters.Select(p => p.EscapedName)) + ")";
+				w.Line($"object __args = ({tArgs}){tupleExpr};");
+				argsExpr = "__args";
+			}
+
+			w.Line($"var (__handled, __result) = RunPriorityChain({argsExpr});");
+			w.Line($"if (__handled) {{ _refReturnBacking = ({model.ReturnType})__result!; return; }}");
+
 			w.Line("_unconfiguredCallCount++;");
 			w.Line($"RecordUnconfiguredArgs({argsExpr});");
 
-			// Sequence exhausted repeat
-			if (model.IsVoid)
+			w.Line($"var (__seqHandled, __seqResult) = HandleNonVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr});");
 			{
-				w.Line($"if (HandleSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr})) return;");
-			}
-			else
-			{
-				w.Line($"var (seqHandled, seqResult) = HandleNonVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr});");
-				w.Line("if (seqHandled) return seqResult;");
+				var defaultExprRef = string.IsNullOrEmpty(model.DefaultExpression) ? $"default({model.ReturnType})!" : model.DefaultExpression;
+				w.Line($"if (__seqHandled) {{ _refReturnBacking = __seqResult is null ? {defaultExprRef} : ({model.ReturnType})__seqResult; return; }}");
 			}
 
-			// Final fallback: Stub Override > Source > Strict > Default
 			if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
 			{
 				var stubOverrideCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
-				if (model.IsVoid)
-				{
-					w.Line($"{methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
-					w.Line("return;");
-				}
-				else
-				{
-					w.Line($"return {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
-				}
+				w.Line($"_refReturnBacking = {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
 			}
 			else
 			{
@@ -929,27 +1385,12 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line("#pragma warning disable CS8601, SYSLIB0050");
 					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
-					if (model.IsVoid)
-					{
-						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
-					}
-					else
-					{
-						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
-					}
+					w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src.{model.MethodName}({sourceCallArgs}); return; }}");
 					w.Line("#pragma warning restore CS8601, SYSLIB0050");
 				}
-
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
-				if (model.IsVoid)
-					w.Line("return;");
-				else if (model.ThrowsOnDefault)
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via Return or Call.\");");
-				else
-				{
-					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
-					w.Line($"return {defaultExpr};");
-				}
+				var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
+				w.Line($"_refReturnBacking = {defaultExpr};");
 			}
 		}
 		w.Line();
@@ -1039,8 +1480,17 @@ internal static class MethodInterceptorRenderer
 			// RecordArg method
 			if (trackableParams.Count == 1)
 			{
-				var param = trackableParams.GetArray()![0];
-				w.Line($"public void RecordArg({tArgs} args) => _lastArg = args;");
+				var trackable = trackableParams.GetArray()![0];
+				if (model.Parameters.Count == 1)
+				{
+					// Single param total: args IS the value
+					w.Line($"public void RecordArg({tArgs} args) => _lastArg = args;");
+				}
+				else
+				{
+					// Multiple params (some out/ref): extract trackable field from tuple
+					w.Line($"public void RecordArg({tArgs} args) => _lastArg = args.{trackable.EscapedName};");
+				}
 			}
 			else if (trackableParams.Count > 1)
 			{
@@ -1064,37 +1514,46 @@ internal static class MethodInterceptorRenderer
 			w.Line($"/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>");
 			if (model.IsVoid)
 			{
-				w.Line($"public MethodSequenceBase {thenChainName}({delegateType} callback)");
+				w.Line($"public MethodSequenceImpl {thenChainName}({delegateType} callback)");
 				using (w.Braces())
 				{
-					w.Line("return ThenCallBase(callback);");
+					w.Line("ThenCallBase(callback);");
+					w.Line("return new MethodSequenceImpl(_typedInterceptor);");
 				}
 			}
 			else
 			{
-				w.Line($"public ReturnMethodSequenceBase {thenChainName}({delegateType} callback)");
+				w.Line($"public MethodSequenceImpl {thenChainName}({delegateType} callback)");
 				using (w.Braces())
 				{
-					w.Line("return ThenReturnBase(callback);");
+					w.Line("ThenReturnCallbackBase(callback);");
+					w.Line("return new MethodSequenceImpl(_typedInterceptor);");
 				}
 			}
 			w.Line();
 
-			// ThenReturn(value) for non-void
-			if (!model.IsVoid)
+			// ThenReturn(value) for non-void (skip for ref/out methods -- value overloads not supported)
+			var hasRefOrOutInBuilder = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+			if (!model.IsVoid && !hasRefOrOutInBuilder)
 			{
-				var (valueType, _, _) = GetAsyncTypeInfo(model.ReturnType);
-				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+				var (valueType, isTaskTBuilder, isValueTaskTBuilder) = GetAsyncTypeInfo(model.ReturnType);
+				var isAsyncBuilder = isTaskTBuilder || isValueTaskTBuilder;
+				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count, isTupleDelegate: model.UsesTupleCallDelegate);
 				w.Line($"/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>");
-				w.Line($"public ReturnMethodSequenceBase ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
+				if (isTaskTBuilder)
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
+				else if (isValueTaskTBuilder)
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
+				else
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
 				w.Line();
 
 				// ThenReturn(params values)
 				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
-				w.Line($"public ReturnMethodSequenceBase ThenReturn(params {valueType}[] values)");
+				w.Line($"public MethodSequenceImpl ThenReturn(params {valueType}[] values)");
 				using (w.Braces())
 				{
-					w.Line("if (values.Length == 0) { ElevateToSequenceBase(); return new ReturnMethodSequenceBase(_typedInterceptor, CreateNextReturnBuilder); }");
+					w.Line("if (values.Length == 0) { ElevateToSequenceBase(); return new MethodSequenceImpl(_typedInterceptor); }");
 					w.Line("var seq = ThenReturn(values[0]);");
 					w.Line("for (int i = 1; i < values.Length; i++) seq.ThenReturn(values[i]);");
 					w.Line("return seq;");
@@ -1201,17 +1660,23 @@ internal static class MethodInterceptorRenderer
 			}
 			else
 			{
-				w.Line($"public MethodSequenceImpl ThenReturn({delegateType} callback) {{ ThenReturnBase(callback); return this; }}");
+				w.Line($"public MethodSequenceImpl ThenReturn({delegateType} callback) {{ ThenReturnCallbackBase(callback); return this; }}");
 			}
 			w.Line();
 
-			// ThenReturn(value) for non-void
-			if (!model.IsVoid)
+			// ThenReturn(value) for non-void (skip for ref/out methods)
+			var hasRefOrOutInSeq = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+			if (!model.IsVoid && !hasRefOrOutInSeq)
 			{
-				var (valueType, _, _) = GetAsyncTypeInfo(model.ReturnType);
-				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+				var (valueType, isTaskTSeq, isValueTaskTSeq) = GetAsyncTypeInfo(model.ReturnType);
+				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count, isTupleDelegate: model.UsesTupleCallDelegate);
 				w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
-				w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
+				if (isTaskTSeq)
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
+				else if (isValueTaskTSeq)
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
+				else
+					w.Line($"public MethodSequenceImpl ThenReturn({valueType} value) => ThenReturn({discardPrefix} => value);");
 				w.Line();
 
 				// ThenReturn(params values)
@@ -1259,6 +1724,71 @@ internal static class MethodInterceptorRenderer
 
 	// --- Thin WhenBuilder/WhenChain/VoidWhenChain (base class mode) ---
 
+	/// <summary>
+	/// Renders concrete WhenMatcherBase subclasses for non-void When chains.
+	/// WhenMatcherPredicateValueBase: predicate-based matcher with stored return value.
+	/// WhenMatcherTerminalCallbackBase: terminal always-matching callback matcher.
+	/// WhenMatcherNoneBase: terminal no-op matcher for ThenNone().
+	/// </summary>
+	private static void RenderBaseClassNonVoidWhenMatcherClasses(
+		CodeWriter w,
+		string tArgs,
+		EquatableArray<ParameterModel> parameters,
+		string returnType)
+	{
+		// WhenMatcherPredicateValueBase - predicate matcher with stored return value
+		w.Line("/// <summary>Predicate-based When matcher that returns a stored value.</summary>");
+		w.Line($"private sealed class WhenMatcherPredicateValueBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<{tArgs}, bool> _predicate;");
+			w.Line("private readonly object? _value;");
+			w.Line();
+			w.Line($"public WhenMatcherPredicateValueBase(global::System.Func<{tArgs}, bool> predicate, object? value) {{ _predicate = predicate; _value = value; }}");
+			w.Line();
+			// Matches
+			if (parameters.Count == 0)
+				w.Line("public override bool Matches(object? args) => _predicate(default);");
+			else
+				w.Line($"public override bool Matches(object? args) => _predicate(({tArgs})args!);");
+			// Execute (void - no-op for non-void matchers)
+			w.Line("public override void Execute(object? args) { }");
+			// ExecuteReturn
+			w.Line("public override object? ExecuteReturn(object? args) => _value;");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// WhenMatcherTerminalCallbackBase - terminal always-matching callback matcher
+		// Uses Func<object?, object?> to store a boxed-args-to-boxed-result wrapper
+		w.Line("/// <summary>Terminal always-matching callback matcher for non-void When chains.</summary>");
+		w.Line($"private sealed class WhenMatcherTerminalCallbackBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<object?, object?> _callback;");
+			w.Line();
+			w.Line($"public WhenMatcherTerminalCallbackBase(global::System.Func<object?, object?> callback) {{ _callback = callback; }}");
+			w.Line();
+			w.Line("public override bool Matches(object? args) => true;");
+			w.Line("public override void Execute(object? args) { }");
+			w.Line("public override object? ExecuteReturn(object? args) => _callback(args);");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+
+		// WhenMatcherNoneBase - terminal no-op matcher for ThenNone()
+		w.Line("/// <summary>Terminal no-op matcher for ThenNone() on non-void When chains.</summary>");
+		w.Line($"private sealed class WhenMatcherNoneBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line("public override bool Matches(object? args) => false;");
+			w.Line("public override void Execute(object? args) { }");
+			w.Line("public override object? ExecuteReturn(object? args) => null;");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
 	private static void RenderBaseClassWhenBuilder(
 		CodeWriter w,
 		string interceptorClassName,
@@ -1274,10 +1804,17 @@ internal static class MethodInterceptorRenderer
 		w.Line($"public sealed class WhenBuilder : WhenBuilderBase");
 		using (w.Braces())
 		{
-			w.Line($"public WhenBuilder({interceptorClassName} interceptor, global::System.Func<{tArgs}, bool> predicate) : base(interceptor, predicate) {{ }}");
+			// Store typed predicate as a field (not passed to base)
+			w.Line($"private readonly global::System.Func<{tArgs}, bool> _predicate;");
+			w.Line();
+			w.Line($"public WhenBuilder({interceptorClassName} interceptor, global::System.Func<{tArgs}, bool> predicate) : base(interceptor)");
+			using (w.Braces())
+			{
+				w.Line("_predicate = predicate;");
+			}
 			w.Line();
 
-			// Return(value) - calls ReturnBase which handles the When chain
+			// Return(value) - creates a WhenMatcherPredicateValueBase and calls AddValueMatcher
 			if (isAsync)
 			{
 				// Async: Return accepts unwrapped type and wraps
@@ -1286,18 +1823,19 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					if (isTaskT)
-						w.Line($"ReturnBase(global::System.Threading.Tasks.Task.FromResult(value));");
+						w.Line($"AddValueMatcher(new WhenMatcherPredicateValueBase(_predicate, global::System.Threading.Tasks.Task.FromResult(value)));");
 					else
-						w.Line($"ReturnBase(new global::System.Threading.Tasks.ValueTask<{innerType}>(value));");
+						w.Line($"AddValueMatcher(new WhenMatcherPredicateValueBase(_predicate, new global::System.Threading.Tasks.ValueTask<{innerType}>(value)));");
 					w.Line($"return new WhenChain(({interceptorClassName})_interceptor);");
 				}
 			}
 			else
 			{
+				w.Line($"/// <summary>Configures the return value when predicate matches.</summary>");
 				w.Line($"public WhenChain Return({returnType} value)");
 				using (w.Braces())
 				{
-					w.Line("ReturnBase(value);");
+					w.Line("AddValueMatcher(new WhenMatcherPredicateValueBase(_predicate, value));");
 					w.Line($"return new WhenChain(({interceptorClassName})_interceptor);");
 				}
 			}
@@ -1311,7 +1849,8 @@ internal static class MethodInterceptorRenderer
 		EquatableArray<ParameterModel> parameters,
 		string returnType,
 		string delegateType,
-		string tArgs)
+		string tArgs,
+		bool usesTupleCallDelegate)
 	{
 		var paramTypeList = BuildParamTypeList(parameters);
 
@@ -1348,54 +1887,48 @@ internal static class MethodInterceptorRenderer
 				}
 				w.Line();
 
-				// ThenWhen with predicate
-				if (parameters.Count == 1)
+				// ThenWhen with predicate - predicate already uses same type as TArgs (tuple for 2+), no bridging needed
 				{
-					var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+					var predicateType = BuildPredicateType(parameters);
 					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
 					w.Line($"public WhenBuilder ThenWhen({predicateType} predicate) => new WhenBuilder(_typedInterceptor, predicate);");
 					w.Line();
 				}
-				else
-				{
-					var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-					var predicateType = $"global::System.Func<{paramTypes}, bool>";
-					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
-					w.Line($"public WhenBuilder ThenWhen({predicateType} predicate)");
-					using (w.Braces())
-					{
-						var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-						w.Line($"return new WhenBuilder(_typedInterceptor, (args) => predicate({tupleAccess}));");
-					}
-					w.Line();
-				}
 			}
 
-			// ThenCall - terminal with callback
+			// ThenCall - terminal with callback (creates WhenMatcherTerminalCallbackBase)
+			// The callback (delegateType) returns a typed value; we wrap it in Func<object?, object?> for the matcher
 			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
 			w.Line($"public WhenChain ThenCall({delegateType} callback)");
 			using (w.Braces())
 			{
-				if (parameters.Count == 1)
+				if (parameters.Count == 0)
 				{
-					w.Line("ThenCallBase((args) => callback(args));");
+					w.Line("AddTerminalCallbackMatcher(new WhenMatcherTerminalCallbackBase((object? args) => (object?)callback()));");
 				}
-				else if (parameters.Count == 0)
+				else if (parameters.Count == 1)
 				{
-					w.Line("ThenCallBase((args) => callback());");
+					var p = parameters.GetArray()![0];
+					w.Line($"AddTerminalCallbackMatcher(new WhenMatcherTerminalCallbackBase((object? args) => (object?)callback(({p.Type})args!)));");
+				}
+				else if (usesTupleCallDelegate)
+				{
+					// 2+ params with tuple delegate: callback takes tuple, args is boxed tuple -- cast and pass directly
+					w.Line($"AddTerminalCallbackMatcher(new WhenMatcherTerminalCallbackBase((object? args) => (object?)callback(({tArgs})args!)));");
 				}
 				else
 				{
-					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-					w.Line($"ThenCallBase((args) => callback({callArgs}));");
+					// 2+ params with individual-param delegate (delegate stubs): unpack tuple fields
+					var unpackedArgs = string.Join(", ", parameters.Select(p => $"typedArgs.{p.EscapedName}"));
+					w.Line($"AddTerminalCallbackMatcher(new WhenMatcherTerminalCallbackBase((object? args) => {{ var typedArgs = ({tArgs})args!; return (object?)callback({unpackedArgs}); }}));");
 				}
 				w.Line("return this;");
 			}
 			w.Line();
 
-			// ThenNone
+			// ThenNone - terminal no-op matcher
 			w.Line($"/// <summary>Closes chain with no matcher.</summary>");
-			w.Line("public new WhenChain ThenNone() { base.ThenNone(); return this; }");
+			w.Line("public WhenChain ThenNone() { AddNoneMatcher(new WhenMatcherNoneBase()); return this; }");
 			w.Line();
 
 			// Verifiable
@@ -1405,12 +1938,82 @@ internal static class MethodInterceptorRenderer
 		w.Line();
 	}
 
+	/// <summary>
+	/// Renders concrete WhenMatcherBase subclasses for void When chains.
+	/// VoidWhenMatcherPredicateBase: predicate-based matcher with optional callback.
+	/// VoidWhenMatcherCallBase: terminal always-matching callback matcher.
+	/// </summary>
+	private static void RenderBaseClassVoidWhenMatcherClasses(CodeWriter w, string tArgs, EquatableArray<ParameterModel> parameters)
+	{
+		// VoidWhenMatcherPredicateBase - predicate matcher for void methods
+		w.Line("/// <summary>Predicate-based When matcher for void methods.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherPredicateBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<{tArgs}, bool> _predicate;");
+			w.Line($"private global::System.Action<{tArgs}>? _callback;");
+			w.Line();
+			w.Line($"public VoidWhenMatcherPredicateBase(global::System.Func<{tArgs}, bool> predicate) {{ _predicate = predicate; }}");
+			w.Line();
+			w.Line($"public void SetCallback(global::System.Action<{tArgs}> callback) {{ _callback = callback; }}");
+			w.Line();
+			// Matches: cast args to TArgs, invoke predicate
+			if (parameters.Count == 0)
+				w.Line("public override bool Matches(object? args) => _predicate(default);");
+			else if (parameters.Count == 1)
+				w.Line($"public override bool Matches(object? args) => _predicate(({tArgs})args!);");
+			else
+				w.Line($"public override bool Matches(object? args) => _predicate(({tArgs})args!);");
+			// Execute: invoke callback if set
+			if (parameters.Count == 0)
+				w.Line("public override void Execute(object? args) { _callback?.Invoke(default); }");
+			else
+				w.Line($"public override void Execute(object? args) {{ _callback?.Invoke(({tArgs})args!); }}");
+			// ExecuteReturn: void matcher, return null
+			w.Line("public override object? ExecuteReturn(object? args) { Execute(args); return null; }");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// VoidWhenMatcherCallBase - terminal always-matching callback matcher
+		w.Line("/// <summary>Terminal always-matching callback matcher for void methods.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherCallBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Action<{tArgs}> _callback;");
+			w.Line();
+			w.Line($"public VoidWhenMatcherCallBase(global::System.Action<{tArgs}> callback) {{ _callback = callback; }}");
+			w.Line();
+			w.Line("public override bool Matches(object? args) => true;");
+			if (parameters.Count == 0)
+				w.Line("public override void Execute(object? args) { _callback(default); }");
+			else
+				w.Line($"public override void Execute(object? args) {{ _callback(({tArgs})args!); }}");
+			w.Line("public override object? ExecuteReturn(object? args) { Execute(args); return null; }");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+
+		// VoidWhenMatcherNoneBase - terminal no-op matcher for ThenNone()
+		w.Line("/// <summary>Terminal no-op matcher for ThenNone() on void When chains.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherNoneBase : WhenMatcherBase");
+		using (w.Braces())
+		{
+			w.Line("public override bool Matches(object? args) => false;");
+			w.Line("public override void Execute(object? args) { }");
+			w.Line("public override object? ExecuteReturn(object? args) => null;");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
 	private static void RenderBaseClassVoidWhenChain(
 		CodeWriter w,
 		string interceptorClassName,
 		EquatableArray<ParameterModel> parameters,
 		string delegateType,
-		string tArgs)
+		string tArgs,
+		bool usesTupleCallDelegate)
 	{
 		var paramTypeList = BuildParamTypeList(parameters);
 
@@ -1422,7 +2025,7 @@ internal static class MethodInterceptorRenderer
 			w.Line("private readonly VoidWhenMatcherPredicateBase? _typedMatcher;");
 			w.Line();
 
-			w.Line($"public VoidWhenChain({interceptorClassName} interceptor, VoidWhenMatcherBase matcher) : base(interceptor, matcher)");
+			w.Line($"public VoidWhenChain({interceptorClassName} interceptor, WhenMatcherBase matcher) : base(interceptor, matcher)");
 			using (w.Braces())
 			{
 				w.Line("_typedInterceptor = interceptor;");
@@ -1431,22 +2034,29 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 
 			// Call - sets callback on current matcher
+			// For 0 params: bridge Action to Action<TArgs> (wrap with unused param)
+			// For 1 param: callback type matches SetCallback type directly
+			// For 2+ params with tuple delegate: callback type matches SetCallback type
+			// For 2+ params with individual-param delegate (delegate stubs): bridge needed
 			w.Line($"/// <summary>Sets an optional callback to invoke when this matcher matches.</summary>");
 			w.Line($"public VoidWhenChain Call({delegateType} callback)");
 			using (w.Braces())
 			{
-				if (parameters.Count == 1)
-				{
-					w.Line("_typedMatcher?.SetCallback(callback);");
-				}
-				else if (parameters.Count == 0)
+				if (parameters.Count == 0)
 				{
 					w.Line("_typedMatcher?.SetCallback((_) => callback());");
 				}
+				else if (parameters.Count == 1 || usesTupleCallDelegate)
+				{
+					// For 1 param: Action<T> matches Action<TArgs>
+					// For 2+ params with tuple delegate: Action<(tuple)> matches Action<TArgs>
+					w.Line("_typedMatcher?.SetCallback(callback);");
+				}
 				else
 				{
-					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-					w.Line($"_typedMatcher?.SetCallback((args) => callback({callArgs}));");
+					// For 2+ params with individual-param delegate: bridge to tuple
+					var unpackedCallParams = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+					w.Line($"_typedMatcher?.SetCallback((args) => callback({unpackedCallParams}));");
 				}
 				w.Line("return this;");
 			}
@@ -1459,7 +2069,7 @@ internal static class MethodInterceptorRenderer
 				w.Line($"public VoidWhenChain ThenWhen({paramTypeList})");
 				using (w.Braces())
 				{
-					w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+					w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
 					if (parameters.Count == 1)
 					{
 						var p = parameters.GetArray()![0];
@@ -1475,32 +2085,15 @@ internal static class MethodInterceptorRenderer
 				}
 				w.Line();
 
-				// ThenWhen with predicate
-				if (parameters.Count == 1)
+				// ThenWhen with predicate - predicate already uses same type as TArgs, no bridging needed
 				{
-					var predicateType = $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+					var predicateType = BuildPredicateType(parameters);
 					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
 					w.Line($"public VoidWhenChain ThenWhen({predicateType} predicate)");
 					using (w.Braces())
 					{
-						w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
+						w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
 						w.Line("var matcher = new VoidWhenMatcherPredicateBase(predicate);");
-						w.Line("_typedInterceptor._whenChain.Add(matcher);");
-						w.Line("return new VoidWhenChain(_typedInterceptor, matcher);");
-					}
-					w.Line();
-				}
-				else
-				{
-					var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-					var predicateType = $"global::System.Func<{paramTypes}, bool>";
-					w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
-					w.Line($"public VoidWhenChain ThenWhen({predicateType} predicate)");
-					using (w.Braces())
-					{
-						w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
-						var tupleAccess = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-						w.Line($"var matcher = new VoidWhenMatcherPredicateBase((args) => predicate({tupleAccess}));");
 						w.Line("_typedInterceptor._whenChain.Add(matcher);");
 						w.Line("return new VoidWhenChain(_typedInterceptor, matcher);");
 					}
@@ -1509,31 +2102,36 @@ internal static class MethodInterceptorRenderer
 			}
 
 			// ThenCall - terminal with callback
+			// For 0 params: bridge Action to Action<TArgs>
+			// For 1+ params: callback type matches VoidWhenMatcherCallBase ctor (both Action<TArgs>)
 			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
 			w.Line($"public VoidWhenChain ThenCall({delegateType} callback)");
 			using (w.Braces())
 			{
-				w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcherBase>();");
-				if (parameters.Count == 1)
-				{
-					w.Line("_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase(callback));");
-				}
-				else if (parameters.Count == 0)
+				w.Line("_typedInterceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcherBase>();");
+				if (parameters.Count == 0)
 				{
 					w.Line("_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase((_) => callback()));");
 				}
+				else if (parameters.Count == 1 || usesTupleCallDelegate)
+				{
+					// For 1 param: Action<T> matches ctor's Action<TArgs>
+					// For 2+ params with tuple delegate: Action<(tuple)> matches ctor's Action<TArgs>
+					w.Line("_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase(callback));");
+				}
 				else
 				{
-					var callArgs = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
-					w.Line($"_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase((args) => callback({callArgs})));");
+					// For 2+ params with individual-param delegate: bridge to tuple
+					var unpackedThenCallParams = string.Join(", ", parameters.Select(p => $"args.{p.EscapedName}"));
+					w.Line($"_typedInterceptor._whenChain.Add(new VoidWhenMatcherCallBase((args) => callback({unpackedThenCallParams})));");
 				}
 				w.Line("return this;");
 			}
 			w.Line();
 
-			// ThenNone
+			// ThenNone - terminal no-op matcher for void methods
 			w.Line("/// <summary>Closes chain with no matcher.</summary>");
-			w.Line("public new VoidWhenChain ThenNone() { base.ThenNone(); return this; }");
+			w.Line("public VoidWhenChain ThenNone() { AddTerminalMatcher(new VoidWhenMatcherNoneBase()); return this; }");
 			w.Line();
 
 			// Verifiable
@@ -1573,10 +2171,13 @@ internal static class MethodInterceptorRenderer
 		// Generate delegates and storage for each unique overload
 		foreach (var overload in model.Overloads)
 		{
-			// Delegate
-			w.Line($"/// <summary>Delegate for {model.MethodName}({GetParamTypeList(overload.Parameters)}).</summary>");
-			w.Line(overload.DelegateSignature);
-			w.Line();
+			// Delegate (only emit custom delegate declaration when needed; Func/Action don't need one)
+			if (overload.DelegateSignature != null)
+			{
+				w.Line($"/// <summary>Delegate for {model.MethodName}({GetParamTypeList(overload.Parameters)}).</summary>");
+				w.Line(overload.DelegateSignature);
+				w.Line();
+			}
 
 			// Callback storage
 			w.Line($"private {overload.DelegateName}? _call_{overload.SignatureSuffix};");
@@ -1603,6 +2204,17 @@ internal static class MethodInterceptorRenderer
 				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
 				w.Line($"private {voidDelegateType}? _callSimplifiedVoid_{overload.SignatureSuffix};");
 				w.Line($"private MethodCallBuilderImpl_{overload.SignatureSuffix}? _callSimplifiedVoidTracking_{overload.SignatureSuffix};");
+				w.Line();
+			}
+
+			// Value storage for Return(value) overload (skip for void/ref/out overloads)
+			var canHaveValueOverloadForThis = !overload.IsVoid && !hasRefOrOut;
+			if (canHaveValueOverloadForThis)
+			{
+				var (valueStorageType, _, _) = GetAsyncTypeInfo(overload.ReturnType);
+				w.Line($"private {valueStorageType} _returnValue_{overload.SignatureSuffix} = default!;");
+				w.Line($"private bool _hasReturnValue_{overload.SignatureSuffix};");
+				w.Line($"private MethodCallBuilderImpl_{overload.SignatureSuffix}? _returnValueTracking_{overload.SignatureSuffix};");
 				w.Line();
 			}
 
@@ -1644,7 +2256,7 @@ internal static class MethodInterceptorRenderer
 		// Skip Verifiable() for overload groups - they have per-signature verifiable fields
 		RenderInterceptorVerifyMethods(w, model.MethodName, isOverloadGroup: true);
 
-		// Return/Call overloads for each unique signature
+		// Call/Return overloads for each unique signature
 		foreach (var overload in model.Overloads)
 		{
 			// Determine async characteristics for this overload
@@ -1654,16 +2266,23 @@ internal static class MethodInterceptorRenderer
 			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 			var isVoidAsync = isVoidTask || isVoidValueTask;
 
-			// Return/Call - repeating callback
-			var overloadEntryPointName = overload.IsVoid ? "Call" : "Return";
-			w.Line($"/// <summary>Configures callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Return builder for sequence chaining.</summary>");
-			w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} {overloadEntryPointName}({overload.DelegateName} callback)");
+			// Call - repeating callback (always "Call" for overloads, regardless of void/non-void)
+			var canHaveValueOverloadForThis = !overload.IsVoid && !hasRefOrOut;
+			EmitCallXmlDoc(w, model.MethodName, overload.Parameters, overload.XmlDocSummary, "Returns builder for sequence chaining.");
+			w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Call({overload.DelegateName} callback)");
 			using (w.Braces())
 			{
 				w.Line($"_sequence_{overload.SignatureSuffix} = null;");
 				w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
 				w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
 				w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
+				// Clear value storage (Call replaces Return(value))
+				if (canHaveValueOverloadForThis)
+				{
+					w.Line($"_hasReturnValue_{overload.SignatureSuffix} = false;");
+					w.Line($"_returnValue_{overload.SignatureSuffix} = default!;");
+					w.Line($"_returnValueTracking_{overload.SignatureSuffix} = null;");
+				}
 				// Clear simplified callback storage (mutual exclusivity)
 				if (isAsyncWithInnerType && !hasRefOrOut)
 				{
@@ -1681,12 +2300,12 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Return(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> overloads
+			// Call(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> overloads
 			if (isAsyncWithInnerType && !hasRefOrOut)
 			{
 				var simplifiedDelegateType = BuildSimplifiedDelegateType(overload.Parameters, innerType);
-				w.Line($"/// <summary>Configures callback returning unwrapped value for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
-				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Return({simplifiedDelegateType} callback)");
+				EmitCallXmlDoc(w, model.MethodName, overload.Parameters, overload.XmlDocSummary, $"Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.");
+				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Call({simplifiedDelegateType} callback)");
 				using (w.Braces())
 				{
 					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -1704,12 +2323,12 @@ internal static class MethodInterceptorRenderer
 				w.Line();
 			}
 
-			// Return(Action<...>) - simplified void callback for Task/ValueTask overloads
+			// Call(Action<...>) - simplified void callback for Task/ValueTask overloads
 			if (isVoidAsync && !hasRefOrOut)
 			{
 				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
-				w.Line($"/// <summary>Configures callback action for {model.MethodName}({GetParamTypeList(overload.Parameters)}). {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
-				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Return({voidDelegateType} callback)");
+				EmitCallXmlDoc(w, model.MethodName, overload.Parameters, overload.XmlDocSummary, $"{(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.");
+				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Call({voidDelegateType} callback)");
 				using (w.Braces())
 				{
 					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -1729,6 +2348,71 @@ internal static class MethodInterceptorRenderer
 
 		}
 
+		// Return(value) methods for non-void overloads.
+		// Only generated when the return type is unique among non-void overloads (otherwise ambiguous).
+		// Normalize types by stripping trailing '?' for reference type nullability
+		// (C# treats T and T? as the same method signature for reference types).
+		var returnTypeOccurrences = new Dictionary<string, int>();
+		foreach (var overload in model.Overloads)
+		{
+			if (!overload.IsVoid && !HasRefOrOutParameters(overload.Parameters))
+			{
+				var (valueType, _, _) = GetAsyncTypeInfo(overload.ReturnType);
+				var normalizedType = valueType.TrimEnd('?');
+				returnTypeOccurrences.TryGetValue(normalizedType, out var count);
+				returnTypeOccurrences[normalizedType] = count + 1;
+			}
+		}
+		foreach (var overload in model.Overloads)
+		{
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			if (overload.IsVoid || hasRefOrOut) continue;
+
+			var (valueStorageType, valIsTaskT, valIsValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			// Skip if return type is not unique (ambiguous overload resolution)
+			var normalizedStorageType = valueStorageType.TrimEnd('?');
+			if (returnTypeOccurrences.TryGetValue(normalizedStorageType, out var occurrences) && occurrences > 1)
+				continue;
+
+			EmitReturnXmlDoc(w, model.MethodName, overload.Parameters, overload.XmlDocSummary, "Returns builder for sequence chaining.");
+			w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Return({valueStorageType} value)");
+			using (w.Braces())
+			{
+				w.Line($"_sequence_{overload.SignatureSuffix} = null;");
+				w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
+				w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
+				w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
+				// Clear callback storage (Return(value) replaces Call(callback))
+				w.Line($"_call_{overload.SignatureSuffix} = null;");
+				w.Line($"_callTracking_{overload.SignatureSuffix} = null;");
+				// Clear simplified callback storage
+				var (_, rvIsTaskT, rvIsValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+				var rvIsAsyncWithInnerType = rvIsTaskT || rvIsValueTaskT;
+				if (rvIsAsyncWithInnerType && !hasRefOrOut)
+				{
+					w.Line($"_callSimplified_{overload.SignatureSuffix} = null;");
+					w.Line($"_callSimplifiedTracking_{overload.SignatureSuffix} = null;");
+				}
+				var (rvIsVoidTask, rvIsVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+				if ((rvIsVoidTask || rvIsVoidValueTask) && !hasRefOrOut)
+				{
+					w.Line($"_callSimplifiedVoid_{overload.SignatureSuffix} = null;");
+					w.Line($"_callSimplifiedVoidTracking_{overload.SignatureSuffix} = null;");
+				}
+				// Set value storage
+				w.Line($"_hasReturnValue_{overload.SignatureSuffix} = true;");
+				if (valIsTaskT)
+					w.Line($"_returnValue_{overload.SignatureSuffix} = global::System.Threading.Tasks.Task.FromResult(value);");
+				else if (valIsValueTaskT)
+					w.Line($"_returnValue_{overload.SignatureSuffix} = new global::System.Threading.Tasks.ValueTask<{valueStorageType}>(value);");
+				else
+					w.Line($"_returnValue_{overload.SignatureSuffix} = value;");
+				w.Line($"_returnValueTracking_{overload.SignatureSuffix} = new MethodCallBuilderImpl_{overload.SignatureSuffix}(this);");
+				w.Line($"return _returnValueTracking_{overload.SignatureSuffix};");
+			}
+			w.Line();
+		}
+
 		// Full interceptor class name for nested class constructors
 		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
 
@@ -1744,11 +2428,11 @@ internal static class MethodInterceptorRenderer
 			var returnTypeSuffix = needsReturnTypeDisambiguation ? UnifiedInterceptorBuilder.GetTypeSuffix(overload.ReturnType) : null;
 			if (canHaveWhenChain)
 			{
-				RenderWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix);
+				RenderWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix, methodName: model.MethodName, xmlDocSummary: overload.XmlDocSummary);
 			}
 			if (canHaveVoidWhenChain)
 			{
-				RenderVoidWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix);
+				RenderVoidWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix, methodName: model.MethodName, xmlDocSummary: overload.XmlDocSummary);
 			}
 		}
 
@@ -1786,14 +2470,14 @@ internal static class MethodInterceptorRenderer
 		foreach (var overload in model.Overloads)
 		{
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
-			RenderMethodCallBuilderImpl(w, overload.TrackableParameters, overload.LastArgType, overload.LastArgsType, overload.BuilderInterface, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters);
+			RenderMethodCallBuilderImpl(w, overload.TrackableParameters, overload.LastArgType, overload.LastArgsType, overload.BuilderInterface, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters, overload.UsesTupleCallDelegate);
 		}
 
 		// Nested sequence classes for each unique signature
 		foreach (var overload in model.Overloads)
 		{
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
-			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters);
+			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters, overload.UsesTupleCallDelegate);
 		}
 
 		// Nested When chain classes for each unique signature (for parameter-specific matching)
@@ -1867,7 +2551,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("var (callback, tracking) = _sequence[_sequenceIndex];");
 				w.Line($"tracking.RecordCall({trackingArgs});");
 				w.Line("_sequenceIndex++;");
-				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 				if (model.IsVoid)
 					w.Line($"callback({callbackArgs});");
 				else
@@ -1901,7 +2585,7 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"_callTracking.RecordCall({trackingArgs});");
-				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 				if (model.IsVoid)
 					w.Line($"_call({callbackArgs});");
 				else
@@ -1920,7 +2604,7 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_callSimplifiedTracking.RecordCall({trackingArgs});");
-					var callbackArgs = BuildCallbackArgs(model.Parameters);
+					var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 					if (invokeIsTaskT)
 						w.Line($"return global::System.Threading.Tasks.Task.FromResult(_callSimplified({callbackArgs}));");
 					else
@@ -1938,7 +2622,7 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_callSimplifiedVoidTracking.RecordCall({trackingArgs});");
-					var callbackArgs = BuildCallbackArgs(model.Parameters);
+					var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 					w.Line($"_callSimplifiedVoid({callbackArgs});");
 					if (invokeIsVoidTask)
 						w.Line("return global::System.Threading.Tasks.Task.CompletedTask;");
@@ -1972,7 +2656,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line("var (callback, tracking) = _sequence[_sequence.Count - 1];");
 					w.Line($"tracking.RecordCall({trackingArgs});");
-					var repeatCallbackArgs = BuildCallbackArgs(model.Parameters);
+					var repeatCallbackArgs = BuildDelegateCallArgs(model.Parameters);
 					if (model.IsVoid)
 					{
 						w.Line($"callback({repeatCallbackArgs});");
@@ -2090,7 +2774,7 @@ internal static class MethodInterceptorRenderer
 				w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequenceIndex_{overload.SignatureSuffix}];");
 				w.Line($"tracking.RecordCall({trackingArgs});");
 				w.Line($"_sequenceIndex_{overload.SignatureSuffix}++;");
-				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 				if (overload.IsVoid)
 					w.Line($"callback({callbackArgs});");
 				else
@@ -2100,12 +2784,32 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
+			// Check repeating return value (before callback - value is simpler, check it first)
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var canHaveValueOverload = !overload.IsVoid && !hasRefOrOut;
+			if (canHaveValueOverload)
+			{
+				var (valueType, valIsTaskT, valIsValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+				w.Line($"if (_hasReturnValue_{overload.SignatureSuffix} && _returnValueTracking_{overload.SignatureSuffix} != null)");
+				using (w.Braces())
+				{
+					w.Line($"_returnValueTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
+					if (valIsTaskT)
+						w.Line($"return global::System.Threading.Tasks.Task.FromResult(_returnValue_{overload.SignatureSuffix});");
+					else if (valIsValueTaskT)
+						w.Line($"return new global::System.Threading.Tasks.ValueTask<{valueType}>(_returnValue_{overload.SignatureSuffix});");
+					else
+						w.Line($"return _returnValue_{overload.SignatureSuffix};");
+				}
+				w.Line();
+			}
+
 			// Check repeating callback
 			w.Line($"if (_call_{overload.SignatureSuffix} != null && _callTracking_{overload.SignatureSuffix} != null)");
 			using (w.Braces())
 			{
 				w.Line($"_callTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
-				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 				if (overload.IsVoid)
 					w.Line($"_call_{overload.SignatureSuffix}({callbackArgs});");
 				else
@@ -2116,7 +2820,6 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 
 			// Check simplified callback for Task<T>/ValueTask<T> overloads
-			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
 			var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 			var isAsyncWithInnerType = isTaskT || isValueTaskT;
 			if (isAsyncWithInnerType && !hasRefOrOut)
@@ -2125,7 +2828,7 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_callSimplifiedTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
-					var callbackArgs = BuildCallbackArgs(overload.Parameters);
+					var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 					if (isTaskT)
 						w.Line($"return global::System.Threading.Tasks.Task.FromResult(_callSimplified_{overload.SignatureSuffix}({callbackArgs}));");
 					else
@@ -2143,7 +2846,7 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_callSimplifiedVoidTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
-					var callbackArgs = BuildCallbackArgs(overload.Parameters);
+					var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 					w.Line($"_callSimplifiedVoid_{overload.SignatureSuffix}({callbackArgs});");
 					if (isVoidTask)
 						w.Line("return global::System.Threading.Tasks.Task.CompletedTask;");
@@ -2168,7 +2871,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequence_{overload.SignatureSuffix}.Count - 1];");
 					w.Line($"tracking.RecordCall({trackingArgs});");
-					var repeatCallbackArgs = BuildCallbackArgs(overload.Parameters);
+					var repeatCallbackArgs = BuildDelegateCallArgs(overload.Parameters);
 					if (overload.IsVoid)
 					{
 						w.Line($"callback({repeatCallbackArgs});");
@@ -2344,7 +3047,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("var (callback, tracking) = _sequence[_sequenceIndex];");
 				w.Line($"tracking.RecordCall({trackingArgs});");
 				w.Line("_sequenceIndex++;");
-				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 				w.Line($"_refReturnBacking = callback({callbackArgs});");
 				w.Line("return;");
 			}
@@ -2369,7 +3072,7 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"_callTracking.RecordCall({trackingArgs});");
-				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(model.Parameters);
 				w.Line($"_refReturnBacking = _call({callbackArgs});");
 				w.Line("return;");
 			}
@@ -2402,7 +3105,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line("var (callback, tracking) = _sequence[_sequence.Count - 1];");
 					w.Line($"tracking.RecordCall({trackingArgs});");
-					var repeatCallbackArgs = BuildCallbackArgs(model.Parameters);
+					var repeatCallbackArgs = BuildDelegateCallArgs(model.Parameters);
 					w.Line($"_refReturnBacking = callback({repeatCallbackArgs});");
 					w.Line("return;");
 				}
@@ -2482,7 +3185,7 @@ internal static class MethodInterceptorRenderer
 				w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequenceIndex_{overload.SignatureSuffix}];");
 				w.Line($"tracking.RecordCall({trackingArgs});");
 				w.Line($"_sequenceIndex_{overload.SignatureSuffix}++;");
-				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 				w.Line($"{backingField} = callback({callbackArgs});");
 				w.Line("return;");
 			}
@@ -2493,7 +3196,7 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"_callTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
-				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				var callbackArgs = BuildDelegateCallArgs(overload.Parameters);
 				w.Line($"{backingField} = _call_{overload.SignatureSuffix}({callbackArgs});");
 				w.Line("return;");
 			}
@@ -2514,7 +3217,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequence_{overload.SignatureSuffix}.Count - 1];");
 					w.Line($"tracking.RecordCall({trackingArgs});");
-					var repeatCallbackArgs = BuildCallbackArgs(overload.Parameters);
+					var repeatCallbackArgs = BuildDelegateCallArgs(overload.Parameters);
 					w.Line($"{backingField} = callback({repeatCallbackArgs});");
 					w.Line("return;");
 				}
@@ -2651,8 +3354,13 @@ internal static class MethodInterceptorRenderer
 				foreach (var overload in overloads)
 				{
 					w.Line($"_callTracking_{overload.SignatureSuffix}?.Reset();");
-					// Reset simplified callback tracking for async overloads
+					// Reset value tracking for non-void overloads
 					var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+					if (!overload.IsVoid && !hasRefOrOut)
+					{
+						w.Line($"_returnValueTracking_{overload.SignatureSuffix}?.Reset();");
+					}
+					// Reset simplified callback tracking for async overloads
 					var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 					var isAsyncWithInnerType = isTaskT || isValueTaskT;
 					if (isAsyncWithInnerType && !hasRefOrOut)
@@ -2778,7 +3486,7 @@ internal static class MethodInterceptorRenderer
 			w.Line($"internal bool IsVerifiable => {isVerifiableExpr};");
 			w.Line();
 
-			// Build IsConfigured including simplified callbacks and When chains for each overload
+			// Build IsConfigured including value storage, simplified callbacks and When chains for each overload
 			w.Line("/// <summary>Whether any overload has been configured.</summary>");
 			var isConfiguredParts = new List<string>();
 			foreach (var overload in overloads)
@@ -2788,8 +3496,11 @@ internal static class MethodInterceptorRenderer
 					$"_call_{overload.SignatureSuffix} != null",
 					$"(_sequence_{overload.SignatureSuffix}?.Count ?? 0) > 0"
 				};
-				// Add simplified callback checks for async overloads
+				// Add value storage check for non-void overloads
 				var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+				if (!overload.IsVoid && !hasRefOrOut)
+					parts.Add($"_hasReturnValue_{overload.SignatureSuffix}");
+				// Add simplified callback checks for async overloads
 				var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 				if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 					parts.Add($"_callSimplified_{overload.SignatureSuffix} != null");
@@ -2817,13 +3528,16 @@ internal static class MethodInterceptorRenderer
 					using (w.Braces())
 					{
 						w.Line($"var times = _verifiableTimes_{overload.SignatureSuffix} ?? global::KnockOff.Called.AtLeastOnce;");
-						// Build count including simplified tracking
+						// Build count including value tracking and simplified tracking
 						var countParts = new List<string>
 						{
 							$"(_callTracking_{overload.SignatureSuffix}?._callCount ?? 0)",
 							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)"
 						};
 						var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+						// Add value tracking count
+						if (!overload.IsVoid && !hasRefOrOut)
+							countParts.Add($"(_returnValueTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 							countParts.Add($"(_callSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
@@ -2866,13 +3580,16 @@ internal static class MethodInterceptorRenderer
 			{
 				foreach (var overload in overloads)
 				{
-					// Build condition including simplified callbacks
+					// Build condition including value storage and simplified callbacks
 					var condParts = new List<string>
 					{
 						$"_call_{overload.SignatureSuffix} != null",
 						$"(_sequence_{overload.SignatureSuffix}?.Count ?? 0) > 0"
 					};
 					var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+					// Add value storage condition
+					if (!overload.IsVoid && !hasRefOrOut)
+						condParts.Add($"_hasReturnValue_{overload.SignatureSuffix}");
 					var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 					if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 						condParts.Add($"_callSimplified_{overload.SignatureSuffix} != null");
@@ -2888,12 +3605,15 @@ internal static class MethodInterceptorRenderer
 					w.Line($"if ({condExpr})");
 					using (w.Braces())
 					{
-						// Build count including simplified tracking
+						// Build count including value tracking and simplified tracking
 						var countParts = new List<string>
 						{
 							$"(_callTracking_{overload.SignatureSuffix}?._callCount ?? 0)",
 							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)"
 						};
+						// Add value tracking count
+						if (!overload.IsVoid && !hasRefOrOut)
+							countParts.Add($"(_returnValueTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 							countParts.Add($"(_callSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
@@ -2945,7 +3665,8 @@ internal static class MethodInterceptorRenderer
 		bool isVoid,
 		bool hasRefOrOut,
 		int parameterCount,
-		EquatableArray<ParameterModel> parameters)
+		EquatableArray<ParameterModel> parameters,
+		bool usesTupleCallDelegate = false)
 	{
 		var className = signatureSuffix == null ? "MethodCallBuilderImpl" : $"MethodCallBuilderImpl_{signatureSuffix}";
 		var sequenceClassName = signatureSuffix == null ? "MethodSequenceImpl" : $"MethodSequenceImpl_{signatureSuffix}";
@@ -3067,7 +3788,8 @@ internal static class MethodInterceptorRenderer
 					elevationIsTaskT, elevationIsValueTaskT, elevationIsVoidTask, elevationIsVoidValueTask,
 					elevationInnerType, callSimplifiedFieldName, callSimplifiedTrackingFieldName,
 					callSimplifiedVoidFieldName, callSimplifiedVoidTrackingFieldName,
-					hasRefOrOut, parameterCount, parameters);
+					hasRefOrOut, parameterCount, parameters,
+					isTupleDelegate: signatureSuffix == null || usesTupleCallDelegate);
 				// Add new callback with fresh builder for its tracking
 				w.Line($"var nextBuilder = new {className}(_interceptor);");
 				w.Line($"_interceptor.{sequenceFieldName}.Add((callback, nextBuilder));");
@@ -3079,7 +3801,9 @@ internal static class MethodInterceptorRenderer
 			if (!isVoid && !hasRefOrOut)
 			{
 				var (valueType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(returnType);
-				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount);
+				// Uses tuple delegate when either single-signature mode or overload mode with tuple delegate
+				var isTupleDelegateForDiscard = signatureSuffix == null || usesTupleCallDelegate;
+				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount, isTupleDelegateForDiscard);
 				w.Line($"/// <summary>Elevates to sequence mode and adds a value. Return sequence for further chaining.</summary>");
 				if (isTaskT)
 				{
@@ -3110,7 +3834,8 @@ internal static class MethodInterceptorRenderer
 							elevationIsTaskT, elevationIsValueTaskT, elevationIsVoidTask, elevationIsVoidValueTask,
 							elevationInnerType, callSimplifiedFieldName, callSimplifiedTrackingFieldName,
 							callSimplifiedVoidFieldName, callSimplifiedVoidTrackingFieldName,
-							hasRefOrOut, parameterCount, parameters);
+							hasRefOrOut, parameterCount, parameters,
+							isTupleDelegate: signatureSuffix == null || usesTupleCallDelegate);
 						w.Line($"return new {sequenceClassName}(_interceptor);");
 					}
 					w.Line("var seq = ThenReturn(values[0]);");
@@ -3129,16 +3854,34 @@ internal static class MethodInterceptorRenderer
 				if (builderIsAsync && !hasRefOrOut)
 				{
 					var simplifiedDelegateType = BuildSimplifiedDelegateType(parameters, builderAsyncInner);
-					var lambdaParams = BuildLambdaParams(parameters);
-					var lambdaCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParams})";
-					w.Line($"/// <summary>Elevates to sequence mode with simplified callback. Result auto-wrapped in {(builderIsTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
-					if (builderIsTaskT)
+					// When the main delegate uses individual params (custom delegate for ref/out overloads),
+					// we need a wrapper lambda that bridges individual params -> tuple for the simplified callback call.
+					// When the main delegate uses a tuple (single-sig or tuple-based overloads), use tuple-based lambda directly.
+					string wrapperLambdaParamDecls, wrapperCallbackCall;
+					if (signatureSuffix != null && parameters.Count >= 2 && !usesTupleCallDelegate)
 					{
-						w.Line($"public {sequenceClassName} ThenReturn({simplifiedDelegateType} callback) => ThenReturn(({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}));");
+						// Custom delegate overload mode with 2+ params: outer lambda uses individual params,
+						// inner callback call uses tuple construction
+						var paramList = string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}"));
+						wrapperLambdaParamDecls = $"({paramList})";
+						var tupleArgs = string.Join(", ", parameters.Select(p => p.EscapedName));
+						wrapperCallbackCall = $"callback(({tupleArgs}))";
 					}
 					else
 					{
-						w.Line($"public {sequenceClassName} ThenReturn({simplifiedDelegateType} callback) => ThenReturn(({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{builderAsyncInner}>({lambdaCall}));");
+						// Single-sig mode, tuple-based overload, or 0-1 params: use tuple-based lambda
+						wrapperLambdaParamDecls = BuildLambdaParamDecls(parameters);
+						var lambdaParamsStr = BuildLambdaCallArgs(parameters);
+						wrapperCallbackCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParamsStr})";
+					}
+					w.Line($"/// <summary>Elevates to sequence mode with simplified callback. Result auto-wrapped in {(builderIsTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+					if (builderIsTaskT)
+					{
+						w.Line($"public {sequenceClassName} ThenReturn({simplifiedDelegateType} callback) => ThenReturn({wrapperLambdaParamDecls} => global::System.Threading.Tasks.Task.FromResult({wrapperCallbackCall}));");
+					}
+					else
+					{
+						w.Line($"public {sequenceClassName} ThenReturn({simplifiedDelegateType} callback) => ThenReturn({wrapperLambdaParamDecls} => new global::System.Threading.Tasks.ValueTask<{builderAsyncInner}>({wrapperCallbackCall}));");
 					}
 					w.Line();
 				}
@@ -3209,7 +3952,8 @@ internal static class MethodInterceptorRenderer
 		bool isVoid,
 		bool hasRefOrOut,
 		int parameterCount,
-		EquatableArray<ParameterModel> parameters)
+		EquatableArray<ParameterModel> parameters,
+		bool usesTupleCallDelegate = false)
 	{
 		var className = signatureSuffix == null ? "MethodSequenceImpl" : $"MethodSequenceImpl_{signatureSuffix}";
 		var trackingClassName = signatureSuffix == null ? "MethodCallBuilderImpl" : $"MethodCallBuilderImpl_{signatureSuffix}";
@@ -3267,7 +4011,8 @@ internal static class MethodInterceptorRenderer
 			if (!isVoid && !hasRefOrOut)
 			{
 				var (valueType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(returnType);
-				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount);
+				var isTupleDelegateForDiscard = signatureSuffix == null || usesTupleCallDelegate;
+				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount, isTupleDelegateForDiscard);
 				w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
 				if (isTaskT)
 				{
@@ -3301,16 +4046,34 @@ internal static class MethodInterceptorRenderer
 				if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 				{
 					var simplifiedDelegateType = BuildSimplifiedDelegateType(parameters, valueType);
-					var lambdaParams = BuildLambdaParams(parameters);
-					var lambdaCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParams})";
-					w.Line($"/// <summary>Adds simplified callback to the sequence. Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
-					if (isTaskT)
+					// When the main delegate uses individual params (custom delegate for ref/out overloads),
+					// we need a wrapper lambda that bridges individual params -> tuple for the simplified callback call.
+					// When the main delegate uses a tuple, use tuple-based lambda directly.
+					string seqWrapperLambdaParamDecls, seqWrapperCallbackCall;
+					if (signatureSuffix != null && parameters.Count >= 2 && !usesTupleCallDelegate)
 					{
-						w.Line($"public {className} ThenReturn({simplifiedDelegateType} callback) => ThenReturn(({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}));");
+						// Custom delegate overload mode with 2+ params: outer lambda uses individual params,
+						// inner callback call uses tuple construction
+						var paramList = string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}"));
+						seqWrapperLambdaParamDecls = $"({paramList})";
+						var tupleArgs = string.Join(", ", parameters.Select(p => p.EscapedName));
+						seqWrapperCallbackCall = $"callback(({tupleArgs}))";
 					}
 					else
 					{
-						w.Line($"public {className} ThenReturn({simplifiedDelegateType} callback) => ThenReturn(({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{valueType}>({lambdaCall}));");
+						// Single-sig mode, tuple-based overload, or 0-1 params: use tuple-based lambda
+						seqWrapperLambdaParamDecls = BuildLambdaParamDecls(parameters);
+						var lambdaParamsStr = BuildLambdaCallArgs(parameters);
+						seqWrapperCallbackCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParamsStr})";
+					}
+					w.Line($"/// <summary>Adds simplified callback to the sequence. Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+					if (isTaskT)
+					{
+						w.Line($"public {className} ThenReturn({simplifiedDelegateType} callback) => ThenReturn({seqWrapperLambdaParamDecls} => global::System.Threading.Tasks.Task.FromResult({seqWrapperCallbackCall}));");
+					}
+					else
+					{
+						w.Line($"public {className} ThenReturn({simplifiedDelegateType} callback) => ThenReturn({seqWrapperLambdaParamDecls} => new global::System.Threading.Tasks.ValueTask<{valueType}>({seqWrapperCallbackCall}));");
 					}
 					w.Line();
 				}
@@ -3395,7 +4158,11 @@ internal static class MethodInterceptorRenderer
 		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
 		var matchParams = BuildMatchParams(parameters);
 		var callParams = BuildMatchParams(parameters);
-		var callbackArgs = BuildCallbackArgs(parameters);
+		// Both single-signature mode and tuple-based overloads use Func/Action with tuple parameter
+		// for 2+ params. BuildDelegateCallArgs handles this: wraps in tuple for 2+ params without
+		// ref/out, returns individual args otherwise (0-1 params or ref/out custom delegates).
+		var callbackInvokeArgs = BuildDelegateCallArgs(parameters);
+		var predicateCallArgs = BuildPredicateCallArgs(parameters);
 		var predicateType = BuildPredicateType(parameters);
 
 		// WhenMatcher abstract base
@@ -3425,7 +4192,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("_value = value;");
 			}
 			w.Line();
-			w.Line($"public override bool Matches({matchParams}) => _predicate({callbackArgs});");
+			w.Line($"public override bool Matches({matchParams}) => _predicate({predicateCallArgs});");
 			w.Line($"public override {returnType} Call({callParams}) => _value;");
 			w.Line("public override bool IsTerminal => false;");
 		}
@@ -3441,7 +4208,7 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public WhenMatcherCall{suffix}({delegateType} callback) => _callback = callback;");
 			w.Line();
 			w.Line($"public override bool Matches({matchParams}) => true;");
-			w.Line($"public override {returnType} Call({callParams}) => _callback({callbackArgs});");
+			w.Line($"public override {returnType} Call({callParams}) => _callback({callbackInvokeArgs});");
 			w.Line("public override bool IsTerminal => true;");
 		}
 		w.Line();
@@ -3678,7 +4445,9 @@ internal static class MethodInterceptorRenderer
 		string returnType,
 		string delegateType,
 		string? signatureSuffix,
-		string? methodNameSuffix = null)
+		string? methodNameSuffix = null,
+		string? methodName = null,
+		string? xmlDocSummary = null)
 	{
 		// When() requires parameters - parameterless methods cannot use When()
 		if (parameters.Count == 0) return;
@@ -3691,7 +4460,7 @@ internal static class MethodInterceptorRenderer
 
 		// When() value overload - exact value matching via Object.Equals
 		// Returns concrete type to enable fluent ThenWhen chaining
-		w.Line($"/// <summary>Configures parameter-specific matching with exact values. Returns builder for Return().</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches exact values using Object.Equals. Returns builder for Return().");
 		w.Line($"public WhenBuilder{suffix} {whenMethodName}({paramTypeList})");
 		using (w.Braces())
 		{
@@ -3707,7 +4476,7 @@ internal static class MethodInterceptorRenderer
 
 		// When() predicate overload - Func<T1, T2, bool>
 		// Returns concrete type to enable fluent ThenWhen chaining
-		w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Return().</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches using predicate. Returns builder for Return().");
 		w.Line($"public WhenBuilder{suffix} {whenMethodName}({predicateType} predicate)");
 		using (w.Braces())
 		{
@@ -3728,15 +4497,20 @@ internal static class MethodInterceptorRenderer
 	}
 
 	/// <summary>
-	/// Builds the predicate Func type for When matching (e.g., "Func&lt;int, string, bool&gt;").
+	/// Builds the predicate Func type for When matching.
+	/// 0 params: Func&lt;bool&gt;, 1 param: Func&lt;T1, bool&gt;, 2+ params: Func&lt;(T1 a, T2 b), bool&gt;.
 	/// </summary>
 	private static string BuildPredicateType(EquatableArray<ParameterModel> parameters)
 	{
 		if (parameters.Count == 0)
 			return "global::System.Func<bool>";
 
-		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-		return $"global::System.Func<{paramTypes}, bool>";
+		if (parameters.Count == 1)
+			return $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
+
+		// 2+ params: named tuple
+		var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+		return $"global::System.Func<{tupleType}, bool>";
 	}
 
 	/// <summary>
@@ -3758,30 +4532,39 @@ internal static class MethodInterceptorRenderer
 	}
 
 	/// <summary>
-	/// Builds lambda parameter names for equality comparisons using indexed names to avoid keyword conflicts.
-	/// E.g., "_arg0, _arg1" for use in "(_arg0, _arg1) => Equals(_arg0, a) &amp;&amp; Equals(_arg1, b)".
+	/// Builds lambda parameter names for equality comparisons.
+	/// For 1 param: "_arg0" (indexed to avoid keyword conflicts).
+	/// For 2+ params: "_args" (single tuple parameter, access fields via _args.fieldName).
 	/// </summary>
 	private static string BuildLambdaParamsForEquality(EquatableArray<ParameterModel> parameters)
 	{
 		if (parameters.Count == 0) return "";
-		// Use indexed names to avoid conflicts with C# keywords and the method parameters
-		return string.Join(", ", Enumerable.Range(0, parameters.Count).Select(i => $"_arg{i}"));
+		if (parameters.Count == 1) return "_arg0";
+		// 2+ params: single tuple parameter
+		return "_args";
 	}
 
 	/// <summary>
-	/// Builds an equality predicate body comparing lambda params (indexed) to method params.
-	/// E.g., "Equals(_arg0, a) &amp;&amp; Equals(_arg1, b)".
+	/// Builds an equality predicate body comparing lambda params to method params.
+	/// For 1 param: "Equals(_arg0, a)".
+	/// For 2+ params: "Equals(_args.a, a) &amp;&amp; Equals(_args.b, b)" (accessing tuple fields).
 	/// Uses Object.Equals for null-safety.
 	/// </summary>
 	private static string BuildEqualityPredicateBody(EquatableArray<ParameterModel> parameters)
 	{
 		if (parameters.Count == 0) return "true";
 
+		if (parameters.Count == 1)
+		{
+			return $"global::System.Object.Equals(_arg0, {parameters.GetArray()![0].EscapedName})";
+		}
+
+		// 2+ params: access tuple fields by name
 		var parts = new List<string>();
 		for (int i = 0; i < parameters.Count; i++)
 		{
-			// Lambda param is indexed (_arg0, _arg1, etc.), method param is the expected value
-			parts.Add($"global::System.Object.Equals(_arg{i}, {parameters.GetArray()![i].EscapedName})");
+			var p = parameters.GetArray()![i];
+			parts.Add($"global::System.Object.Equals(_args.{p.EscapedName}, {p.EscapedName})");
 		}
 		return string.Join(" && ", parts);
 	}
@@ -3801,7 +4584,9 @@ internal static class MethodInterceptorRenderer
 		EquatableArray<ParameterModel> parameters,
 		string delegateType,
 		string? signatureSuffix,
-		string? methodNameSuffix = null)
+		string? methodNameSuffix = null,
+		string? methodName = null,
+		string? xmlDocSummary = null)
 	{
 		// When() requires parameters - parameterless methods cannot use When()
 		if (parameters.Count == 0) return;
@@ -3815,7 +4600,7 @@ internal static class MethodInterceptorRenderer
 
 		// When() value overload - exact value matching via Object.Equals
 		// Returns concrete type to enable fluent ThenWhen chaining
-		w.Line($"/// <summary>Configures parameter-specific matching with exact values for void method. Returns chain directly.</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches exact values using Object.Equals. Returns chain directly.");
 		w.Line($"public {chainType} {whenMethodName}({paramTypeList})");
 		using (w.Braces())
 		{
@@ -3835,7 +4620,7 @@ internal static class MethodInterceptorRenderer
 
 		// When() predicate overload - Func<T1, T2, bool>
 		// Returns concrete type to enable fluent ThenWhen chaining
-		w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
+		EmitWhenXmlDoc(w, methodName, parameters, xmlDocSummary, "Matches using predicate. Returns chain directly.");
 		w.Line($"public {chainType} {whenMethodName}({predicateType} predicate)");
 		using (w.Braces())
 		{
@@ -3907,7 +4692,10 @@ internal static class MethodInterceptorRenderer
 	{
 		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
 		var matchParams = BuildMatchParams(parameters);
-		var callbackArgs = BuildCallbackArgs(parameters);
+		// Both single-signature mode and tuple-based overloads use Func/Action with tuple parameter
+		// for 2+ params. BuildDelegateCallArgs handles this correctly for all cases.
+		var callbackInvokeArgs = BuildDelegateCallArgs(parameters);
+		var predicateCallArgs = BuildPredicateCallArgs(parameters);
 		var predicateType = BuildPredicateType(parameters);
 
 		// VoidWhenMatcher abstract base
@@ -3932,8 +4720,8 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 			w.Line($"public VoidWhenMatcherPredicate{suffix}({predicateType} predicate) => _predicate = predicate;");
 			w.Line();
-			w.Line($"public override bool Matches({matchParams}) => _predicate({callbackArgs});");
-			w.Line($"public override void Call({matchParams}) {{ Callback?.Invoke({callbackArgs}); }}");
+			w.Line($"public override bool Matches({matchParams}) => _predicate({predicateCallArgs});");
+			w.Line($"public override void Call({matchParams}) {{ Callback?.Invoke({callbackInvokeArgs}); }}");
 			w.Line("public override bool IsTerminal => false;");
 		}
 		w.Line();
@@ -3948,7 +4736,7 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public VoidWhenMatcherCall{suffix}({delegateType} callback) => _callback = callback;");
 			w.Line();
 			w.Line($"public override bool Matches({matchParams}) => true;");
-			w.Line($"public override void Call({matchParams}) => _callback({callbackArgs});");
+			w.Line($"public override void Call({matchParams}) => _callback({callbackInvokeArgs});");
 			w.Line("public override bool IsTerminal => true;");
 		}
 		w.Line();
@@ -4159,7 +4947,8 @@ internal static class MethodInterceptorRenderer
 		string callSimplifiedVoidTrackingFieldName,
 		bool hasRefOrOut,
 		int parameterCount,
-		EquatableArray<ParameterModel> parameters)
+		EquatableArray<ParameterModel> parameters,
+		bool isTupleDelegate = true)
 	{
 		w.Line($"if (_interceptor.{sequenceFieldName} == null)");
 		using (w.Braces())
@@ -4177,23 +4966,24 @@ internal static class MethodInterceptorRenderer
 			// Only emitted for single-signature, non-void, no ref/out interceptors
 			if (canHaveValueOverload)
 			{
-				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount);
+				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount, isTupleDelegate);
 				w.Line("else if (_interceptor._hasReturnValue)");
 				using (w.Braces())
 				{
 					w.Line("var capturedValue = _interceptor._returnValue;");
 					if (isTaskT)
 					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(capturedValue), this));");
+						w.Line($"{delegateType} valueWrapper = {discardPrefix} => global::System.Threading.Tasks.Task.FromResult(capturedValue);");
 					}
 					else if (isValueTaskT)
 					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{innerType}>(capturedValue), this));");
+						w.Line($"{delegateType} valueWrapper = {discardPrefix} => new global::System.Threading.Tasks.ValueTask<{innerType}>(capturedValue);");
 					}
 					else
 					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => capturedValue, this));");
+						w.Line($"{delegateType} valueWrapper = {discardPrefix} => capturedValue;");
 					}
+					w.Line($"_interceptor.{sequenceFieldName}.Add((valueWrapper, this));");
 					w.Line("_interceptor._hasReturnValue = false;");
 					w.Line("_interceptor._returnValue = default!;");
 					w.Line("_interceptor._returnValueTracking = null;");
@@ -4204,21 +4994,46 @@ internal static class MethodInterceptorRenderer
 			// Only emitted when method is Task<T> or ValueTask<T> and has no ref/out params
 			if (isAsyncWithInnerType && !hasRefOrOut)
 			{
-				var lambdaParams = BuildLambdaParams(parameters);
-				var callbackArgs = BuildCallbackArgs(parameters);
-				var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callbackArgs})";
+				// For tuple delegates (single-signature or tuple overload): lambda matches delegate's tuple param
+				// For individual-param delegates (custom delegate overload): lambda matches custom delegate's individual params
+				string wrapperLambda;
+				if (isTupleDelegate)
+				{
+					// Func<(int a, int b), TReturn> -- single tuple param
+					var paramDecls = BuildLambdaParamDecls(parameters);
+					var callArgs = BuildLambdaCallArgs(parameters);
+					var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callArgs})";
+					if (isTaskT)
+						wrapperLambda = $"{paramDecls} => global::System.Threading.Tasks.Task.FromResult({lambdaCall})";
+					else
+						wrapperLambda = $"{paramDecls} => new global::System.Threading.Tasks.ValueTask<{innerType}>({lambdaCall})";
+				}
+				else
+				{
+					// Custom delegate with individual params -- bridge to simplified tuple callback
+					var paramDecls = BuildDelegateMatchingParamDecls(parameters);
+					string simplifiedCallArgs;
+					if (parameters.Count >= 2)
+					{
+						// Build a tuple from individual params to pass to simplified callback
+						simplifiedCallArgs = "(" + string.Join(", ", parameters.Select(p => p.EscapedName)) + ")";
+					}
+					else
+					{
+						simplifiedCallArgs = BuildDelegateMatchingCallArgs(parameters);
+					}
+					var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({simplifiedCallArgs})";
+					if (isTaskT)
+						wrapperLambda = $"{paramDecls} => global::System.Threading.Tasks.Task.FromResult({lambdaCall})";
+					else
+						wrapperLambda = $"{paramDecls} => new global::System.Threading.Tasks.ValueTask<{innerType}>({lambdaCall})";
+				}
 				w.Line($"else if (_interceptor.{callSimplifiedFieldName} != null)");
 				using (w.Braces())
 				{
 					w.Line($"var captured = _interceptor.{callSimplifiedFieldName};");
-					if (isTaskT)
-					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}), this));");
-					}
-					else // isValueTaskT
-					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{innerType}>({lambdaCall}), this));");
-					}
+					w.Line($"{delegateType} wrapper = {wrapperLambda};");
+					w.Line($"_interceptor.{sequenceFieldName}.Add((wrapper, this));");
 					w.Line($"_interceptor.{callSimplifiedFieldName} = null;");
 					w.Line($"_interceptor.{callSimplifiedTrackingFieldName} = null;");
 				}
@@ -4228,21 +5043,42 @@ internal static class MethodInterceptorRenderer
 			// Only emitted when method is void Task or void ValueTask and has no ref/out params
 			if (isVoidAsync && !hasRefOrOut)
 			{
-				var lambdaParams = BuildLambdaParams(parameters);
-				var callbackArgs = BuildCallbackArgs(parameters);
-				var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callbackArgs})";
+				// Build the wrapper lambda that converts a void callback into the async delegate type
+				string wrapperLambda;
+				if (isTupleDelegate)
+				{
+					var paramDecls = BuildLambdaParamDecls(parameters);
+					var callArgs = BuildLambdaCallArgs(parameters);
+					var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callArgs})";
+					if (isVoidTask)
+						wrapperLambda = $"{paramDecls} => {{ {lambdaCall}; return global::System.Threading.Tasks.Task.CompletedTask; }}";
+					else
+						wrapperLambda = $"{paramDecls} => {{ {lambdaCall}; return default; }}";
+				}
+				else
+				{
+					var paramDecls = BuildDelegateMatchingParamDecls(parameters);
+					string simplifiedCallArgs;
+					if (parameters.Count >= 2)
+					{
+						simplifiedCallArgs = "(" + string.Join(", ", parameters.Select(p => p.EscapedName)) + ")";
+					}
+					else
+					{
+						simplifiedCallArgs = BuildDelegateMatchingCallArgs(parameters);
+					}
+					var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({simplifiedCallArgs})";
+					if (isVoidTask)
+						wrapperLambda = $"{paramDecls} => {{ {lambdaCall}; return global::System.Threading.Tasks.Task.CompletedTask; }}";
+					else
+						wrapperLambda = $"{paramDecls} => {{ {lambdaCall}; return default; }}";
+				}
 				w.Line($"else if (_interceptor.{callSimplifiedVoidFieldName} != null)");
 				using (w.Braces())
 				{
 					w.Line($"var captured = _interceptor.{callSimplifiedVoidFieldName};");
-					if (isVoidTask)
-					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => {{ {lambdaCall}; return global::System.Threading.Tasks.Task.CompletedTask; }}, this));");
-					}
-					else // isVoidValueTask
-					{
-						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => {{ {lambdaCall}; return default; }}, this));");
-					}
+					w.Line($"{delegateType} voidWrapper = {wrapperLambda};");
+					w.Line($"_interceptor.{sequenceFieldName}.Add((voidWrapper, this));");
 					w.Line($"_interceptor.{callSimplifiedVoidFieldName} = null;");
 					w.Line($"_interceptor.{callSimplifiedVoidTrackingFieldName} = null;");
 				}
@@ -4299,6 +5135,34 @@ internal static class MethodInterceptorRenderer
 	}
 
 	/// <summary>
+	/// Builds invocation args for calling a delegate field.
+	/// For 2+ params without ref/out, the delegate uses a named tuple parameter,
+	/// so args are wrapped in tuple construction syntax: (a, b).
+	/// For 0-1 params, ref/out, or custom delegates: returns individual args.
+	/// </summary>
+	private static string BuildDelegateCallArgs(EquatableArray<ParameterModel> parameters)
+	{
+		var hasRefOrOut = HasRefOrOutParameters(parameters);
+		var individual = BuildCallbackArgs(parameters);
+		if (!hasRefOrOut && parameters.Count >= 2)
+			return $"({individual})";
+		return individual;
+	}
+
+	/// <summary>
+	/// Builds the invocation args for a predicate call.
+	/// Predicates use tuples for 2+ params, so the args must be wrapped in a tuple constructor.
+	/// 0 params: "" (no args), 1 param: "a", 2+ params: "(a, b)" (tuple construction).
+	/// </summary>
+	private static string BuildPredicateCallArgs(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		if (parameters.Count == 1) return parameters.GetArray()![0].EscapedName;
+		// 2+ params: wrap in tuple
+		return "(" + string.Join(", ", parameters.Select(p => p.EscapedName)) + ")";
+	}
+
+	/// <summary>
 	/// Analyzes a return type for async patterns and extracts the inner type.
 	/// </summary>
 	/// <param name="returnType">The fully-qualified return type (e.g., "global::System.Threading.Tasks.Task&lt;string&gt;").</param>
@@ -4339,30 +5203,43 @@ internal static class MethodInterceptorRenderer
 
 	/// <summary>
 	/// Builds the simplified callback delegate type for Task&lt;T&gt;/ValueTask&lt;T&gt; methods.
-	/// E.g., Func&lt;int, User?&gt; for a method with int param returning Task&lt;User?&gt;
+	/// 0 params: Func&lt;TInner&gt;, 1 param: Func&lt;T1, TInner&gt;, 2+ params: Func&lt;(T1 a, T2 b), TInner&gt;.
 	/// </summary>
 	private static string BuildSimplifiedDelegateType(EquatableArray<ParameterModel> parameters, string innerType)
 	{
 		if (parameters.Count == 0)
 			return $"global::System.Func<{innerType}>";
 
-		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-		return $"global::System.Func<{paramTypes}, {innerType}>";
+		if (parameters.Count == 1)
+			return $"global::System.Func<{parameters.GetArray()![0].Type}, {innerType}>";
+
+		// 2+ params: named tuple
+		var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+		return $"global::System.Func<{tupleType}, {innerType}>";
 	}
 
 	/// <summary>
 	/// Builds the simplified void callback delegate type for Task/ValueTask methods.
-	/// E.g., Action&lt;User&gt; for a method with User param returning Task
+	/// 0 params: Action, 1 param: Action&lt;T1&gt;, 2+ params: Action&lt;(T1 a, T2 b)&gt;.
 	/// </summary>
 	private static string BuildSimplifiedVoidDelegateType(EquatableArray<ParameterModel> parameters)
 	{
 		if (parameters.Count == 0)
 			return "global::System.Action";
 
-		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
-		return $"global::System.Action<{paramTypes}>";
+		if (parameters.Count == 1)
+			return $"global::System.Action<{parameters.GetArray()![0].Type}>";
+
+		// 2+ params: named tuple
+		var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
+		return $"global::System.Action<{tupleType}>";
 	}
 
+	// ========================================================================
+	// New-style Func<>/Action<> delegate type computation for MethodInterceptorRuntime
+	// ========================================================================
+
+	/// <summary>
 	/// <summary>
 	/// Makes a type nullable for storage, avoiding double-nullable types.
 	/// </summary>
@@ -4387,12 +5264,17 @@ internal static class MethodInterceptorRenderer
 
 	/// <summary>
 	/// Builds the lambda prefix for a value-returning lambda that ignores method parameters.
-	/// E.g., for 0 params: "()", for 1 param: "(_)", for 2 params: "(_, _)".
+	/// 0 params: "()", 1 param: "(_)", 2+ params with tuple delegate: "(_)", 2+ params with individual delegate: "(_, _, ...)".
 	/// </summary>
-	private static string BuildDiscardLambdaPrefix(int parameterCount)
+	/// <param name="parameterCount">Number of method parameters.</param>
+	/// <param name="isTupleDelegate">True if the delegate uses a single tuple param for 2+ args (Func/Action mode), false if individual params (custom delegate mode).</param>
+	private static string BuildDiscardLambdaPrefix(int parameterCount, bool isTupleDelegate = true)
 	{
 		if (parameterCount == 0)
 			return "()";
+		if (parameterCount == 1 || isTupleDelegate)
+			return "(_)"; // Single param or single tuple param
+		// Custom delegate with individual params
 		var discards = string.Join(", ", Enumerable.Range(0, parameterCount).Select(_ => "_"));
 		return $"({discards})";
 	}
@@ -4508,14 +5390,17 @@ internal static class MethodInterceptorRenderer
 		EquatableArray<MethodOverloadSignature> overloads)
 	{
 		// Build a sum expression across all storage types for each overload, plus unconfigured calls
-		// Include simplified callback tracking for async overloads
+		// Include value tracking and simplified callback tracking for async overloads
 		var sumParts = new List<string>();
 		foreach (var overload in overloads)
 		{
 			sumParts.Add($"(_callTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 			sumParts.Add($"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)");
-			// Add simplified tracking for async overloads
+			// Add value tracking for non-void overloads
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			if (!overload.IsVoid && !hasRefOrOut)
+				sumParts.Add($"(_returnValueTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
+			// Add simplified tracking for async overloads
 			var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 			if ((isTaskT || isValueTaskT) && !hasRefOrOut)
 				sumParts.Add($"(_callSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
@@ -4575,6 +5460,158 @@ internal static class MethodInterceptorRenderer
 				w.Line("_verifiableTimes = times;");
 			}
 			w.Line();
+		}
+	}
+
+	#endregion
+
+	#region XML Documentation Helpers
+
+	/// <summary>
+	/// Builds a method signature string for XML doc summaries.
+	/// E.g., "DoWork(int id, string name)" or "GetCount()".
+	/// Uses shortened type names for readability.
+	/// </summary>
+	private static string FormatMethodSignatureForDoc(string methodName, EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return $"{methodName}()";
+
+		var paramList = string.Join(", ", parameters.Select(p =>
+		{
+			var shortType = ShortenTypeForDoc(p.Type);
+			return $"{p.RefPrefix}{shortType} {p.Name}";
+		}));
+		return $"{methodName}({paramList})";
+	}
+
+	/// <summary>
+	/// Shortens a fully qualified type name for display in XML doc comments.
+	/// </summary>
+	private static string ShortenTypeForDoc(string type)
+	{
+		var result = type;
+		if (result.StartsWith("global::"))
+			result = result.Substring(8);
+
+		// Map common System types to keywords
+		result = result switch
+		{
+			"System.Int32" => "int",
+			"System.Int64" => "long",
+			"System.Int16" => "short",
+			"System.Byte" => "byte",
+			"System.SByte" => "sbyte",
+			"System.UInt32" => "uint",
+			"System.UInt64" => "ulong",
+			"System.UInt16" => "ushort",
+			"System.Single" => "float",
+			"System.Double" => "double",
+			"System.Decimal" => "decimal",
+			"System.Boolean" => "bool",
+			"System.Char" => "char",
+			"System.String" => "string",
+			"System.Object" => "object",
+			"System.Void" => "void",
+			_ => result
+		};
+
+		return result;
+	}
+
+	/// <summary>
+	/// Emits XML doc comments for a Call() method on the interceptor.
+	/// Includes method signature in summary and parameter-level docs in the callback param tag.
+	/// </summary>
+	private static void EmitCallXmlDoc(CodeWriter w, string methodName, EquatableArray<ParameterModel> parameters, string? xmlDocSummary, string? extraSummary = null)
+	{
+		var sig = FormatMethodSignatureForDoc(methodName, parameters);
+		var summaryText = xmlDocSummary != null
+			? $"Configures callback for {sig}. {xmlDocSummary}"
+			: $"Configures callback for {sig}.";
+		if (extraSummary != null)
+			summaryText += $" {extraSummary}";
+		w.Line($"/// <summary>{summaryText}</summary>");
+
+		// Emit <param> for the callback parameter with per-parameter docs
+		EmitCallbackParamDoc(w, "callback", parameters);
+	}
+
+	/// <summary>
+	/// Emits XML doc comments for a Return() method on the interceptor.
+	/// Includes method signature in summary.
+	/// </summary>
+	private static void EmitReturnXmlDoc(CodeWriter w, string methodName, EquatableArray<ParameterModel> parameters, string? xmlDocSummary, string? extraSummary = null)
+	{
+		var sig = FormatMethodSignatureForDoc(methodName, parameters);
+		var summaryText = xmlDocSummary != null
+			? $"Sets return value for {sig}. {xmlDocSummary}"
+			: $"Sets return value for {sig}.";
+		if (extraSummary != null)
+			summaryText += $" {extraSummary}";
+		w.Line($"/// <summary>{summaryText}</summary>");
+		w.Line("/// <param name=\"value\">The value to return.</param>");
+	}
+
+	/// <summary>
+	/// Emits a &lt;param&gt; XML doc tag for a callback parameter, including per-parameter
+	/// documentation from the original interface/class if available.
+	/// </summary>
+	private static void EmitCallbackParamDoc(CodeWriter w, string paramName, EquatableArray<ParameterModel> parameters)
+	{
+		var hasAnyDocs = parameters.Any(p => p.XmlDoc != null);
+		if (!hasAnyDocs || parameters.Count == 0)
+		{
+			// No parameter-level docs available; emit simple param tag
+			return;
+		}
+
+		if (parameters.Count == 1)
+		{
+			var p = parameters.GetArray()![0];
+			var shortType = ShortenTypeForDoc(p.Type);
+			var docText = p.XmlDoc != null
+				? $"Callback for {p.Name} ({shortType}): {p.XmlDoc}"
+				: $"Callback for {p.Name} ({shortType}).";
+			w.Line($"/// <param name=\"{paramName}\">{docText}</param>");
+		}
+		else
+		{
+			// Multi-param: list each parameter
+			w.Line($"/// <param name=\"{paramName}\">");
+			w.Line($"/// Callback receiving ({string.Join(", ", parameters.Select(p => p.Name))}) parameters.");
+			foreach (var p in parameters)
+			{
+				var shortType = ShortenTypeForDoc(p.Type);
+				var docSuffix = p.XmlDoc != null ? $": {p.XmlDoc}" : "";
+				w.Line($"/// - {p.Name} ({shortType}){docSuffix}");
+			}
+			w.Line("/// </param>");
+		}
+	}
+
+	/// <summary>
+	/// Emits XML doc comments for a When() method on the interceptor.
+	/// Includes method signature in summary and parameter-level docs.
+	/// </summary>
+	private static void EmitWhenXmlDoc(CodeWriter w, string? methodName, EquatableArray<ParameterModel> parameters, string? xmlDocSummary, string? extraSummary = null)
+	{
+		if (methodName != null)
+		{
+			var sig = FormatMethodSignatureForDoc(methodName, parameters);
+			var summaryText = xmlDocSummary != null
+				? $"Configures parameter matching for {sig}. {xmlDocSummary}"
+				: $"Configures parameter matching for {sig}.";
+			if (extraSummary != null)
+				summaryText += $" {extraSummary}";
+			w.Line($"/// <summary>{summaryText}</summary>");
+		}
+		else
+		{
+			var summaryText = "Configures parameter-specific matching.";
+			if (extraSummary != null)
+				summaryText += $" {extraSummary}";
+			w.Line($"/// <summary>{summaryText}</summary>");
 		}
 	}
 

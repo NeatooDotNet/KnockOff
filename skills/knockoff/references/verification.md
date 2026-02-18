@@ -48,7 +48,7 @@ Mark interceptors during configuration, then verify all at once:
 <!-- snippet: verification-ref-batch -->
 ```cs
 // Step 1: Mark during setup
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((u) => { }).Verifiable(Called.Exactly(2));
 stub.Refresh.Call(() => { }).Verifiable(Called.Never);
 
@@ -73,7 +73,7 @@ stub.Verify();  // Checks GetById (AtLeastOnce), Save (Exactly(2)), Refresh (Nev
 
 <!-- snippet: verification-ref-verifyall -->
 ```cs
-stub.GetById.Return((id) => new User { Id = id });
+stub.GetById.Call((id) => new User { Id = id });
 stub.Save.Call((user) => { });
 
 IRepoVerify repo = stub;
@@ -186,7 +186,7 @@ When verification fails, `VerificationException` collects ALL failures and repor
 
 <!-- snippet: verification-ref-exception -->
 ```cs
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((user) => { }).Verifiable();
 stub.Refresh.Call(() => { }).Verifiable();
 
@@ -226,7 +226,7 @@ Choose based on testing philosophy:
 <!-- snippet: verification-ref-verifiable-chaining -->
 ```cs
 // Chain with Return
-stub.GetById.Return((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
+stub.GetById.Call((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
 
 // Chain with Call
 stub.Save.Call((u) => { }).Verifiable(Called.Once);
@@ -241,7 +241,7 @@ stub.Save.Call((u) => { }).Verifiable(Called.Once);
 
 <!-- snippet: verification-ref-reset -->
 ```cs
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 IRepoVerify repo = stub;
 repo.GetById(1);
 stub.Verify(); // Passes

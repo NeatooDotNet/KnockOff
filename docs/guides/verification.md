@@ -30,7 +30,7 @@ KnockOff enables verification of:
 
 ## Direct Verification
 
-Call `.Verify()` directly on interceptors returned by `Returns`/`Execute`. This approach is concise when you only need to verify one or two calls.
+Call `.Verify()` directly on interceptors returned by `Return`/`Call`. This approach is concise when you only need to verify one or two calls.
 
 ### At Least Once (Default)
 
@@ -39,7 +39,7 @@ The simplest verification checks whether a method was invoked at least once.
 <!-- snippet: verify-verifiable -->
 ```cs
 // Mark for batch verification, then verify all marked members
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 
 IRepoVerify repository = stub;
 repository.GetById(42);
@@ -103,7 +103,7 @@ Use `.Verifiable()` to mark interceptors as requiring verification, then call `s
 
 ### Basic Marked Verification
 
-The `verify-verifiable` example in the Direct Verification section demonstrates this pattern. Chain `.Verifiable()` on the builder returned by `Returns`/`Execute`, then call `stub.Verify()` to check all marked members at once.
+The `verify-verifiable` example in the Direct Verification section demonstrates this pattern. Chain `.Verifiable()` on the builder returned by `Return`/`Call`, then call `stub.Verify()` to check all marked members at once.
 
 ### Verifiable with Called
 
@@ -131,7 +131,7 @@ stub.Refresh.Call(() => { }).Verifiable(Called.Exactly(2));
 
 ## Verify All
 
-Call `stub.VerifyAll()` to check every interceptor that has `Returns`/`Execute` or `Value` configured, regardless of whether it was marked `.Verifiable()`.
+Call `stub.VerifyAll()` to check every interceptor that has `Return`/`Call` or `Value` configured, regardless of whether it was marked `.Verifiable()`.
 
 <!-- snippet: verify-verifyall -->
 ```cs
@@ -166,7 +166,7 @@ Assert.Equal(42, tracking.LastArg);
 <!-- snippet: verify-lastcallargs-tuple -->
 ```cs
 // LastArgs is a named tuple for multi-parameter methods
-var (id, name) = tracking.LastArgs!.Value;
+var (id, name) = tracking.LastArgs;
 Assert.Equal(42, id);
 Assert.Equal("Alice", name);
 ```
@@ -197,13 +197,13 @@ stub.Save.Call((user) => { saveCount++; });
 
 ## Call History Tracking
 
-For complex scenarios requiring inspection of all calls (not just the last), use `Returns`/`Execute` callbacks to capture a complete history.
+For complex scenarios requiring inspection of all calls (not just the last), use `Return`/`Call` callbacks to capture a complete history.
 
 <!-- snippet: verify-call-history -->
 ```cs
 // Capture all calls to a list for history inspection
 var calls = new List<int>();
-stub.GetById.Return((id) =>
+stub.GetById.Call((id) =>
 {
     calls.Add(id);
     return new User { Id = id };
@@ -242,7 +242,7 @@ Verify multiple methods were called using `.Verifiable()` and `stub.Verify()`.
 <!-- snippet: verify-cross-interceptor -->
 ```cs
 // Mark multiple methods as verifiable
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((user) => { }).Verifiable();
 stub.Refresh.Call(() => { }).Verifiable();
 ```
@@ -370,7 +370,7 @@ Delegate stubs support the same verification API via `stub.Interceptor`:
 ```cs
 // Create delegate stub and configure with Verifiable()
 var stub = new DelegateVerificationHost.Stubs.VerifyArithmeticOp();
-stub.Interceptor.Return((a, b) => a + b).Verifiable();
+stub.Interceptor.Call((a, b) => a + b).Verifiable();
 
 VerifyArithmeticOp op = stub;
 op(2, 3);
@@ -400,4 +400,4 @@ See the [Delegates Guide](delegates.md) for comprehensive delegate examples.
 
 ---
 
-**UPDATED:** 2026-02-05
+**UPDATED:** 2026-02-18

@@ -25,7 +25,7 @@ public class StandalonePatternTests
     public void StandaloneStub_ConfigureAndVerify()
     {
         var stub = new SkillUserRepoStub();
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         stub.Save.Call((user) => { }).Verifiable();
         ISkillUserRepo repo = stub;
 
@@ -54,7 +54,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.Return((to, subj) => true).Verifiable();
+        stub.Send.Call(_ => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -77,7 +77,7 @@ public partial class SkillDataTests
     public void Test()
     {
         var stub = new Stubs.SkillDataServiceBase();
-        stub.GetData.Return((id) => "test").Verifiable();
+        stub.GetData.Call((id) => "test").Verifiable();
         SkillDataServiceBase service = stub.Object;  // Use .Object!
     }
 }
@@ -97,7 +97,7 @@ public partial class SkillValidationTests
     public void Test()
     {
         var stub = new Stubs.SkillValidationRule();
-        stub.Interceptor.Return((val) => val != "invalid");
+        stub.Interceptor.Call((val) => val != "invalid");
         SkillValidationRule rule = stub;  // Implicit conversion
     }
 }
@@ -127,10 +127,10 @@ public class MethodReturnTests
         stub.GetValue.Return("default-value");
 
         // CALLBACK syntax - for dynamic values based on arguments
-        stub.GetValue.Return((key) => key == "debug" ? "true" : "false");
+        stub.GetValue.Call((key) => key == "debug" ? "true" : "false");
 
         // Void methods use Action callback
-        stub.SetValue.Call((key, value) => { /* track or validate */ });
+        stub.SetValue.Call(_ => { /* track or validate */ });
     }
 }
 
@@ -234,13 +234,13 @@ public class ArgumentAccessTests
     {
         var stub = new SkillNotifierStub();
 
-        var tracking = stub.Notify.Call((userId, message) => { });
+        var tracking = stub.Notify.Call(_ => { });
 
         ISkillNotifier notifier = stub;
         notifier.Notify(42, "Hello");
 
         // Access arguments from tracking object
-        var (userId, message) = tracking.LastArgs!.Value;
+        var (userId, message) = tracking.LastArgs;
         Assert.Equal(42, userId);
         Assert.Equal("Hello", message);
     }
@@ -279,7 +279,7 @@ public class GotchaTests
         var stub = new SkillBarStub();
 
         // CORRECT: Callback signature matches method parameters exactly
-        stub.Process.Call((int id, string name) => { /* ... */ });
+        stub.Process.Call(args => { /* ... */ });
     }
 }
 

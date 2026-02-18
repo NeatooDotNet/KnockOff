@@ -47,7 +47,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_OnCall_ConfiguresCallback()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.Return((a, b) => a + b);
+        stub.Interceptor.Call((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
         var result = operation(5, 10);

@@ -6,26 +6,26 @@ Generic methods (methods with their own type parameters like `T Method<T>()`) us
 
 ## Of<T>() Pattern
 
-Generic methods don't use `Return()` directly. You must first access a typed handler via `Of<T>()`:
+Generic methods don't use `Return()` or `Call()` directly. You must first access a typed handler via `Of<T>()`:
 
 ```csharp
 // WRONG: Cannot Return directly on a generic method handler
 // stub.Convert.Return(42);
 
 // CORRECT: Access typed handler first
-stub.Convert.Of<int>().Return((value) => 42);
-stub.Convert.Of<string>().Return((value) => "converted");
+stub.Convert.Of<int>().Call((value) => 42);
+stub.Convert.Of<string>().Call((value) => "converted");
 ```
 
 ---
 
 ## Configuration
 
-### Return(callback) -- Per-Type Behavior
+### Call(callback) -- Per-Type Behavior
 
 <!-- snippet: generic-methods-return-constant -->
 ```cs
-stub.GetById.Of<User>().Return((id) =>
+stub.GetById.Of<User>().Call((id) =>
     new User { Id = id, Name = "User" });
 ```
 <!-- endSnippet -->
@@ -50,11 +50,11 @@ Methods with multiple type parameters use `Of<T1, T2>()`:
 <!-- snippet: generic-multi-param -->
 ```cs
 // Configure for string -> int conversion
-stub.Convert.Of<string, int>().Return((source) =>
+stub.Convert.Of<string, int>().Call((source) =>
     int.Parse(source));
 
 // Configure for int -> string conversion
-stub.Convert.Of<int, string>().Return((source) =>
+stub.Convert.Of<int, string>().Call((source) =>
     source.ToString());
 ```
 <!-- endSnippet -->
@@ -151,7 +151,7 @@ Generic methods are **excluded** from the stub override pattern (underscore-suff
 // protected override T Convert_<T>(object value) => ...  // NOT generated
 
 // Use Of<T>() instead:
-stub.Convert.Of<int>().Return((value) => 42);
+stub.Convert.Of<int>().Call((value) => 42);
 ```
 
 ---
@@ -160,7 +160,7 @@ stub.Convert.Of<int>().Return((value) => 42);
 
 | Task | Code |
 |------|------|
-| Configure return | `stub.Method.Of<T>().Return((args) => result)` |
+| Configure return | `stub.Method.Of<T>().Call((args) => result)` |
 | Configure void | `stub.Method.Of<T>().Call(() => { })` |
 | Verify per-type | `stub.Method.Of<T>().Verify(Called.Once)` |
 | Verify all types | `stub.Method.Verify(Called.Exactly(n))` |

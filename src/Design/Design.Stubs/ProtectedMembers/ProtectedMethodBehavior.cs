@@ -72,7 +72,7 @@ public partial class ProtectedMethodBehaviorDemo
         var stub = new Stubs.ServiceBase();
 
         // Callback-based configuration works too
-        stub.GetInternalId.Return(() => $"ID-{DateTime.Now.Ticks}");
+        stub.GetInternalId.Call(() => $"ID-{DateTime.Now.Ticks}");
 
         ServiceBase service = stub.Object;
         var desc = service.GetDescription();
@@ -257,7 +257,7 @@ public partial class ProtectedMethodBehaviorDemo
 
         // Use callback form for sequences
         stub.GetInternalId
-            .Return(() => "first-id")
+            .Call(() => "first-id")
             .ThenReturn(() => "second-id");
 
         ServiceBase service = stub.Object;

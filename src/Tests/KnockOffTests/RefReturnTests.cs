@@ -189,7 +189,7 @@ public class RefReturnTests
 		var knockOff = new MixedRefReturnServiceKnockOff();
 		IMixedRefReturnService service = knockOff;
 
-		knockOff.GetNormal.Return((x) => x * 2);
+		knockOff.GetNormal.Call((x) => x * 2);
 		var result = service.GetNormal(5);
 
 		Assert.Equal(10, result);
@@ -363,7 +363,7 @@ public class RefReturnTests
 		var stub = new MixedRefReturnInlineTest.Stubs.IMixedRefReturnService();
 		IMixedRefReturnService service = stub;
 
-		stub.GetNormal.Return((x) => x * 2);
+		stub.GetNormal.Call((x) => x * 2);
 		var result = service.GetNormal(5);
 
 		Assert.Equal(10, result);

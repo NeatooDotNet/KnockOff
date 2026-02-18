@@ -84,7 +84,7 @@ public partial class RefReturnDemo
 		var stub = new RefReturnServiceStub();
 		IRefReturnService service = stub;
 
-		stub.GetValueRef.Return(() => 100);
+		stub.GetValueRef.Call(() => 100);
 		ref int result = ref service.GetValueRef();
 		// result == 100
 	}
@@ -104,7 +104,7 @@ public partial class RefReturnDemo
 		var stub = new RefReturnServiceStub();
 		IRefReturnService service = stub;
 
-		stub.GetItemRef.Return((index) => $"item-{index}");
+		stub.GetItemRef.Call((index) => $"item-{index}");
 		ref string result = ref service.GetItemRef(3);
 		// result == "item-3"
 	}
@@ -158,7 +158,7 @@ public partial class RefReturnDemo
 		IRefReturnService service = stub;
 
 		// Normal method works as usual
-		stub.GetNormal.Return((x) => x * 2);
+		stub.GetNormal.Call((x) => x * 2);
 		var normalResult = service.GetNormal(5);
 		// normalResult == 10
 

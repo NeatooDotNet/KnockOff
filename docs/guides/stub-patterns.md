@@ -89,7 +89,7 @@ public partial class UserRepoStandaloneStub : IUserRepoStandalone { } // Stub cl
 ```cs
 // Stand-Alone: instantiate like any class, configure via Verify()
 var stub = new UserRepoStandaloneStub();
-stub.GetById.Return((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
 stub.Save.Call((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
@@ -165,11 +165,11 @@ public partial class RepositoryGenericStub<T> : IRepositoryGeneric<T> where T : 
 ```cs
 // Generic Standalone: reusable across multiple type arguments
 var userRepo = new RepositoryGenericStub<User>();
-userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 userRepo.Save.Call((entity) => { }).Verifiable();
 
 var productRepo = new RepositoryGenericStub<Product>();
-productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+productRepo.GetById.Call((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -298,7 +298,7 @@ public partial class RepositoryBaseStub<T> where T : class { } // Stub classes M
 ```cs
 // Generic Standalone Class: reusable across multiple type arguments, uses .Object
 var stub = new RepositoryBaseStub<User>();
-stub.GetItem.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+stub.GetItem.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 stub.Save.Call((entity) => { }).Verifiable();
 RepositoryBase<User> service = stub.Object;
 ```
@@ -362,7 +362,7 @@ public partial class InlineInterfaceTests // Test classes MUST be partial to use
 ```cs
 // Inline Interface: access via Stubs namespace
 var stub = new Stubs.IUserRepoInline();
-stub.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 stub.Save.Call((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
@@ -419,7 +419,7 @@ public partial class InlineClassTests // Test classes MUST be partial to use inl
 ```cs
 // Inline Class: configure stub, use .Object for the class instance
 var stub = new Stubs.UserServiceClass();
-stub.GetUser.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+stub.GetUser.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 UserServiceClass service = stub.Object;
 ```
 <!-- endSnippet -->
@@ -474,7 +474,7 @@ public partial class InlineDelegateTests // Test classes MUST be partial to use 
 ```cs
 // Inline Delegate: configure via Interceptor, implicit conversion to delegate
 var ruleStub = new Stubs.ValidationRule();
-ruleStub.Interceptor.Return((value) => value != "invalid");
+ruleStub.Interceptor.Call((value) => value != "invalid");
 ValidationRule rule = ruleStub;
 ```
 <!-- endSnippet -->
@@ -525,10 +525,10 @@ public partial class OpenGenericTests // Test classes MUST be partial to use inl
 ```cs
 // Open Generic: instantiate with any type argument
 var userStub = new Stubs.IServiceOpenGeneric<User>();
-userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 var productStub = new Stubs.IServiceOpenGeneric<Product>();
-productStub.GetItem.Return((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
+productStub.GetItem.Call((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -586,7 +586,7 @@ public partial class OpenGenericClassTests // Test classes MUST be partial to us
 ```cs
 // Open Generic Class: instantiate with any type argument, use .Object
 var userStub = new Stubs.ServiceBaseOpenGeneric<User>();
-userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 // IMPORTANT: .Object gives you the actual class instance
 ServiceBaseOpenGeneric<User> service = userStub.Object;
@@ -740,7 +740,7 @@ This example demonstrates all nine patterns working together in a realistic test
 
 // 1. Standalone Interface: direct instantiation, stub IS implementation
 var emailStub = new EmailSvcPatternStub();
-emailStub.Send.Return((to, subject, body) => true).Verifiable();
+emailStub.Send.Call(_ => true).Verifiable();
 IEmailSvcPattern email = emailStub;
 
 // 2. Generic Standalone Interface: reusable with type args
@@ -756,7 +756,7 @@ ServiceBaseNonGeneric serviceBase = serviceBaseStub.Object;
 
 // 4. Generic Standalone Class: reusable class stub with type args
 var repoStub = new RepositoryBaseStub<Product>();
-repoStub.GetItem.Return((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+repoStub.GetItem.Call((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
 repoStub.Save.Call((entity) => { }).Verifiable();
 RepositoryBase<Product> repo = repoStub.Object;
 
@@ -774,7 +774,7 @@ AuditSvcBase audit = auditStub.Object;
 
 // 7. Inline Delegate: implicit conversion
 var ruleStub = new InlineDelegateTests.Stubs.ValidationRule();
-ruleStub.Interceptor.Return((value) => true);
+ruleStub.Interceptor.Call((value) => true);
 ValidationRule rule = ruleStub;
 
 // 8. Open Generic Interface: inline stub with type args
@@ -784,7 +784,7 @@ IProcessor<Order> processor = processorStub;
 
 // 9. Open Generic Class: inline stub with type args, uses .Object
 var serviceStub = new CompleteExampleOpenGenericClassHost.Stubs.ServiceBase<Order>();
-serviceStub.GetItem.Return((id) => new Order { Id = id }).Verifiable();
+serviceStub.GetItem.Call((id) => new Order { Id = id }).Verifiable();
 ServiceBase<Order> service = serviceStub.Object;
 ```
 <!-- endSnippet -->
@@ -794,11 +794,11 @@ ServiceBase<Order> service = serviceStub.Object;
 ## Next Steps
 
 - **[Getting Started](../getting-started.md)** - Learn basic stub creation
-- **[Methods Guide](methods.md)** - Configure method behavior with Returns and Execute
+- **[Methods Guide](methods.md)** - Configure method behavior with Return and Call
 - **[Properties Guide](properties.md)** - Work with property interceptors
 - **[Delegates Guide](delegates.md)** - Stub delegate types for callbacks and validation
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
 
 ---
 
-**UPDATED:** 2026-02-04 (Nine patterns including Standalone Class stubs)
+**UPDATED:** 2026-02-18 (Nine patterns including Standalone Class stubs)

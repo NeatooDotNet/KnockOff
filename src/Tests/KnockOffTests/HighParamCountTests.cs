@@ -22,8 +22,8 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		knockOff.Compute.Return((a, b, c, d, e, f, g, h, i) =>
-			a + b + c + d + e + f + g + h + i);
+		knockOff.Compute.Call(args =>
+			args.a + args.b + args.c + args.d + args.e + args.f + args.g + args.h + args.i);
 
 		var result = service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
@@ -36,7 +36,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		var tracking = knockOff.Compute.Return((a, b, c, d, e, f, g, h, i) => 0);
+		var tracking = knockOff.Compute.Call(_ => 0);
 
 		service.Compute(10, 20, 30, 40, 50, 60, 70, 80, 90);
 
@@ -58,7 +58,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		knockOff.Compute.Return((a, b, c, d, e, f, g, h, i) => 0);
+		knockOff.Compute.Call(_ => 0);
 
 		service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
 		service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -73,9 +73,9 @@ public class HighParamCountTests
 		IHighParamCountService service = knockOff;
 
 		int sum = 0;
-		knockOff.ProcessAll.Call((a, b, c, d, e, f, g, h, i, j) =>
+		knockOff.ProcessAll.Call(args =>
 		{
-			sum = a + b + c + d + e + f + g + h + i + j;
+			sum = args.a + args.b + args.c + args.d + args.e + args.f + args.g + args.h + args.i + args.j;
 		});
 
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -89,7 +89,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		var tracking = knockOff.ProcessAll.Call((a, b, c, d, e, f, g, h, i, j) => { });
+		var tracking = knockOff.ProcessAll.Call(args => { });
 
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -105,9 +105,9 @@ public class HighParamCountTests
 		IHighParamCountService service = knockOff;
 
 		knockOff.Compute
-			.Return((a, b, c, d, e, f, g, h, i) => 100)
-			.ThenReturn((a, b, c, d, e, f, g, h, i) => 200)
-			.ThenReturn((a, b, c, d, e, f, g, h, i) => 300);
+			.Call(_ => 100)
+			.ThenReturn(_ => 200)
+			.ThenReturn(_ => 300);
 
 		Assert.Equal(100, service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9));
 		Assert.Equal(200, service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9));

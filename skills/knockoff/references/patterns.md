@@ -84,7 +84,7 @@ public partial class PtUserRepositoryStub : IUserRepository { }
 ```cs
 // Standalone: instantiate like any class, configure via Verify()
 var stub = new PtUserRepositoryStub();
-stub.GetById.Return((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
+stub.GetById.Call((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
 stub.Save.Call((user) => { }).Verifiable();
 
 IUserRepository repo = stub;
@@ -162,11 +162,11 @@ public partial class PtRepositoryStub<T> : IRepository<T> where T : class { }
 ```cs
 // Generic Standalone: reusable across multiple type arguments
 var userRepo = new PtRepositoryStub<User>();
-userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 userRepo.Save.Call((entity) => { }).Verifiable();
 
 var productRepo = new PtRepositoryStub<Product>();
-productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+productRepo.GetById.Call((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -300,7 +300,7 @@ public partial class PtRepositoryBaseStub<T> where T : class { }
 ```cs
 // Generic Standalone Class: reusable across multiple type arguments
 var userRepo = new PtRepositoryBaseStub<User>();
-userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
+userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
 userRepo.Save.Call((entity) => { }).Verifiable();
 
 RepositoryBase<User> repo = userRepo.Object;  // Use .Object!
@@ -374,7 +374,7 @@ public partial class PtEmailServiceTests
 ```cs
 // Inline Interface: access via Stubs namespace
 var stub = new Stubs.IEmailService();
-stub.Send.Return((to, subject) => true).Verifiable();
+stub.Send.Call(_ => true).Verifiable();
 
 IEmailService email = stub;
 email.Send("test@example.com", "Hello");
@@ -435,7 +435,7 @@ public partial class PtUserServiceTests
 ```cs
 // Inline Class: configure stub, use .Object for the class instance
 var stub = new Stubs.UserService();
-stub.GetUser.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+stub.GetUser.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 UserService service = stub.Object;  // Use .Object!
 var user = service.GetUser(42);
@@ -505,7 +505,7 @@ public partial class PtDelegateTests
 ```cs
 // Inline Delegate: configure via Interceptor, implicit conversion to delegate
 var ruleStub = new Stubs.ValidationRule();
-ruleStub.Interceptor.Return((value) => value != "invalid");
+ruleStub.Interceptor.Call((value) => value != "invalid");
 
 ValidationRule rule = ruleStub;  // Implicit conversion
 bool isValid = rule("test");
@@ -560,10 +560,10 @@ public partial class PtOpenGenericTests
 ```cs
 // Open Generic Interface: instantiate with any type argument
 var userStub = new Stubs.IService<User>();
-userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 var productStub = new Stubs.IService<Product>();
-productStub.GetItem.Return((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
+productStub.GetItem.Call((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
 
 // The stub IS the interface implementation (no .Object needed)
 IService<User> userService = userStub;
@@ -627,7 +627,7 @@ public partial class PtOpenGenericClassTests
 ```cs
 // Open Generic Class: instantiate with any type argument, use .Object
 var userStub = new Stubs.ServiceBaseGeneric<User>();
-userStub.GetItem.Return((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+userStub.GetItem.Call((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 // IMPORTANT: .Object gives you the actual class instance
 ServiceBaseGeneric<User> service = userStub.Object;
@@ -768,7 +768,7 @@ This example demonstrates all nine patterns working together:
 ```cs
 // 1. Standalone: direct instantiation
 var emailStub = new PtEmailSvcStub();
-emailStub.Send.Return((to, subject, body) => true).Verifiable();
+emailStub.Send.Call(_ => true).Verifiable();
 IEmailSvc email = emailStub;
 
 // 2. Generic Standalone: reusable with type args
@@ -784,7 +784,7 @@ ServiceBase cache = cacheStub.Object;
 
 // 4. Generic Standalone Class: reusable generic class stub, uses .Object
 var repoStub = new PtRepositoryBaseStub<User>();
-repoStub.GetById.Return((id) => new User { Id = id }).Verifiable();
+repoStub.GetById.Call((id) => new User { Id = id }).Verifiable();
 RepositoryBase<User> repo = repoStub.Object;
 
 // 5. Inline Interface: via Stubs namespace
@@ -799,7 +799,7 @@ AuditService audit = auditStub.Object;
 
 // 7. Inline Delegate: implicit conversion
 var ruleStub = new PtDelegateHost.Stubs.ValidationRule();
-ruleStub.Interceptor.Return((value) => true);
+ruleStub.Interceptor.Call((value) => true);
 ValidationRule rule = ruleStub;
 
 // 8. Open Generic Interface: inline stub with type args
@@ -809,7 +809,7 @@ IProcessor<Order> processor = processorStub;
 
 // 9. Open Generic Class: inline stub with type args, uses .Object
 var serviceStub = new PtOpenGenericClassHost.Stubs.ServiceBaseGeneric<Order>();
-serviceStub.GetItem.Return((id) => new Order { Id = id }).Verifiable();
+serviceStub.GetItem.Call((id) => new Order { Id = id }).Verifiable();
 ServiceBaseGeneric<Order> service = serviceStub.Object;  // .Object required for class patterns
 ```
 <!-- endSnippet -->

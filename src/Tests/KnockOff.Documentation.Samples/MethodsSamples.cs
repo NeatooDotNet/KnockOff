@@ -101,7 +101,7 @@ public class MethodConfigurationTests
 
         #region methods-oncall-return
         // Return with return value: Func<...params, TReturn>
-        stub.GetUserName.Return((userId) => "TestUser");
+        stub.GetUserName.Call((userId) => "TestUser");
         #endregion
 
         ILogSvcMethods logger = stub;
@@ -139,7 +139,7 @@ public class MethodConfigurationTests
         // - Dynamic values based on arguments
         // - Side effects
         // - Conditional logic
-        stub.GetUserName.Return((userId) => userId > 100 ? "Admin" : "User");
+        stub.GetUserName.Call((userId) => userId > 100 ? "Admin" : "User");
 
         // Both return tracking objects for verification
         #endregion
@@ -152,8 +152,8 @@ public class MethodConfigurationTests
 
         #region methods-oncall-multi-param
         // All method parameters are passed to the callback in order
-        stub.ValidateCredentials.Return((username, password) =>
-            username == "admin" && password == "secret");
+        stub.ValidateCredentials.Call(args =>
+            args.username == "admin" && args.password == "secret");
         #endregion
 
         IAuthSvcMethods auth = stub;
@@ -209,7 +209,7 @@ public class MethodVerificationTests
         #region methods-verify-verifiable
         // Mark expected calls with Verifiable(), then stub.Verify() checks all
         stub.Save.Call((entity) => { }).Verifiable(Called.Once);
-        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Call((id) => new User { Id = id }).Verifiable();
         #endregion
 
         ISaveRepoMethods repository = stub;
@@ -230,7 +230,7 @@ public class ArgumentCaptureTests
     public void LastArg_CapturesSingleParameter()
     {
         var stub = new UserRepoMethodsStub();
-        var tracking = stub.GetUser.Return((userId) => new User { Id = userId });
+        var tracking = stub.GetUser.Call((userId) => new User { Id = userId });
 
         IUserRepoMethods repository = stub;
         repository.GetUser(42);
@@ -247,14 +247,14 @@ public class ArgumentCaptureTests
     public void LastArgs_CapturesAllParameters()
     {
         var stub = new AuthSvcMethodsStub();
-        var tracking = stub.ValidateCredentials.Return((username, password) => true);
+        var tracking = stub.ValidateCredentials.Call(_ => true);
 
         IAuthSvcMethods auth = stub;
         auth.ValidateCredentials("admin", "secret123");
 
         #region methods-capture-multiple
         // LastArgs is a named tuple with all parameters
-        var (username, password) = tracking.LastArgs!.Value;
+        var (username, password) = tracking.LastArgs;
         #endregion
 
         Assert.Equal("admin", username);
@@ -332,7 +332,7 @@ public class CompleteMethodExampleTests
 
         #region methods-complete-example
         // Configure stub with tracking
-        var getTracking = stub.GetUser.Return((id) => id == 1 ? testUser : null).Verifiable();
+        var getTracking = stub.GetUser.Call((id) => id == 1 ? testUser : null).Verifiable();
         var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
         #endregion
 
@@ -359,9 +359,9 @@ public class OverloadedMethodTests
 
         #region methods-overloads
         // Fully-typed lambda tells KnockOff which overload to configure
-        stub.Find.Return(() => new List<User>());
-        stub.Find.Return((int id) => new User { Id = id, Name = "ById" });
-        stub.Find.Return((string name) => new User { Id = 1, Name = name });
+        stub.Find.Call(() => new List<User>());
+        stub.Find.Call((int id) => new User { Id = id, Name = "ById" });
+        stub.Find.Call((string name) => new User { Id = 1, Name = name });
         #endregion
 
         ISearchRepo repo = stub;
@@ -447,7 +447,7 @@ public class SequenceTests
 
         // Mix callbacks with params for complex sequences:
         // First call uses callback, then returns 100, 200, 300
-        addStub.Calculate.Return((x, y) => x + y).ThenReturn(100, 200, 300);
+        addStub.Calculate.Call(args => args.x + args.y).ThenReturn(100, 200, 300);
         #endregion
 
         IValueSvc service = stub;
@@ -506,7 +506,7 @@ public class SequenceTests
         #region methods-sequence-callback-then-params
         // Return for first callback, then ThenReturn for constant values
         stub.Calculate
-            .Return((x, y) => x + y)
+            .Call(args => args.x + args.y)
             .ThenReturn(100, 200, 300);
         #endregion
 
@@ -527,7 +527,7 @@ public class SequenceTests
         #region methods-sequence-basic
         // Chain ThenCall() for callback sequences
         stub.GetStatus
-            .Return(() => "Pending")
+            .Call(() => "Pending")
             .ThenReturn(() => "Processing")
             .ThenReturn(() => "Complete");
         #endregion
@@ -570,9 +570,9 @@ public class SequenceTests
         #region methods-sequence-return
         // Return method sequences use Func callbacks
         stub.Calculate
-            .Return((x, y) => x + y)
-            .ThenReturn((x, y) => x * y)
-            .ThenReturn((x, y) => x - y);
+            .Call(args => args.x + args.y)
+            .ThenReturn(args => args.x * args.y)
+            .ThenReturn(args => args.x - args.y);
         #endregion
 
         ICalculatorSvc calc = stub;
@@ -589,7 +589,7 @@ public class SequenceTests
 
         #region methods-sequence-exhaustion
         // After exhaustion: repeats last value (NSubstitute behavior)
-        stub.GetValue.Return(() => 1).ThenReturn(() => 2).ThenReturn(() => 3);
+        stub.GetValue.Call(() => 1).ThenReturn(() => 2).ThenReturn(() => 3);
         #endregion
 
         IValueSvc service = stub;
@@ -608,7 +608,7 @@ public class SequenceTests
 
         #region methods-sequence-then-default
         // ThenDefault() returns default(T) after exhaustion instead of repeating
-        stub.GetValue.Return(() => 1).ThenReturn(() => 2).ThenDefault();
+        stub.GetValue.Call(() => 1).ThenReturn(() => 2).ThenDefault();
         #endregion
 
         IValueSvc service = stub;
@@ -627,7 +627,7 @@ public class SequenceTests
         #region methods-sequence-strict
         // Strict mode throws on sequence exhaustion
         stub.Strict = true;
-        stub.GetValue.Return(() => 1).ThenReturn(() => 2);
+        stub.GetValue.Call(() => 1).ThenReturn(() => 2);
         #endregion
 
         IValueSvc service = stub;
@@ -645,7 +645,7 @@ public class SequenceTests
         #region methods-sequence-mixed
         // Mix fixed values with dynamic callbacks
         stub.GetStatus
-            .Return(() => "Initial")
+            .Call(() => "Initial")
             .ThenReturn(() => DateTime.Now.ToString("HH:mm:ss"))
             .ThenReturn(() => "Final");
         #endregion
@@ -754,7 +754,7 @@ public class SequenceTests
         #region methods-sequence-callback-then-params-full
         // First call: compute dynamically
         // Then: return 100, 200, 300 in sequence
-        stub.Calculate.Return((a, b) => a + b).ThenReturn(100, 200, 300);
+        stub.Calculate.Call(args => args.x + args.y).ThenReturn(100, 200, 300);
 
         ICalculatorSvc calc = stub;
         var r1 = calc.Calculate(1, 2);  // 3 (computed: 1 + 2)

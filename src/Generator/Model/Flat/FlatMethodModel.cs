@@ -59,7 +59,10 @@ internal sealed record FlatMethodModel(
     /// pragmas because it has unconstrained nullable type parameters (T? without where T : class).
     /// The ReturnType and ParameterDeclarations will have ? stripped from these type parameters.
     /// </summary>
-    bool NeedsNullableDisable = false)
+    bool NeedsNullableDisable = false,
+
+    /// <summary>XML documentation summary text for the method, extracted from the original interface/class. Null if none.</summary>
+    string? XmlDocSummary = null)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

@@ -14,7 +14,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.StructReturn.Of<int>().Return((v) => v * 2);
+		knockOff.StructReturn.Of<int>().Call((v) => v * 2);
 
 		var result = service.StructReturn(21);
 
@@ -27,7 +27,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.StructReturn.Of<int>().Return((_) => null);
+		knockOff.StructReturn.Of<int>().Call((_) => null);
 
 		var result = service.StructReturn(5);
 
@@ -44,7 +44,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.NotNullReturn.Of<string>().Return((v) => v + "!");
+		knockOff.NotNullReturn.Of<string>().Call((v) => v + "!");
 
 		var result = service.NotNullReturn("hello");
 
@@ -57,7 +57,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.NotNullReturn.Of<int>().Return((v) => v + 1);
+		knockOff.NotNullReturn.Of<int>().Call((v) => v + 1);
 
 		var result = service.NotNullReturn(41);
 
@@ -74,7 +74,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.ClassNewReturn.Of<List<int>>().Return(() => new List<int> { 1, 2, 3 });
+		knockOff.ClassNewReturn.Of<List<int>>().Call(() => new List<int> { 1, 2, 3 });
 
 		var result = service.ClassNewReturn<List<int>>();
 
@@ -91,7 +91,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.MultiInterfaceReturn.Of<string>().Return((_) => "result");
+		knockOff.MultiInterfaceReturn.Of<string>().Call((_) => "result");
 
 		var result = service.MultiInterfaceReturn("input");
 
@@ -108,7 +108,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.SelfReferentialReturn.Of<int>().Return((v) => v);
+		knockOff.SelfReferentialReturn.Of<int>().Call((v) => v);
 
 		var result = service.SelfReferentialReturn(42);
 
@@ -126,7 +126,7 @@ public class GenericConstraintCoverageTests
 		IGenericConstraintCoverage service = knockOff;
 
 		var stream = new MemoryStream(new byte[] { 1, 2, 3 });
-		knockOff.NotNullInterfaceReturn.Of<MemoryStream>().Return((_) => stream);
+		knockOff.NotNullInterfaceReturn.Of<MemoryStream>().Call((_) => stream);
 
 		var result = service.NotNullInterfaceReturn(new MemoryStream());
 
@@ -143,7 +143,7 @@ public class GenericConstraintCoverageTests
 		var knockOff = new GenericConstraintCoverageKnockOff();
 		IGenericConstraintCoverage service = knockOff;
 
-		knockOff.ConvertWithConstraint.Of<object, string>().Return((input) => input.ToString()!);
+		knockOff.ConvertWithConstraint.Of<object, string>().Call((input) => input.ToString()!);
 
 		var result = service.ConvertWithConstraint<object, string>(42);
 
@@ -160,7 +160,7 @@ public class GenericConstraintCoverageTests
 		var stub = new GenericConstraintInlineTests.Stubs.IGenericConstraintCoverage();
 		IGenericConstraintCoverage service = stub;
 
-		stub.StructReturn.Of<int>().Return((v) => v * 3);
+		stub.StructReturn.Of<int>().Call((v) => v * 3);
 
 		var result = service.StructReturn(10);
 
@@ -173,7 +173,7 @@ public class GenericConstraintCoverageTests
 		var stub = new GenericConstraintInlineTests.Stubs.IGenericConstraintCoverage();
 		IGenericConstraintCoverage service = stub;
 
-		stub.NotNullReturn.Of<string>().Return((v) => v.ToUpper());
+		stub.NotNullReturn.Of<string>().Call((v) => v.ToUpper());
 
 		var result = service.NotNullReturn("test");
 
@@ -186,7 +186,7 @@ public class GenericConstraintCoverageTests
 		var stub = new GenericConstraintInlineTests.Stubs.IGenericConstraintCoverage();
 		IGenericConstraintCoverage service = stub;
 
-		stub.ClassNewReturn.Of<List<string>>().Return(() => new List<string> { "a" });
+		stub.ClassNewReturn.Of<List<string>>().Call(() => new List<string> { "a" });
 
 		var result = service.ClassNewReturn<List<string>>();
 
@@ -199,7 +199,7 @@ public class GenericConstraintCoverageTests
 		var stub = new GenericConstraintInlineTests.Stubs.IGenericConstraintCoverage();
 		IGenericConstraintCoverage service = stub;
 
-		stub.ConvertWithConstraint.Of<object, string>().Return((input) => $"converted:{input}");
+		stub.ConvertWithConstraint.Of<object, string>().Call((input) => $"converted:{input}");
 
 		var result = service.ConvertWithConstraint<object, string>("hello");
 

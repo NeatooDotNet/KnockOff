@@ -523,9 +523,10 @@ Update plan status to "Sent Back" and report to orchestrator: "Architect verific
 
 These extend the core rules in CLAUDE.md:
 
-1. **Pattern Consistency**: New interceptors must follow established naming and structure patterns
-2. **Minimal Model Changes**: Models are the foundation; changes ripple to builders and renderers
-3. **Generated Code Readability**: Users debug generated code; keep it clean and traceable
+1. **Interceptor-as-Property is Sacred**: `stub.Method` must remain a property returning an interceptor object. This enables `Verify()`, `LastArgs`, `Reset()`, `Verifiable()`, and stub override fallback wiring. Any design that turns `stub.Method` into a method call breaks this foundation. **Push back hard** if any proposal — including Arg-style matching — would eliminate interceptor properties.
+2. **Pattern Consistency**: New interceptors must follow established naming and structure patterns
+3. **Minimal Model Changes**: Models are the foundation; changes ripple to builders and renderers
+4. **Generated Code Readability**: Users debug generated code; keep it clean and traceable
 
 ## Questions to Ask Before Designing
 

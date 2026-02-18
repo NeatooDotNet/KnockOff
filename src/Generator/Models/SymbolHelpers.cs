@@ -1,7 +1,9 @@
 // Helper methods for extracting information from Roslyn symbols
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using Microsoft.CodeAnalysis;
 
 namespace KnockOff;
@@ -455,4 +457,124 @@ internal static class SymbolHelpers
 		}
 		return new EquatableArray<TypeParameterInfo>(result.ToArray());
 	}
+
+	#region XML Documentation Extraction
+
+	/// <summary>
+	/// Extracts the XML documentation summary text from a method symbol.
+	/// Returns null if no documentation is available.
+	/// </summary>
+	public static string? GetXmlDocSummary(IMethodSymbol method)
+	{
+		var xml = method.GetDocumentationCommentXml();
+		if (string.IsNullOrWhiteSpace(xml))
+			return null;
+
+		try
+		{
+			var doc = new XmlDocument();
+			doc.LoadXml(xml);
+			var summaryNode = doc.SelectSingleNode("//summary");
+			if (summaryNode == null)
+				return null;
+
+			var text = summaryNode.InnerText?.Trim();
+			return string.IsNullOrEmpty(text) ? null : XmlEscape(text!);
+		}
+		catch (XmlException)
+		{
+			return null;
+		}
+	}
+
+	/// <summary>
+	/// Extracts the XML documentation text for a specific parameter from a method symbol.
+	/// Returns null if no documentation is available for this parameter.
+	/// </summary>
+	public static string? GetXmlDocForParameter(IMethodSymbol method, string parameterName)
+	{
+		var xml = method.GetDocumentationCommentXml();
+		if (string.IsNullOrWhiteSpace(xml))
+			return null;
+
+		try
+		{
+			var doc = new XmlDocument();
+			doc.LoadXml(xml);
+			var paramNode = doc.SelectSingleNode($"//param[@name='{parameterName}']");
+			if (paramNode == null)
+				return null;
+
+			var text = paramNode.InnerText?.Trim();
+			return string.IsNullOrEmpty(text) ? null : XmlEscape(text!);
+		}
+		catch (XmlException)
+		{
+			return null;
+		}
+	}
+
+	/// <summary>
+	/// Escapes special XML characters in text content for use in XML doc comments.
+	/// </summary>
+	public static string XmlEscape(string text)
+	{
+		return text
+			.Replace("&", "&amp;")
+			.Replace("<", "&lt;")
+			.Replace(">", "&gt;")
+			.Replace("\"", "&quot;");
+	}
+
+	/// <summary>
+	/// Formats a short method signature string for use in XML summaries.
+	/// E.g., "DoWork(int id, string name)" or "GetCount()".
+	/// Uses short type names for readability.
+	/// </summary>
+	public static string FormatMethodSignatureForXmlDoc(string methodName, IReadOnlyList<(string Type, string Name)> parameters)
+	{
+		if (parameters.Count == 0)
+			return $"{methodName}()";
+
+		var paramList = string.Join(", ", parameters.Select(p => $"{ShortenTypeName(p.Type)} {p.Name}"));
+		return $"{methodName}({paramList})";
+	}
+
+	/// <summary>
+	/// Shortens a fully qualified type name for display in XML doc summaries.
+	/// E.g., "global::System.Int32" -> "int", "global::System.String" -> "string".
+	/// </summary>
+	private static string ShortenTypeName(string type)
+	{
+		// Strip global:: prefix
+		var result = type;
+		if (result.StartsWith("global::"))
+			result = result.Substring(8);
+
+		// Map common System types to keywords
+		result = result switch
+		{
+			"System.Int32" => "int",
+			"System.Int64" => "long",
+			"System.Int16" => "short",
+			"System.Byte" => "byte",
+			"System.SByte" => "sbyte",
+			"System.UInt32" => "uint",
+			"System.UInt64" => "ulong",
+			"System.UInt16" => "ushort",
+			"System.Single" => "float",
+			"System.Double" => "double",
+			"System.Decimal" => "decimal",
+			"System.Boolean" => "bool",
+			"System.Char" => "char",
+			"System.String" => "string",
+			"System.Object" => "object",
+			"System.Void" => "void",
+			_ => result
+		};
+
+		return result;
+	}
+
+	#endregion
 }

@@ -2,8 +2,8 @@
 // Design.Stubs - Basic Method Stubbing
 // -----------------------------------------------------------------------------
 // This file demonstrates the fundamental method stubbing APIs:
-// - Returns(value) for constant return values
-// - Returns(callback) for dynamic returns based on arguments
+// - Return(value) for constant return values
+// - Call(callback) for dynamic returns based on arguments
 // - Async method handling with auto-wrapping
 // - Void method handling
 // - Argument capture (LastArg, LastArgs)
@@ -23,23 +23,17 @@ namespace Design.Stubs.Methods;
 public partial class BasicMethodsDemo
 {
     // =========================================================================
-    // Returns(value) - Constant Return Value
+    // Return(value) - Constant Return Value
     // =========================================================================
-    // DESIGN DECISION: Returns(value) sets a constant return value for all calls.
+    // DESIGN DECISION: Return(value) sets a constant return value for all calls.
     // This is the simplest configuration - no callback, no argument inspection.
     //
-    // GENERATOR BEHAVIOR: The generated interceptor stores the value internally:
+    // GENERATOR BEHAVIOR: The generated interceptor is fully generated (no
+    // generic base types in tooltips). It stores the value internally:
     //
-    //   public class AddInterceptor : MethodInterceptor<int, (int a, int b), int>
+    //   public sealed class AddInterceptor : MethodInterceptorRuntime
     //   {
-    //       private int _returnValue;
-    //
-    //       public AddInterceptor Returns(int value)
-    //       {
-    //           _returnValue = value;
-    //           _callback = null;  // Clears any Returns callback
-    //           return this;
-    //       }
+    //       public AddInterceptor Return(int value) { ... }
     //   }
     // =========================================================================
 
@@ -53,15 +47,16 @@ public partial class BasicMethodsDemo
         ICalculator calc = stub;
         var result = calc.Add(100, 200); // Returns 42, ignores arguments
 
-        // Returns() is chainable (returns the interceptor)
+        // Return() is chainable (returns the interceptor)
         stub.Subtract.Return(10).Verifiable();
     }
 
     // =========================================================================
-    // Returns(callback) - Dynamic Return Based on Arguments
+    // Call(callback) - Dynamic Return Based on Arguments
     // =========================================================================
-    // DESIGN DECISION: Returns(callback) receives typed arguments directly.
-    // The callback signature matches the method parameters: (a, b) => result
+    // DESIGN DECISION: Call(callback) receives typed arguments directly.
+    // For 2+ params, the callback receives a named tuple: args => args.a + args.b
+    // For 0-1 params, the callback receives the raw type.
     //
     // This differs from NSubstitute's callInfo.Arg<T>() pattern which requires
     // extracting arguments from an object array at runtime.
@@ -69,7 +64,7 @@ public partial class BasicMethodsDemo
     // DID NOT DO THIS: Use untyped argument access
     //
     // REJECTED PATTERN (NSubstitute-style):
-    //   stub.Add.Return(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
+    //   stub.Add.Call(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
     //
     // WHY NOT: Source generators can provide typed access at compile time.
     // Typed callbacks are safer and provide IntelliSense support.
@@ -79,8 +74,8 @@ public partial class BasicMethodsDemo
     {
         var stub = new Stubs.ICalculator();
 
-        // Callback receives actual method arguments with correct types
-        stub.Add.Return((a, b) => a + b);
+        // Callback receives actual method arguments as named tuple (IntelliSense shows field names)
+        stub.Add.Call(args => args.a + args.b);
 
         ICalculator calc = stub;
         var result = calc.Add(3, 5); // Returns 8 (3 + 5)
@@ -91,11 +86,11 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
 
         // Callbacks can throw exceptions for error testing
-        stub.Divide.Return((a, b) =>
+        stub.Divide.Call(args =>
         {
-            if (b == 0)
+            if (args.b == 0)
                 throw new DivideByZeroException();
-            return a / b;
+            return args.a / args.b;
         });
 
         ICalculator calc = stub;
@@ -109,7 +104,7 @@ public partial class BasicMethodsDemo
     // All configuration methods use direct replacement. Calling any
     // configuration method replaces the previous configuration of the same kind:
     //
-    //   - Return(value) and Return(callback) replace each other
+    //   - Return(value) and Call(callback) replace each other
     //   - Multiple Call(callback) calls — last wins
     //   - Multiple Get(value) or Get(callback) calls — last wins
     //   - Multiple Set(callback) calls — last wins
@@ -121,21 +116,23 @@ public partial class BasicMethodsDemo
     // KNOWN BUG: When() currently accumulates like ThenWhen() instead of
     // replacing. See docs/todos/when-entry-point-should-clear-chain.md.
     //
-    // COMMON MISTAKE: Expecting Return(value) and Return(callback) to combine
+    // COMMON MISTAKE: Expecting Return(value) and Call(callback) to combine
     //
     // WRONG:
-    //   stub.Add.Return((a, b) => a + b);
+    //   stub.Add.Call(args => args.a + args.b);
     //   stub.Add.Return(42);  // This REPLACES the callback, does not combine
     //
-    // NOTE: Return() is for methods with return values. Call() is for void
-    // methods. A method only has one or the other — never both.
+    // NOTE: Return(value) sets a constant value. Call(callback) provides a
+    // callback for dynamic behavior. Both work on void and non-void methods.
+    // For non-void: Call(callback) returns the callback's result.
+    // For void: Call(callback) executes the callback for side effects.
     // =========================================================================
 
     public void Returns_ValueAndCallback_AreExclusive()
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Return((a, b) => a + b);  // Set callback
+        stub.Add.Call(args => args.a + args.b);  // Set callback
         stub.Add.Return(42);               // REPLACES callback with constant
 
         ICalculator calc = stub;
@@ -145,16 +142,16 @@ public partial class BasicMethodsDemo
     // =========================================================================
     // Void Methods
     // =========================================================================
-    // DESIGN DECISION: Void methods have simpler interceptor APIs:
-    // - Execute(callback) for side effects
-    // - Verify() for call count verification
-    // - No Returns() since there's nothing to return
+    // DESIGN DECISION: Void methods use Call(callback) for side effects and
+    // Verify() for call count verification. No Return() since there's nothing
+    // to return.
     //
-    // GENERATOR BEHAVIOR: Void methods generate VoidMethodInterceptor:
+    // GENERATOR BEHAVIOR: Void methods generate a fully generated interceptor
+    // class extending non-generic MethodInterceptorRuntime:
     //
-    //   public class ResetInterceptor : VoidMethodInterceptor<Unit>
+    //   public sealed class ResetInterceptor : MethodInterceptorRuntime
     //   {
-    //       public void Execute(Action callback) { ... }
+    //       public ResetInterceptor Call(Action callback) { ... }
     //       public void Verify() { ... }
     //       public void Verify(Called called) { ... }
     //   }
@@ -165,7 +162,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
         var resetCount = 0;
 
-        // Void Execute uses Action, not Func
+        // Void Call uses Action, not Func
         stub.Reset.Call(() => resetCount++);
 
         ICalculator calc = stub;
@@ -181,24 +178,18 @@ public partial class BasicMethodsDemo
     // =========================================================================
     // DESIGN DECISION: Every method interceptor tracks the last call's arguments.
     // - LastArg: For single-parameter methods (e.g., GetById(int id))
-    // - LastArgs: For multi-parameter methods, returns a tuple
+    // - LastArgs: For multi-parameter methods, returns a named tuple
     //
-    // GENERATOR BEHAVIOR: The interceptor tracks arguments:
+    // GENERATOR BEHAVIOR: The fully generated interceptor tracks arguments:
     //
-    //   public class AddInterceptor : MethodInterceptor<int, (int a, int b), int>
+    //   public sealed class AddInterceptor : MethodInterceptorRuntime
     //   {
-    //       // For methods with multiple parameters
-    //       public (int a, int b) LastArgs { get; private set; }
-    //
-    //       public int Call((int a, int b) args)
-    //       {
-    //           LastArgs = args;
-    //           // ... invoke callback or return value
-    //       }
+    //       // For methods with multiple parameters (named tuple)
+    //       public (int a, int b)? LastArgs { get; private set; }
     //   }
     //
     // For single-parameter methods:
-    //   public int LastArg { get; private set; }  // Not LastArgs
+    //   public int? LastArg { get; private set; }  // Not LastArgs
     // =========================================================================
 
     public void ArgumentCapture_LastArgs_ForMultipleParameters()
@@ -215,8 +206,8 @@ public partial class BasicMethodsDemo
         var args = stub.Add.LastArgs;
         // args == (10, 20)
 
-        // For Returns() return values, you get LastArgs via the builder interface:
-        var builder = stub.Subtract.Return((a, b) => a - b);
+        // For Call() callbacks, you get LastArgs via the builder interface:
+        var builder = stub.Subtract.Call(args => args.a - args.b);
         calc.Subtract(100, 25);
         var subtractArgs = builder.LastArgs;
         // subtractArgs == (100, 25)
@@ -225,11 +216,11 @@ public partial class BasicMethodsDemo
     // =========================================================================
     // Async Methods - Auto-Wrapping
     // =========================================================================
-    // DESIGN DECISION: For async methods (Task<T>, ValueTask<T>), Returns()
+    // DESIGN DECISION: For async methods (Task<T>, ValueTask<T>), Return()
     // automatically wraps the value with Task.FromResult or ValueTask.FromResult.
     //
-    // This avoids boilerplate: Returns(Task.FromResult("value"))
-    // Instead: Returns("value")
+    // This avoids boilerplate: Return(Task.FromResult("value"))
+    // Instead: Return("value")
     //
     // DID NOT DO THIS: Require explicit Task.FromResult wrapping
     //
@@ -242,9 +233,9 @@ public partial class BasicMethodsDemo
     // WHY NOT: Reducing boilerplate improves readability. The method signature
     // already indicates it's async - forcing explicit wrapping adds noise.
     //
-    // GENERATOR BEHAVIOR: For Task<T> methods, Returns() wraps automatically:
+    // GENERATOR BEHAVIOR: For Task<T> methods, Return() wraps automatically:
     //
-    //   public GetDataAsyncInterceptor Returns(string? value)
+    //   public GetDataAsyncInterceptor Return(string? value)
     //   {
     //       _returnValue = Task.FromResult(value);
     //       return this;
@@ -267,8 +258,8 @@ public partial class BasicMethodsDemo
     {
         var stub = new Stubs.IDataService();
 
-        // Returns callback for async methods: callback returns T, not Task<T>
-        stub.GetDataAsync.Return((id) => $"Data for ID {id}");
+        // Call callback for async methods: callback returns T, not Task<T>
+        stub.GetDataAsync.Call((id) => $"Data for ID {id}");
 
         IDataService service = stub;
         var result = await service.GetDataAsync(42);
@@ -279,13 +270,14 @@ public partial class BasicMethodsDemo
     // Void Async Methods (Task return)
     // =========================================================================
     // DESIGN DECISION: For async void methods (Task return, no value),
-    // Execute receives the arguments and Returns() is not available.
+    // Call() receives the arguments and Return() is not available.
     //
-    // GENERATOR BEHAVIOR: Task-returning void methods generate:
+    // GENERATOR BEHAVIOR: Task-returning void methods generate a fully
+    // generated interceptor class:
     //
-    //   public class SaveDataAsyncInterceptor : VoidMethodInterceptor<string>
+    //   public sealed class SaveDataAsyncInterceptor : MethodInterceptorRuntime
     //   {
-    //       public void Execute(Action<string> callback) { ... }
+    //       public SaveDataAsyncInterceptor Call(Action<string> callback) { ... }
     //       // Returns Task.CompletedTask when not configured
     //   }
     // =========================================================================
@@ -308,12 +300,12 @@ public partial class BasicMethodsDemo
     // DESIGN DECISION: Reset() clears tracking state without changing configuration.
     // - LastArg/LastArgs reset to default
     // - Call count resets to 0
-    // - Returns/Execute configuration is PRESERVED
+    // - Return/Call configuration is PRESERVED
     //
     // DID NOT DO THIS: Reset() clears configuration too
     //
     // REJECTED PATTERN:
-    //   stub.Add.Reset(); // Would clear Returns(42) too
+    //   stub.Add.Reset(); // Would clear Return(42) too
     //
     // WHY NOT: Separating tracking reset from configuration allows reusing
     // stubs across multiple test scenarios without reconfiguring.
@@ -330,7 +322,7 @@ public partial class BasicMethodsDemo
 
         stub.Add.Reset();
         // stub.Add.LastArgs == (0, 0) (default)
-        // But Returns(42) is still in effect
+        // But Return(42) is still in effect
 
         var result = calc.Add(3, 4);
         // result == 42 (configuration preserved)

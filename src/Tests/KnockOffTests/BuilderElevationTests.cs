@@ -42,7 +42,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        stub.Calculate.Return(x => x * 2);
+        stub.Calculate.Call(x => x * 2);
 
         IBuilderElevationService svc = stub;
 
@@ -60,7 +60,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .Return(x => 100)
+            .Call(x => 100)
             .ThenReturn(x => 200)
             .ThenReturn(x => 300);
 
@@ -77,7 +77,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        var builder = stub.Calculate.Return(x => x * 10);
+        var builder = stub.Calculate.Call(x => x * 10);
 
         IBuilderElevationService svc = stub;
 
@@ -104,7 +104,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        var tracking = stub.Calculate.Return(x => x);
+        var tracking = stub.Calculate.Call(x => x);
 
         IBuilderElevationService svc = stub;
 
@@ -123,7 +123,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .Return(x => 1)
+            .Call(x => 1)
             .ThenReturn(x => 2)
             .ThenReturn(x => 3)
             .ThenReturn(x => 4)
@@ -146,7 +146,7 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = true;
         stub.Calculate
-            .Return(x => 100)
+            .Call(x => 100)
             .ThenReturn(x => 200);
 
         IBuilderElevationService svc = stub;
@@ -167,7 +167,7 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = false;
         stub.Calculate
-            .Return(x => 100)
+            .Call(x => 100)
             .ThenReturn(x => 200);
 
         IBuilderElevationService svc = stub;
@@ -188,7 +188,7 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = false;
         stub.Calculate
-            .Return(x => 100)
+            .Call(x => 100)
             .ThenReturn(x => 200)
             .ThenDefault();  // Explicitly request default after exhaustion
 
@@ -211,7 +211,7 @@ public class BuilderElevationTests
 
         // First, configure a sequence
         stub.Calculate
-            .Return(x => 100)
+            .Call(x => 100)
             .ThenReturn(x => 200);
 
         IBuilderElevationService svc = stub;
@@ -219,7 +219,7 @@ public class BuilderElevationTests
         Assert.Equal(200, svc.Calculate(0));
 
         // Now reconfigure with OnCall (should clear the sequence)
-        stub.Calculate.Return(x => 999);
+        stub.Calculate.Call(x => 999);
 
         // Act & Assert - should now be repeating mode again
         Assert.Equal(999, svc.Calculate(0));
@@ -233,7 +233,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .Return(x => 1).Verifiable()
+            .Call(x => 1).Verifiable()
             .ThenReturn(x => 2);
 
         IBuilderElevationService svc = stub;

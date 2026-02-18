@@ -78,7 +78,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher and mark verifiable
-        stub.Add.When((1, 2)).Return(100).Verifiable();
+        stub.Add.When(1, 2).Return(100).Verifiable();
 
         ICalculator calc = stub;
 
@@ -110,7 +110,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher
-        var chain = stub.Add.When((1, 2)).Return(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -145,8 +145,8 @@ public class WhenChainVerificationBugTests
 
         // Chain with two non-terminal matchers (no terminal at end)
         var chain = stub.Add
-            .When((1, 2)).Return(10)
-            .ThenWhen((3, 4)).Return(20);
+            .When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20);
 
         ICalculator calc = stub;
 
@@ -178,7 +178,7 @@ public class WhenChainVerificationBugTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        var chain = stub.Add.When((1, 2)).Return(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -211,7 +211,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a When chain (making it "configured" for VerifyAll)
-        stub.Add.When((1, 2)).Return(100);
+        stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -240,8 +240,8 @@ public class WhenChainVerificationBugTests
 
         // Chain ending with terminal matcher (ThenCall)
         var chain = stub.Add
-            .When((1, 2)).Return(10)
-            .ThenCall((a, b) => a + b);
+            .When(1, 2).Return(10)
+            .ThenCall(args => args.a + args.b);
 
         ICalculator calc = stub;
 
@@ -278,9 +278,9 @@ public class WhenChainVerificationBugTests
     // and _sequence counts -- but NOT When chain matcher CallCount values.
     //
     // WHAT SHOULD HAPPEN: After calling Add(1,2) via When chain and Add(5,6)
-    // via Returns fallback, Verify(Called.Exactly(2)) should pass (2 total calls).
+    // via Return fallback, Verify(Called.Exactly(2)) should pass (2 total calls).
     //
-    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Returns call counted).
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Return call counted).
     // Verify(Called.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
     //
     // WHY: The When chain invoke path does matcher.CallCount++ and returns early,
@@ -294,8 +294,8 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Add.When((1, 2)).Return(100);
-        // Configure Returns as fallback for non-matching args
+        stub.Add.When(1, 2).Return(100);
+        // Configure Return as fallback for non-matching args
         stub.Add.Return(0);
 
         ICalculator calc = stub;
@@ -304,13 +304,13 @@ public class WhenChainVerificationBugTests
         var r1 = calc.Add(1, 2);
         Assert.Equal(100, r1);
 
-        // Call 2: When chain doesn't match (5, 6), falls through to Returns
+        // Call 2: When chain doesn't match (5, 6), falls through to Return
         // -> _returnValueTracking._callCount++
         var r2 = calc.Add(5, 6);
         Assert.Equal(0, r2);
 
-        // BUG: TotalCallCount = 1 (only Returns call counted).
-        // Should be 2 (When chain + Returns).
+        // BUG: TotalCallCount = 1 (only Return call counted).
+        // Should be 2 (When chain + Return).
         stub.Add.Verify(Called.Exactly(2));
     }
 
@@ -340,7 +340,7 @@ public class WhenChainVerificationBugTests
         // Configure When chain (non-terminal, specific value matching)
         stub.Format.When("special").Return("SPECIAL");
         // Configure Call on the same overload as fallback
-        stub.Format.Return((string input) => "default");
+        stub.Format.Call((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -395,7 +395,7 @@ public class WhenChainVerificationBugTests
         stub.Format.When("special").Return("SPECIAL");
         // Configure Call on the same overload (makes condExpr true in Block 1,
         // isolating the count bug from the condExpr bug)
-        stub.Format.Return((string input) => "default");
+        stub.Format.Call((string input) => "default");
 
         IFormatter formatter = stub;
 

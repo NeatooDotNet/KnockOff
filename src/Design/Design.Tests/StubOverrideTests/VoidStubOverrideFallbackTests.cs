@@ -22,7 +22,7 @@
 // TESTS IN THIS FILE:
 // - Tests 1-2: BUG CASES - custom-type parameters (should fail today)
 // - Tests 3-4: CONTROL CASES - primitive parameters (should pass today)
-// - Test 5: OnCall still works for custom-type parameters (interceptor is fine)
+// - Test 5: Call still works for custom-type parameters (interceptor is fine)
 // - Test 6: Verify the stub override IS callable (it's defined, just not wired)
 // -----------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ public class VoidStubOverrideFallbackTests
     // =========================================================================
     // Test 1: BUG - Void method with custom-type parameter
     // =========================================================================
-    // EXPECTED: When no OnCall is configured, calling SaveOrder should invoke
+    // EXPECTED: When no Call is configured, calling SaveOrder should invoke
     //           the stub override SaveOrder_ as fallback, setting SaveOrderCalled
     //           to true and capturing the order.
     // ACTUAL:   SaveOrder_ is never called. SaveOrderCalled remains false.
@@ -56,7 +56,7 @@ public class VoidStubOverrideFallbackTests
 
         var order = new Order { Id = 1, Description = "Test", Amount = 99.99m };
 
-        // Call the void method with no OnCall configured
+        // Call the void method with no Call configured
         service.SaveOrder(order);
 
         // BUG: SaveOrder_ stub override is NOT called as fallback.
@@ -68,7 +68,7 @@ public class VoidStubOverrideFallbackTests
     // =========================================================================
     // Test 2: BUG - Non-void method with custom-type parameter
     // =========================================================================
-    // EXPECTED: When no OnCall/Returns is configured, calling FormatOrder
+    // EXPECTED: When no Call/Return is configured, calling FormatOrder
     //           should invoke the stub override FormatOrder_ as fallback and
     //           return its formatted string.
     // ACTUAL:   FormatOrder_ is never called. FormatOrder returns null (default!).
@@ -82,7 +82,7 @@ public class VoidStubOverrideFallbackTests
 
         var order = new Order { Id = 42, Description = "Widget", Amount = 19.99m };
 
-        // Call the non-void method with no OnCall/Returns configured
+        // Call the non-void method with no Call/Return configured
         var result = service.FormatOrder(order);
 
         // BUG: FormatOrder_ stub override is NOT called as fallback.
@@ -105,7 +105,7 @@ public class VoidStubOverrideFallbackTests
         var stub = new VoidStubOverrideFallbackStub();
         IVoidStubOverrideService service = stub;
 
-        // Call the void method with no OnCall configured
+        // Call the void method with no Call configured
         service.LogMessage("Hello, World!");
 
         // WORKS: LogMessage_ stub override IS called because "string" matches
@@ -126,7 +126,7 @@ public class VoidStubOverrideFallbackTests
         var stub = new VoidStubOverrideFallbackStub();
         IVoidStubOverrideService service = stub;
 
-        // Call the non-void method with no OnCall/Returns configured
+        // Call the non-void method with no Call/Return configured
         var result = service.GetStatus(200);
 
         // WORKS: GetStatus_ stub override IS called because "int" matches
@@ -134,9 +134,9 @@ public class VoidStubOverrideFallbackTests
     }
 
     // =========================================================================
-    // Test 5: OnCall still works for custom-type parameters
+    // Test 5: Call still works for custom-type parameters
     // =========================================================================
-    // Even though the stub override fallback is broken, OnCall should still work
+    // Even though the stub override fallback is broken, Call should still work
     // because it's configured on the interceptor directly, not via the user
     // method detection path.
     // =========================================================================
@@ -152,7 +152,7 @@ public class VoidStubOverrideFallbackTests
 
         service.SaveOrder(new Order { Id = 1 });
 
-        // OnCall works regardless of the stub override detection bug
+        // Call works regardless of the stub override detection bug
         Assert.True(captured);
         stub.SaveOrder.Verify(Called.Once);
     }
@@ -163,11 +163,11 @@ public class VoidStubOverrideFallbackTests
         var stub = new VoidStubOverrideFallbackStub();
         IVoidStubOverrideService service = stub;
 
-        stub.FormatOrder.Return(order => $"Custom: {order.Id}");
+        stub.FormatOrder.Call(order => $"Custom: {order.Id}");
 
         var result = service.FormatOrder(new Order { Id = 99 });
 
-        // OnCall works regardless of the stub override detection bug
+        // Call works regardless of the stub override detection bug
         Assert.Equal("Custom: 99", result);
         stub.FormatOrder.Verify(Called.Once);
     }

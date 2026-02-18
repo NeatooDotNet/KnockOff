@@ -117,7 +117,7 @@ public class SetupMethodKnockOffTests
 
         #region moq-migration-setup-method-knockoff
         // Return with typed delegate - arguments available directly
-        stub.GetUser.Return((id) => testUser);
+        stub.GetUser.Call((id) => testUser);
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -146,7 +146,7 @@ public class MethodReturnsCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUser.Return((id) => testUser);
+        stub.GetUser.Call((id) => testUser);
         #endregion
 
         Assert.Equal("Alice", mock.Object.GetUser(1)?.Name);
@@ -326,7 +326,7 @@ public class AsyncMethodKnockOffTests
 
         #region moq-migration-async-knockoff
         // Use Task.FromResult to wrap the return value
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -355,7 +355,7 @@ public class AsyncMethodsCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         var moqResult = await mock.Object.GetUserAsync(42);
@@ -484,7 +484,7 @@ public class ArgumentMatchingKnockOffTests
 
         #region moq-migration-arguments-knockoff
         // Arguments available directly - use standard C# conditionals
-        stub.GetUser.Return((id) =>
+        stub.GetUser.Call((id) =>
             id > 0 ? new User { Id = id, Name = "Valid User" } : null);
         #endregion
 
@@ -515,7 +515,7 @@ public class ArgumentMatchingCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUser.Return((id) =>
+        stub.GetUser.Call((id) =>
             id > 0 ? new User { Id = id, Name = "Valid" } : null);
         #endregion
 
@@ -548,7 +548,7 @@ public class SequencePatternCombinedSamples
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
         int callCount = 0;
-        stub.GetUser.Return((id) =>
+        stub.GetUser.Call((id) =>
         {
             callCount++;
             return callCount == 1 ? firstUser : secondUser;
@@ -682,7 +682,7 @@ public class CompleteKnockOffTests
 
         #region moq-migration-complete-knockoff
         // Return with Verifiable marks for batch verification
-        _stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
+        _stub.GetUserAsync.Call((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
@@ -735,7 +735,7 @@ public class CompleteMigrationCombinedExample
         var stub = new MoqUserRepoStub();
         var knockoffService = new UserServiceMigration(stub);
 
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var knockoffResult = await knockoffService.GetUserAsync(1);
         stub.Verify();
@@ -776,12 +776,12 @@ public class GotchaSignatureTests
 
         #region moq-migration-gotcha-signature-wrong
         // Wrong: GetUser(int id) expects (int) callback
-        // stub.GetUser.Return(() => user);  // Compile error
+        // stub.GetUser.Call(() => user);  // Compile error
         #endregion
 
         #region moq-migration-gotcha-signature-correct
         // Correct
-        stub.GetUser.Return((id) => user);
+        stub.GetUser.Call((id) => user);
         #endregion
     }
 }
@@ -829,10 +829,10 @@ public class GotchaAsyncAutoWrapTests
         stub.GetUserAsync.Return(user);
 
         // Simplified callback - also auto-wraps (return unwrapped type)
-        stub.GetUserAsync.Return((id) => user);
+        stub.GetUserAsync.Call((id) => user);
 
         // Only use Task.FromResult when callback needs actual async operations
-        stub.GetUserAsync.Return(async (id) =>
+        stub.GetUserAsync.Call(async (id) =>
         {
             await Task.Delay(1); // Some actual async work
             return user;
@@ -861,10 +861,10 @@ public class MoqAsyncConfigOptionsTests
         stub.GetUserAsync.Return(testUser);
 
         // 2. Return() simplified -- callback returns unwrapped type, auto-wrapped
-        stub.GetUserAsync.Return((id) => new User { Id = id });
+        stub.GetUserAsync.Call((id) => new User { Id = id });
 
         // 3. Return() full -- callback returns Task<T> directly
-        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Call((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -887,7 +887,7 @@ public class GotchaPropertyTests
 
         #region moq-migration-gotcha-property-wrong
         // Wrong: Return is for methods
-        // stub.ConnectionString.Return(() => "connection");  // Compile error
+        // stub.ConnectionString.Call(() => "connection");  // Compile error
         #endregion
 
         #region moq-migration-gotcha-property-correct
