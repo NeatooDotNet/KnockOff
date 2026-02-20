@@ -409,7 +409,8 @@ internal static class FlatRenderer
 		var outParams = method.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out).ToList();
 		var hasOutParams = outParams.Count > 0;
 
-		w.Line($"/// <summary>Override to provide default implementation for {method.DeclaringInterface}.{method.MethodName}.</summary>");
+		var methodSig = MethodInterceptorRenderer.FormatMethodSignatureForDoc(method.MethodName, method.Parameters, method.ReturnType, method.IsVoid);
+		w.Line($"/// <summary>Override to provide default implementation for {methodSig}.</summary>");
 
 		if (hasOutParams)
 		{
@@ -451,7 +452,15 @@ internal static class FlatRenderer
 		var propertyName = $"{property.MemberName}_";
 		var returnType = property.ReturnType;
 
-		w.Line($"/// <summary>Override to provide default implementation for {property.DeclaringInterface}.{property.MemberName}.</summary>");
+		var shortType = MethodInterceptorRenderer.ShortenTypeForDoc(property.ReturnType);
+		var accessors = (property.HasGetter, property.HasSetter) switch
+		{
+			(true, true) => " {{ get; set; }}",
+			(true, false) => " {{ get; }}",
+			(false, true) => " {{ set; }}",
+			_ => ""
+		};
+		w.Line($"/// <summary>Override to provide default implementation for {shortType} {property.MemberName}{accessors}.</summary>");
 
 		if (property.HasGetter && property.HasSetter)
 		{

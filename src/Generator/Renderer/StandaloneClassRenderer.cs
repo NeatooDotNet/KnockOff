@@ -304,7 +304,8 @@ internal static class StandaloneClassRenderer
         var methodName = $"{method.MethodName}_";
         var returnType = method.ReturnType;
 
-        w.Line($"/// <summary>Override to provide default implementation for {method.TargetMemberDescription}.</summary>");
+        var methodSig = MethodInterceptorRenderer.FormatMethodSignatureForDoc(method.MethodName, method.Parameters, method.ReturnType, method.IsVoid);
+        w.Line($"/// <summary>Override to provide default implementation for {methodSig}.</summary>");
 
         if (method.IsVoid)
         {
@@ -335,7 +336,15 @@ internal static class StandaloneClassRenderer
         var propertyName = $"{property.PropertyName}_";
         var returnType = property.ReturnType;
 
-        w.Line($"/// <summary>Override to provide default implementation for {property.TargetMemberDescription}.</summary>");
+        var shortType = MethodInterceptorRenderer.ShortenTypeForDoc(property.ReturnType);
+        var accessors = (property.HasGetter, property.HasSetter) switch
+        {
+            (true, true) => " {{ get; set; }}",
+            (true, false) => " {{ get; }}",
+            (false, true) => " {{ set; }}",
+            _ => ""
+        };
+        w.Line($"/// <summary>Override to provide default implementation for {shortType} {property.PropertyName}{accessors}.</summary>");
 
         if (property.HasGetter && property.HasSetter)
         {

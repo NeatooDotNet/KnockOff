@@ -5086,7 +5086,7 @@ internal static class MethodInterceptorRenderer
 	/// E.g., "DoWork(int id, string name)" or "GetCount()".
 	/// Uses shortened type names for readability.
 	/// </summary>
-	private static string FormatMethodSignatureForDoc(string methodName, EquatableArray<ParameterModel> parameters, string? returnType = null, bool isVoid = true)
+	internal static string FormatMethodSignatureForDoc(string methodName, EquatableArray<ParameterModel> parameters, string? returnType = null, bool isVoid = true)
 	{
 		string paramPart;
 		if (parameters.Count == 0)
@@ -5114,7 +5114,7 @@ internal static class MethodInterceptorRenderer
 	/// <summary>
 	/// Shortens a fully qualified type name for display in XML doc comments.
 	/// </summary>
-	private static string ShortenTypeForDoc(string type)
+	internal static string ShortenTypeForDoc(string type)
 	{
 		var result = type;
 		if (result.StartsWith("global::"))

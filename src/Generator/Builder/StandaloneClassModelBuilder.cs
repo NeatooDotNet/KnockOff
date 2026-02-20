@@ -310,6 +310,14 @@ internal static class StandaloneClassModelBuilder
                 IsVoid: m.ReturnType == "void",
                 IsAbstract: m.IsAbstract,
                 TargetMemberDescription: $"{cls.FullName}.{m.Name}",
+                Parameters: m.Parameters.Select(p => new ParameterModel(
+                    Name: p.Name,
+                    EscapedName: EscapeIdentifier(p.Name),
+                    Type: p.Type,
+                    NullableType: MakeNullable(p.Type),
+                    RefKind: p.RefKind,
+                    RefPrefix: GetRefKindPrefix(p.RefKind),
+                    XmlDoc: p.XmlDoc)).ToEquatableArray(),
                 ReturnsByRef: m.ReturnsByRef,
                 ReturnsByRefReadonly: m.ReturnsByRefReadonly))
             .ToEquatableArray();

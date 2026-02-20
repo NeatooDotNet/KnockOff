@@ -1,6 +1,7 @@
 // src/Generator/Model/StandaloneClass/BaseClassMethodModel.cs
 #nullable enable
 using KnockOff;
+using KnockOff.Model.Shared;
 
 namespace KnockOff.Model.StandaloneClass;
 
@@ -21,6 +22,8 @@ internal sealed record BaseClassMethodModel(
     bool IsAbstract,
     /// <summary>The target class member description for XML doc.</summary>
     string TargetMemberDescription,
+    /// <summary>Parameters for XML doc generation (shortened types).</summary>
+    EquatableArray<ParameterModel> Parameters,
     // Ref return support
     /// <summary>True if the method returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
