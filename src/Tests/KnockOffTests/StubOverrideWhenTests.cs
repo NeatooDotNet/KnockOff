@@ -444,17 +444,17 @@ public class StubOverrideWhenTests
     [Fact]
     public void Overloaded_When_OnNonStubOverrideOverload()
     {
-        // Arrange - Format2 (two-param overload) has no stub override
+        // Arrange - two-param overload has no stub override, configured via unified Format interceptor
         var stub = new OverloadedStubOverrideStub();
-        stub.Format2.When("hello", true).Return("[WHEN UPPER]");
-        stub.Format2.Return("[DEFAULT]");
+        stub.Format.When("hello", true).Return("[WHEN UPPER]");
+        stub.Format.Call((string input, bool uppercase) => "[DEFAULT]");
 
         // Act
         IOverloadedStubOverrideService service = stub;
         var whenResult = service.Format("hello", true);
         var fallbackResult = service.Format("other", false);
 
-        // Assert - When match on non-user-method overload, fallback to Returns
+        // Assert - When match on non-stub-override overload, fallback to Call
         Assert.Equal("[WHEN UPPER]", whenResult);
         Assert.Equal("[DEFAULT]", fallbackResult);
     }
@@ -462,18 +462,18 @@ public class StubOverrideWhenTests
     [Fact]
     public void Overloaded_When_BothOverloadsIndependent()
     {
-        // Arrange - Configure When on both overloads independently
+        // Arrange - Configure When on both overloads via the unified Format interceptor
         var stub = new OverloadedStubOverrideStub();
         stub.Format.When("special").Return("[WHEN1]");
-        stub.Format2.When("special", true).Return("[WHEN2]");
-        stub.Format2.Return("[DEFAULT2]");
+        stub.Format.When("special", true).Return("[WHEN2]");
+        stub.Format.Call((string input, bool uppercase) => "[DEFAULT2]");
 
         // Act
         IOverloadedStubOverrideService service = stub;
         var when1 = service.Format("special");       // Matches When on stub override overload
         var user1 = service.Format("normal");         // Falls to stub override
-        var when2 = service.Format("special", true);  // Matches When on non-user overload
-        var fall2 = service.Format("normal", false);   // Falls to Returns
+        var when2 = service.Format("special", true);  // Matches When on non-stub-override overload
+        var fall2 = service.Format("normal", false);   // Falls to Call
 
         // Assert - Each overload has independent When chain
         Assert.Equal("[WHEN1]", when1);

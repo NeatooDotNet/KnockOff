@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.53.0</FileVersion>
-		<PackageVersion>0.53.0</PackageVersion>
+		<FileVersion>0.54.0</FileVersion>
+		<PackageVersion>0.54.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Delegate-based Call API: custom named delegates replace Func/Action+tuple for all Call callbacks and When predicates, fixing CS0121 overload ambiguity. Method-name-based type names (AddDelegate, AddImpl). XML docs include return type.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix: stub override on partial overloads no longer splits interceptor groups. All overloads share a single interceptor with per-signature stub override fallback.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

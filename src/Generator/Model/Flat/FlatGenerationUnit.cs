@@ -17,10 +17,8 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<FlatPropertyModel> Properties,
     EquatableArray<FlatIndexerModel> Indexers,
     EquatableArray<FlatMethodModel> Methods,
-    /// <summary>Method groups for interceptor generation (groups overloads by name).</summary>
+    /// <summary>Method groups for interceptor generation (groups overloads by name). Includes both regular and stub override methods.</summary>
     EquatableArray<FlatMethodGroup> MethodGroups,
-    /// <summary>Stub override groups for tracking-only interceptors (groups stub override overloads by name).</summary>
-    EquatableArray<FlatMethodGroup> StubOverrideGroups,
     EquatableArray<FlatGenericMethodHandlerModel> GenericMethodHandlers,
     /// <summary>Generic stub override handler groups for tracking-only interceptors with overloads.</summary>
     EquatableArray<FlatGenericMethodHandlerGroup> GenericStubOverrideHandlerGroups,

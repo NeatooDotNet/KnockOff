@@ -466,8 +466,9 @@ public class BaseClassStubOverrideTests
     {
         // Arrange
         var stub = new OverloadedStubOverrideStub();
-        // Non-overridden overload uses Format2 (separate interceptor after fix)
-        stub.Format2.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+        // Non-overridden overload is configured via the unified Format interceptor
+        // The two-parameter lambda disambiguates to the Format(string, bool) overload
+        stub.Format.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
         IOverloadedStubOverrideService service = stub;
 
         // Act
@@ -480,10 +481,10 @@ public class BaseClassStubOverrideTests
     [Fact]
     public void Overload_MixedConfiguration_EachOverloadIndependent()
     {
-        // Arrange - one overload uses stub override, another uses OnCall
+        // Arrange - one overload uses stub override, another uses Call on the same interceptor
         var stub = new OverloadedStubOverrideStub();
-        // Each overload now has its own interceptor (Format for overridden, Format2 for non-overridden)
-        stub.Format2.Call((string input, bool uppercase) => "ONCALL:" + (uppercase ? input.ToUpper() : input));
+        // The two-parameter lambda disambiguates to the Format(string, bool) overload
+        stub.Format.Call((string input, bool uppercase) => "ONCALL:" + (uppercase ? input.ToUpper() : input));
         IOverloadedStubOverrideService service = stub;
 
         // Act
@@ -511,6 +512,104 @@ public class BaseClassStubOverrideTests
 
         // The second overload does NOT have stub override, so it SHOULD throw
         Assert.Throws<StubException>(() => service.Format("hello", true));
+    }
+
+    #endregion
+
+    #region 8. ThreeOverloadPartialStubOverrideTests - Verify 3-overload partial stub override
+
+    [Fact]
+    public void ThreeOverload_SingleInterceptor_AllOverloadsAccessible()
+    {
+        // Arrange - stub override on Format(string) only
+        var stub = new ThreeOverloadPartialStubOverrideStub();
+        IThreeOverloadStubOverrideService service = stub;
+
+        // Act - call the overridden overload (uses stub override)
+        var result = service.Format("hello");
+
+        // Assert - stub override was called
+        Assert.Equal("USER:hello", result);
+
+        // Assert - all 3 overloads are tracked through a SINGLE interceptor
+        stub.Format.Verify(Called.Once);
+    }
+
+    [Fact]
+    public void ThreeOverload_NonOverriddenOverloads_ThrowWithoutCall()
+    {
+        // Arrange
+        var stub = new ThreeOverloadPartialStubOverrideStub();
+        IThreeOverloadStubOverrideService service = stub;
+
+        // Act & Assert - non-overridden 2-param overload throws
+        Assert.Throws<InvalidOperationException>(() => service.Format("hello", true));
+
+        // Act & Assert - non-overridden 3-param overload throws
+        Assert.Throws<InvalidOperationException>(() => service.Format("hello", true, 5));
+    }
+
+    [Fact]
+    public void ThreeOverload_OverloadDisambiguation_ViaLambdaParameterTypes()
+    {
+        // Arrange
+        var stub = new ThreeOverloadPartialStubOverrideStub();
+        // Configure non-overridden overloads via Call with disambiguating lambdas
+        stub.Format.Call((string input, bool uppercase) =>
+            uppercase ? input.ToUpper() : input);
+        stub.Format.Call((string input, bool uppercase, int maxLength) =>
+            (uppercase ? input.ToUpper() : input).Substring(0, System.Math.Min(input.Length, maxLength)));
+        IThreeOverloadStubOverrideService service = stub;
+
+        // Act
+        var r1 = service.Format("hello");              // Uses stub override
+        var r2 = service.Format("hello", true);         // Uses Call (2-param lambda)
+        var r3 = service.Format("hello world", true, 5);// Uses Call (3-param lambda)
+
+        // Assert
+        Assert.Equal("USER:hello", r1);                 // Stub override
+        Assert.Equal("HELLO", r2);                      // Call via 2-param
+        Assert.Equal("HELLO", r3);                      // Call via 3-param (truncated)
+
+        // All 3 tracked through single interceptor
+        stub.Format.Verify(Called.Exactly(3));
+    }
+
+    [Fact]
+    public void ThreeOverload_MixedConfiguration_StubOverrideAndCallCoexist()
+    {
+        // Arrange - override all 3 overloads via Call (supersedes stub override on first)
+        var stub = new ThreeOverloadPartialStubOverrideStub();
+        stub.Format.Call(input => "CALL:" + input);                                    // Supersedes stub override
+        stub.Format.Call((string input, bool uppercase) => "CALL2:" + input);          // Regular call
+        stub.Format.Call((string input, bool uppercase, int maxLength) => "CALL3:" + input); // Regular call
+        IThreeOverloadStubOverrideService service = stub;
+
+        // Act
+        var r1 = service.Format("hello");
+        var r2 = service.Format("hello", true);
+        var r3 = service.Format("hello", true, 5);
+
+        // Assert - Call supersedes stub override for all overloads
+        Assert.Equal("CALL:hello", r1);
+        Assert.Equal("CALL2:hello", r2);
+        Assert.Equal("CALL3:hello", r3);
+    }
+
+    [Fact]
+    public void ThreeOverload_StrictMode_OverriddenOverloadDoesNotThrow()
+    {
+        // Arrange
+        var stub = new ThreeOverloadPartialStubOverrideStub().Strict();
+        IThreeOverloadStubOverrideService service = stub;
+
+        // Act & Assert - overridden overload does NOT throw (stub override IS configuration)
+        var result = service.Format("hello");
+        Assert.Equal("USER:hello", result);
+
+        // Act & Assert - non-overridden overloads SHOULD throw in strict mode
+        Assert.Throws<StubException>(() => service.Format("hello", true));
+        Assert.Throws<StubException>(() => service.Format("hello", true, 5));
     }
 
     #endregion
@@ -586,6 +685,32 @@ public partial class OverloadedStubOverrideStub
 
     // NO override for Format_(string input, bool uppercase)
     // That overload uses the interceptor path
+}
+
+/// <summary>Interface with 3 overloaded Format methods for 3-overload partial stub override regression test.</summary>
+public interface IThreeOverloadStubOverrideService
+{
+    string Format(string input);
+    string Format(string input, bool uppercase);
+    string Format(string input, bool uppercase, int maxLength);
+}
+
+/// <summary>Stub with partial stub override on only 1 of 3 overloads.</summary>
+[KnockOff]
+public partial class ThreeOverloadPartialStubOverrideStub : IThreeOverloadStubOverrideService
+{
+}
+
+public partial class ThreeOverloadPartialStubOverrideStub
+{
+    // Stub override for the first overload ONLY
+    protected override string Format_(string input)
+    {
+        return "USER:" + input;
+    }
+
+    // NO override for Format_(string input, bool uppercase)
+    // NO override for Format_(string input, bool uppercase, int maxLength)
 }
 
 #endregion
