@@ -55,7 +55,7 @@ public partial class BasicMethodsDemo
     // Call(callback) - Dynamic Return Based on Arguments
     // =========================================================================
     // DESIGN DECISION: Call(callback) receives typed arguments directly.
-    // For 2+ params, the callback receives a named tuple: args => args.a + args.b
+    // For 2+ params, the callback receives individual named parameters: (int a, int b) => a + b
     // For 0-1 params, the callback receives the raw type.
     //
     // This differs from NSubstitute's callInfo.Arg<T>() pattern which requires
@@ -74,8 +74,8 @@ public partial class BasicMethodsDemo
     {
         var stub = new Stubs.ICalculator();
 
-        // Callback receives actual method arguments as named tuple (IntelliSense shows field names)
-        stub.Add.Call(args => args.a + args.b);
+        // Callback receives actual method arguments as named parameters (IntelliSense shows names)
+        stub.Add.Call((int a, int b) => a + b);
 
         ICalculator calc = stub;
         var result = calc.Add(3, 5); // Returns 8 (3 + 5)
@@ -86,11 +86,11 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
 
         // Callbacks can throw exceptions for error testing
-        stub.Divide.Call(args =>
+        stub.Divide.Call((int a, int b) =>
         {
-            if (args.b == 0)
+            if (b == 0)
                 throw new DivideByZeroException();
-            return args.a / args.b;
+            return a / b;
         });
 
         ICalculator calc = stub;
@@ -119,7 +119,7 @@ public partial class BasicMethodsDemo
     // COMMON MISTAKE: Expecting Return(value) and Call(callback) to combine
     //
     // WRONG:
-    //   stub.Add.Call(args => args.a + args.b);
+    //   stub.Add.Call((int a, int b) => a + b);
     //   stub.Add.Return(42);  // This REPLACES the callback, does not combine
     //
     // NOTE: Return(value) sets a constant value. Call(callback) provides a
@@ -132,7 +132,7 @@ public partial class BasicMethodsDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Call(args => args.a + args.b);  // Set callback
+        stub.Add.Call((int a, int b) => a + b);  // Set callback
         stub.Add.Return(42);               // REPLACES callback with constant
 
         ICalculator calc = stub;
@@ -207,7 +207,7 @@ public partial class BasicMethodsDemo
         // args == (10, 20)
 
         // For Call() callbacks, you get LastArgs via the builder interface:
-        var builder = stub.Subtract.Call(args => args.a - args.b);
+        var builder = stub.Subtract.Call((int a, int b) => a - b);
         calc.Subtract(100, 25);
         var subtractArgs = builder.LastArgs;
         // subtractArgs == (100, 25)

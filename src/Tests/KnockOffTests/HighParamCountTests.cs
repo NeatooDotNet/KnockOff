@@ -22,8 +22,8 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		knockOff.Compute.Call(args =>
-			args.a + args.b + args.c + args.d + args.e + args.f + args.g + args.h + args.i);
+		knockOff.Compute.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i) =>
+			a + b + c + d + e + f + g + h + i);
 
 		var result = service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
@@ -36,7 +36,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		var tracking = knockOff.Compute.Call(_ => 0);
+		var tracking = knockOff.Compute.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i) => 0);
 
 		service.Compute(10, 20, 30, 40, 50, 60, 70, 80, 90);
 
@@ -58,7 +58,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		knockOff.Compute.Call(_ => 0);
+		knockOff.Compute.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i) => 0);
 
 		service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
 		service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -73,9 +73,9 @@ public class HighParamCountTests
 		IHighParamCountService service = knockOff;
 
 		int sum = 0;
-		knockOff.ProcessAll.Call(args =>
+		knockOff.ProcessAll.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) =>
 		{
-			sum = args.a + args.b + args.c + args.d + args.e + args.f + args.g + args.h + args.i + args.j;
+			sum = a + b + c + d + e + f + g + h + i + j;
 		});
 
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -89,7 +89,7 @@ public class HighParamCountTests
 		var knockOff = new HighParamCountServiceKnockOff();
 		IHighParamCountService service = knockOff;
 
-		var tracking = knockOff.ProcessAll.Call(args => { });
+		var tracking = knockOff.ProcessAll.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) => { });
 
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		service.ProcessAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -105,9 +105,9 @@ public class HighParamCountTests
 		IHighParamCountService service = knockOff;
 
 		knockOff.Compute
-			.Call(_ => 100)
-			.ThenReturn(_ => 200)
-			.ThenReturn(_ => 300);
+			.Call((int a, int b, int c, int d, int e, int f, int g, int h, int i) => 100)
+			.ThenReturn((int a, int b, int c, int d, int e, int f, int g, int h, int i) => 200)
+			.ThenReturn((int a, int b, int c, int d, int e, int f, int g, int h, int i) => 300);
 
 		Assert.Equal(100, service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9));
 		Assert.Equal(200, service.Compute(1, 2, 3, 4, 5, 6, 7, 8, 9));

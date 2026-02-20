@@ -371,7 +371,7 @@ public class MethodConfigTests
         // After third call, repeats 3 (NSubstitute-like behavior)
 
         // Mix callbacks with value sequences
-        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
+        stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200);
         // First: computed, then 100, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating:
@@ -643,7 +643,7 @@ public class ArgumentCaptureTests
         Assert.Equal(42, getTracking.LastArg);
 
         // Multiple parameters - LastArgs tuple
-        var updateTracking = stub.Update.Call(_ => { });
+        var updateTracking = stub.Update.Call((int id, string name) => { });
         service.Update(1, "Alice");
         var (id, name) = updateTracking.LastArgs;
         #endregion

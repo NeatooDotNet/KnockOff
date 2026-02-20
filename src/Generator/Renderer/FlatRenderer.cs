@@ -126,31 +126,20 @@ internal static class FlatRenderer
 			// Render method interceptor classes using groups (handles overloads)
 			// All method interceptors are fully generated classes inheriting from MethodInterceptorRuntime.
 			// No pre-compiled method interceptor types are used (Phase 2 redesign).
+			// Groups may contain a mix of stub override and regular methods; if ANY method
+			// in the group has HasStubOverride, render with StubOverrideFallback enabled.
 			foreach (var group in unit.MethodGroups)
 			{
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
 				{
 					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
-					var options = new InterceptorRenderOptions(
-						BaseIndent: 0,
-						IncludeStrictParameter: true,
-						StrictAccessExpression: "strict");
-					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
-				}
-			}
-
-			// Render user-defined method interceptor classes (full interceptor with When/Sequence support)
-			foreach (var group in unit.StubOverrideGroups)
-			{
-				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
-				{
-					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
+					var hasAnyStubOverride = group.Methods.Any(m => m.HasStubOverride);
 					var options = new InterceptorRenderOptions(
 						BaseIndent: 0,
 						IncludeStrictParameter: true,
 						StrictAccessExpression: "strict",
-						StubOverrideFallback: true,
-						StubTypeName: classNameWithTypeParams);
+						StubOverrideFallback: hasAnyStubOverride,
+						StubTypeName: hasAnyStubOverride ? classNameWithTypeParams : null);
 					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
 				}
 			}
@@ -192,12 +181,6 @@ internal static class FlatRenderer
 					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
 					.Select(g => g.InterceptorName));
 
-			// Build set of stub override interceptor names that have multiple UNIQUE overloads (need suffixed RecordCall)
-			var multiOverloadStubOverrideInterceptors = new HashSet<string>(
-				unit.StubOverrideGroups
-					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
-					.Select(g => g.InterceptorName));
-
 			// Build set of generic stub override interceptor names that have multiple overloads (need suffixed RecordCall/Callback)
 			// A generic handler group needs suffixes if it has multiple type arities OR multiple signatures per arity
 			var multiOverloadGenericStubOverrideInterceptors = new HashSet<string>(
@@ -232,7 +215,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer, multiIndexerInterceptors);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups, preCompiledInterceptors);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -409,7 +392,8 @@ internal static class FlatRenderer
 		var outParams = method.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out).ToList();
 		var hasOutParams = outParams.Count > 0;
 
-		w.Line($"/// <summary>Override to provide default implementation for {method.DeclaringInterface}.{method.MethodName}.</summary>");
+		var methodSig = MethodInterceptorRenderer.FormatMethodSignatureForDoc(method.MethodName, method.Parameters, method.ReturnType, method.IsVoid);
+		w.Line($"/// <summary>Override to provide default implementation for {methodSig}.</summary>");
 
 		if (hasOutParams)
 		{
@@ -451,7 +435,15 @@ internal static class FlatRenderer
 		var propertyName = $"{property.MemberName}_";
 		var returnType = property.ReturnType;
 
-		w.Line($"/// <summary>Override to provide default implementation for {property.DeclaringInterface}.{property.MemberName}.</summary>");
+		var shortType = MethodInterceptorRenderer.ShortenTypeForDoc(property.ReturnType);
+		var accessors = (property.HasGetter, property.HasSetter) switch
+		{
+			(true, true) => " {{ get; set; }}",
+			(true, false) => " {{ get; }}",
+			(false, true) => " {{ set; }}",
+			_ => ""
+		};
+		w.Line($"/// <summary>Override to provide default implementation for {shortType} {property.MemberName}{accessors}.</summary>");
 
 		if (property.HasGetter && property.HasSetter)
 		{
@@ -1581,7 +1573,6 @@ internal static class FlatRenderer
 		// Must check all member types: methods, stub overrides, properties, events
 		// NOTE: Indexers excluded from Verify/VerifyAll - will be added in the indexer API redesign
 		if (unit.MethodGroups.Count > 0
-			|| unit.StubOverrideGroups.Count > 0
 			|| unit.Properties.Count > 0
 			|| unit.Events.Count > 0)
 		{
@@ -1599,12 +1590,6 @@ internal static class FlatRenderer
 	{
 		// Get unique interceptor names for methods (method groups define the interceptor names)
 		var methodInterceptorNames = unit.MethodGroups
-			.Select(g => g.InterceptorName)
-			.Distinct()
-			.ToList();
-
-		// Get unique user-defined method interceptor names (tracking-only, always configured)
-		var stubOverrideInterceptorNames = unit.StubOverrideGroups
 			.Select(g => g.InterceptorName)
 			.Distinct()
 			.ToList();
@@ -1654,12 +1639,6 @@ internal static class FlatRenderer
 
 			// Check verifiable event interceptors
 			foreach (var name in eventInterceptorNames)
-			{
-				w.Line($"if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
-			}
-
-			// Check verifiable user-defined method interceptors
-			foreach (var name in stubOverrideInterceptorNames)
 			{
 				w.Line($"if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
 			}
@@ -1933,19 +1912,20 @@ internal static class FlatRenderer
 		// Collect stub override fallback wiring needed for pre-compiled interceptors
 		var fallbackWiring = new List<string>();
 
-		// Method stub overrides
-		foreach (var group in unit.StubOverrideGroups)
+		// Method stub overrides (check per-method HasStubOverride within unified MethodGroups)
+		foreach (var group in unit.MethodGroups)
 		{
 			if (!preCompiledInterceptors.ContainsKey(group.InterceptorName))
 				continue;
 			var methods = group.Methods.GetArray();
 			if (methods == null || methods.Length == 0) continue;
-			var first = methods[0];
-			if (first.HasStubOverride && !string.IsNullOrEmpty(GetStubOverrideName(first)))
+			// Find the first method with a stub override in this group
+			var stubOverrideMethod = methods.FirstOrDefault(m => m.HasStubOverride);
+			if (stubOverrideMethod != null && !string.IsNullOrEmpty(GetStubOverrideName(stubOverrideMethod)))
 			{
 				fallbackWiring.Add(PreCompiledInterceptorRenderer.GetStubOverrideFallbackExpression(
-					group.InterceptorName, GetStubOverrideName(first)!,
-					first.ReturnType, first.Parameters.AsEnumerable()));
+					group.InterceptorName, GetStubOverrideName(stubOverrideMethod)!,
+					stubOverrideMethod.ReturnType, stubOverrideMethod.Parameters.AsEnumerable()));
 			}
 		}
 
@@ -2169,7 +2149,6 @@ internal static class FlatRenderer
 		CodeWriter w,
 		FlatMethodModel method,
 		HashSet<string> multiOverloadInterceptors,
-		HashSet<string> multiOverloadStubOverrideInterceptors,
 		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
 		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups,
 		Dictionary<string, string> preCompiledInterceptors)
@@ -2191,7 +2170,7 @@ internal static class FlatRenderer
 		// User-defined methods with base class pattern
 		if (method.HasStubOverride)
 		{
-			RenderStubOverrideImplementation(w, method, multiOverloadStubOverrideInterceptors);
+			RenderStubOverrideImplementation(w, method, multiOverloadInterceptors);
 			return;
 		}
 
@@ -2227,10 +2206,10 @@ internal static class FlatRenderer
 	/// Priority chain: When chains > Sequences > Return/Call > Stub override (virtual method with _ suffix).
 	/// The unified interceptor handles all logic including stub override fallback.
 	/// </summary>
-	private static void RenderStubOverrideImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadStubOverrideInterceptors)
+	private static void RenderStubOverrideImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadInterceptors)
 	{
 		// Determine if this stub override is part of an overload group (needs suffixed Invoke)
-		var isMultiOverload = multiOverloadStubOverrideInterceptors.Contains(method.InterceptorName);
+		var isMultiOverload = multiOverloadInterceptors.Contains(method.InterceptorName);
 		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
 
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");

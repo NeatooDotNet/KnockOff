@@ -106,7 +106,7 @@ public class SequentialQueueTests
         #region advanced-sequential-queue
         // Queue of results: first succeeds, second fails
         var results = new Queue<bool>(new[] { true, false });
-        stub.Send.Call(_ => results.Dequeue());
+        stub.Send.Call((string to, string message) => results.Dequeue());
         #endregion
 
         IEmailService service = stub;
@@ -348,14 +348,14 @@ public class CacheSimulationTests
         });
 
         // Set: Enforce capacity, evict oldest if needed
-        stub.Set.Call(args =>
+        stub.Set.Call((string key, string value) =>
         {
-            if (cache.Count >= maxCapacity && !cache.ContainsKey(args.key))
+            if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
             {
                 var oldest = cache.OrderBy(kvp => kvp.Value.Added).First();
                 cache.Remove(oldest.Key);
             }
-            cache[args.key] = (args.value, DateTime.UtcNow);
+            cache[key] = (value, DateTime.UtcNow);
         });
 
         // Clear: Reset everything

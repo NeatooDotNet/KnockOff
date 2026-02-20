@@ -48,7 +48,7 @@ Console.WriteLine();
 
 // Test method with multiple params - uses Call API
 Console.WriteLine("Method with multiple params:");
-var processTracking = knockOff.Process.Call(_ => { });
+var processTracking = knockOff.Process.Call((string id, int count, bool urgent) => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 

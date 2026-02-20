@@ -40,7 +40,7 @@ public partial class ParameterMatchingComparisonTests
 
         #region parammatch-conditional
         // Standard C# conditional — no matchers needed
-        stub.GetPrice.Call(args => args.quantity > 10 ? 8.99m : 9.99m);
+        stub.GetPrice.Call((string product, int quantity) => quantity > 10 ? 8.99m : 9.99m);
         #endregion
 
         IPricingService pricing = stub;
@@ -71,8 +71,8 @@ public partial class ParameterMatchingComparisonTests
 
         #region parammatch-named-params
         // Both params are string — names come from the lambda, not index math
-        stub.FindUser.Call(args =>
-            args.firstName == "Jane" && args.lastName == "Doe" ? "jane.doe" : null);
+        stub.FindUser.Call((string firstName, string lastName) =>
+            firstName == "Jane" && lastName == "Doe" ? "jane.doe" : null);
         #endregion
 
         IUserSearch search = stub;
@@ -87,7 +87,7 @@ public partial class ParameterMatchingComparisonTests
 
         #region parammatch-capture
         // Built-in capture — no Callback<> or Arg.Do<> setup
-        var tracking = stub.RecordSale.Call(_ => { });
+        var tracking = stub.RecordSale.Call((string product, int quantity) => { });
 
         IPricingService pricing = stub;
         pricing.RecordSale("widget", 3);
@@ -108,7 +108,7 @@ public partial class ParameterMatchingComparisonTests
         #region parammatch-fallback
         // When() for specifics, Return() as fallback
         stub.GetPrice.When("premium-widget", 1).Return(99.99m);
-        stub.GetPrice.Call(args => args.quantity * 9.99m);
+        stub.GetPrice.Call((string product, int quantity) => quantity * 9.99m);
         #endregion
 
         IPricingService pricing = stub;
@@ -128,8 +128,8 @@ public partial class ParameterMatchingComparisonTests
         #region parammatch-predicate
         // Predicate on multiple params — standard C# lambda
         stub.GetPrice
-            .When(args => args.quantity > 100).Return(7.99m)
-            .ThenCall(args => args.quantity > 10 ? 8.99m : 9.99m);
+            .When((string product, int quantity) => quantity > 100).Return(7.99m)
+            .ThenCall((string product, int quantity) => quantity > 10 ? 8.99m : 9.99m);
         #endregion
 
         IPricingService pricing = stub;

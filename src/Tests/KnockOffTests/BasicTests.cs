@@ -76,7 +76,7 @@ public class BasicTests
 	public void Method_WithMultipleParams_TracksArgs_AsNamedTuple()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.Call(args => { });
+		var tracking = knockOff.Calculate.Call((string name, int value, bool flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 100, true);
@@ -150,7 +150,7 @@ public class BasicTests
 	public void TupleDestructuring_Works()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.Call(args => { });
+		var tracking = knockOff.Calculate.Call((string name, int value, bool flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 42, true);

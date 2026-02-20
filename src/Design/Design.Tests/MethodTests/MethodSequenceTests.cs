@@ -57,7 +57,7 @@ public class MethodSequenceTests
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
 
         stub.Add
-            .Call(args => args.a + args.b)
+            .Call((int a, int b) => a + b)
             .ThenReturn(100, 200, 300);
 
         ICalculator calc = stub;
@@ -170,9 +170,9 @@ public class MethodSequenceTests
     public void ThenCall_CreatesSequence()
     {
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
-        stub.Add.Call(_ => 1)
-            .ThenReturn(_ => 2)
-            .ThenReturn(_ => 3);
+        stub.Add.Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 2)
+            .ThenReturn((int a, int b) => 3);
 
         ICalculator calc = stub;
 
@@ -187,8 +187,8 @@ public class MethodSequenceTests
         // ACTUAL BEHAVIOR: Sequences repeat the last callback (NSubstitute-like).
         // Use ThenDefault() to return default(T) after exhaustion instead.
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
-        stub.Add.Call(_ => 1)
-            .ThenReturn(_ => 999);
+        stub.Add.Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 999);
 
         ICalculator calc = stub;
 
@@ -203,8 +203,8 @@ public class MethodSequenceTests
     {
         // ThenDefault() causes sequence to return default(T) after exhaustion
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
-        stub.Add.Call(_ => 1)
-            .ThenReturn(_ => 999)
+        stub.Add.Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 999)
             .ThenDefault();
 
         ICalculator calc = stub;
@@ -220,8 +220,8 @@ public class MethodSequenceTests
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
         var counter = 0;
 
-        stub.Add.Call(args => args.a + args.b) // Use args
-            .ThenReturn(_ => ++counter); // Use closure
+        stub.Add.Call((int a, int b) => a + b) // Use args
+            .ThenReturn((int a, int b) => ++counter); // Use closure
 
         ICalculator calc = stub;
 
@@ -254,9 +254,9 @@ public class MethodSequenceTests
     {
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
 
-        var sequence = stub.Add.Call(_ => 1)
-            .ThenReturn(_ => 2)
-            .ThenReturn(_ => 3);
+        var sequence = stub.Add.Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 2)
+            .ThenReturn((int a, int b) => 3);
 
         ICalculator calc = stub;
 
@@ -282,7 +282,7 @@ public class MethodSequenceTests
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
 
         // Call starts the sequence, ThenReturn adds constant values
-        stub.Add.Call(_ => 1)
+        stub.Add.Call((int a, int b) => 1)
             .ThenReturn(2)
             .ThenReturn(3);
 
@@ -300,9 +300,9 @@ public class MethodSequenceTests
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
 
         // Mix callbacks and values in the same sequence
-        stub.Add.Call(args => args.a + args.b)
+        stub.Add.Call((int a, int b) => a + b)
             .ThenReturn(100)
-            .ThenReturn(args => args.a * args.b)
+            .ThenReturn((int a, int b) => a * b)
             .ThenReturn(999);
 
         ICalculator calc = stub;
@@ -318,7 +318,7 @@ public class MethodSequenceTests
     {
         var stub = new MethodSequencesDemo.Stubs.ICalculator();
 
-        var sequence = stub.Add.Call(_ => 1)
+        var sequence = stub.Add.Call((int a, int b) => 1)
             .ThenReturn(2)
             .ThenReturn(3);
 

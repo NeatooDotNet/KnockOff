@@ -814,7 +814,7 @@ public class WhenChainTests
 
         #region delegate-when-predicate-matching
         // Match via predicate
-        stub.Interceptor.When(args => args.a > 10).Return(999);
+        stub.Interceptor.When((int a, int b) => a > 10).Return(999);
         #endregion
 
         Calculate calc = stub;

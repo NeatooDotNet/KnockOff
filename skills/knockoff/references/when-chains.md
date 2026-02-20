@@ -24,12 +24,12 @@ calc.Add(3, 4);  // falls to Return/default
 
 ## Predicate Matching
 
-Match using a predicate function for complex conditions. For 2+ params, the predicate receives a named tuple:
+Match using a predicate function for complex conditions. For 2+ params, the predicate uses a custom named delegate with typed parameters:
 
 <!-- snippet: when-chains-ref-predicate -->
 ```cs
 // Range check
-stub.Add.When(args => args.a > 0 && args.b > 0).Return(42);
+stub.Add.When((int a, int b) => a > 0 && b > 0).Return(42);
 ```
 <!-- endSnippet -->
 
@@ -76,10 +76,10 @@ When chains use `Return(value)` -- there is **no** `Return(callback)` on When ch
 stub.Add.When(10, 10).Return(100);
 
 // This does NOT exist:
-// stub.Add.When(10, 10).Return(args => args.a * args.b);  // No Return(callback) on When
+// stub.Add.When(10, 10).Return((int a, int b) => a * b);  // No Return(callback) on When
 
 // For dynamic behavior on all calls, use Call(callback) without When:
-stub.Add.Call(args => args.a * args.b);
+stub.Add.Call((int a, int b) => a * b);
 ```
 
 ---
@@ -90,7 +90,7 @@ Void methods use `Call(callback)` instead of `Return(value)`:
 
 <!-- snippet: when-chains-ref-void-call -->
 ```cs
-stub.Process.When(1, 2).Call(args => errors.Add($"{args.a},{args.b}"));
+stub.Process.When(1, 2).Call((int a, int b) => errors.Add($"{a},{b}"));
 ```
 <!-- endSnippet -->
 
@@ -103,7 +103,7 @@ Use `.ThenCall()` as a terminal fallback for non-void When chains:
 stub.Add
     .When(1, 2).Return(100)
     .ThenWhen(3, 4).Return(200)
-    .ThenCall(args => args.a + args.b);  // Fallback for unmatched
+    .ThenCall((int a, int b) => a + b);  // Fallback for unmatched
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2); // 100
@@ -151,7 +151,7 @@ When chains have their own `Verify()` for checking consumption:
 ```cs
 var chain = stub.Add.When(1, 2).Return(10)
     .ThenWhen(3, 4).Return(20)
-    .ThenCall(_ => 999);
+    .ThenCall((int a, int b) => 999);
 
 IWhenCalculator calc = stub;
 calc.Add(1, 2);

@@ -326,7 +326,7 @@ public partial class SourceHierarchyDemo
 
         // Explicitly configure write operations
         var saved = new Dictionary<int, string>();
-        stub.Save.Call(args => saved[args.id] = args.value);
+        stub.Save.Call((int id, string value) => saved[id] = value);
         stub.Delete.Call((id) => saved.Remove(id));
 
         IStore store = stub;

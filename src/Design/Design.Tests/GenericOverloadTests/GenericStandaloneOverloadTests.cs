@@ -29,8 +29,8 @@ public class GenericStandaloneOverloadTests
 
         // Configure each overload - explicit types needed for disambiguation
         stub.Format.Call((string item) => $"[1-param: {item}]");
-        stub.Format.Call(((string item, bool uppercase) args) => $"[2-param: {args.item}, {args.uppercase}]");
-        stub.Format.Call(((string item, bool uppercase, int maxLength) args) => $"[3-param: {args.item}, {args.uppercase}, {args.maxLength}]");
+        stub.Format.Call((string item, bool uppercase) => $"[2-param: {item}, {uppercase}]");
+        stub.Format.Call((string item, bool uppercase, int maxLength) => $"[3-param: {item}, {uppercase}, {maxLength}]");
 
         IGenericFormatter<string> formatter = stub;
 
@@ -48,7 +48,7 @@ public class GenericStandaloneOverloadTests
         var entity = new TestEntity { Id = 42, Name = "Test" };
 
         stub.Format.Call((TestEntity item) => $"Entity: {item.Name}");
-        stub.Format.Call(((TestEntity item, bool uppercase) args) => args.uppercase ? args.item.Name.ToUpperInvariant() : args.item.Name);
+        stub.Format.Call((TestEntity item, bool uppercase) => uppercase ? item.Name.ToUpperInvariant() : item.Name);
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -107,8 +107,8 @@ public class GenericStandaloneOverloadTests
 
         // Default callbacks for non-matched
         stub.Format.Call((string item) => "default-1");
-        stub.Format.Call(((string item, bool uppercase) args) => "default-2");
-        stub.Format.Call(((string item, bool uppercase, int maxLength) args) => "default-3");
+        stub.Format.Call((string item, bool uppercase) => "default-2");
+        stub.Format.Call((string item, bool uppercase, int maxLength) => "default-3");
 
         IGenericFormatter<string> formatter = stub;
 
@@ -134,8 +134,8 @@ public class GenericStandaloneOverloadTests
         var stub = new GenericFormatterStub<string>();
 
         var tracking1 = stub.Format.Call((string item) => item);
-        var tracking2 = stub.Format.Call(((string item, bool uppercase) args) => args.item);
-        var tracking3 = stub.Format.Call(((string item, bool uppercase, int maxLength) args) => args.item);
+        var tracking2 = stub.Format.Call((string item, bool uppercase) => item);
+        var tracking3 = stub.Format.Call((string item, bool uppercase, int maxLength) => item);
 
         IGenericFormatter<string> formatter = stub;
 
@@ -178,7 +178,7 @@ public class GenericStandaloneOverloadTests
         // Arrange
         var stub = new GenericFormatterStub<string>();
 
-        var tracking = stub.Format.Call(((string item, bool uppercase, int maxLength) args) => args.item);
+        var tracking = stub.Format.Call((string item, bool uppercase, int maxLength) => item);
 
         IGenericFormatter<string> formatter = stub;
 
@@ -199,8 +199,8 @@ public class GenericStandaloneOverloadTests
         var stub = new GenericFormatterStub<string>();
 
         stub.Format.Call((string item) => item);
-        stub.Format.Call(((string item, bool uppercase) args) => args.item);
-        stub.Format.Call(((string item, bool uppercase, int maxLength) args) => args.item);
+        stub.Format.Call((string item, bool uppercase) => item);
+        stub.Format.Call((string item, bool uppercase, int maxLength) => item);
 
         IGenericFormatter<string> formatter = stub;
 
@@ -226,7 +226,7 @@ public class GenericStandaloneOverloadTests
         var calls = new List<string>();
 
         stub.Process.Call((string item) => calls.Add($"1-param: {item}"));
-        stub.Process.Call(((string item, string tag) args) => calls.Add($"2-param: {args.item}, {args.tag}"));
+        stub.Process.Call((string item, string tag) => calls.Add($"2-param: {item}, {tag}"));
 
         IGenericFormatter<string> formatter = stub;
 
@@ -251,7 +251,7 @@ public class GenericStandaloneOverloadTests
         var stub = new GenericFormatterStub<TestEntity>();
 
         stub.Transform.Call((TestEntity item) => new TestEntity { Id = item.Id * 2, Name = item.Name });
-        stub.Transform.Call(((TestEntity item, string options) args) => new TestEntity { Id = args.item.Id, Name = $"{args.item.Name}-{args.options}" });
+        stub.Transform.Call((TestEntity item, string options) => new TestEntity { Id = item.Id, Name = $"{item.Name}-{options}" });
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -286,7 +286,7 @@ public class GenericStandaloneOverloadTests
 
         // Independent sequence for two-param overload
         stub.Format
-            .Call(((string item, bool uppercase) args) => "A")
+            .Call((string item, bool uppercase) => "A")
             .ThenReturn("B");
 
         IGenericFormatter<string> formatter = stub;
@@ -418,7 +418,7 @@ public class GenericStandaloneOverloadTests
 
         // Configure overloads - explicit types for disambiguation
         stub.Find.Call((Func<TestEntity, bool> predicate) => allMatches.Where(predicate));
-        stub.Find.Call(((Func<TestEntity, bool> predicate, int limit) args) => allMatches.Where(args.predicate).Take(args.limit));
+        stub.Find.Call((Func<TestEntity, bool> predicate, int limit) => allMatches.Where(predicate).Take(limit));
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -438,7 +438,7 @@ public class GenericStandaloneOverloadTests
         var stub = new GenericFormatterStub<string>();
 
         var tracking1 = stub.Find.Call((Func<string, bool> predicate) => Array.Empty<string>());
-        var tracking2 = stub.Find.Call(((Func<string, bool> predicate, int limit) args) => Array.Empty<string>());
+        var tracking2 = stub.Find.Call((Func<string, bool> predicate, int limit) => Array.Empty<string>());
 
         IGenericFormatter<string> formatter = stub;
 

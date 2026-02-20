@@ -19,7 +19,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -34,7 +34,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
         // Don't call the method
 
         // Act & Assert
@@ -46,7 +46,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -63,7 +63,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -98,8 +98,8 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Call(_ => 100)
-            .ThenReturn(_ => 200);
+            .Call((int a, int b) => 100)
+            .ThenReturn((int a, int b) => 200);
 
         // Act
         ISequenceTestService svc = stub;
@@ -116,8 +116,8 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Call(_ => 100)
-            .ThenReturn(_ => 200);
+            .Call((int a, int b) => 100)
+            .ThenReturn((int a, int b) => 200);
 
         // Act
         ISequenceTestService svc = stub;
@@ -133,8 +133,8 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .Call(_ => 100)
-            .ThenReturn(_ => 200);
+            .Call((int a, int b) => 100)
+            .ThenReturn((int a, int b) => 200);
 
         // Act - Don't call anything
 
@@ -151,7 +151,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
         // Don't call the method
 
         // Act & Assert - Stub.Verify() should fail because the verifiable wasn't called
@@ -163,7 +163,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
 
         // Act
         ISequenceTestService svc = stub;
@@ -178,7 +178,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable(Called.Exactly(2));
+        stub.Add.Call((int a, int b) => a + b).Verifiable(Called.Exactly(2));
 
         // Act
         ISequenceTestService svc = stub;
@@ -194,7 +194,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b); // No .Verifiable()
+        stub.Add.Call((int a, int b) => a + b); // No .Verifiable()
         // Don't call the method
 
         // Assert - Stub.Verify() should pass because nothing is marked verifiable
@@ -206,7 +206,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
         stub.DoWork.Call(() => { }); // Not marked verifiable
         stub.GetMessage.Call((name) => name); // Not marked verifiable
 
@@ -228,7 +228,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b); // No .Verifiable()
+        stub.Add.Call((int a, int b) => a + b); // No .Verifiable()
         // Don't call any methods
 
         // Assert - No verifiables means nothing to check
@@ -240,7 +240,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
         stub.DoWork.Call(() => { }).Verifiable();
         stub.GetMessage.Call((name) => $"Hello {name}").Verifiable();
 
@@ -259,7 +259,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
         stub.DoWork.Call(() => { }).Verifiable();
         stub.GetMessage.Call((name) => $"Hello {name}").Verifiable();
 
@@ -278,7 +278,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
         stub.DoWork.Call(() => { }).Verifiable();
         stub.GetMessage.Call((name) => $"Hello {name}").Verifiable();
         // Don't call any methods
@@ -307,7 +307,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
         stub.DoWork.Call(() => { });
         stub.GetMessage.Call((name) => $"Hello {name}");
 
@@ -326,7 +326,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
         stub.DoWork.Call(() => { });
         stub.GetMessage.Call((name) => $"Hello {name}");
 
@@ -345,7 +345,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
         stub.DoWork.Call(() => { });
         stub.GetMessage.Call((name) => $"Hello {name}");
         // Don't call any methods
@@ -359,7 +359,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
         // Don't call the method
 
         // Act
@@ -378,7 +378,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
 
         // Act - Call, verify (passes), then reset
         ISequenceTestService svc = stub;
@@ -396,7 +396,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -413,7 +413,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Call(args => args.a + args.b).Verifiable();
+        stub.Add.Call((int a, int b) => a + b).Verifiable();
 
         // Act
         ISequenceTestService svc = stub;
@@ -439,7 +439,7 @@ public class VerificationTests
         // Arrange
         var stub = new OverloadTestKnockOff();
         stub.Format.Call((string input) => input.ToUpper());
-        stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
+        stub.Format.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
 
         // Act
         IOverloadTestService svc = stub;
@@ -456,7 +456,7 @@ public class VerificationTests
         // Arrange
         var stub = new OverloadTestKnockOff();
         stub.Format.Call((string input) => input.ToUpper());
-        stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
+        stub.Format.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
 
         // Act - Only call one overload
         IOverloadTestService svc = stub;
@@ -473,7 +473,7 @@ public class VerificationTests
         // Arrange
         var stub = new OverloadTestKnockOff();
         stub.Format.Call((string input) => input.ToUpper()).Verifiable();
-        stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
+        stub.Format.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
         // Second overload not marked verifiable
 
         // Act
@@ -509,7 +509,7 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         stub.Strict = true;
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -524,7 +524,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
         ISequenceTestService svc = stub;
 
         // Act & Assert - Multiple reset cycles

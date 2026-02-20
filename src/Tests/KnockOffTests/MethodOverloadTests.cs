@@ -24,8 +24,8 @@ public class MethodOverloadTests
 
         // Compiler resolves based on lambda parameter types (explicit types needed for disambiguation)
         var tracking1 = stub.Format.Call((string input) => input.ToUpper());
-        var tracking2 = stub.Format.Call(((string input, bool uppercase) args) => args.uppercase ? args.input.ToUpper() : args.input);
-        var tracking3 = stub.Format.Call(((string input, int maxLength) args) => args.input.Substring(0, Math.Min(args.input.Length, args.maxLength)));
+        var tracking2 = stub.Format.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+        var tracking3 = stub.Format.Call((string input, int maxLength) => input.Substring(0, Math.Min(input.Length, maxLength)));
 
         IMethodOverloadService svc = stub;
 
@@ -44,7 +44,7 @@ public class MethodOverloadTests
         var stub = new MethodOverloadServiceKnockOff();
 
         var tracking1 = stub.Format.Call((string input) => "1");
-        var tracking2 = stub.Format.Call(((string input, bool uppercase) args) => "2");
+        var tracking2 = stub.Format.Call((string input, bool uppercase) => "2");
 
         IMethodOverloadService svc = stub;
 

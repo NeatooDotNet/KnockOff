@@ -44,7 +44,7 @@ public class InlineInterfacePatternTests
     public void InlineInterface_OnCall_ConfiguresCallback()
     {
         var stub = new InlineInterfaceExample.Stubs.ICalculator();
-        stub.Add.Call(args => args.a * args.b);
+        stub.Add.Call((int a, int b) => a * b);
 
         Design.Domain.Services.ICalculator calc = stub;
         var result = calc.Add(5, 10);

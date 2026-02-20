@@ -64,7 +64,7 @@ var stub = new PartialSetupCalcStub();
 
 // One call does both: configures the method AND defines the return value
 // There is no second step to forget
-stub.Calculate.Call(args => args.a + args.b);
+stub.Calculate.Call((int a, int b) => a + b);
 
 IPartialSetupCalc calc = stub;
 Assert.Equal(3, calc.Calculate(1, 2));
@@ -185,7 +185,7 @@ var stub = new TypeSafeCalcStub();
 
 // (int a, int b) — types and names come from Add(int a, int b)
 // Wrong types here cause a COMPILE error, not a runtime error
-stub.Add.Call(args => args.a + args.b);
+stub.Add.Call((int a, int b) => a + b);
 
 ITypeSafeCalc calc = stub;
 Assert.Equal(3, calc.Add(1, 2));
@@ -201,7 +201,7 @@ var stub = new TypeSafeValidatorStub();
 
 // (string firstName, string lastName) — both parameters are named and typed
 // No ambiguity: each parameter is a separate lambda argument
-stub.Validate.When(args => args.firstName.Length > 0).Return(true);
+stub.Validate.When((string firstName, string lastName) => firstName.Length > 0).Return(true);
 
 ITypeSafeValidator validator = stub;
 Assert.True(validator.Validate("Jane", "Doe"));

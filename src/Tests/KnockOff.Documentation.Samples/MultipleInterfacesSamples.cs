@@ -92,7 +92,7 @@ public partial class HierarchyTests
         // All members from IStore AND IReadableStore — same flat API
         stub.GetById.Call((id) => $"item-{id}");  // from IReadableStore
         stub.Count.Get(42);                           // from IReadableStore
-        stub.Save.Call(_ => { });           // from IStore
+        stub.Save.Call((int id, string value) => { });           // from IStore
         stub.Delete.Call((id) => { });                // from IStore
 
         IStore store = stub;

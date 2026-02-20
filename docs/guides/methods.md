@@ -52,8 +52,8 @@ The callback signature includes all method parameters in the same order:
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-stub.ValidateCredentials.Call(args =>
-    args.username == "admin" && args.password == "secret");
+stub.ValidateCredentials.Call((string username, string password) =>
+    username == "admin" && password == "secret");
 ```
 <!-- endSnippet -->
 
@@ -202,7 +202,7 @@ Use `Return(callback)` for the first callback, then `ThenReturn()` with params f
 ```cs
 // Return for first callback, then ThenReturn for constant values
 stub.Calculate
-    .Call(args => args.x + args.y)
+    .Call((int x, int y) => x + y)
     .ThenReturn(100, 200, 300);
 ```
 <!-- endSnippet -->
@@ -245,9 +245,9 @@ Sequences with return values use `Func` callbacks:
 ```cs
 // Return method sequences use Func callbacks
 stub.Calculate
-    .Call(args => args.x + args.y)
-    .ThenReturn(args => args.x * args.y)
-    .ThenReturn(args => args.x - args.y);
+    .Call((int x, int y) => x + y)
+    .ThenReturn((int x, int y) => x * y)
+    .ThenReturn((int x, int y) => x - y);
 ```
 <!-- endSnippet -->
 

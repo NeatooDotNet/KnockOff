@@ -107,7 +107,7 @@ public partial class InlineClassPatternTests
         #region attr-inline-class-usage
         // Generated stub inherits from EmailServiceBase
         var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
-        stub.Send.Call(_ => { }).Verifiable();
+        stub.Send.Call((string to, string subject, string body) => { }).Verifiable();
 
         // Use .Object to get the base class type
         EmailServiceBase service = stub.Object;
@@ -143,7 +143,7 @@ public partial class MultipleStubsPatternTests
         var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 
         userRepo.GetById.Call((id) => new User { Id = id, Name = "Test" }).Verifiable();
-        emailService.Send.Call(_ => { }).Verifiable();
+        emailService.Send.Call((string to, string subject, string body) => { }).Verifiable();
         logger.Log.Call((message) => { }).Verifiable();
         #endregion
 

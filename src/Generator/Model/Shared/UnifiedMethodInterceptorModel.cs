@@ -72,18 +72,21 @@ internal sealed record UnifiedMethodInterceptorModel(
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
     bool ReturnsByRefReadonly = false,
 
-    // Tuple delegate info
-    /// <summary>
-    /// True when the CallDelegateType uses a named tuple for 2+ params (e.g., Func&lt;(int a, int b), int&gt;).
-    /// False for delegate stubs where the original delegate type has individual params (e.g., Func&lt;int, int, int&gt;),
-    /// and false for custom delegates (ref/out) and 0-1 param methods.
-    /// Used by the renderer to determine whether to pass typedArgs as a single tuple or unpack individual fields.
-    /// </summary>
-    bool UsesTupleCallDelegate = false,
-
     // XML documentation
     /// <summary>XML documentation summary text for the method, extracted from the original interface/class. Null if none.</summary>
-    string? XmlDocSummary = null)
+    string? XmlDocSummary = null,
+
+    // Friendly name fields for method-name-based delegate/builder/sequence naming
+    /// <summary>Custom delegate friendly name (e.g., "AddDelegate"). Used for the Call delegate type name.</summary>
+    string? DelegateFriendlyName = null,
+    /// <summary>Custom predicate delegate friendly name (e.g., "AddPredicate"). Null for 0-1 params.</summary>
+    string? PredicateFriendlyName = null,
+    /// <summary>Custom predicate delegate signature (e.g., "public delegate bool AddPredicate(int a, int b);"). Null for 0-1 params.</summary>
+    string? PredicateDelegateSignature = null,
+    /// <summary>Builder class friendly name (e.g., "AddImpl").</summary>
+    string? BuilderFriendlyName = null,
+    /// <summary>Sequence class friendly name (e.g., "AddSequence").</summary>
+    string? SequenceFriendlyName = null)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

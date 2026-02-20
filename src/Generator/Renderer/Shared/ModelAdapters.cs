@@ -61,12 +61,7 @@ internal static class ModelAdapters
 		string className,
 		string typeParameters)
 	{
-		var ownerWithParams = string.IsNullOrEmpty(typeParameters)
-			? className
-			: $"{className}{typeParameters}";
-
 		// Recompute delegate types using UnifiedInterceptorBuilder for consistency.
-		// The FlatModelBuilder may compute these differently (e.g., old NeedsCustomDelegate logic).
 		var hasRefOrOut = first.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
 		var sig = new MethodSignatureInfo(
 			Parameters: first.Parameters,
@@ -81,13 +76,26 @@ internal static class ModelAdapters
 			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
 			XmlDocSummary: first.XmlDocSummary);
 
-		var needsCustomDelegate = UnifiedInterceptorBuilder.NeedsCustomDelegate(sig);
 		var callDelegateType = UnifiedInterceptorBuilder.BuildCallDelegateType(first.MethodName, sig, className, typeParameters);
 		var customDelegateSignature = UnifiedInterceptorBuilder.BuildCustomDelegateSignature(first.MethodName, sig, className, typeParameters);
-		var usesTuple = !needsCustomDelegate && first.Parameters.Count >= 2;
 
 		// Get delegate type without nullable marker for builder interface
 		var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
+
+		// Friendly names for single-signature (no overload suffix)
+		var delegateFriendlyName = $"{first.MethodName}Delegate";
+		var builderFriendlyName = $"{first.MethodName}Impl";
+		var sequenceFriendlyName = $"{first.MethodName}Sequence";
+
+		// Predicate delegate: only for 2+ trackable params
+		string? predicateFriendlyName = null;
+		string? predicateDelegateSignature = null;
+		if (first.TrackableParameters.Count >= 2)
+		{
+			predicateFriendlyName = $"{first.MethodName}Predicate";
+			var predicateParamList = BuildDelegateParamList(first.TrackableParameters);
+			predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
+		}
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
@@ -101,7 +109,7 @@ internal static class ModelAdapters
 			ReturnType: first.ReturnType,
 			IsVoid: first.IsVoid,
 			CallDelegateType: callDelegateType,
-			NeedsCustomDelegate: needsCustomDelegate,
+			NeedsCustomDelegate: true,
 			CustomDelegateSignature: customDelegateSignature,
 			LastArgType: GetLastArgType(first.TrackableParameters),
 			LastArgsType: GetLastArgsType(first.TrackableParameters, first.LastCallType),
@@ -114,7 +122,11 @@ internal static class ModelAdapters
 			ReturnsByRef: first.ReturnsByRef,
 			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
 			XmlDocSummary: first.XmlDocSummary,
-			UsesTupleCallDelegate: usesTuple);
+			DelegateFriendlyName: delegateFriendlyName,
+			PredicateFriendlyName: predicateFriendlyName,
+			PredicateDelegateSignature: predicateDelegateSignature,
+			BuilderFriendlyName: builderFriendlyName,
+			SequenceFriendlyName: sequenceFriendlyName);
 	}
 
 	private static UnifiedMethodInterceptorModel BuildMultiOverloadModel(
@@ -124,42 +136,48 @@ internal static class ModelAdapters
 		string className,
 		string typeParameters)
 	{
-		var first = methods[0];
-		var ownerWithParams = string.IsNullOrEmpty(typeParameters)
-			? className
-			: $"{className}{typeParameters}";
-
-		// Build overload signatures
-		var overloads = new List<MethodOverloadSignature>();
+		// Sort unique methods for stable numbering: ascending by param count, then lex order by param types
 		var seenSuffixes = new HashSet<string>();
-
+		var uniqueMethods = new List<FlatMethodModel>();
 		foreach (var method in methods)
 		{
 			var suffix = UnifiedInterceptorBuilder.GetSignatureSuffix(method.Parameters, method.ReturnType);
-			if (!seenSuffixes.Add(suffix))
-				continue;
+			if (seenSuffixes.Add(suffix))
+				uniqueMethods.Add(method);
+		}
 
-			// Use Func/Action for non-ref/out overloads (same as single-signature),
-			// only fall back to custom delegates for ref/out.
-			var hasRefOrOut = method.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
-			string delegateName;
-			string? delegateSignature;
-			bool usesTuple;
+		// Sort for numbering
+		var sorted = uniqueMethods
+			.OrderBy(m => m.Parameters.Count)
+			.ThenBy(m => string.Join(",", m.Parameters.Select(p => p.Type)))
+			.ToList();
 
-			if (hasRefOrOut)
+		// Build overload signatures with numbered friendly names
+		var overloads = new List<MethodOverloadSignature>();
+		for (int i = 0; i < sorted.Count; i++)
+		{
+			var method = sorted[i];
+			var suffix = UnifiedInterceptorBuilder.GetSignatureSuffix(method.Parameters, method.ReturnType);
+			var overloadSuffix = UnifiedInterceptorBuilder.GetOverloadSuffix(i);
+
+			// Always use custom delegate with method-name-based naming
+			var delegateFriendlyName = $"{method.MethodName}Delegate{overloadSuffix}";
+			var delegateParamList = BuildDelegateParamList(method.Parameters);
+			var delegateSignature = method.IsVoid
+				? $"public delegate void {delegateFriendlyName}({delegateParamList});"
+				: $"public delegate {method.ReturnType} {delegateFriendlyName}({delegateParamList});";
+
+			var builderFriendlyName = $"{method.MethodName}Impl{overloadSuffix}";
+			var sequenceFriendlyName = $"{method.MethodName}Sequence{overloadSuffix}";
+
+			// Predicate delegate: only for 2+ trackable params
+			string? predicateFriendlyName = null;
+			string? predicateDelegateSignature = null;
+			if (method.TrackableParameters.Count >= 2)
 			{
-				delegateName = $"{method.MethodName}Delegate_{suffix}";
-				var delegateParamList = BuildDelegateParamList(method.Parameters);
-				delegateSignature = method.IsVoid
-					? $"public delegate void {delegateName}({delegateParamList});"
-					: $"public delegate {method.ReturnType} {delegateName}({delegateParamList});";
-				usesTuple = false;
-			}
-			else
-			{
-				delegateName = BuildFuncActionDelegateType(method.Parameters, method.ReturnType, method.IsVoid);
-				delegateSignature = null;
-				usesTuple = method.Parameters.Count >= 2;
+				predicateFriendlyName = $"{method.MethodName}Predicate{overloadSuffix}";
+				var predicateParamList = BuildDelegateParamList(method.TrackableParameters);
+				predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
 			}
 
 			overloads.Add(new MethodOverloadSignature(
@@ -169,11 +187,11 @@ internal static class ModelAdapters
 				ParameterDeclarations: method.ParameterDeclarations,
 				ReturnType: method.ReturnType,
 				IsVoid: method.IsVoid,
-				DelegateName: delegateName,
+				DelegateName: delegateFriendlyName,
 				DelegateSignature: delegateSignature,
 				LastArgType: GetLastArgType(method.TrackableParameters),
 				LastArgsType: GetLastArgsType(method.TrackableParameters, method.LastCallType),
-				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName, method.IsVoid),
+				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateFriendlyName, method.IsVoid),
 				DefaultExpression: method.DefaultExpression,
 				ThrowsOnDefault: method.ThrowsOnDefault,
 				// Per-signature stub override name for mixed overload groups
@@ -181,17 +199,26 @@ internal static class ModelAdapters
 				ReturnsByRef: method.ReturnsByRef,
 				ReturnsByRefReadonly: method.ReturnsByRefReadonly,
 				XmlDocSummary: method.XmlDocSummary,
-				UsesTupleCallDelegate: usesTuple));
+				DelegateFriendlyName: delegateFriendlyName,
+				PredicateFriendlyName: predicateFriendlyName,
+				PredicateDelegateSignature: predicateDelegateSignature,
+				BuilderFriendlyName: builderFriendlyName,
+				SequenceFriendlyName: sequenceFriendlyName));
 		}
 
 		// For overload groups, check if any method has stub override (for model-level tracking)
-		// Per-signature stub overrides are tracked in MethodOverloadSignature.StubOverrideName
+		var first = sorted[0];
+		// Use the original (unsorted) methods list for DeclaringInterface -- the first method's
+		// declaring interface is the most specific type that supports all overloads.
+		// Sorted order would pick the overload with fewest params, whose declaring interface
+		// may not have all overload signatures (e.g., IDictionary.Add vs ICollection.Add).
+		var declaringInterface = methods[0].DeclaringInterface;
 		var anyHasStubOverride = methods.Any(m => m.HasStubOverride);
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
 			MethodName: first.MethodName,
-			DeclaringInterface: first.DeclaringInterface,
+			DeclaringInterface: declaringInterface,
 			OwnerClassName: className,
 			OwnerTypeParameters: typeParameters,
 			Parameters: first.Parameters,
@@ -284,33 +311,6 @@ internal static class ModelAdapters
 			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");
 		}
 		return string.Join(", ", parts);
-	}
-
-	/// <summary>
-	/// Builds the Func/Action type string for a non-ref/out method signature.
-	/// For 2+ params, uses a named tuple as a single parameter.
-	/// Returns the type without trailing ?.
-	/// </summary>
-	private static string BuildFuncActionDelegateType(EquatableArray<ParameterModel> parameters, string returnType, bool isVoid)
-	{
-		if (isVoid)
-		{
-			if (parameters.Count == 0)
-				return "global::System.Action";
-			if (parameters.Count == 1)
-				return $"global::System.Action<{parameters.GetArray()![0].Type}>";
-			var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
-			return $"global::System.Action<{tupleType}>";
-		}
-		else
-		{
-			if (parameters.Count == 0)
-				return $"global::System.Func<{returnType}>";
-			if (parameters.Count == 1)
-				return $"global::System.Func<{parameters.GetArray()![0].Type}, {returnType}>";
-			var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
-			return $"global::System.Func<{tupleType}, {returnType}>";
-		}
 	}
 
 	#region Property Adapters
@@ -427,12 +427,35 @@ internal static class ModelAdapters
 	public static (UnifiedMethodInterceptorModel Model, InterceptorRenderOptions Options) ToUnifiedModel(InlineDelegateStubModel del)
 	{
 		// Delegates have no out params, so trackable == all params
-		var callType = del.CallType;
-		var builderInterface = GetBuilderInterface(del.Parameters, null, callType, del.IsVoid);
+		var methodName = del.StubClassName;
+
+		// Custom delegate type and signature
+		var callDelegateType = $"{methodName}Delegate?";
+		var delegateParamList = string.Join(", ", del.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+		var customDelegateSignature = del.IsVoid
+			? $"public delegate void {methodName}Delegate({delegateParamList});"
+			: $"public delegate {del.ReturnType} {methodName}Delegate({delegateParamList});";
+		var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
+
+		// Friendly names
+		var delegateFriendlyName = $"{methodName}Delegate";
+		var builderFriendlyName = $"{methodName}Impl";
+		var sequenceFriendlyName = $"{methodName}Sequence";
+
+		// Predicate delegate: only for 2+ params
+		string? predicateFriendlyName = null;
+		string? predicateDelegateSignature = null;
+		if (del.Parameters.Count >= 2)
+		{
+			predicateFriendlyName = $"{methodName}Predicate";
+			predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({delegateParamList});";
+		}
+
+		var builderInterface = GetBuilderInterface(del.Parameters, null, delegateTypeForBuilder, del.IsVoid);
 
 		var model = new UnifiedMethodInterceptorModel(
 			InterceptorClassName: del.InterceptorClassName,
-			MethodName: del.StubClassName,
+			MethodName: methodName,
 			DeclaringInterface: "",
 			OwnerClassName: del.StubClassName,
 			OwnerTypeParameters: del.TypeParameterList,
@@ -441,16 +464,21 @@ internal static class ModelAdapters
 			ParameterDeclarations: del.InvokeParameterDeclarations,
 			ReturnType: del.ReturnType,
 			IsVoid: del.IsVoid,
-			CallDelegateType: del.CallType,
-			NeedsCustomDelegate: false,
-			CustomDelegateSignature: null,
+			CallDelegateType: callDelegateType,
+			NeedsCustomDelegate: true,
+			CustomDelegateSignature: customDelegateSignature,
 			LastArgType: GetLastArgType(del.Parameters),
 			LastArgsType: GetLastArgsType(del.Parameters, null),
 			BuilderInterface: builderInterface,
 			DefaultExpression: del.DefaultExpression,
 			ThrowsOnDefault: false,
 			StubOverrideName: null,
-			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
+			Overloads: EquatableArray<MethodOverloadSignature>.Empty,
+			DelegateFriendlyName: delegateFriendlyName,
+			PredicateFriendlyName: predicateFriendlyName,
+			PredicateDelegateSignature: predicateDelegateSignature,
+			BuilderFriendlyName: builderFriendlyName,
+			SequenceFriendlyName: sequenceFriendlyName);
 
 		var options = new InterceptorRenderOptions(
 			BaseIndent: 2,

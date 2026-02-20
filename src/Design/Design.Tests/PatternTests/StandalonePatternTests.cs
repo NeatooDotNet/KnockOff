@@ -45,7 +45,7 @@ public class StandalonePatternTests
         var stub = new CalculatorStub();
 
         // Call() sets a callback that receives the arguments
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
 
         var result = ((Design.Domain.Services.ICalculator)stub).Add(5, 3);
 

@@ -126,7 +126,7 @@ public partial class MethodSequencesDemo
 
         // Returns callback for first, then add multiple with params
         stub.Add
-            .Call(args => args.a + args.b)  // First: compute a + b
+            .Call((int a, int b) => a + b)  // First: compute a + b
             .ThenReturn(100, 200, 300);  // Then: 100, 200, 300
 
         ICalculator calc = stub;
@@ -248,15 +248,15 @@ public partial class MethodSequencesDemo
         // Third call: returns 3
         // Fourth+ calls: repeats last value (3) - NSubstitute-like behavior
         // Use ThenDefault() to return default(T) instead, or Strict mode to throw
-        stub.Add.Call(args =>
+        stub.Add.Call((int a, int b) =>
         {
             callCount++;
             return 1;
-        }).ThenReturn(args =>
+        }).ThenReturn((int a, int b) =>
         {
             callCount++;
             return 2;
-        }).ThenReturn(args =>
+        }).ThenReturn((int a, int b) =>
         {
             callCount++;
             return 3;
@@ -293,7 +293,7 @@ public partial class MethodSequencesDemo
 
         // Call starts the sequence, ThenReturn adds values
         stub.Add
-            .Call(_ => 1)
+            .Call((int a, int b) => 1)
             .ThenReturn(2)
             .ThenReturn(3);
 
@@ -320,13 +320,13 @@ public partial class MethodSequencesDemo
 
         // Mix callbacks and values in the same sequence
         stub.Add
-            .Call(args =>
+            .Call((int a, int b) =>
             {
-                computedValue = args.a + args.b;
+                computedValue = a + b;
                 return computedValue;
             })
             .ThenReturn(100)  // Constant value
-            .ThenReturn(args => args.a * args.b)  // Computed value
+            .ThenReturn((int a, int b) => a * b)  // Computed value
             .ThenReturn(999);  // Another constant
 
         ICalculator calc = stub;
@@ -344,20 +344,20 @@ public partial class MethodSequencesDemo
     // This matches NSubstitute's behavior for easier migration and more forgiving tests.
     //
     // DEFAULT BEHAVIOR (repeat last value):
-    //   stub.Add.Call(() => 1).ThenReturn(() => 999);
+    //   stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 999);
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // 999 (repeats forever)
     //
     // EXPLICIT DEFAULT TERMINATION (ThenDefault):
-    //   stub.Add.Call(() => 1).ThenReturn(() => 999).ThenDefault();
+    //   stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 999).ThenDefault();
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // 0 (default(T) after exhaustion)
     //
     // STRICT MODE (throws exception):
     //   stub.Strict = true;
-    //   stub.Add.Call(() => 1).ThenReturn(() => 999);
+    //   stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 999);
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // Throws StubException.SequenceExhausted
@@ -374,8 +374,8 @@ public partial class MethodSequencesDemo
 
         // With only one ThenReturn, we have two total callbacks
         stub.Add
-            .Call(_ => 100)
-            .ThenReturn(_ => 200);
+            .Call((int a, int b) => 100)
+            .ThenReturn((int a, int b) => 200);
 
         ICalculator calc = stub;
 
@@ -399,8 +399,8 @@ public partial class MethodSequencesDemo
         var stub = new Stubs.ICalculator();
 
         stub.Add
-            .Call(_ => 1)
-            .ThenReturn(_ => 999);
+            .Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 999);
 
         ICalculator calc = stub;
 
@@ -424,8 +424,8 @@ public partial class MethodSequencesDemo
         var stub = new Stubs.ICalculator();
 
         stub.Add
-            .Call(_ => 1)
-            .ThenReturn(_ => 999)
+            .Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 999)
             .ThenDefault();  // Terminates chain, return default after exhaustion
 
         ICalculator calc = stub;
@@ -492,8 +492,8 @@ public partial class MethodSequencesDemo
 
         // General sequence behavior
         stub.Add
-            .Call(_ => 1)
-            .ThenReturn(_ => 2);
+            .Call((int a, int b) => 1)
+            .ThenReturn((int a, int b) => 2);
 
         // Specific argument match (higher priority)
         stub.Add.When(99, 99).Return(9999);

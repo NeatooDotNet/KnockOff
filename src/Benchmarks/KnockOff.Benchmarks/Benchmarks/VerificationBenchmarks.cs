@@ -54,7 +54,7 @@ public class VerificationBenchmarks
         _ = _moqCalculator.Object.Add(3, 4);
 
         _knockOffCalculator = new CalculatorStub();
-        _knockOffCalculatorTracking = _knockOffCalculator.Add.Call(_ => 0);
+        _knockOffCalculatorTracking = _knockOffCalculator.Add.Call((int a, int b) => 0);
         _ = ((ICalculator)_knockOffCalculator).Add(1, 2);
         _ = ((ICalculator)_knockOffCalculator).Add(3, 4);
 

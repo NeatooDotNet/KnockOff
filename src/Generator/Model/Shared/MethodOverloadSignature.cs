@@ -50,9 +50,17 @@ internal sealed record MethodOverloadSignature(
     /// <summary>XML documentation summary text for this overload, extracted from the original interface/class. Null if none.</summary>
     string? XmlDocSummary = null,
 
-    // Tuple delegate support
-    /// <summary>True when the delegate type uses a named tuple parameter (2+ params, no ref/out). Affects how args are passed at call sites.</summary>
-    bool UsesTupleCallDelegate = false)
+    // Friendly name fields for method-name-based delegate/builder/sequence naming
+    /// <summary>Custom delegate friendly name (e.g., "ValidateCredentialsDelegate2"). Used for the Call delegate type name.</summary>
+    string? DelegateFriendlyName = null,
+    /// <summary>Custom predicate delegate friendly name (e.g., "ValidateCredentialsPredicate2"). Null for 0-1 params.</summary>
+    string? PredicateFriendlyName = null,
+    /// <summary>Custom predicate delegate signature (e.g., "public delegate bool ValidateCredentialsPredicate2(...)"). Null for 0-1 params.</summary>
+    string? PredicateDelegateSignature = null,
+    /// <summary>Builder class friendly name (e.g., "ValidateCredentialsImpl2").</summary>
+    string? BuilderFriendlyName = null,
+    /// <summary>Sequence class friendly name (e.g., "ValidateCredentialsSequence2").</summary>
+    string? SequenceFriendlyName = null)
 {
     /// <summary>True if this signature returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

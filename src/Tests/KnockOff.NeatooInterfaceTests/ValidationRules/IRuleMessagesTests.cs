@@ -71,10 +71,10 @@ public partial class IRuleMessagesTests
         string? capturedProp = null;
         string? capturedMsg = null;
 
-        stub.Add.Call(((string propertyName, string message) args) =>
+        stub.Add.Call((string propertyName, string message) =>
         {
-            capturedProp = args.propertyName;
-            capturedMsg = args.message;
+            capturedProp = propertyName;
+            capturedMsg = message;
         });
 
         messages.Add("Name", "Required");
@@ -315,7 +315,7 @@ public class IRuleMessagesStandaloneTests
         IRuleMessages messages = stub;
 
         // Configure callback to enable tracking (string overload)
-        var tracking = stub.Add.Call(((string propertyName, string message) args) => { });
+        var tracking = stub.Add.Call((string propertyName, string message) => { });
 
         messages.Add("Property", "Message");
 

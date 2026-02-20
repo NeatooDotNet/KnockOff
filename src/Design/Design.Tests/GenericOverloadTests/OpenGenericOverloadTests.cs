@@ -26,8 +26,8 @@ public partial class OpenGenericInterfaceOverloadTests
         var stub = new Stubs.IGenericFormatter<string>();
 
         stub.Format.Call((string item) => $"[1: {item}]");
-        stub.Format.Call(((string item, bool uppercase) args) => $"[2: {args.item}, {args.uppercase}]");
-        stub.Format.Call(((string item, bool uppercase, int maxLength) args) => $"[3: {args.item}, {args.uppercase}, {args.maxLength}]");
+        stub.Format.Call((string item, bool uppercase) => $"[2: {item}, {uppercase}]");
+        stub.Format.Call((string item, bool uppercase, int maxLength) => $"[3: {item}, {uppercase}, {maxLength}]");
 
         IGenericFormatter<string> formatter = stub;
 
@@ -79,7 +79,7 @@ public partial class OpenGenericInterfaceOverloadTests
         var stub = new Stubs.IGenericFormatter<string>();
 
         var tracking1 = stub.Format.Call((string item) => item);
-        var tracking2 = stub.Format.Call(((string item, bool uppercase) args) => args.item);
+        var tracking2 = stub.Format.Call((string item, bool uppercase) => item);
 
         IGenericFormatter<string> formatter = stub;
 
@@ -101,7 +101,7 @@ public partial class OpenGenericInterfaceOverloadTests
         var stub = new Stubs.IGenericFormatter<TestEntity>();
 
         stub.Transform.Call((TestEntity item) => new TestEntity { Id = item.Id * 2, Name = item.Name });
-        stub.Transform.Call(((TestEntity item, string options) args) => new TestEntity { Id = args.item.Id, Name = $"{args.item.Name}-{args.options}" });
+        stub.Transform.Call((TestEntity item, string options) => new TestEntity { Id = item.Id, Name = $"{item.Name}-{options}" });
 
         IGenericFormatter<TestEntity> formatter = stub;
 

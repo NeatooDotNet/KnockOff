@@ -76,8 +76,8 @@ public class SeqMethodTests
 
         #region sequences-method-callback
         stub.Add
-            .Call(args => args.a + args.b)     // First: computed
-            .ThenReturn(args => args.a * args.b) // Second: computed
+            .Call((int a, int b) => a + b)     // First: computed
+            .ThenReturn((int a, int b) => a * b) // Second: computed
             .ThenReturn(999);            // Third+: constant
         #endregion
 
@@ -94,7 +94,7 @@ public class SeqMethodTests
         var stub = new SeqCalcStub();
 
         #region sequences-callback-then-params
-        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200, 300);
+        stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200, 300);
 
         ISeqCalc calc = stub;
         calc.Add(1, 2); // 3 (computed)
@@ -127,7 +127,7 @@ public class SeqMethodTests
         var stub = new SeqCalcStub();
 
         #region sequences-method-thendefault
-        stub.Add.Call(_ => 1).ThenReturn(_ => 999).ThenDefault();
+        stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 999).ThenDefault();
 
         ISeqCalc calc = stub;
         calc.Add(0, 0); // 1
@@ -346,7 +346,7 @@ public class SeqExhaustionTests
 
         #region sequences-strict-exhaustion
         stub.Strict = true;
-        stub.Add.Call(_ => 100).ThenReturn(_ => 200);
+        stub.Add.Call((int a, int b) => 100).ThenReturn((int a, int b) => 200);
 
         ISeqCalc calc = stub;
         calc.Add(0, 0); // 100
@@ -392,7 +392,7 @@ public class SeqWhenInteractionTests
         var stub = new SeqCalcStub();
 
         #region sequences-when-interaction
-        stub.Add.Call(_ => 1).ThenReturn(_ => 2);
+        stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 2);
         stub.Add.When(99, 99).Return(9999);
 
         ISeqCalc calc = stub;

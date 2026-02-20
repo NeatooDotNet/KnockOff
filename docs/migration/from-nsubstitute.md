@@ -350,8 +350,8 @@ substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
 <!-- snippet: nsub-migration-multiargs-knockoff -->
 ```cs
 // KnockOff: Named parameters directly in delegate
-stub.FindUsers.Call(args =>
-    args.limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = args.name } });
+stub.FindUsers.Call((string name, int limit) =>
+    limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
 ```
 <!-- endSnippet -->
 

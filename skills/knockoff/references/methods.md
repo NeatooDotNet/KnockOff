@@ -76,15 +76,15 @@ stub.GetUserName.Call((userId) => userId > 100 ? "Admin" : "User");
 | Dynamic based on args | `Call((args) => computed)` |
 | Callback then constants | `Call(cb).ThenReturn(x, y, z)` |
 
-### Methods with Multiple Parameters (Named Tuples)
+### Methods with Multiple Parameters (Custom Delegates)
 
-Methods with 2+ parameters receive a **named tuple** in the callback. The tuple field names match the original parameter names, providing IntelliSense:
+Methods with 2+ parameters use **custom named delegates** with typed parameters. The parameter names match the original method signature, providing IntelliSense:
 
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-stub.ValidateCredentials.Call(args =>
-    args.username == "admin" && args.password == "secret");
+stub.ValidateCredentials.Call((string username, string password) =>
+    username == "admin" && password == "secret");
 ```
 <!-- endSnippet -->
 
@@ -93,8 +93,8 @@ stub.ValidateCredentials.Call(args =>
 | Params | Callback Style | Example |
 |--------|---------------|---------|
 | 0 | No args | `stub.Reset.Call(() => { })` |
-| 1 | Raw type | `stub.GetUser.Call((id) => new User { Id = id })` |
-| 2+ | Named tuple | `stub.Add.Call(args => args.a + args.b)` |
+| 1 | Raw type | `stub.GetUser.Call((int id) => new User { Id = id })` |
+| 2+ | Custom delegate | `stub.Add.Call((int a, int b) => a + b)` |
 | ref/out | Custom delegate | `stub.RefArg.Call((ref int a) => { a++; })` |
 
 ---
@@ -185,8 +185,8 @@ When an interface has overloaded methods, KnockOff generates a **single intercep
 ### Disambiguation Rules
 
 - **1-param overloads:** Use explicit parameter type: `(string input) => ...`
-- **2+ param overloads:** Use named tuple type: `((string input, FormatOptions options) args) => args.input`
-- **Different param counts:** Compiler resolves automatically by lambda arity
+- **2+ param overloads:** Use typed parameters: `(string input, FormatOptions options) => input`
+- **Different param counts:** Compiler resolves automatically by delegate signature
 
 <!-- snippet: methods-overloads -->
 ```cs
@@ -204,7 +204,7 @@ stub.Find.Call((string name) => new User { Id = 1, Name = name });
 ```csharp
 // Each Call returns a separate tracking handle
 var tracking1 = stub.Format.Call((string input) => input);
-var tracking2 = stub.Format.Call(((string input, FormatOptions options) args) => args.input);
+var tracking2 = stub.Format.Call((string input, FormatOptions options) => input);
 
 formatter.Format("a");
 formatter.Format("b", new FormatOptions());
@@ -252,9 +252,9 @@ stub.ProcessData.Reset();
 | Task | Code |
 |------|------|
 | Configure void method (0-1 params) | `stub.Method.Call((arg) => { })` |
-| Configure void method (2+ params) | `stub.Method.Call(args => { })` (named tuple) |
-| Configure method with callback (1 param) | `stub.Method.Call((arg) => result)` |
-| Configure method with callback (2+ params) | `stub.Method.Call(args => args.a + args.b)` |
+| Configure void method (2+ params) | `stub.Method.Call((int a, int b) => { })` |
+| Configure method with callback (1 param) | `stub.Method.Call((int arg) => result)` |
+| Configure method with callback (2+ params) | `stub.Method.Call((int a, int b) => a + b)` |
 | Configure method with value | `stub.Method.Return(fixedValue)` |
 | Configure async Task<T> (auto-wrap) | `stub.AsyncMethod.Return(value)` |
 | Configure overloaded method | `stub.Method.Call((string input) => result)` |
@@ -262,7 +262,7 @@ stub.ProcessData.Reset();
 | Verify method was called | `stub.Method.Verify()` |
 | Verify call count | `stub.Method.Verify(Called.Exactly(n))` |
 | Get last single arg | `stub.Method.LastArg` |
-| Get last multiple args | `stub.Method.LastArgs` (named tuple) |
+| Get last multiple args | `stub.Method.LastArgs` (tuple) |
 | Reset interceptor | `stub.Method.Reset()` |
 
 **Cross-cutting features** covered in dedicated reference files:

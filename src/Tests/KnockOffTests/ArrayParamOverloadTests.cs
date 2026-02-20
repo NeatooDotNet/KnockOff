@@ -44,7 +44,7 @@ public class ArrayParamOverloadTests
 		var knockOff = new ArrayParamOverloadKnockOff();
 		IArrayParamOverloadService service = knockOff;
 
-		knockOff.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>(args.filters.Take(args.maxCount)));
+		knockOff.GetItems.Call((string[] filters, int maxCount) => new List<string>(filters.Take(maxCount)));
 
 		var result = service.GetItems(new[] { "a", "b", "c" }, 2);
 
@@ -65,7 +65,7 @@ public class ArrayParamOverloadTests
 
 		var tracking1 = knockOff.GetItems.Call(() => new List<string>());
 		var tracking2 = knockOff.GetItems.Call((string[] filters) => new List<string>(filters));
-		var tracking3 = knockOff.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>());
+		var tracking3 = knockOff.GetItems.Call((string[] filters, int maxCount) => new List<string>());
 
 		service.GetItems();
 		service.GetItems(new[] { "x" });
@@ -84,7 +84,7 @@ public class ArrayParamOverloadTests
 
 		knockOff.GetItems.Call(() => new List<string>());
 		knockOff.GetItems.Call((string[] filters) => new List<string>());
-		knockOff.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>());
+		knockOff.GetItems.Call((string[] filters, int maxCount) => new List<string>());
 
 		service.GetItems();
 		service.GetItems(new[] { "a" });
@@ -132,7 +132,7 @@ public class ArrayParamOverloadTests
 		var stub = new ArrayParamOverloadInlineTests.Stubs.IArrayParamOverloadService();
 		IArrayParamOverloadService service = stub;
 
-		stub.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>(args.filters.Take(args.maxCount)));
+		stub.GetItems.Call((string[] filters, int maxCount) => new List<string>(filters.Take(maxCount)));
 
 		var result = service.GetItems(new[] { "a", "b", "c", "d" }, 3);
 
@@ -151,7 +151,7 @@ public class ArrayParamOverloadTests
 
 		var tracking1 = stub.GetItems.Call(() => new List<string>());
 		var tracking2 = stub.GetItems.Call((string[] filters) => new List<string>());
-		var tracking3 = stub.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>());
+		var tracking3 = stub.GetItems.Call((string[] filters, int maxCount) => new List<string>());
 
 		service.GetItems();
 		service.GetItems();
@@ -172,7 +172,7 @@ public class ArrayParamOverloadTests
 
 		stub.GetItems.Call(() => new List<string>());
 		stub.GetItems.Call((string[] filters) => new List<string>());
-		stub.GetItems.Call(((string[] filters, int maxCount) args) => new List<string>());
+		stub.GetItems.Call((string[] filters, int maxCount) => new List<string>());
 
 		service.GetItems();
 		service.GetItems(new[] { "a" });

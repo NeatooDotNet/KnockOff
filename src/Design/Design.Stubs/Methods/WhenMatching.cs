@@ -79,7 +79,7 @@ public partial class WhenMatchingDemo
     // matching logic. The predicate receives the arguments and returns bool.
     //
     // This is useful for:
-    // - Range checks: When(args => args.a > 0 && args.b > 0)
+    // - Range checks: When((int a, int b) => a > 0 && b > 0)
     // - Pattern matching: When((s) => s.StartsWith("prefix"))
     // - Complex conditions that can't be expressed with equality
     //
@@ -96,10 +96,10 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Match when both arguments are positive
-        stub.Add.When(args => args.a > 0 && args.b > 0).Return(42);
+        stub.Add.When((int a, int b) => a > 0 && b > 0).Return(42);
 
         // Match when either argument is negative
-        stub.Add.When(args => args.a < 0 || args.b < 0).Return(-1);
+        stub.Add.When((int a, int b) => a < 0 || b < 0).Return(-1);
 
         ICalculator calc = stub;
 
@@ -233,7 +233,7 @@ public partial class WhenMatchingDemo
         stub.Add.Return(0);
 
         // Order matters! First match wins.
-        stub.Add.When(args => args.a > 0).Return(100);  // Added first
+        stub.Add.When((int a, int b) => a > 0).Return(100);  // Added first
         stub.Add.When(5, 5).Return(500);              // Added second
 
         ICalculator calc = stub;
@@ -341,8 +341,8 @@ public partial class WhenMatchingDemo
     // so When() and ThenWhen() accept tuples directly:
     //
     //   stub.Add.When(1, 2).Return(100);   // Tuple value matching
-    //   stub.Add.When(args => args.a > 0).Return(42);  // Predicate matching
+    //   stub.Add.When((int a, int b) => a > 0).Return(42);  // Predicate matching
     //
-    // Named tuple fields (args.a, args.b) provide natural access in predicates.
+    // Named parameters provide natural access in predicates.
     // =========================================================================
 }

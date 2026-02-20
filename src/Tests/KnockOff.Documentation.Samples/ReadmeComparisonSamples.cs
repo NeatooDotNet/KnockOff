@@ -172,7 +172,7 @@ public class MethodsConditionalKnockOffTests
     public void KnockOff_Conditional()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Call(args => args.a > 0 ? args.a + args.b : 0);
+        stub.Add.Call((int a, int b) => a > 0 ? a + b : 0);
 
         ICalculator calc = stub;
         Assert.Equal(12, calc.Add(5, 7));  // 5 > 0, returns 5+7
@@ -203,7 +203,7 @@ public class MethodsThrowKnockOffTests
     public void KnockOff_Throw()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Call(_ => throw new InvalidOperationException());
+        stub.Add.Call((int a, int b) => throw new InvalidOperationException());
 
         ICalculator calc = stub;
         Assert.Throws<InvalidOperationException>(() => calc.Add(1, 2));
@@ -241,7 +241,7 @@ public class MethodsCallbackKnockOffTests
         var stub = new CompareCalculatorStub();
         var log = new List<string>();
 
-        stub.Add.Call(args => { log.Add($"Add({args.a}, {args.b})"); return 3; });
+        stub.Add.Call((int a, int b) => { log.Add($"Add({a}, {b})"); return 3; });
 
         ICalculator calc = stub;
         var result = calc.Add(1, 2);
@@ -309,7 +309,7 @@ public class MethodsVerifyKnockOffTests
     public void KnockOff_VerifyCalled()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -343,7 +343,7 @@ public class MethodsVerifyCountKnockOffTests
     public void KnockOff_VerifyCount()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Call(args => args.a + args.b);
+        stub.Add.Call((int a, int b) => a + b);
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -373,7 +373,7 @@ public class ArgumentCaptureNSubTests
 
         #region readme-argmatch-knockoff-oncall
         // KnockOff - Returns with conditional (permanent, matches all calls)
-        stub.Add.Call(args => args.a > 0 ? 100 : 0);
+        stub.Add.Call((int a, int b) => a > 0 ? 100 : 0);
         #endregion
 
         Assert.Equal(100, calc.Add(5, 7));
@@ -387,7 +387,7 @@ public class ArgumentCaptureNSubTests
         var stub = new CompareCalculatorStub();
         #region readme-argmatch-knockoff-when
         // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-        stub.Add.When(args => args.a > 0).Return(100).ThenCall(args => args.a + args.b);
+        stub.Add.When((int a, int b) => a > 0).Return(100).ThenCall((int a, int b) => a + b);
         #endregion
 
         ICalculator calc = stub;
@@ -442,7 +442,7 @@ public class ArgumentCaptureKnockOffTests
 
         #region readme-argcapture-knockoff
         // KnockOff - built-in, no pre-setup
-        var tracking = stub.Add.Call(args => args.a + args.b);
+        var tracking = stub.Add.Call((int a, int b) => a + b);
         ICalculator calc = stub;
         calc.Add(1, 2);
         var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2

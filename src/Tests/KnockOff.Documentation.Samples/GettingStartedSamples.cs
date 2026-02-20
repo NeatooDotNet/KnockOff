@@ -88,7 +88,7 @@ public partial class InlineStubTests
 
         #region getting-started-inline-use
         // Call returns a tracking object for argument access
-        var tracking = stub.Send.Call(_ => { }).Verifiable();
+        var tracking = stub.Send.Call((string to, string subject, string body) => { }).Verifiable();
 
         IEmailSvc emailService = stub;
         emailService.Send("user@example.com", "Welcome", "Hello!");

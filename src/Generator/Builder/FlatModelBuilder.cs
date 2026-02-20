@@ -45,21 +45,10 @@ internal static class FlatModelBuilder
 		var events = BuildEventModels(typeInfo, nameMap);
 
 		// Group non-generic methods by interceptor name for multi-overload support
-		// Exclude methods with user implementations (HasStubOverride)
+		// All methods (with or without stub overrides) are unified in a single group per interceptor name.
+		// Per-signature stub override tracking is handled via HasStubOverride on each FlatMethodModel.
 		var flatMethodGroups = methods
-			.Where(m => !m.IsGenericMethod && !m.HasStubOverride)
-			.GroupBy(m => m.InterceptorName)
-			.Select(g => new FlatMethodGroup(
-				InterceptorName: g.Key,
-				InterceptorClassName: g.First().InterceptorClassName,
-				NeedsNewKeyword: g.Any(m => m.NeedsNewKeyword),
-				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
-			.ToList();
-
-		// Group stub overrides by interceptor name for per-signature RecordCall support
-		// This groups methods where HasStubOverride (base class pattern)
-		var flatStubOverrideGroups = methods
-			.Where(m => !m.IsGenericMethod && m.HasStubOverride)
+			.Where(m => !m.IsGenericMethod)
 			.GroupBy(m => m.InterceptorName)
 			.Select(g => new FlatMethodGroup(
 				InterceptorName: g.Key,
@@ -90,7 +79,6 @@ internal static class FlatModelBuilder
 			Indexers: indexers,
 			Methods: methods,
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
-			StubOverrideGroups: new EquatableArray<FlatMethodGroup>(flatStubOverrideGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
 			GenericStubOverrideHandlerGroups: genericStubOverrideHandlerGroups,
 			Events: events,
@@ -254,9 +242,8 @@ internal static class FlatModelBuilder
 
 	/// <summary>
 	/// Assigns interceptor names for a group of method overloads with the same name.
-	/// Handles partial stub override coverage: overloads WITH stub overrides get one name,
-	/// overloads WITHOUT stub overrides get a different name.
-	/// Uses base class pattern StubOverrideMethods only.
+	/// All overloads share a single interceptor name regardless of stub override status.
+	/// Per-signature stub override tracking is handled downstream via HasStubOverride on each method model.
 	/// </summary>
 	private static void AssignNamesForOverloadGroup(
 		string methodName,
@@ -265,42 +252,13 @@ internal static class FlatModelBuilder
 		Dictionary<string, string> nameMap,
 		HashSet<string> usedNames)
 	{
-		// Split overloads by whether they have a matching stub override (base class pattern)
-		var withStubOverride = overloads.Where(o => HasMatchingStubOverride(o, stubOverrideMethods)).ToList();
-		var withoutStubOverride = overloads.Where(o => !HasMatchingStubOverride(o, stubOverrideMethods)).ToList();
-
-		if (withStubOverride.Count > 0 && withoutStubOverride.Count > 0)
+		// All overloads share a single interceptor name
+		var finalName = GetUniqueInterceptorName(methodName, usedNames);
+		usedNames.Add(finalName);
+		foreach (var overload in overloads)
 		{
-			// Partial coverage: overloads are split between stub override and regular interceptors
-			// Overloads WITH stub overrides use one interceptor name
-			var stubOverrideName = GetUniqueInterceptorName(methodName, usedNames);
-			usedNames.Add(stubOverrideName);
-			foreach (var overload in withStubOverride)
-			{
-				var key = GetMemberKey(overload);
-				nameMap[key] = stubOverrideName;
-			}
-
-			// Overloads WITHOUT stub overrides use a different interceptor name
-			var regularName = GetUniqueInterceptorName(methodName, usedNames);
-			usedNames.Add(regularName);
-			foreach (var overload in withoutStubOverride)
-			{
-				var key = GetMemberKey(overload);
-				nameMap[key] = regularName;
-			}
-		}
-		else
-		{
-			// All overloads are the same (all with stub overrides or all without)
-			// They share a single interceptor name
-			var finalName = GetUniqueInterceptorName(methodName, usedNames);
-			usedNames.Add(finalName);
-			foreach (var overload in overloads)
-			{
-				var key = GetMemberKey(overload);
-				nameMap[key] = finalName;
-			}
+			var key = GetMemberKey(overload);
+			nameMap[key] = finalName;
 		}
 	}
 
@@ -755,7 +713,7 @@ internal static class FlatModelBuilder
 		// Third pass: Determine which methods are part of overload groups
 		// A method is part of an overload group if there are multiple methods with the same InterceptorName
 		var interceptorNameCounts = methods
-			.Where(m => !m.IsGenericMethod && !m.HasStubOverride)
+			.Where(m => !m.IsGenericMethod)
 			.GroupBy(m => m.InterceptorName)
 			.ToDictionary(g => g.Key, g => g.Count());
 
@@ -763,7 +721,6 @@ internal static class FlatModelBuilder
 		{
 			// Check if this method's interceptor name appears multiple times
 			var isPartOfOverloadGroup = !m.IsGenericMethod &&
-			                            !m.HasStubOverride &&
 			                            interceptorNameCounts.TryGetValue(m.InterceptorName, out var count) &&
 			                            count > 1;
 			return m with { IsPartOfOverloadGroup = isPartOfOverloadGroup };

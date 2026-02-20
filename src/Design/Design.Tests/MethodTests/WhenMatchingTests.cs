@@ -38,7 +38,7 @@ public class WhenMatchingTests
     public void When_WithPredicate()
     {
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
-        stub.Add.When(args => args.a > 10).Return(999);
+        stub.Add.When((int a, int b) => a > 10).Return(999);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -52,7 +52,7 @@ public class WhenMatchingTests
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
         stub.Add.When(1, 2).Return(10)
             .ThenWhen(3, 4).Return(20)
-            .ThenCall(args => args.a + args.b);
+            .ThenCall((int a, int b) => a + b);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -95,7 +95,7 @@ public class WhenMatchingTests
 
         var chain = stub.Add.When(1, 2).Return(100)
             .ThenWhen(3, 4).Return(200)
-            .ThenCall(_ => 999);
+            .ThenCall((int a, int b) => 999);
 
         Design.Domain.Services.ICalculator calc = stub;
 

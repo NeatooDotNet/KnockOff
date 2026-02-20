@@ -230,7 +230,7 @@ public class MethodInterceptorApiTests
             new User { Id = id, Name = $"User{id}" }).Verifiable();
 
         // Configure multi-parameter method
-        var updateTracking = stub.Update.Call(_ => { }).Verifiable();
+        var updateTracking = stub.Update.Call((int id, string name) => { }).Verifiable();
         #endregion
 
         // Exercise the stub

@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.52.0</FileVersion>
-		<PackageVersion>0.52.0</PackageVersion>
+		<FileVersion>0.54.0</FileVersion>
+		<PackageVersion>0.54.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Comprehensive IntelliSense API redesign: fully generated interceptor classes, Call/Return unified API, named tuples for 2+ params, XML comments on all generated methods, single property for overloads with tracking handles.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix: stub override on partial overloads no longer splits interceptor groups. All overloads share a single interceptor with per-signature stub override fallback.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

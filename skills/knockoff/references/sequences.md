@@ -39,8 +39,8 @@ stub.Add.Return(1, 2, 3);  // Params -- sequence, last repeats after exhaustion
 <!-- snippet: sequences-method-callback -->
 ```cs
 stub.Add
-    .Call(args => args.a + args.b)     // First: computed
-    .ThenReturn(args => args.a * args.b) // Second: computed
+    .Call((int a, int b) => a + b)     // First: computed
+    .ThenReturn((int a, int b) => a * b) // Second: computed
     .ThenReturn(999);            // Third+: constant
 ```
 <!-- endSnippet -->
@@ -49,7 +49,7 @@ stub.Add
 
 <!-- snippet: sequences-callback-then-params -->
 ```cs
-stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200, 300);
+stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200, 300);
 
 ISeqCalc calc = stub;
 calc.Add(1, 2); // 3 (computed)
@@ -73,7 +73,7 @@ stub.Add.Return(1).ThenReturn(2).ThenReturn(3);
 
 <!-- snippet: sequences-method-thendefault -->
 ```cs
-stub.Add.Call(_ => 1).ThenReturn(_ => 999).ThenDefault();
+stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 999).ThenDefault();
 
 ISeqCalc calc = stub;
 calc.Add(0, 0); // 1
@@ -241,7 +241,7 @@ For per-key behavior, use per-key `Returns` or a Get callback with its own dicti
 <!-- snippet: sequences-strict-exhaustion -->
 ```cs
 stub.Strict = true;
-stub.Add.Call(_ => 100).ThenReturn(_ => 200);
+stub.Add.Call((int a, int b) => 100).ThenReturn((int a, int b) => 200);
 
 ISeqCalc calc = stub;
 calc.Add(0, 0); // 100
@@ -277,7 +277,7 @@ When chains have **higher priority** than sequences. When matches don't advance 
 
 <!-- snippet: sequences-when-interaction -->
 ```cs
-stub.Add.Call(_ => 1).ThenReturn(_ => 2);
+stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 2);
 stub.Add.When(99, 99).Return(9999);
 
 ISeqCalc calc = stub;

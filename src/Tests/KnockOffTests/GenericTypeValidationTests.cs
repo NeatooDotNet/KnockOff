@@ -400,7 +400,7 @@ public class GenericValidationP2Tests
 
 		var entity = new ValidationEntity { Id = 1, Name = "Test" };
 		stub.Get.Call((key) => entity);
-		var setTracking = stub.Set.Call(args => { });
+		var setTracking = stub.Set.Call((string key, ValidationEntity value) => { });
 
 		var result = service.Get("key1");
 		service.Set("key2", entity);
@@ -802,7 +802,7 @@ public class GenericValidationP9Tests
 
 		var entity = new ValidationEntity { Id = 1, Name = "Test" };
 		stub.Get.Call((key) => entity);
-		var setTracking = stub.Set.Call(args => { });
+		var setTracking = stub.Set.Call((string key, ValidationEntity value) => { });
 
 		var result = service.Get("key1");
 		service.Set("key2", entity);

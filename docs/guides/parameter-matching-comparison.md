@@ -2,7 +2,7 @@
 
 # Parameter Matching Comparison
 
-KnockOff uses standard C# lambdas for parameter matching — conditionals, named parameters, and tuple destructuring replace framework-specific matchers. No `It.Is<>`, no `Arg.Is<>`, no `x.ArgAt<>()`.
+KnockOff uses standard C# lambdas for parameter matching — conditionals and named parameters replace framework-specific matchers. No `It.Is<>`, no `Arg.Is<>`, no `x.ArgAt<>()`. Custom named delegates provide full IntelliSense with original parameter names.
 
 ---
 
@@ -34,7 +34,7 @@ public interface IUserSearch
 <!-- snippet: parammatch-conditional -->
 ```cs
 // Standard C# conditional — no matchers needed
-stub.GetPrice.Call(args => args.quantity > 10 ? 8.99m : 9.99m);
+stub.GetPrice.Call((string product, int quantity) => quantity > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->
 
@@ -55,8 +55,8 @@ stub.GetPrice.When("gadget", 1).Return(29.99m);
 <!-- snippet: parammatch-named-params -->
 ```cs
 // Both params are string — names come from the lambda, not index math
-stub.FindUser.Call(args =>
-    args.firstName == "Jane" && args.lastName == "Doe" ? "jane.doe" : null);
+stub.FindUser.Call((string firstName, string lastName) =>
+    firstName == "Jane" && lastName == "Doe" ? "jane.doe" : null);
 ```
 <!-- endSnippet -->
 
@@ -67,7 +67,7 @@ Both parameters are `string`. The lambda names `firstName` and `lastName` come f
 <!-- snippet: parammatch-capture -->
 ```cs
 // Built-in capture — no Callback<> or Arg.Do<> setup
-var tracking = stub.RecordSale.Call(_ => { });
+var tracking = stub.RecordSale.Call((string product, int quantity) => { });
 
 IPricingService pricing = stub;
 pricing.RecordSale("widget", 3);
@@ -85,7 +85,7 @@ No `Callback<>` pre-setup. No `Arg.Do<>`. The tracking object captures arguments
 ```cs
 // When() for specifics, Return() as fallback
 stub.GetPrice.When("premium-widget", 1).Return(99.99m);
-stub.GetPrice.Call(args => args.quantity * 9.99m);
+stub.GetPrice.Call((string product, int quantity) => quantity * 9.99m);
 ```
 <!-- endSnippet -->
 
@@ -97,8 +97,8 @@ When() matches specific values first. Unmatched calls fall through to Return().
 ```cs
 // Predicate on multiple params — standard C# lambda
 stub.GetPrice
-    .When(args => args.quantity > 100).Return(7.99m)
-    .ThenCall(args => args.quantity > 10 ? 8.99m : 9.99m);
+    .When((string product, int quantity) => quantity > 100).Return(7.99m)
+    .ThenCall((string product, int quantity) => quantity > 10 ? 8.99m : 9.99m);
 ```
 <!-- endSnippet -->
 

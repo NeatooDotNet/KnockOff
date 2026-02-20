@@ -141,7 +141,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_Compare_TracksInvocation()
     {
         var knockOff = new ComparerStringKnockOff();
-        var tracking = knockOff.Compare.Call(_ => 0);
+        var tracking = knockOff.Compare.Call((string? x, string? y) => 0);
         IComparer<string> comparer = knockOff;
 
         comparer.Compare("a", "b");
@@ -153,7 +153,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_OnCall_CustomBehavior()
     {
         var knockOff = new ComparerStringKnockOff();
-        knockOff.Compare.Call(args => string.Compare(args.x, args.y, StringComparison.OrdinalIgnoreCase));
+        knockOff.Compare.Call((string? x, string? y) => string.Compare(x, y, StringComparison.OrdinalIgnoreCase));
         IComparer<string> comparer = knockOff;
 
         var result = comparer.Compare("A", "a");
@@ -165,7 +165,7 @@ public class BclStandaloneTests
     public void ComparerStringKnockOff_OnCall_LengthComparer()
     {
         var knockOff = new ComparerStringKnockOff();
-        knockOff.Compare.Call(args => (args.x?.Length ?? 0) - (args.y?.Length ?? 0));
+        knockOff.Compare.Call((string? x, string? y) => (x?.Length ?? 0) - (y?.Length ?? 0));
         IComparer<string> comparer = knockOff;
 
         var result1 = comparer.Compare("aaa", "b");

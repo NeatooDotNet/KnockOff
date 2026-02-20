@@ -54,7 +54,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.Call(_ => true).Verifiable();
+        stub.Send.Call((string to, string subject) => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -130,7 +130,7 @@ public class MethodReturnTests
         stub.GetValue.Call((key) => key == "debug" ? "true" : "false");
 
         // Void methods use Action callback
-        stub.SetValue.Call(_ => { /* track or validate */ });
+        stub.SetValue.Call((string key, string value) => { /* track or validate */ });
     }
 }
 
@@ -234,7 +234,7 @@ public class ArgumentAccessTests
     {
         var stub = new SkillNotifierStub();
 
-        var tracking = stub.Notify.Call(_ => { });
+        var tracking = stub.Notify.Call((int userId, string message) => { });
 
         ISkillNotifier notifier = stub;
         notifier.Notify(42, "Hello");
@@ -279,7 +279,7 @@ public class GotchaTests
         var stub = new SkillBarStub();
 
         // CORRECT: Callback signature matches method parameters exactly
-        stub.Process.Call(args => { /* ... */ });
+        stub.Process.Call((int id, string name) => { /* ... */ });
     }
 }
 

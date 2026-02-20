@@ -148,7 +148,7 @@ public class StubOverrideOnCallTests
     {
         // Arrange
         var stub = new MultiParamStubOverrideStub();
-        stub.Calculate.Call(args => args.a - args.b); // Override stub override (which does a + b)
+        stub.Calculate.Call((int a, int b) => a - b); // Override stub override (which does a + b)
 
         // Act
         IMultiParamStubOverrideService service = stub;

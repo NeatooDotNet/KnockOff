@@ -47,11 +47,25 @@ internal static class UnifiedInterceptorBuilder
 			// Single-signature case
 			var sig = uniqueSignatures[0];
 			var callDelegateType = BuildCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
-			var needsCustom = NeedsCustomDelegate(sig);
-			// UsesTupleCallDelegate: true when we use a named tuple in the Func/Action type (2+ params, no ref/out)
-			var usesTuple = !needsCustom && sig.Parameters.Count >= 2;
+			var customDelegateSignature = BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters);
 			// Get the delegate type without nullable marker for builder interface
 			var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
+
+			// Friendly names for single-signature (no overload suffix)
+			var delegateFriendlyName = $"{methodName}Delegate";
+			var builderFriendlyName = $"{methodName}Impl";
+			var sequenceFriendlyName = $"{methodName}Sequence";
+
+			// Predicate delegate: only for 2+ trackable params
+			string? predicateFriendlyName = null;
+			string? predicateDelegateSignature = null;
+			if (sig.TrackableParameters.Count >= 2)
+			{
+				predicateFriendlyName = $"{methodName}Predicate";
+				var predicateParamList = BuildDelegateParamList(sig.TrackableParameters);
+				predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
+			}
+
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
@@ -64,8 +78,8 @@ internal static class UnifiedInterceptorBuilder
 				ReturnType: sig.ReturnType,
 				IsVoid: sig.IsVoid,
 				CallDelegateType: callDelegateType,
-				NeedsCustomDelegate: needsCustom,
-				CustomDelegateSignature: BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters),
+				NeedsCustomDelegate: true,
+				CustomDelegateSignature: customDelegateSignature,
 				LastArgType: GetLastArgType(sig.TrackableParameters),
 				LastArgsType: GetLastArgsType(sig.TrackableParameters),
 				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder, sig.IsVoid),
@@ -76,12 +90,17 @@ internal static class UnifiedInterceptorBuilder
 				ReturnsByRef: sig.ReturnsByRef,
 				ReturnsByRefReadonly: sig.ReturnsByRefReadonly,
 				XmlDocSummary: sig.XmlDocSummary,
-				UsesTupleCallDelegate: usesTuple);
+				DelegateFriendlyName: delegateFriendlyName,
+				PredicateFriendlyName: predicateFriendlyName,
+				PredicateDelegateSignature: predicateDelegateSignature,
+				BuilderFriendlyName: builderFriendlyName,
+				SequenceFriendlyName: sequenceFriendlyName);
 		}
 		else
 		{
-			// Multi-overload case
-			var first = uniqueSignatures[0];
+			// Multi-overload case: sort and number overloads
+			var sorted = SortOverloadsForNumbering(uniqueSignatures);
+			var first = sorted[0];
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
@@ -106,7 +125,7 @@ internal static class UnifiedInterceptorBuilder
 				// For multi-overload, stub override is tracked per-signature (see MethodOverloadSignature.StubOverrideName)
 				StubOverrideName: stubOverrideName,
 				Overloads: new EquatableArray<MethodOverloadSignature>(
-					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, stubOverrideName)).ToArray()),
+					sorted.Select((sig, index) => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, stubOverrideName, GetOverloadSuffix(index))).ToArray()),
 				ReturnsByRef: first.ReturnsByRef,
 				ReturnsByRefReadonly: first.ReturnsByRefReadonly,
 				XmlDocSummary: first.XmlDocSummary);
@@ -153,33 +172,29 @@ internal static class UnifiedInterceptorBuilder
 		MethodSignatureInfo sig,
 		string ownerClassName,
 		string ownerTypeParameters,
-		string? stubOverrideName = null)
+		string? stubOverrideName = null,
+		string overloadSuffix = "")
 	{
 		var suffix = GetSignatureSuffix(sig.Parameters, sig.ReturnType);
 
-		// Use Func/Action for non-ref/out overloads (same logic as single-signature),
-		// only fall back to custom delegates for ref/out.
-		string delegateName;
-		string? delegateSignature;
-		bool usesTuple;
+		// Always use custom delegate with method-name-based naming
+		var delegateFriendlyName = $"{methodName}Delegate{overloadSuffix}";
+		var delegateParamList = BuildDelegateParamList(sig.Parameters);
+		var delegateSignature = sig.IsVoid
+			? $"public delegate void {delegateFriendlyName}({delegateParamList});"
+			: $"public delegate {sig.ReturnType} {delegateFriendlyName}({delegateParamList});";
 
-		if (NeedsCustomDelegate(sig))
+		var builderFriendlyName = $"{methodName}Impl{overloadSuffix}";
+		var sequenceFriendlyName = $"{methodName}Sequence{overloadSuffix}";
+
+		// Predicate delegate: only for 2+ params (0 params has no When predicate, 1 param uses raw Func<T, bool>)
+		string? predicateFriendlyName = null;
+		string? predicateDelegateSignature = null;
+		if (sig.TrackableParameters.Count >= 2)
 		{
-			// ref/out: keep custom delegate
-			delegateName = $"{methodName}Delegate_{suffix}";
-			var delegateParamList = BuildDelegateParamList(sig.Parameters);
-			delegateSignature = sig.IsVoid
-				? $"public delegate void {delegateName}({delegateParamList});"
-				: $"public delegate {sig.ReturnType} {delegateName}({delegateParamList});";
-			usesTuple = false;
-		}
-		else
-		{
-			// Use Func/Action (same logic as BuildCallDelegateType but without trailing ?)
-			var fullType = BuildCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
-			delegateName = fullType.TrimEnd('?');
-			delegateSignature = null;
-			usesTuple = sig.Parameters.Count >= 2;
+			predicateFriendlyName = $"{methodName}Predicate{overloadSuffix}";
+			var predicateParamList = BuildDelegateParamList(sig.TrackableParameters);
+			predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
 		}
 
 		return new MethodOverloadSignature(
@@ -189,18 +204,22 @@ internal static class UnifiedInterceptorBuilder
 			ParameterDeclarations: sig.ParameterDeclarations,
 			ReturnType: sig.ReturnType,
 			IsVoid: sig.IsVoid,
-			DelegateName: delegateName,
+			DelegateName: delegateFriendlyName,
 			DelegateSignature: delegateSignature,
 			LastArgType: GetLastArgType(sig.TrackableParameters),
 			LastArgsType: GetLastArgsType(sig.TrackableParameters),
-			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName, sig.IsVoid),
+			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateFriendlyName, sig.IsVoid),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault,
 			StubOverrideName: sig.StubOverrideName,
 			ReturnsByRef: sig.ReturnsByRef,
 			ReturnsByRefReadonly: sig.ReturnsByRefReadonly,
 			XmlDocSummary: sig.XmlDocSummary,
-			UsesTupleCallDelegate: usesTuple);
+			DelegateFriendlyName: delegateFriendlyName,
+			PredicateFriendlyName: predicateFriendlyName,
+			PredicateDelegateSignature: predicateDelegateSignature,
+			BuilderFriendlyName: builderFriendlyName,
+			SequenceFriendlyName: sequenceFriendlyName);
 	}
 
 	#endregion
@@ -399,20 +418,18 @@ internal static class UnifiedInterceptorBuilder
 
 	/// <summary>
 	/// Determines if a custom delegate is needed (vs Func/Action).
-	/// Custom delegate is only needed for ref/out parameters.
-	/// Non-void methods without ref/out use Func&lt;&gt;, void methods use Action&lt;&gt;.
-	/// For 2+ params, the Func/Action uses a named tuple as a single parameter.
+	/// Always returns true: every method gets a custom named delegate for
+	/// unambiguous overload resolution and consistent IntelliSense.
 	/// </summary>
 	public static bool NeedsCustomDelegate(MethodSignatureInfo sig)
 	{
-		return sig.HasRefOrOutParams;
+		return true;
 	}
 
 	/// <summary>
 	/// Builds the Call delegate type string.
-	/// For ref/out: custom delegate. For non-void without ref/out: Func&lt;...&gt;.
-	/// For void without ref/out: Action&lt;...&gt;.
-	/// For 2+ params (without ref/out): uses named tuple as single parameter.
+	/// Always returns a custom delegate name: {methodName}Delegate?.
+	/// Every method gets a custom named delegate for unambiguous overload resolution.
 	/// </summary>
 	public static string BuildCallDelegateType(
 		string methodName,
@@ -420,48 +437,19 @@ internal static class UnifiedInterceptorBuilder
 		string ownerClassName,
 		string ownerTypeParameters)
 	{
-		if (NeedsCustomDelegate(sig))
-		{
-			return $"{methodName}Delegate?";
-		}
-
-		if (sig.IsVoid)
-		{
-			// Void methods: Action, Action<T1>, or Action<(T1 a, T2 b)>
-			if (sig.Parameters.Count == 0)
-				return "global::System.Action?";
-			if (sig.Parameters.Count == 1)
-				return $"global::System.Action<{sig.Parameters.GetArray()![0].Type}>?";
-			// 2+ params: named tuple
-			var tupleType = "(" + string.Join(", ", sig.Parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
-			return $"global::System.Action<{tupleType}>?";
-		}
-		else
-		{
-			// Non-void methods: Func<TReturn>, Func<T1, TReturn>, or Func<(T1 a, T2 b), TReturn>
-			if (sig.Parameters.Count == 0)
-				return $"global::System.Func<{sig.ReturnType}>?";
-			if (sig.Parameters.Count == 1)
-				return $"global::System.Func<{sig.Parameters.GetArray()![0].Type}, {sig.ReturnType}>?";
-			// 2+ params: named tuple
-			var tupleType = "(" + string.Join(", ", sig.Parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
-			return $"global::System.Func<{tupleType}, {sig.ReturnType}>?";
-		}
+		return $"{methodName}Delegate?";
 	}
 
 	/// <summary>
-	/// Builds the custom delegate signature if needed.
-	/// Only generates for ref/out parameters.
+	/// Builds the custom delegate signature for a method.
+	/// Always generates a custom delegate for every method.
 	/// </summary>
-	public static string? BuildCustomDelegateSignature(
+	public static string BuildCustomDelegateSignature(
 		string methodName,
 		MethodSignatureInfo sig,
 		string ownerClassName,
 		string ownerTypeParameters)
 	{
-		if (!NeedsCustomDelegate(sig))
-			return null;
-
 		var delegateName = $"{methodName}Delegate";
 		var delegateParamList = BuildDelegateParamList(sig.Parameters);
 
@@ -573,10 +561,12 @@ internal static class UnifiedInterceptorBuilder
 	#region When Chain Support
 
 	/// <summary>
-	/// Builds the predicate Func type for When matching.
-	/// 0 params: Func&lt;bool&gt;, 1 param: Func&lt;T1, bool&gt;, 2+ params: Func&lt;(T1 a, T2 b), bool&gt;.
+	/// Builds the predicate type for When matching.
+	/// 0 params: Func&lt;bool&gt;, 1 param: Func&lt;T1, bool&gt;, 2+ params: custom predicate delegate name.
+	/// For 2+ params, returns the friendly name from the model (e.g., "AddPredicate").
+	/// For 0-1 params, returns Func-based type (no custom predicate needed).
 	/// </summary>
-	public static string BuildWhenPredicateType(EquatableArray<ParameterModel> parameters)
+	public static string BuildWhenPredicateType(EquatableArray<ParameterModel> parameters, string? predicateFriendlyName = null)
 	{
 		if (parameters.Count == 0)
 			return "global::System.Func<bool>";
@@ -584,9 +574,52 @@ internal static class UnifiedInterceptorBuilder
 		if (parameters.Count == 1)
 			return $"global::System.Func<{parameters.GetArray()![0].Type}, bool>";
 
-		// 2+ params: named tuple
+		// 2+ params: use custom predicate delegate name if available
+		if (predicateFriendlyName != null)
+			return predicateFriendlyName;
+
+		// Fallback to tuple-based (should not normally be reached with new model)
 		var tupleType = "(" + string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}")) + ")";
 		return $"global::System.Func<{tupleType}, bool>";
+	}
+
+	#endregion
+
+	#region Overload Numbering
+
+	/// <summary>
+	/// Sorts overloads for numbering: ascending by parameter count, then lexicographic by parameter types.
+	/// The first overload gets no suffix, second gets "2", third gets "3", etc.
+	/// </summary>
+	public static List<MethodSignatureInfo> SortOverloadsForNumbering(List<MethodSignatureInfo> signatures)
+	{
+		return signatures
+			.OrderBy(s => s.Parameters.Count)
+			.ThenBy(s => string.Join(",", s.Parameters.Select(p => p.Type)))
+			.ToList();
+	}
+
+	/// <summary>
+	/// Gets the overload number suffix for a given 0-based index.
+	/// Index 0 -> "" (no suffix), index 1 -> "2", index 2 -> "3", etc.
+	/// </summary>
+	public static string GetOverloadSuffix(int index)
+	{
+		return index == 0 ? "" : (index + 1).ToString();
+	}
+
+	/// <summary>
+	/// Builds a custom predicate delegate signature for a method.
+	/// Returns null for 0-1 params (use raw Func for those).
+	/// </summary>
+	public static string? BuildPredicateDelegateSignature(string methodName, EquatableArray<ParameterModel> trackableParameters, string overloadSuffix = "")
+	{
+		if (trackableParameters.Count < 2)
+			return null;
+
+		var predicateName = $"{methodName}Predicate{overloadSuffix}";
+		var paramList = BuildDelegateParamList(trackableParameters);
+		return $"public delegate bool {predicateName}({paramList});";
 	}
 
 	#endregion
