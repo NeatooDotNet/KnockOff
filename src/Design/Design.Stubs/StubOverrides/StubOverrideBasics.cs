@@ -255,7 +255,7 @@ public partial class StubOverrideBasicsDemo
     public void Reset_PreservesReturnsConfiguration()
     {
         var stub = new BasicStubOverrideStub();
-        stub.Calculate.Call(args => args.a * args.b); // Override addition with multiplication
+        stub.Calculate.Call((int a, int b) => a * b); // Override addition with multiplication
 
         IStubOverrideService service = stub;
         service.Calculate(3, 4);
@@ -695,7 +695,7 @@ public static class WhenChainStubOverrideDemo
 
         // Configure specific parameter combinations
         stub.Calculate.When(0, 0).Return(0);  // Edge case
-        stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);  // Both negative
+        stub.Calculate.When((int a, int b) => a < 0 && b < 0).Return(-1);  // Both negative
 
         // Matching calls use When chain
         var zero = service.Calculate(0, 0);      // 0 (from When)

@@ -187,7 +187,7 @@ All 8 patterns use identical API:
 stub.Add
     .When(1, 2).Return(100)
     .ThenWhen(3, 4).Return(200)
-    .ThenWhen(args => args.a < 0).Return(0);
+    .ThenWhen((int a, int b) => a < 0).Return(0);
 
 // Fallback for non-matching calls or after chain is consumed
 stub.Add.Return(42);
@@ -322,7 +322,7 @@ var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 
 // Return supersedes stub override
-stub.Add.Call(_ => 999);
+stub.Add.Call((int a, int b) => 999);
 var overridden = calc.Add(3, 4);
 Assert.Equal(999, overridden);
 ```
@@ -416,7 +416,7 @@ var calcStub = new MatrixCalcStub();
 IMatrixCalculator calc = calcStub;
 
 // Configure and use - same API across all patterns
-calcStub.Add.Call(args => args.a + args.b);
+calcStub.Add.Call((int a, int b) => a + b);
 var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 

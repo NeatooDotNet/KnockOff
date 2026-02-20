@@ -347,7 +347,7 @@ public class StubOverrideWhenTests
         // Arrange
         var stub = new WhenStubOverrideStub();
         stub.Calculate.When(0, 0).Return(0);
-        stub.Calculate.When(args => args.a < 0 && args.b < 0).Return(-1);
+        stub.Calculate.When((int a, int b) => a < 0 && b < 0).Return(-1);
 
         // Act
         IWhenStubOverrideTest service = stub;

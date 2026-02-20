@@ -60,7 +60,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for typed version - Execute takes ISampleTarget
-		stub.Execute.Call(((ISampleTarget target, CancellationToken? token) args) =>
+		stub.Execute.Call((ISampleTarget target, CancellationToken? token) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via typed interface
@@ -79,7 +79,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for base version - Execute takes ISampleRuleTarget
-		stub.Execute.Call(((ISampleRuleTarget target, CancellationToken? token) args) =>
+		stub.Execute.Call((ISampleRuleTarget target, CancellationToken? token) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via base interface

@@ -103,7 +103,7 @@ public class SkillReadmeMethodConfigTests
         // Returns: 1, 2, 3, 3, 3... (repeats last value)
 
         // Mix callbacks with value sequences
-        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
+        stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200);
         // First call: computed. Then: 100, 200, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating
@@ -188,7 +188,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
+        stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200);
 
         IMethodConfigService svc = stub;
 

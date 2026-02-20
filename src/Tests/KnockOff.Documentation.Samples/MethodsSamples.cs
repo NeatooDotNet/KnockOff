@@ -152,8 +152,8 @@ public class MethodConfigurationTests
 
         #region methods-oncall-multi-param
         // All method parameters are passed to the callback in order
-        stub.ValidateCredentials.Call(args =>
-            args.username == "admin" && args.password == "secret");
+        stub.ValidateCredentials.Call((string username, string password) =>
+            username == "admin" && password == "secret");
         #endregion
 
         IAuthSvcMethods auth = stub;
@@ -247,7 +247,7 @@ public class ArgumentCaptureTests
     public void LastArgs_CapturesAllParameters()
     {
         var stub = new AuthSvcMethodsStub();
-        var tracking = stub.ValidateCredentials.Call(_ => true);
+        var tracking = stub.ValidateCredentials.Call((string username, string password) => true);
 
         IAuthSvcMethods auth = stub;
         auth.ValidateCredentials("admin", "secret123");
@@ -447,7 +447,7 @@ public class SequenceTests
 
         // Mix callbacks with params for complex sequences:
         // First call uses callback, then returns 100, 200, 300
-        addStub.Calculate.Call(args => args.x + args.y).ThenReturn(100, 200, 300);
+        addStub.Calculate.Call((int x, int y) => x + y).ThenReturn(100, 200, 300);
         #endregion
 
         IValueSvc service = stub;
@@ -506,7 +506,7 @@ public class SequenceTests
         #region methods-sequence-callback-then-params
         // Return for first callback, then ThenReturn for constant values
         stub.Calculate
-            .Call(args => args.x + args.y)
+            .Call((int x, int y) => x + y)
             .ThenReturn(100, 200, 300);
         #endregion
 
@@ -570,9 +570,9 @@ public class SequenceTests
         #region methods-sequence-return
         // Return method sequences use Func callbacks
         stub.Calculate
-            .Call(args => args.x + args.y)
-            .ThenReturn(args => args.x * args.y)
-            .ThenReturn(args => args.x - args.y);
+            .Call((int x, int y) => x + y)
+            .ThenReturn((int x, int y) => x * y)
+            .ThenReturn((int x, int y) => x - y);
         #endregion
 
         ICalculatorSvc calc = stub;
@@ -754,7 +754,7 @@ public class SequenceTests
         #region methods-sequence-callback-then-params-full
         // First call: compute dynamically
         // Then: return 100, 200, 300 in sequence
-        stub.Calculate.Call(args => args.x + args.y).ThenReturn(100, 200, 300);
+        stub.Calculate.Call((int x, int y) => x + y).ThenReturn(100, 200, 300);
 
         ICalculatorSvc calc = stub;
         var r1 = calc.Calculate(1, 2);  // 3 (computed: 1 + 2)

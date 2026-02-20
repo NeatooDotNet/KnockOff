@@ -186,7 +186,7 @@ public class ArgumentVerificationTests
     public void LastArgs_VerifiesMultipleParameters()
     {
         var stub = new SvcVerifyStub();
-        var tracking = stub.Update.Call(_ => { });
+        var tracking = stub.Update.Call((int id, string name) => { });
 
         ISvcVerify service = stub;
         service.Update(42, "Alice");

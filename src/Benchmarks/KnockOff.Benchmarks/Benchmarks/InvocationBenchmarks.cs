@@ -36,7 +36,7 @@ public class InvocationBenchmarks
         _moqCalculator = moqCalc.Object;
 
         var knockOffCalc = new CalculatorStub();
-        knockOffCalc.Add.Call(args => args.a + args.b);
+        knockOffCalc.Add.Call((int a, int b) => a + b);
         _knockOffCalculator = knockOffCalc;
 
         var rocksCalc = new ICalculatorCreateExpectations();

@@ -449,7 +449,7 @@ public class PatternComparisonTests
 
         // 1. Standalone Interface: direct instantiation, stub IS implementation
         var emailStub = new EmailSvcPatternStub();
-        emailStub.Send.Call(_ => true).Verifiable();
+        emailStub.Send.Call((string to, string subject, string body) => true).Verifiable();
         IEmailSvcPattern email = emailStub;
 
         // 2. Generic Standalone Interface: reusable with type args

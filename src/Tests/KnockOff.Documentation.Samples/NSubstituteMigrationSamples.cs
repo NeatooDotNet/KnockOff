@@ -560,8 +560,8 @@ public class MultipleArgsKnockOffTests
 
         #region nsub-migration-multiargs-knockoff
         // KnockOff: Named parameters directly in delegate
-        stub.FindUsers.Call(args =>
-            args.limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = args.name } });
+        stub.FindUsers.Call((string name, int limit) =>
+            limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
         #endregion
 
         INSubUserRepo repository = stub;

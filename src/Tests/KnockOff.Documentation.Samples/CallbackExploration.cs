@@ -88,7 +88,7 @@ public class KnockOffPartialSetupTests
 
         // One call does both: configures the method AND defines the return value
         // There is no second step to forget
-        stub.Calculate.Call(args => args.a + args.b);
+        stub.Calculate.Call((int a, int b) => a + b);
 
         IPartialSetupCalc calc = stub;
         Assert.Equal(3, calc.Calculate(1, 2));

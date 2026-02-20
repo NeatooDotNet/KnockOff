@@ -352,7 +352,7 @@ stub.Interceptor.When(1, 2).Return(100)
 <!-- snippet: delegate-when-predicate-matching -->
 ```cs
 // Match via predicate
-stub.Interceptor.When(args => args.a > 10).Return(999);
+stub.Interceptor.When((int a, int b) => a > 10).Return(999);
 ```
 <!-- endSnippet -->
 

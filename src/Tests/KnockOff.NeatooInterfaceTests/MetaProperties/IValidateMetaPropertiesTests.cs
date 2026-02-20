@@ -145,7 +145,7 @@ public partial class IValidateMetaPropertiesTests
         IValidateMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Call(((string propertyName, CancellationToken? token) args) =>
+        stub.RunRules.Call((string propertyName, CancellationToken? token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;

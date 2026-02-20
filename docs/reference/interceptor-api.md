@@ -99,7 +99,7 @@ var getTracking = stub.GetById.Call((id) =>
     new User { Id = id, Name = $"User{id}" }).Verifiable();
 
 // Configure multi-parameter method
-var updateTracking = stub.Update.Call(_ => { }).Verifiable();
+var updateTracking = stub.Update.Call((int id, string name) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -562,7 +562,7 @@ When() returns `IVoidWhenChain<TDelegate>` directly - no builder step needed sin
 var chain = stub.Process.When(1, 2);
 
 // .Call() is optional - adds callback for side effects
-chain.Call(_ => called = true);
+chain.Call((int a, int b) => called = true);
 ```
 <!-- endSnippet -->
 

@@ -323,7 +323,7 @@ public class ValidateBaseStandaloneTests
     {
         var stub = new ValidateBaseStub();
         // RunRules is overloaded - disambiguate via generated delegate type
-        var tracking = stub.RunRules.Call(((string propertyName, CancellationToken? token) args) => Task.CompletedTask);
+        var tracking = stub.RunRules.Call((string propertyName, CancellationToken? token) => Task.CompletedTask);
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
@@ -337,7 +337,7 @@ public class ValidateBaseStandaloneTests
     {
         var stub = new ValidateBaseStub();
         // RunRules is overloaded - disambiguate via named tuple type
-        var tracking = stub.RunRules.Call(((RunRulesFlag flag, CancellationToken? token) args) => Task.CompletedTask);
+        var tracking = stub.RunRules.Call((RunRulesFlag flag, CancellationToken? token) => Task.CompletedTask);
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
@@ -535,7 +535,7 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.Call(((string propertyName, CancellationToken? token) args) =>
+        stub.RunRules.Call((string propertyName, CancellationToken? token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;

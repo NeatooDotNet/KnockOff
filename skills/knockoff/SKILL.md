@@ -12,15 +12,14 @@ KnockOff is a Roslyn Source Generator that creates test stubs at compile time. S
 
 Each method on a stubbed interface/class gets a **fully generated interceptor class** (e.g., `AddInterceptor`) that inherits from `MethodInterceptorRuntime`. These interceptors provide:
 - Clean IntelliSense with XML documentation showing original method signatures and parameter names
-- Typed `Call`/`Return`/`When` methods with named tuple parameters for 2+ param methods
+- Typed `Call`/`Return`/`When` methods with custom named delegates for parameter IntelliSense
 - `Verify()`, `LastArg`/`LastArgs`, `Reset()`, `Verifiable()` directly on the interceptor
 
 **Callback parameter conventions:**
 - **0 params:** `() => ...`
-- **1 param:** Raw type, you name the lambda parameter: `(id) => ...`
-- **2+ params (non-overloaded):** Named tuple: `args => args.a + args.b`
-- **2+ params (overloaded):** Explicit tuple type for disambiguation: `((string input, FormatOptions options) args) => args.input`
-- **ref/out:** Custom delegate fallback: `(ref int a) => { a = a + 1; }`
+- **1 param:** Raw type, you name the lambda parameter: `(int id) => ...`
+- **2+ params:** Custom named delegate with typed params: `(int a, int b) => a + b`
+- **ref/out:** Custom delegate with ref/out modifiers: `(ref int a) => { a = a + 1; }`
 
 **Overloaded methods** use a single interceptor property with overloaded `Call`/`When` methods. The lambda signature disambiguates which overload is configured. `Call()` returns a tracking handle for per-overload `Verify()`/`LastArg`/`LastArgs`.
 
@@ -171,7 +170,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.Call(_ => true).Verifiable();
+        stub.Send.Call((string to, string subject) => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -213,7 +212,7 @@ stub.GetNext.Return(1, 2, 3);
 // After third call, repeats 3 (NSubstitute-like behavior)
 
 // Mix callbacks with value sequences
-stub.Add.Call(args => args.a + args.b).ThenReturn(100, 200);
+stub.Add.Call((int a, int b) => a + b).ThenReturn(100, 200);
 // First: computed, then 100, 200, 200...
 
 // Use ThenDefault() to return default(T) instead of repeating:
@@ -382,7 +381,7 @@ service.GetUser(42);
 Assert.Equal(42, getTracking.LastArg);
 
 // Multiple parameters - LastArgs tuple
-var updateTracking = stub.Update.Call(_ => { });
+var updateTracking = stub.Update.Call((int id, string name) => { });
 service.Update(1, "Alice");
 var (id, name) = updateTracking.LastArgs;
 ```

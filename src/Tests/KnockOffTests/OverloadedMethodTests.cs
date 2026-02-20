@@ -15,8 +15,8 @@ public class OverloadedMethodTests
 
 		// Each OnCall returns a separate tracking object for that overload
 		var tracking1 = knockOff.Process.Call((string data) => { });
-		var tracking2 = knockOff.Process.Call(((string data, int priority) args) => { });
-		var tracking3 = knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
+		var tracking2 = knockOff.Process.Call((string data, int priority) => { });
+		var tracking3 = knockOff.Process.Call((string data, int priority, bool @async) => { });
 
 		service.Process("data1");           // Process(string)
 		service.Process("data2", 5);         // Process(string, int)
@@ -50,7 +50,7 @@ public class OverloadedMethodTests
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		var tracking = knockOff.Process.Call(((string data, int priority) args) => { });
+		var tracking = knockOff.Process.Call((string data, int priority) => { });
 
 		service.Process("test", 42);
 
@@ -66,7 +66,7 @@ public class OverloadedMethodTests
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		var tracking = knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
+		var tracking = knockOff.Process.Call((string data, int priority, bool @async) => { });
 
 		service.Process("full", 100, true);
 
@@ -83,8 +83,8 @@ public class OverloadedMethodTests
 		IOverloadedService service = knockOff;
 
 		var tracking1 = knockOff.Process.Call((string data) => { });
-		var tracking2 = knockOff.Process.Call(((string data, int priority) args) => { });
-		var tracking3 = knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
+		var tracking2 = knockOff.Process.Call((string data, int priority) => { });
+		var tracking3 = knockOff.Process.Call((string data, int priority, bool @async) => { });
 
 		service.Process("a");
 		service.Process("b");
@@ -110,8 +110,8 @@ public class OverloadedMethodTests
 
 		// Compiler resolves correct delegate type based on lambda signature
 		var tracking1 = knockOff.Process.Call((string data) => { });
-		var tracking2 = knockOff.Process.Call(((string data, int priority) args) => { });
-		var tracking3 = knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
+		var tracking2 = knockOff.Process.Call((string data, int priority) => { });
+		var tracking3 = knockOff.Process.Call((string data, int priority, bool @async) => { });
 
 		// Call only the first overload
 		service.Process("test");
@@ -132,7 +132,7 @@ public class OverloadedMethodTests
 		knockOff.Calculate.Call((int value) => value * 2);
 
 		// Set callback for Calculate(int a, int b) - two param overload
-		knockOff.Calculate.Call(((int a, int b) args) => args.a + args.b);
+		knockOff.Calculate.Call((int a, int b) => a + b);
 
 		Assert.Equal(10, service.Calculate(5));      // 5 * 2 = 10
 		Assert.Equal(8, service.Calculate(3, 5));    // 3 + 5 = 8
@@ -152,8 +152,8 @@ public class OverloadedMethodTests
 			Task.FromResult<User?>(user));
 
 		// Set callback for GetByIdAsync(int id, CancellationToken) - two param overload
-		var tracking2 = knockOff.GetByIdAsync.Call(((int id, CancellationToken cancellationToken) args) =>
-			Task.FromResult<User?>(new User { Id = args.id, Name = "FromCt" }));
+		var tracking2 = knockOff.GetByIdAsync.Call((int id, CancellationToken cancellationToken) =>
+			Task.FromResult<User?>(new User { Id = id, Name = "FromCt" }));
 
 		// Call first overload
 		var result1 = await service.GetByIdAsync(1);
@@ -185,7 +185,7 @@ public class OverloadedMethodTests
 		IOverloadedService service = knockOff;
 
 		var tracking1 = knockOff.Process.Call((string data) => { });
-		var tracking2 = knockOff.Process.Call(((string data, int priority) args) => { });
+		var tracking2 = knockOff.Process.Call((string data, int priority) => { });
 
 		service.Process("test");
 		service.Process("test2", 1);
@@ -209,7 +209,7 @@ public class OverloadedMethodTests
 
 		// Calculate has (int value) and (int a, int b) - compiler resolves by param count
 		var tracking1 = knockOff.Calculate.Call((int value) => value);
-		var tracking2 = knockOff.Calculate.Call(((int a, int b) args) => args.a);
+		var tracking2 = knockOff.Calculate.Call((int a, int b) => a);
 
 		service.Calculate(5);
 		service.Calculate(3, 7);
@@ -231,8 +231,8 @@ public class OverloadedMethodTests
 		IOverloadedService service = knockOff;
 
 		var tracking1 = knockOff.Process.Call((string data) => { });
-		var tracking2 = knockOff.Process.Call(((string data, int priority) args) => { });
-		var tracking3 = knockOff.Process.Call(((string data, int priority, bool @async) args) => { });
+		var tracking2 = knockOff.Process.Call((string data, int priority) => { });
+		var tracking3 = knockOff.Process.Call((string data, int priority, bool @async) => { });
 
 		service.Process("data", 42);  // This is the two-param overload
 

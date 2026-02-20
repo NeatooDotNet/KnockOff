@@ -241,7 +241,7 @@ public class WhenChainVerificationBugTests
         // Chain ending with terminal matcher (ThenCall)
         var chain = stub.Add
             .When(1, 2).Return(10)
-            .ThenCall(args => args.a + args.b);
+            .ThenCall((int a, int b) => a + b);
 
         ICalculator calc = stub;
 

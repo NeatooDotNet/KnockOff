@@ -32,7 +32,7 @@ public partial class InlineClassOverloadTests
         // All Process overloads share one interceptor with multiple Call overloads
         stub.Process.Call(() => "no-params");
         stub.Process.Call((string message) => $"message: {message}");
-        stub.Process.Call(((string message, int priority) args) => $"message-priority: {args.message}, {args.priority}");
+        stub.Process.Call((string message, int priority) => $"message-priority: {message}, {priority}");
 
         ProcessorBase processor = stub.Object;
 
@@ -50,7 +50,7 @@ public partial class InlineClassOverloadTests
 
         var tracking0 = stub.Process.Call(() => "0");
         var tracking1 = stub.Process.Call((string message) => "1");
-        var tracking2 = stub.Process.Call(((string message, int priority) args) => "2");
+        var tracking2 = stub.Process.Call((string message, int priority) => "2");
 
         ProcessorBase processor = stub.Object;
 
@@ -76,7 +76,7 @@ public partial class InlineClassOverloadTests
 
         stub.Process.Call(() => "0");
         stub.Process.Call((string message) => "1");
-        stub.Process.Call(((string message, int priority) args) => "2");
+        stub.Process.Call((string message, int priority) => "2");
 
         ProcessorBase processor = stub.Object;
 
@@ -191,7 +191,7 @@ public partial class InlineClassOverloadTests
 
         // Both return int, different param counts - compatible
         stub.Calculate.Call((int x) => x * 2);
-        stub.Calculate.Call(((int x, int y) args) => args.x * args.y);
+        stub.Calculate.Call((int x, int y) => x * y);
 
         ProcessorBase processor = stub.Object;
 

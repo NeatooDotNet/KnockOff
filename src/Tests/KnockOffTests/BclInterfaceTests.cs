@@ -703,7 +703,7 @@ public class BclInterfaceTests
     public void IComparerInt_Compare_OnCall_CustomBehavior()
     {
         var stub = new ComparerIntStubTests.Stubs.IComparer();
-        stub.Compare.Call(args => args.x - args.y);
+        stub.Compare.Call((int x, int y) => x - y);
         IComparer<int> comparer = stub;
 
         var result = comparer.Compare(10, 5);
@@ -1201,7 +1201,7 @@ public class BclInterfaceTests
     public void ICustomFormatter_Format_OnCall_ReturnsCustomFormat()
     {
         var stub = new CustomFormatterStubTests.Stubs.ICustomFormatter();
-        stub.Format.Call(args => $"[{args.format}:{args.arg}]");
+        stub.Format.Call((string? format, object? arg, IFormatProvider? formatProvider) => $"[{format}:{arg}]");
         ICustomFormatter formatter = stub;
 
         var result = formatter.Format("X", 255, null);

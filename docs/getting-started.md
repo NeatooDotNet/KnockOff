@@ -107,7 +107,7 @@ Instantiate and configure the generated stub:
 <!-- snippet: getting-started-inline-use -->
 ```cs
 // Call returns a tracking object for argument access
-var tracking = stub.Send.Call(_ => { }).Verifiable();
+var tracking = stub.Send.Call((string to, string subject, string body) => { }).Verifiable();
 
 IEmailSvc emailService = stub;
 emailService.Send("user@example.com", "Welcome", "Hello!");

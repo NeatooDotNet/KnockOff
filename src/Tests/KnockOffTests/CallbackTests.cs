@@ -48,11 +48,11 @@ public class CallbackTests
 		string? capturedName = null;
 		int? capturedValue = null;
 		bool? capturedFlag = null;
-		var tracking = knockOff.Calculate.Call(args =>
+		var tracking = knockOff.Calculate.Call((string name, int value, bool flag) =>
 		{
-			capturedName = args.name;
-			capturedValue = args.value;
-			capturedFlag = args.flag;
+			capturedName = name;
+			capturedValue = value;
+			capturedFlag = flag;
 		});
 
 		service.Calculate("test", 42, true);

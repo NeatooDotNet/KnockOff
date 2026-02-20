@@ -56,7 +56,7 @@ public partial class TroubleshootEmailServiceTests
     public void ClassStub_RequiresObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Call(_ => true);
+        stub.Send.Call((string to, string subject) => true);
 
         #region troubleshoot-object
         // Use .Object to get the typed instance for class stubs
@@ -76,7 +76,7 @@ public partial class TroubleshootEmailServiceTests
     public void PassingStubObjectToMethod()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Call(_ => true);
+        stub.Send.Call((string to, string subject) => true);
         UseEmailService(stub.Object);
         stub.Send.Verify();
     }
@@ -368,8 +368,8 @@ public class ReturnSignatureAdditionalTests
 
         #region troubleshoot-oncall-signature-correct
         // CORRECT: Match all parameters from method signature
-        stub.GetUser.Call(args =>
-            new User { Id = args.id, Name = args.includeDeleted ? "All" : "Active" });
+        stub.GetUser.Call((int id, bool includeDeleted) =>
+            new User { Id = id, Name = includeDeleted ? "All" : "Active" });
         #endregion
 
         IUserService service = stub;
@@ -396,7 +396,7 @@ public partial class EmailServiceAdditionalTests
     public void ClassStub_UseObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.Call(_ => true);
+        stub.Send.Call((string to, string subject) => true);
 
         // Use .Object to get the typed instance
         EmailService service = stub.Object;

@@ -467,7 +467,7 @@ public class BaseClassStubOverrideTests
         // Arrange
         var stub = new OverloadedStubOverrideStub();
         // Non-overridden overload uses Format2 (separate interceptor after fix)
-        stub.Format2.Call(args => args.uppercase ? args.input.ToUpper() : args.input);
+        stub.Format2.Call((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
         IOverloadedStubOverrideService service = stub;
 
         // Act
@@ -483,7 +483,7 @@ public class BaseClassStubOverrideTests
         // Arrange - one overload uses stub override, another uses OnCall
         var stub = new OverloadedStubOverrideStub();
         // Each overload now has its own interceptor (Format for overridden, Format2 for non-overridden)
-        stub.Format2.Call(args => "ONCALL:" + (args.uppercase ? args.input.ToUpper() : args.input));
+        stub.Format2.Call((string input, bool uppercase) => "ONCALL:" + (uppercase ? input.ToUpper() : input));
         IOverloadedStubOverrideService service = stub;
 
         // Act

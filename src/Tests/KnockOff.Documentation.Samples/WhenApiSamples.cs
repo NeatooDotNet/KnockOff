@@ -87,17 +87,17 @@ public class WhenProblemTests
 
         #region when-problem-one-callback-all-args
         // Without When(): callback must handle all argument combinations
-        stub.Calculate.Call(args =>
+        stub.Calculate.Call((int a, int b) =>
         {
             // Complex branching logic inside callback
-            if (args.a == 5 && args.b == 10)
+            if (a == 5 && b == 10)
                 return 50;
-            else if (args.a == 1 && args.b == 2)
+            else if (a == 1 && b == 2)
                 return 100;
-            else if (args.a > 100)
+            else if (a > 100)
                 return 999;
             else
-                return args.a + args.b;
+                return a + b;
         });
         #endregion
 
@@ -164,7 +164,7 @@ public class WhenBasicReturnMethodTests
 
         #region when-basic-predicate-matching
         // Match based on condition
-        stub.Add.When(args => args.a > 10).Return(999);
+        stub.Add.When((int a, int b) => a > 10).Return(999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -224,7 +224,7 @@ public class WhenVoidMethodTests
         var calls = new List<(int, int)>();
         #region when-void-with-callback
         // Call() adds callback for side effects
-        stub.Process.When(1, 2).Call(args => calls.Add((args.a, args.b)));
+        stub.Process.When(1, 2).Call((int a, int b) => calls.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -242,7 +242,7 @@ public class WhenVoidMethodTests
         var matched = new List<(int, int)>();
         #region when-void-predicate
         // Predicate matching works the same for void methods
-        stub.Process.When(args => args.a > 10).Call(args => matched.Add((args.a, args.b)));
+        stub.Process.When((int a, int b) => a > 10).Call((int a, int b) => matched.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -270,7 +270,7 @@ public class WhenChainingTests
         stub.Add
             .When(1, 2).Return(100)
             .ThenWhen(3, 4).Return(200)
-            .ThenWhen(args => args.a > 100).Return(999);
+            .ThenWhen((int a, int b) => a > 100).Return(999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -324,7 +324,7 @@ public class WhenTerminalTests
         // ThenCall() is an unconditional terminal matcher
         stub.Add
             .When(1, 2).Return(100)
-            .ThenCall(args => args.a + args.b);
+            .ThenCall((int a, int b) => a + b);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -390,7 +390,7 @@ public class WhenFallbackTests
         #region when-fallback-oncall
         // When() falls through to Return() when no match
         stub.Add.When(1, 2).Return(100);
-        stub.Add.Call(args => args.a * args.b);
+        stub.Add.Call((int a, int b) => a * b);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -447,7 +447,7 @@ public class WhenPriorityTests
 
         #region when-priority-over-sequence
         // Sequence configured via Return().ThenReturn()
-        stub.Add.Call(_ => 1).ThenReturn(_ => 2);
+        stub.Add.Call((int a, int b) => 1).ThenReturn((int a, int b) => 2);
 
         // When() has higher priority
         stub.Add.When(1, 2).Return(100);
@@ -479,7 +479,7 @@ public class WhenVerificationTests
         // Chain with ThenCall terminal
         var chain = stub.Add
             .When(1, 2).Return(100)
-            .ThenCall(_ => 999);
+            .ThenCall((int a, int b) => 999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -524,7 +524,7 @@ public class WhenVerificationTests
         // Mark chain for batch verification
         stub.Add
             .When(1, 2).Return(100)
-            .ThenCall(_ => 999)
+            .ThenCall((int a, int b) => 999)
             .Verifiable();
         #endregion
 
@@ -571,7 +571,7 @@ public class WhenResetTests
         // Chain tracks position - Reset() restarts from beginning
         var chain = stub.Add
             .When(1, 2).Return(100)
-            .ThenCall(_ => 999);
+            .ThenCall((int a, int b) => 999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -596,7 +596,7 @@ public class WhenResetTests
         // Interceptor Reset() also resets When chain
         stub.Add
             .When(1, 2).Return(100)
-            .ThenCall(_ => 999);
+            .ThenCall((int a, int b) => 999);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -780,7 +780,7 @@ public class WhenRefValueTests
 
         #region when-chains-ref-predicate
         // Range check
-        stub.Add.When(args => args.a > 0 && args.b > 0).Return(42);
+        stub.Add.When((int a, int b) => a > 0 && b > 0).Return(42);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -841,7 +841,7 @@ public class WhenRefVoidTests
         var warnings = new List<string>();
 
         #region when-chains-ref-void-call
-        stub.Process.When(1, 2).Call(args => errors.Add($"{args.a},{args.b}"));
+        stub.Process.When(1, 2).Call((int a, int b) => errors.Add($"{a},{b}"));
         #endregion
 
         IWhenProcessor p = stub;
@@ -858,7 +858,7 @@ public class WhenRefVoidTests
         stub.Add
             .When(1, 2).Return(100)
             .ThenWhen(3, 4).Return(200)
-            .ThenCall(args => args.a + args.b);  // Fallback for unmatched
+            .ThenCall((int a, int b) => a + b);  // Fallback for unmatched
 
         IWhenCalculator calc = stub;
         calc.Add(1, 2); // 100
@@ -936,7 +936,7 @@ public class WhenRefVerifyTests
         #region when-chains-ref-chain-verify
         var chain = stub.Add.When(1, 2).Return(10)
             .ThenWhen(3, 4).Return(20)
-            .ThenCall(_ => 999);
+            .ThenCall((int a, int b) => 999);
 
         IWhenCalculator calc = stub;
         calc.Add(1, 2);
@@ -983,7 +983,7 @@ public class WhenChainApiTests
         var chain = stub.Process.When(1, 2);
 
         // .Call() is optional - adds callback for side effects
-        chain.Call(_ => called = true);
+        chain.Call((int a, int b) => called = true);
         #endregion
 
         IWhenProcessor processor = stub;

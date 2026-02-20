@@ -215,7 +215,7 @@ public partial class PtEmailServiceTests
         #region skill-patterns-inline-interface-usage
         // Inline Interface: access via Stubs namespace
         var stub = new Stubs.IEmailService();
-        stub.Send.Call(_ => true).Verifiable();
+        stub.Send.Call((string to, string subject) => true).Verifiable();
 
         IEmailService email = stub;
         email.Send("test@example.com", "Hello");
@@ -451,7 +451,7 @@ public class AllNinePatternsTests
         #region skill-patterns-complete-example
         // 1. Standalone: direct instantiation
         var emailStub = new PtEmailSvcStub();
-        emailStub.Send.Call(_ => true).Verifiable();
+        emailStub.Send.Call((string to, string subject, string body) => true).Verifiable();
         IEmailSvc email = emailStub;
 
         // 2. Generic Standalone: reusable with type args

@@ -30,10 +30,10 @@ namespace Design.Stubs.Methods;
 // WHY: With overloads, Return(value) would be ambiguous - should it
 // configure one overload or all? Call(callback) makes the target explicit.
 //
-// DISAMBIGUATION: With named tuple delegates, overloads are disambiguated by:
+// DISAMBIGUATION: With custom delegates, overloads are disambiguated by:
 // - 1-param overloads: Explicit parameter type: (string input) => ...
-// - 2+ param overloads: Named tuple parameter: ((string input, FormatOptions options) args) => ...
-// - The tuple element types (and names) uniquely identify the overload.
+// - 2+ param overloads: Named parameters: (string input, FormatOptions options) => ...
+// - The parameter types uniquely identify the overload.
 // =============================================================================
 
 [KnockOff<IFormatter>]
@@ -55,24 +55,24 @@ public partial class MethodOverloadsDemo
     //   }
     //
     // NOTE: For 1-param overloads in a group, explicit type is needed to
-    // disambiguate from the tuple-accepting overloads. For 2+ params,
-    // use the named tuple syntax ((Type1 name1, Type2 name2) args) => ...
+    // disambiguate from the multi-param overloads. For 2+ params,
+    // use named parameters: (Type1 name1, Type2 name2) => ...
     // =========================================================================
 
     public void Returns_DifferentParamCounts_AutoResolves()
     {
         var stub = new Stubs.IFormatter();
 
-        // 1-param: Explicit type needed to distinguish from tuple overloads
+        // 1-param: Explicit type needed to distinguish from multi-param overloads
         stub.Format.Call((string input) => input.ToUpperInvariant());
-        // 2-param: Named tuple with args accessor
-        stub.Format.Call(((string input, FormatOptions options) args) =>
-            args.options.Uppercase ? args.input.ToUpperInvariant() : args.input);
-        // 3-param: Named tuple with args accessor
-        stub.Format.Call(((string input, FormatOptions options, int maxLength) args) =>
+        // 2-param: Named parameters for disambiguation
+        stub.Format.Call((string input, FormatOptions options) =>
+            options.Uppercase ? input.ToUpperInvariant() : input);
+        // 3-param: Named parameters for disambiguation
+        stub.Format.Call((string input, FormatOptions options, int maxLength) =>
         {
-            var result = args.options.Uppercase ? args.input.ToUpperInvariant() : args.input;
-            return result[..Math.Min(result.Length, args.maxLength)];
+            var result = options.Uppercase ? input.ToUpperInvariant() : input;
+            return result[..Math.Min(result.Length, maxLength)];
         });
 
         IFormatter formatter = stub;
@@ -100,7 +100,7 @@ public partial class MethodOverloadsDemo
     //
     // WORKAROUND: Use Call(callback) with explicit overload targeting:
     //   stub.Format.Call((string input) => "constant");
-    //   stub.Format.Call(((string input, FormatOptions options) args) => "constant");
+    //   stub.Format.Call((string input, FormatOptions options) => "constant");
     //
     // DID NOT DO THIS: Add ReturnForAll(value) to configure all overloads
     //
@@ -114,8 +114,8 @@ public partial class MethodOverloadsDemo
 
         // For a constant return value, use Call with a constant lambda
         stub.Format.Call((string input) => "formatted");
-        stub.Format.Call(((string input, FormatOptions options) args) => "formatted");
-        stub.Format.Call(((string input, FormatOptions options, int maxLength) args) => "formatted");
+        stub.Format.Call((string input, FormatOptions options) => "formatted");
+        stub.Format.Call((string input, FormatOptions options, int maxLength) => "formatted");
 
         IFormatter formatter = stub;
 
@@ -137,7 +137,7 @@ public partial class MethodOverloadsDemo
     //   public class IFormatter_FormatInterceptor
     //   {
     //       public WhenBuilder When(string input) { ... }  // 1-param overload
-    //       public WhenBuilder When((string input, FormatOptions options) args) { ... }  // 2-param tuple
+    //       public WhenBuilder When(string input, FormatOptions options) { ... }  // 2-param overload
     //       public WhenBuilder When((string input, FormatOptions options, int maxLength) args) { ... }
     //   }
     // =========================================================================
@@ -148,7 +148,7 @@ public partial class MethodOverloadsDemo
 
         // Default behavior via Call
         stub.Format.Call((string input) => "default-1");
-        stub.Format.Call(((string input, FormatOptions options) args) => "default-2");
+        stub.Format.Call((string input, FormatOptions options) => "default-2");
 
         // Each When targets a specific overload based on parameter signature
         stub.Format.When("special").Return("SPECIAL-1");
@@ -172,8 +172,8 @@ public partial class MethodOverloadsDemo
 
         // 1-param predicate: explicit type needed for disambiguation
         stub.Format.When((string input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
-        // 2-param predicate: named tuple for disambiguation
-        stub.Format.When(((string input, FormatOptions options) args) => args.options.Uppercase).Return("UPPER-MODE");
+        // 2-param predicate: named parameters for disambiguation
+        stub.Format.When((string input, FormatOptions options) => options.Uppercase).Return("UPPER-MODE");
 
         IFormatter formatter = stub;
 
@@ -206,8 +206,8 @@ public partial class MethodOverloadsDemo
 
         // Each Call returns a separate tracking object
         var tracking1 = stub.Format.Call((string input) => input);
-        var tracking2 = stub.Format.Call(((string input, FormatOptions options) args) => args.input);
-        var tracking3 = stub.Format.Call(((string input, FormatOptions options, int maxLength) args) => args.input);
+        var tracking2 = stub.Format.Call((string input, FormatOptions options) => input);
+        var tracking3 = stub.Format.Call((string input, FormatOptions options, int maxLength) => input);
 
         IFormatter formatter = stub;
 
@@ -240,7 +240,7 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         stub.Format.Call((string input) => input);
-        stub.Format.Call(((string input, FormatOptions options) args) => args.input);
+        stub.Format.Call((string input, FormatOptions options) => input);
 
         IFormatter formatter = stub;
 
@@ -263,8 +263,8 @@ public partial class MethodOverloadsDemo
 
         // Configure each void overload
         var tracking1 = stub.Log.Call((string msg) => logs.Add($"[INFO] {msg}"));
-        var tracking2 = stub.Log.Call(((string message, int level) args) => logs.Add($"[L{args.level}] {args.message}"));
-        var tracking3 = stub.Log.Call(((string message, int level, string category) args) => logs.Add($"[{args.category}:L{args.level}] {args.message}"));
+        var tracking2 = stub.Log.Call((string message, int level) => logs.Add($"[L{level}] {message}"));
+        var tracking3 = stub.Log.Call((string message, int level, string category) => logs.Add($"[{category}:L{level}] {message}"));
 
         IFormatter formatter = stub;
 
@@ -292,11 +292,11 @@ public partial class MethodOverloadsDemo
         // Configure async overload without cancellation (explicit type for disambiguation)
         var tracking1 = stub.TransformAsync.Call((string input) => $"[{input}]");
 
-        // Configure async overload with cancellation (named tuple for 2-param overload)
-        var tracking2 = stub.TransformAsync.Call(((string input, CancellationToken cancellationToken) args) =>
+        // Configure async overload with cancellation (named parameters for 2-param overload)
+        var tracking2 = stub.TransformAsync.Call((string input, CancellationToken cancellationToken) =>
         {
-            args.cancellationToken.ThrowIfCancellationRequested();
-            return $"[{args.input}:ct]";
+            cancellationToken.ThrowIfCancellationRequested();
+            return $"[{input}:ct]";
         });
 
         IFormatter formatter = stub;
@@ -330,7 +330,7 @@ public partial class MethodOverloadsDemo
 
         // Sequence for two-param overload (independent)
         stub.Format
-            .Call(((string input, FormatOptions options) args) => "A")
+            .Call((string input, FormatOptions options) => "A")
             .ThenReturn("B");
 
         IFormatter formatter = stub;
@@ -354,8 +354,8 @@ public partial class MethodOverloadsDemo
     //
     // DISAMBIGUATION:
     // - 1-param overloads: Use explicit type — (string input) => ...
-    // - 2+ param overloads: Use named tuple — ((T1 n1, T2 n2) args) => args.n1 ...
-    // - The named tuple types uniquely identify which overload is targeted
+    // - 2+ param overloads: Use named parameters — (T1 n1, T2 n2) => n1 ...
+    // - The parameter types uniquely identify which overload is targeted
     //
     // AVAILABLE ON INTERCEPTOR:
     // - Call(lambda)       - Configures specific overload based on lambda signature

@@ -374,7 +374,7 @@ public partial class PtEmailServiceTests
 ```cs
 // Inline Interface: access via Stubs namespace
 var stub = new Stubs.IEmailService();
-stub.Send.Call(_ => true).Verifiable();
+stub.Send.Call((string to, string subject) => true).Verifiable();
 
 IEmailService email = stub;
 email.Send("test@example.com", "Hello");
@@ -768,7 +768,7 @@ This example demonstrates all nine patterns working together:
 ```cs
 // 1. Standalone: direct instantiation
 var emailStub = new PtEmailSvcStub();
-emailStub.Send.Call(_ => true).Verifiable();
+emailStub.Send.Call((string to, string subject, string body) => true).Verifiable();
 IEmailSvc email = emailStub;
 
 // 2. Generic Standalone: reusable with type args

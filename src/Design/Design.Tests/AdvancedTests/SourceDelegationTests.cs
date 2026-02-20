@@ -65,7 +65,7 @@ public class SourceDelegationTests
         stub.Source(realCalc);
 
         // Override just Add to throw
-        stub.Add.Call(args => throw new InvalidOperationException("Simulated error"));
+        stub.Add.Call((int a, int b) => throw new InvalidOperationException("Simulated error"));
 
         ICalculator calc = stub;
 
@@ -140,7 +140,7 @@ public class SourceHierarchyTests
 
         // Configure writes explicitly
         var saved = new Dictionary<int, string>();
-        stub.Save.Call(args => saved[args.id] = args.value);
+        stub.Save.Call((int id, string value) => saved[id] = value);
 
         IStore store = stub;
 

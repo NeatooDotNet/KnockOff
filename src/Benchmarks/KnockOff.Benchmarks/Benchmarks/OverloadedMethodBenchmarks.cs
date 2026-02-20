@@ -28,7 +28,7 @@ public class OverloadedMethodInvocationBenchmarks
         var stub = new OverloadedServiceStub();
         // Overloaded methods use single interceptor with overloaded Return methods
         stub.Calculate.Call((int v) => v * 2);
-        stub.Calculate.Call(((int a, int b) args) => args.a + args.b);
+        stub.Calculate.Call((int a, int b) => a + b);
         _knockOff = stub;
     }
 
@@ -93,9 +93,9 @@ public class OverloadedMethodSetupBenchmarks
         // Overloaded methods use single interceptor with overloaded Call methods
         stub.Process.Call((int v) => { });
         stub.Process.Call((string v) => { });
-        stub.Process.Call(((int a, int b) args) => { });
+        stub.Process.Call((int a, int b) => { });
         stub.Calculate.Call((int v) => v * 2);
-        stub.Calculate.Call(((int a, int b) args) => args.a + args.b);
+        stub.Calculate.Call((int a, int b) => a + b);
         return stub;
     }
 }
@@ -127,7 +127,7 @@ public class OverloadedMethodVerificationBenchmarks
         // Set up callbacks to get tracking objects
         _processIntTracking = _knockOffStub.Process.Call((int v) => { });
         _processStringTracking = _knockOffStub.Process.Call((string v) => { });
-        _processTwoArgsTracking = _knockOffStub.Process.Call(((int a, int b) args) => { });
+        _processTwoArgsTracking = _knockOffStub.Process.Call((int a, int b) => { });
 
         ((IOverloadedService)_knockOffStub).Process(42);
         ((IOverloadedService)_knockOffStub).Process("test");
