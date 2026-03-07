@@ -410,24 +410,9 @@ stub.Strict();
 
 ---
 
-## Stub Overrides (Standalone Only)
+## Stub Overrides
 
-Override `protected virtual` methods/properties with underscore suffix for reusable defaults. `Return()`/`Call()`/`Get()`/`Set()` supersede overrides per-test. See **stub-overrides.md** for full reference.
-
-<!-- snippet: skill-stub-override-define -->
-```cs
-[KnockOff]
-public partial class SkStubOverrideRepoStub : IUserRepo { }
-
-public partial class SkStubOverrideRepoStub
-{
-    // Override virtual method with underscore suffix - compiler enforces signature!
-    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
-}
-```
-<!-- endSnippet -->
-
-`Call()` supersedes the override: `stub.GetById.Call(id => new User { Id = id, Name = "Override" });`
+**Load `stub-overrides.md` when creating or modifying any KnockOff stubs.** It covers the recommended approach: standalone stubs with constructor parameters and `protected override` properties/methods (underscore suffix: `UserId_`, `GetById_`). Custom constructors must chain to `this()`. `Return()`/`Call()`/`Get()`/`Set()` supersede overrides per-test. Standalone patterns only (1-4).
 
 ---
 
@@ -463,7 +448,7 @@ stub.GetById.Call((id) => testUser);  // This wins over source
 | `.ReturnsAsync(val)` | `stub.Method.Return(val)` (auto-wraps) |
 | `.Callback(action)` | Logic inside `Call` callback |
 | `mock.CallBase = true` | Default for class stubs |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
+| `.Verify(x => x.Method(), Times.Once)` | `stub.Method.Verify(Called.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback always receives all args |
 | `It.Is<T>(pred)` | `stub.Method.When(pred).Return(val)` |

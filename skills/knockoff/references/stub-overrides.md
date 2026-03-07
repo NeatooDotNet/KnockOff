@@ -42,6 +42,146 @@ The compiler enforces signature correctness -- typos or wrong parameter types pr
 
 ---
 
+## Property Stub Overrides
+
+Property overrides use the same underscore suffix convention. KnockOff generates virtual properties in the base class that you override (get-only, get/set, set-only):
+
+<!-- snippet: stub-override-properties-interface-and-stub -->
+```cs
+public interface ISkillUserSvc
+{
+    int Count { get; }
+    string Name { get; set; }
+    string Setting { set; }
+}
+
+[KnockOff]
+public partial class SkillUserSvcStub : ISkillUserSvc { }
+
+public partial class SkillUserSvcStub
+{
+    private int _count;
+    private string _name = "";
+    private string _setting = "";
+
+    // Get-only property override
+    protected override int Count_ => _count;
+
+    // Get/set property override
+    protected override string Name_
+    {
+        get => _name;
+        set => _name = value;
+    }
+
+    // Set-only property override
+    protected override string Setting_
+    {
+        set => _setting = value;
+    }
+
+    // Public methods for test setup
+    public void SetCount(int value) => _count = value;
+}
+```
+<!-- endSnippet -->
+
+### Get/Set Supersedes Property Overrides
+
+`Get()` and `Set()` take priority over property overrides per-test, just like `Return()`/`Call()` do for methods:
+
+<!-- snippet: skill-stub-override-property-onget -->
+```cs
+var stub = new SkUserPropServiceStub();
+stub.SetCount(42);
+IUserService service = stub;
+
+// Without Get: user property is called
+var count1 = service.Count;  // Returns 42 (from Count_ override)
+
+// With Get: Get supersedes user property (clean interceptor name)
+stub.Count.Get(999);
+var count2 = service.Count;  // Returns 999 (Get wins)
+```
+<!-- endSnippet -->
+
+Priority: Get()/Set() > **Property Override** > Smart default
+
+---
+
+## Real-World Example: Standalone Stub with Constructor
+
+Standalone stubs combine constructor parameters with stub overrides to create reusable, configurable stubs. Use constructors for required values and stub overrides for default behavior:
+
+<!-- snippet: skill-stub-override-constructor -->
+```cs
+[KnockOff]
+public partial class CurrentUserStub : ICurrentUser { }
+
+public partial class CurrentUserStub
+{
+    private long _userId;
+    private string _role = "";
+
+    public CurrentUserStub(long userId, string role) : this()
+    {
+        _userId = userId;
+        _role = role;
+    }
+
+    protected override long UserId_ => _userId;
+    protected override string Role_ => _role;
+    protected override string DisplayName_ => $"Test {_role}";
+    protected override bool IsInRole_(string role) => role == _role;
+}
+```
+<!-- endSnippet -->
+
+Usage in tests:
+
+<!-- snippet: skill-stub-override-constructor-usage -->
+```cs
+var stub = new CurrentUserStub(42L, "ROLE_PROVIDER");
+ICurrentUser currentUser = stub;
+
+Assert.Equal(42L, currentUser.UserId);
+Assert.Equal("ROLE_PROVIDER", currentUser.Role);
+Assert.Equal("Test ROLE_PROVIDER", currentUser.DisplayName);
+Assert.True(currentUser.IsInRole("ROLE_PROVIDER"));
+Assert.False(currentUser.IsInRole("ROLE_ADMIN"));
+
+// Per-test override when needed
+stub.IsInRole.Call((role) => true);
+Assert.True(currentUser.IsInRole("ROLE_ADMIN"));  // Now returns true for all
+```
+<!-- endSnippet -->
+
+---
+
+## Anti-Pattern: Factory Methods with `.Get()`
+
+Do not use `.Get()` in factory methods to set reusable defaults. `.Get()` is the per-test interceptor API:
+
+<!-- snippet: skill-anti-pattern-factory-get -->
+```cs
+// WRONG: Using .Get() in a factory method to set reusable defaults
+private CurrentUserBareStub CreateCurrentUser(
+    long userId = 0,
+    string role = "User")
+{
+    var stub = new CurrentUserBareStub();
+    stub.UserId.Get(userId);
+    stub.Role.Get(role);
+    stub.DisplayName.Get($"Test {role}");
+    return stub;
+}
+```
+<!-- endSnippet -->
+
+Use constructor parameters with stub overrides instead (see Real-World Example above).
+
+---
+
 ## Method Stub Overrides
 
 ### Return/Call Supersedes
@@ -172,8 +312,12 @@ stub.GetBalance.Verify(Called.Never);
 
 | Task | Code |
 |------|------|
-| Define override | `protected override string Process_(string input) => result;` |
+| Method override | `protected override string Process_(string input) => result;` |
+| Property override (get-only) | `protected override int Count_ => _count;` |
+| Property override (get/set) | `protected override string Name_ { get => _name; set => _name = value; }` |
+| Property override (set-only) | `protected override string Path_ { set => _path = value; }` |
 | Supersede with Return | `stub.Process.Return(value)` |
+| Supersede with Get | `stub.Count.Get(42)` |
 | Supersede with callback | `stub.Process.Call((input) => result)` |
 | When chain override | `stub.Process.When("x").Return("y")` |
 | Strict mode bypass | Override IS the configuration |

@@ -42,7 +42,7 @@ stub.DataReceived.Raise(source, new DataEventArgs { Data = "test data" });
 ```
 <!-- endSnippet -->
 
-Signature: `void Raise(object? sender, T e)` where T : EventArgs
+Signature: `void Raise(object? sender, T e)`
 
 ### Action Events (No Parameters)
 

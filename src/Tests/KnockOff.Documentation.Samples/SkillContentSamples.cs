@@ -151,6 +151,41 @@ public partial class SkUserPropServiceStub
 }
 #endregion
 
+// Real-world standalone stub with constructor + stub overrides
+public interface ICurrentUser
+{
+    long UserId { get; }
+    string Role { get; }
+    string DisplayName { get; }
+    bool IsInRole(string role);
+}
+
+#region skill-stub-override-constructor
+[KnockOff]
+public partial class CurrentUserStub : ICurrentUser { }
+
+public partial class CurrentUserStub
+{
+    private long _userId;
+    private string _role = "";
+
+    public CurrentUserStub(long userId, string role) : this()
+    {
+        _userId = userId;
+        _role = role;
+    }
+
+    protected override long UserId_ => _userId;
+    protected override string Role_ => _role;
+    protected override string DisplayName_ => $"Test {_role}";
+    protected override bool IsInRole_(string role) => role == _role;
+}
+#endregion
+
+// Anti-pattern: bare stub for factory method example
+[KnockOff]
+public partial class CurrentUserBareStub : ICurrentUser { }
+
 // Source delegation
 public class RealSourceRepo : ISourceRepo
 {
@@ -842,6 +877,63 @@ public class UserPropertyTests
         #endregion
 
         Assert.Equal(100, service.Count);
+    }
+}
+
+// =============================================================================
+// Real-World Standalone Stub with Constructor
+// =============================================================================
+
+public class ConstructorStubOverrideTests
+{
+    [Fact]
+    public void ConstructorStubOverride_Usage()
+    {
+        #region skill-stub-override-constructor-usage
+        var stub = new CurrentUserStub(42L, "ROLE_PROVIDER");
+        ICurrentUser currentUser = stub;
+
+        Assert.Equal(42L, currentUser.UserId);
+        Assert.Equal("ROLE_PROVIDER", currentUser.Role);
+        Assert.Equal("Test ROLE_PROVIDER", currentUser.DisplayName);
+        Assert.True(currentUser.IsInRole("ROLE_PROVIDER"));
+        Assert.False(currentUser.IsInRole("ROLE_ADMIN"));
+
+        // Per-test override when needed
+        stub.IsInRole.Call((role) => true);
+        Assert.True(currentUser.IsInRole("ROLE_ADMIN"));  // Now returns true for all
+        #endregion
+    }
+}
+
+// =============================================================================
+// Anti-Pattern: Factory Method with .Get() Instead of Stub Overrides
+// =============================================================================
+
+public class AntiPatternFactoryGetTests
+{
+    #region skill-anti-pattern-factory-get
+    // WRONG: Using .Get() in a factory method to set reusable defaults
+    private CurrentUserBareStub CreateCurrentUser(
+        long userId = 0,
+        string role = "User")
+    {
+        var stub = new CurrentUserBareStub();
+        stub.UserId.Get(userId);
+        stub.Role.Get(role);
+        stub.DisplayName.Get($"Test {role}");
+        return stub;
+    }
+    #endregion
+
+    [Fact]
+    public void AntiPattern_FactoryGet_Works_But_Wrong()
+    {
+        var stub = CreateCurrentUser(42, "Admin");
+        ICurrentUser user = stub;
+        Assert.Equal(42, user.UserId);
+        Assert.Equal("Admin", user.Role);
+        Assert.Equal("Test Admin", user.DisplayName);
     }
 }
 
