@@ -115,7 +115,7 @@ internal static class ClassRenderer
 
         // Render the wrapper stub class
         w.Line($"{indent}/// <summary>Stub for {cls.BaseType} via composition.</summary>");
-        w.Line($"{indent}public class {cls.StubClassName}{cls.TypeParameterList} : global::KnockOff.IKnockOffStub{cls.ConstraintClauses}");
+        w.Line($"{indent}{cls.Accessibility} class {cls.StubClassName}{cls.TypeParameterList} : global::KnockOff.IKnockOffStub{cls.ConstraintClauses}");
         w.Line($"{indent}{{");
 
         // Strict property

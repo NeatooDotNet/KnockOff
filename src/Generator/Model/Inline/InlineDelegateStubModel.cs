@@ -39,4 +39,6 @@ internal sealed record InlineDelegateStubModel(
     /// <summary>LastCallArgs tuple type (for multiple params) or null.</summary>
     string? LastCallArgsType,
     /// <summary>Default expression for return value.</summary>
-    string DefaultExpression);
+    string DefaultExpression,
+    /// <summary>Accessibility modifier for the generated delegate stub class (e.g., "public", "internal"). Matches the target delegate's accessibility.</summary>
+    string Accessibility = "public");

@@ -35,7 +35,12 @@ internal sealed record ClassStubInfo(
 	/// Names of ALL required members on the class (including non-virtual ones).
 	/// Used to initialize required members in the Impl constructor with default! values.
 	/// </summary>
-	EquatableArray<string> AllRequiredMemberNames = default) : IEquatable<ClassStubInfo>;
+	EquatableArray<string> AllRequiredMemberNames = default,
+	/// <summary>
+	/// The accessibility modifier of the target class (e.g., "public", "internal").
+	/// Used by inline/standalone renderers to match the generated stub class accessibility.
+	/// </summary>
+	string Accessibility = "public") : IEquatable<ClassStubInfo>;
 
 /// <summary>
 /// Info about a virtual/abstract member of a class for stubbing.

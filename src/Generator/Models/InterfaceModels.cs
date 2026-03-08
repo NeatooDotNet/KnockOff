@@ -46,7 +46,12 @@ internal sealed record InterfaceInfo(
 	/// Used for Source(T) methods to correctly delegate to members on transitive base interfaces.
 	/// For example, IList&lt;T&gt; inherits from ICollection&lt;T&gt;, IEnumerable&lt;T&gt;, IEnumerable.
 	/// </summary>
-	EquatableArray<InterfaceHierarchyEntry> InterfaceHierarchy = default) : IEquatable<InterfaceInfo>
+	EquatableArray<InterfaceHierarchyEntry> InterfaceHierarchy = default,
+	/// <summary>
+	/// The accessibility modifier of the target interface (e.g., "public", "internal").
+	/// Used by inline renderers to match the generated stub class accessibility.
+	/// </summary>
+	string Accessibility = "public") : IEquatable<InterfaceInfo>
 {
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.

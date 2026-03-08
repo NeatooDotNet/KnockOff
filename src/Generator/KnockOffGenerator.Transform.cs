@@ -138,7 +138,20 @@ public partial class KnockOffGenerator
 			{
 				// For open generic delegates, use OriginalDefinition to get the Invoke method
 				var delegateSource = isOpenGeneric ? namedDelegate.OriginalDefinition : namedDelegate;
-				var delegateInfo = DelegateInfo.Extract(delegateSource, isOpenGeneric, openGenericTypeParams);
+
+				// Resolve the target delegate's accessibility
+				var delegateAccessibility = namedDelegate.DeclaredAccessibility switch
+				{
+					Accessibility.Public => "public",
+					Accessibility.Internal => "internal",
+					Accessibility.Private => "private",
+					Accessibility.Protected => "protected",
+					Accessibility.ProtectedOrInternal => "protected internal",
+					Accessibility.ProtectedAndInternal => "private protected",
+					_ => "public"
+				};
+
+				var delegateInfo = DelegateInfo.Extract(delegateSource, isOpenGeneric, openGenericTypeParams, delegateAccessibility);
 				if (delegateInfo is not null)
 				{
 					delegates.Add(delegateInfo);
@@ -393,6 +406,18 @@ public partial class KnockOffGenerator
 				new EquatableArray<string>(baseOfBaseNames)));
 		}
 
+		// Resolve the target interface's accessibility
+		var ifaceAccessibility = iface.DeclaredAccessibility switch
+		{
+			Accessibility.Public => "public",
+			Accessibility.Internal => "internal",
+			Accessibility.Private => "private",
+			Accessibility.Protected => "protected",
+			Accessibility.ProtectedOrInternal => "protected internal",
+			Accessibility.ProtectedAndInternal => "private protected",
+			_ => "public"
+		};
+
 		return new InterfaceInfo(
 			iface.ToDisplayString(FullyQualifiedWithNullability),
 			iface.Name,
@@ -404,7 +429,8 @@ public partial class KnockOffGenerator
 			IsOpenGeneric: isOpenGeneric,
 			TypeParameters: typeParameters,
 			BaseInterfaces: new EquatableArray<string>(baseInterfaceNames),
-			InterfaceHierarchy: new EquatableArray<InterfaceHierarchyEntry>(hierarchyEntries.ToArray()));
+			InterfaceHierarchy: new EquatableArray<InterfaceHierarchyEntry>(hierarchyEntries.ToArray()),
+			Accessibility: ifaceAccessibility);
 	}
 
 	/// <summary>
@@ -611,6 +637,18 @@ public partial class KnockOffGenerator
 			// Continue - this is just a warning, we still generate the stub
 		}
 
+		// Resolve the target class's accessibility
+		var classAccessibility = classSource.DeclaredAccessibility switch
+		{
+			Accessibility.Public => "public",
+			Accessibility.Internal => "internal",
+			Accessibility.Private => "private",
+			Accessibility.Protected => "protected",
+			Accessibility.ProtectedOrInternal => "protected internal",
+			Accessibility.ProtectedAndInternal => "private protected",
+			_ => "public"
+		};
+
 		return new ClassStubInfo(
 			classFullName,
 			className,
@@ -620,7 +658,8 @@ public partial class KnockOffGenerator
 			IsOpenGeneric: isOpenGeneric,
 			TypeParameters: typeParameters,
 			IsRecord: isRecord,
-			AllRequiredMemberNames: new EquatableArray<string>(allRequiredMemberNames.ToArray()));
+			AllRequiredMemberNames: new EquatableArray<string>(allRequiredMemberNames.ToArray()),
+			Accessibility: classAccessibility);
 	}
 
 	/// <summary>
@@ -729,6 +768,18 @@ public partial class KnockOffGenerator
 
 		if (classSymbol is null)
 			return null;
+
+		// Resolve the user's stub class accessibility for the generated Base class
+		var stubClassAccessibility = classSymbol.DeclaredAccessibility switch
+		{
+			Accessibility.Public => "public",
+			Accessibility.Internal => "internal",
+			Accessibility.Private => "private",
+			Accessibility.Protected => "protected",
+			Accessibility.ProtectedOrInternal => "protected internal",
+			Accessibility.ProtectedAndInternal => "private protected",
+			_ => "public"
+		};
 
 		// Extract Strict property from [KnockOff] attribute (null if not explicitly set)
 		// Precedence: Attribute > Assembly > Default(false)
@@ -1033,7 +1084,8 @@ public partial class KnockOffGenerator
 			StubOverrideMethods: stubOverrideMethodsArray,
 			StubOverrideProperties: stubOverridePropertiesArray,
 			Strict: strict,
-			HasPrimaryConstructor: hasPrimaryConstructor);
+			HasPrimaryConstructor: hasPrimaryConstructor,
+			StubClassAccessibility: stubClassAccessibility);
 	}
 
 	/// <summary>

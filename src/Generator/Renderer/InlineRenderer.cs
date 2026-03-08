@@ -244,7 +244,7 @@ internal static class InlineRenderer
         var stubConstraints = FormatConstraints(iface.TypeParameters);
 
         w.Line($"\t\t/// <summary>Stub implementation of {iface.BaseType}.</summary>");
-        w.Line($"\t\tpublic class {iface.StubClassName}{stubTypeParamList} : {iface.BaseType}, global::KnockOff.IKnockOffStub{stubConstraints}");
+        w.Line($"\t\t{iface.Accessibility} class {iface.StubClassName}{stubTypeParamList} : {iface.BaseType}, global::KnockOff.IKnockOffStub{stubConstraints}");
         w.Line("\t\t{");
 
         // Interceptor properties
@@ -1323,7 +1323,7 @@ internal static class InlineRenderer
 
         // Render thin stub class shell
         w.Line($"\t\t/// <summary>Stub for {del.DelegateType} delegate.</summary>");
-        w.Line($"\t\tpublic sealed class {del.StubClassName}{del.TypeParameterList} : global::KnockOff.IKnockOffStub{del.ConstraintClauses}");
+        w.Line($"\t\t{del.Accessibility} sealed class {del.StubClassName}{del.TypeParameterList} : global::KnockOff.IKnockOffStub{del.ConstraintClauses}");
         w.Line("\t\t{");
 
         // Strict property

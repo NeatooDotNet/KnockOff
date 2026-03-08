@@ -265,7 +265,7 @@ internal static class FlatRenderer
 		var typeParams = FormatTypeParameters(unit.TypeParameters);
 		var constraints = FormatConstraints(unit.TypeParameters);
 
-		using (w.Block($"public class {unit.ClassName}Base{typeParams}{constraints}"))
+		using (w.Block($"{unit.BaseClassAccessibility} class {unit.ClassName}Base{typeParams}{constraints}"))
 		{
 			// Generate virtual protected methods for each non-generic interface method
 			// Generic methods are excluded from the base class pattern per design decision

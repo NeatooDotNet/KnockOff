@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.55.0](v0.55.0.md) | 2026-03-07 | Fix CS0060 when stubbing internal interfaces, classes, and delegates |
 | [v0.49.0](v0.49.0.md) | 2026-02-13 | Eliminate generated thin subclasses, fix Verifiable(Called times) bug |
 | [v0.47.0](v0.47.0.md) | 2026-02-09 | **Breaking:** Major indexer API redesign — per-key builders, When(predicate), per-key verification |
 | [v0.46.0](v0.46.0.md) | 2026-02-09 | Fix 7 generator bugs: multi-param indexers, init-only indexers, multi-arity generics |
@@ -46,6 +47,17 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v0.55.0](v0.55.0.md) - 2026-03-07 - Fix CS0060 when stubbing internal interfaces, classes, and delegates
+- [v0.54.0](v0.54.0.md) - 2026-02-19 - Fix stub override partial overload split bug
+- [v0.53.0](v0.53.0.md) - 2026-02-19 - **Breaking:** Custom named delegates for Call callbacks and When predicates
+- [v0.52.0](v0.52.0.md) - 2026-02-19 - Overloaded method support improvements
+- [v0.51.2](v0.51.2.md) - 2026-02-14 - Bug fixes
+- [v0.51.1](v0.51.1.md) - 2026-02-14 - Bug fixes
+- [v0.51.0](v0.51.0.md) - 2026-02-14 - When chain verification, user method custom types, VerifyAll TotalCallCount
+- [v0.50.0](v0.50.0.md) - 2026-02-13 - Source delegation improvements
+- [v0.49.0](v0.49.0.md) - 2026-02-13 - Eliminate generated thin subclasses, fix Verifiable(Called times) bug
+- [v0.48.1](v0.48.1.md) - 2026-02-12 - Bug fixes
+- [v0.48.0](v0.48.0.md) - 2026-02-12 - Interceptor base class infrastructure
 - [v0.47.0](v0.47.0.md) - 2026-02-09 - **Breaking:** Major indexer API redesign — per-key builders, When(predicate), per-key verification
 - [v0.46.0](v0.46.0.md) - 2026-02-09 - Fix 7 generator bugs: multi-param indexers, init-only indexers, multi-arity generics
 - [v0.45.0](v0.45.0.md) - 2026-02-08 - Record type stub support, static virtual/abstract member filtering

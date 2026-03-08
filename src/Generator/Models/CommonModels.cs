@@ -45,7 +45,12 @@ internal sealed record KnockOffTypeInfo(
 	/// When true, the user's partial class declaration uses a primary constructor (parameter list).
 	/// Generated constructors must include `: this()` initializer.
 	/// </summary>
-	bool HasPrimaryConstructor = false) : IEquatable<KnockOffTypeInfo>;
+	bool HasPrimaryConstructor = false,
+	/// <summary>
+	/// The accessibility modifier of the user's standalone stub class (e.g., "public", "internal").
+	/// Used by FlatModelBuilder to set the generated Base class accessibility to match.
+	/// </summary>
+	string StubClassAccessibility = "public") : IEquatable<KnockOffTypeInfo>;
 
 /// <summary>
 /// Represents a containing type (for nested class support).

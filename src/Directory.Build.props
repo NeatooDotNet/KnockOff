@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.54.0</FileVersion>
-		<PackageVersion>0.54.0</PackageVersion>
+		<FileVersion>0.55.0</FileVersion>
+		<PackageVersion>0.55.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Fix: stub override on partial overloads no longer splits interceptor groups. All overloads share a single interceptor with per-signature stub override fallback.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix: stubbing internal interfaces, classes, or delegates no longer produces CS0060 compilation errors. The generator now emits stub classes with accessibility matching the target type.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

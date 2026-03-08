@@ -61,4 +61,6 @@ internal sealed record StandaloneClassGenerationUnit(
     /// True when the target class is a C# record type.
     /// When true, the Impl class is emitted as 'sealed record' instead of 'sealed class'.
     /// </summary>
-    bool IsRecord = false);
+    bool IsRecord = false,
+    /// <summary>Accessibility modifier for the generated Base class (e.g., "public", "internal"). Matches the user's stub class accessibility.</summary>
+    string BaseClassAccessibility = "public");
