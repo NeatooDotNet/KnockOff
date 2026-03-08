@@ -64,11 +64,9 @@ public interface INotificationService
 
 #region command-create-stub-inline-interface-pattern
 [KnockOff<INotificationService>]
-public partial class CmdInlineInterfaceTests { }
-#endregion
-
 public partial class CmdInlineInterfaceTests
 {
+#endregion
     #region command-create-stub-inline-interface-usage
     [Fact]
     public void InlineInterfaceStub_Usage()
@@ -101,11 +99,9 @@ public class PaymentProcessor
 
 #region command-create-stub-inline-class-pattern
 [KnockOff<PaymentProcessor>]
-public partial class CmdInlineClassTests { }
-#endregion
-
 public partial class CmdInlineClassTests
 {
+#endregion
     #region command-create-stub-inline-class-usage
     [Fact]
     public void InlineClassStub_Usage()
@@ -136,11 +132,9 @@ public interface IUserRepoCmd
     bool Save(User user);
 }
 
-[KnockOff]
-public partial class UserRepoCmdStub : IUserRepoCmd { }
-
 #region command-create-stub-user-methods
-public partial class UserRepoCmdStub
+[KnockOff]
+public partial class UserRepoCmdStub : IUserRepoCmd
 {
     // Override the generated virtual method (with _ suffix) to provide default test data
     protected override IEnumerable<User> FindAll_()

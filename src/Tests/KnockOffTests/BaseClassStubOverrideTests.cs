@@ -673,10 +673,6 @@ public interface IOverloadedStubOverrideService
 [KnockOff]
 public partial class OverloadedStubOverrideStub : IOverloadedStubOverrideService
 {
-}
-
-public partial class OverloadedStubOverrideStub
-{
     // Stub override for the first overload only
     protected override string Format_(string input)
     {
@@ -698,10 +694,6 @@ public interface IThreeOverloadStubOverrideService
 /// <summary>Stub with partial stub override on only 1 of 3 overloads.</summary>
 [KnockOff]
 public partial class ThreeOverloadPartialStubOverrideStub : IThreeOverloadStubOverrideService
-{
-}
-
-public partial class ThreeOverloadPartialStubOverrideStub
 {
     // Stub override for the first overload ONLY
     protected override string Format_(string input)

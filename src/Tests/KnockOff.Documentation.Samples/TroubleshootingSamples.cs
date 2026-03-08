@@ -29,10 +29,6 @@ public partial class TroubleshootRepoStub : ITroubleshootRepo { }
 [KnockOff]
 public partial class ConfigSvcStub : IConfigSvc { }
 
-// Class stub for .Object property demonstration
-[KnockOff<EmailService>]
-public partial class TroubleshootEmailServiceTests { }
-
 // =============================================================================
 // Issue: Missing Partial Keyword
 // =============================================================================
@@ -50,6 +46,8 @@ public partial class TroubleshootGoodStub : ITroubleshootRepo { }
 // Issue: Class Stubs Need .Object Property
 // =============================================================================
 
+// Class stub for .Object property demonstration
+[KnockOff<EmailService>]
 public partial class TroubleshootEmailServiceTests
 {
     [Fact]
@@ -381,8 +379,6 @@ public class ReturnSignatureAdditionalTests
 
 // Class stub for .Object property demonstration (additional)
 [KnockOff<EmailService>]
-public partial class EmailServiceAdditionalTests { }
-
 public partial class EmailServiceAdditionalTests
 {
     #region troubleshoot-class-stub-wrong
@@ -586,15 +582,9 @@ public delegate int CalcOperation(int a, int b);
 
 // Then use it:
 [KnockOff<CalcOperation>]
-public partial class CalcDelegateTests { }
-#endregion
-
-// =============================================================================
-// Delegate Stubs: Interceptor Pattern Comparison
-// =============================================================================
-
 public partial class CalcDelegateTests
 {
+#endregion
     [Fact]
     public void DelegateStub_UsesInterceptorProperty()
     {

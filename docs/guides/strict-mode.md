@@ -22,7 +22,8 @@ public partial class StrictUserRepoStub : IStrictUserRepo { }
 <!-- snippet: strict-inline-attribute -->
 ```cs
 [KnockOff<IStrictUserRepo>(Strict = true)]
-public partial class StrictMyTests { }
+public partial class StrictMyTests
+{
 ```
 <!-- endSnippet -->
 
@@ -76,7 +77,8 @@ Individual stubs can opt out of the assembly default:
 ```cs
 // Opt out via attribute property
 [KnockOff<IStrictLegacyService>(Strict = false)]
-public partial class StrictLegacyTests { }
+public partial class StrictLegacyTests
+{
 ```
 <!-- endSnippet -->
 

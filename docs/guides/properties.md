@@ -336,9 +336,7 @@ public interface ISkillUserSvc
 }
 
 [KnockOff]
-public partial class SkillUserSvcStub : ISkillUserSvc { }
-
-public partial class SkillUserSvcStub
+public partial class SkillUserSvcStub : ISkillUserSvc
 {
     private int _count;
     private string _name = "";

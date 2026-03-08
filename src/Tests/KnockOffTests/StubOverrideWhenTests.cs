@@ -498,10 +498,6 @@ public interface IWhenStubOverrideTest
 [KnockOff]
 public partial class WhenStubOverrideStub : IWhenStubOverrideTest
 {
-}
-
-public partial class WhenStubOverrideStub
-{
     protected override string Process_(string input)
     {
         return $"[USER: {input}]";
@@ -536,11 +532,6 @@ public interface IGenericWhenStubOverrideService<T>
 /// <summary>Generic standalone stub with stub override override for Process.</summary>
 [KnockOff]
 public partial class GenericWhenStubOverrideStub<T> : IGenericWhenStubOverrideService<T>
-{
-}
-
-/// <summary>Stub override implementations for GenericWhenStubOverrideStub.</summary>
-public partial class GenericWhenStubOverrideStub<T>
 {
     protected override T Process_(T input)
     {

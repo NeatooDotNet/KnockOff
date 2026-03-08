@@ -303,7 +303,8 @@ This is the one feature with intentional variation:
 
 <!-- snippet: matrix-stub-overrides-interface -->
 ```cs
-public partial class MatrixStubOverrideStub
+[KnockOff]
+public partial class MatrixStubOverrideStub : IMatrixCalculator
 {
     protected override int Add_(int a, int b) => a + b;
 }

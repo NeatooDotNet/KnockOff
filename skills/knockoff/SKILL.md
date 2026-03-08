@@ -134,6 +134,8 @@ Before creating an inline stub with `[KnockOff<T>]`, **always search for existin
 
 ### Standalone Pattern
 
+**One class declaration per stub.** Put the attribute, interface, and any overrides together in a single class declaration.
+
 <!-- snippet: skill-standalone-pattern -->
 ```cs
 [KnockOff]

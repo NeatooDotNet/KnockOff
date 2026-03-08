@@ -33,6 +33,7 @@ public partial class GenericFormatterStub<T> : IGenericFormatter<T> where T : cl
 /// Generic standalone stub WITH stub override overrides for T-returning overloads.
 /// Demonstrates that stub overrides work with generic type parameter T.
 /// </summary>
+#pragma warning disable CA1062 // Validate arguments of public methods
 [KnockOff]
 public partial class GenericFormatterWithStubOverridesStub<T> : IGenericFormatter<T> where T : class
 {
@@ -40,11 +41,7 @@ public partial class GenericFormatterWithStubOverridesStub<T> : IGenericFormatte
     public Func<int, T>? CreateById { get; set; }
     public Func<string, T>? CreateByName { get; set; }
     public T? DefaultInstance { get; set; }
-}
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-public partial class GenericFormatterWithStubOverridesStub<T>
-{
     // =========================================================================
     // Stub Override Overrides for T Get() overloads
     // =========================================================================

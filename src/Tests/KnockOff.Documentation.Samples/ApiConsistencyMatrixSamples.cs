@@ -69,11 +69,9 @@ public partial class MatrixStatusStub : IMatrixStatusService { }
 public partial class MatrixAsyncStub : IMatrixAsyncService { }
 
 // Stub overrides stub for Feature 11
-[KnockOff]
-public partial class MatrixStubOverrideStub : IMatrixCalculator { }
-
 #region matrix-stub-overrides-interface
-public partial class MatrixStubOverrideStub
+[KnockOff]
+public partial class MatrixStubOverrideStub : IMatrixCalculator
 {
     protected override int Add_(int a, int b) => a + b;
 }

@@ -182,7 +182,8 @@ Standalone stubs can define async stub overrides:
 
 <!-- snippet: async-stub-overrides-define -->
 ```cs
-public partial class AsyncOverrideDemoStub
+[KnockOff]
+public partial class AsyncOverrideDemoStub : IAsyncOverrideDemo
 {
     protected override async Task<string> ProcessAsync_(string input)
     {

@@ -31,10 +31,7 @@ public interface IAsyncOverrideDemo
 
 #region stub-overrides-basic
 [KnockOff]
-public partial class StubOverridesRepoStub : IStubOverridesRepo { }
-
-// Stub overrides provide default behavior
-public partial class StubOverridesRepoStub
+public partial class StubOverridesRepoStub : IStubOverridesRepo
 {
     // Protected override method with underscore suffix
     // This is the fallback when no Return is configured
@@ -57,9 +54,7 @@ public partial class StubOverridesRepoStub
 
 // Async stub override stub
 [KnockOff]
-public partial class AsyncStubOverrideRepoStub : IAsyncStubOverrideRepo { }
-
-public partial class AsyncStubOverrideRepoStub
+public partial class AsyncStubOverrideRepoStub : IAsyncStubOverrideRepo
 {
     protected override Task<User?> GetUserByIdAsync_(int id)
     {
@@ -68,11 +63,9 @@ public partial class AsyncStubOverrideRepoStub
 }
 
 // Async stub override demo with Task<T> and ValueTask<T>
-[KnockOff]
-public partial class AsyncOverrideDemoStub : IAsyncOverrideDemo { }
-
 #region async-stub-overrides-define
-public partial class AsyncOverrideDemoStub
+[KnockOff]
+public partial class AsyncOverrideDemoStub : IAsyncOverrideDemo
 {
     protected override async Task<string> ProcessAsync_(string input)
     {
@@ -246,9 +239,7 @@ public interface INotificationService
 /// </summary>
 #region stub-overrides-shareable-base
 [KnockOff]
-public partial class NotificationServiceStub : INotificationService { }
-
-public partial class NotificationServiceStub
+public partial class NotificationServiceStub : INotificationService
 {
     // Default: emails succeed
     protected override bool SendEmail_(string to, string subject) => true;
@@ -300,9 +291,7 @@ public interface ISkillRepo
 
 #region stub-overrides-standalone-example
 [KnockOff]
-public partial class SkillRepoStub : ISkillRepo { }
-
-public partial class SkillRepoStub
+public partial class SkillRepoStub : ISkillRepo
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
@@ -320,9 +309,7 @@ public interface IApiRepo
 
 #region user-method-interceptor-standalone-api-example
 [KnockOff]
-public partial class ApiRepoStub : IApiRepo { }
-
-public partial class ApiRepoStub
+public partial class ApiRepoStub : IApiRepo
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
@@ -459,11 +446,9 @@ public interface IFormatter
     string Format(string input, bool uppercase);
 }
 
-[KnockOff]
-public partial class StubOverrideFormatterStub : IFormatter { }
-
 #region stub-overrides-overloads
-public partial class StubOverrideFormatterStub
+[KnockOff]
+public partial class StubOverrideFormatterStub : IFormatter
 {
     // Override only the overloads you need
     protected override string Format_(string input) => input.ToUpperInvariant();
@@ -505,9 +490,7 @@ public interface IStubOverrideMixedSvc
 }
 
 [KnockOff]
-public partial class StubOverrideMixedStub : IStubOverrideMixedSvc { }
-
-public partial class StubOverrideMixedStub
+public partial class StubOverrideMixedStub : IStubOverrideMixedSvc
 {
     protected override string WithOverride_(string input) => $"[User: {input}]";
     // WithoutOverride_ is NOT overridden

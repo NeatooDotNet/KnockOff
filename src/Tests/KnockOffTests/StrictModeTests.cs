@@ -369,10 +369,6 @@ public interface IStrictModeStubOverrideTest
 [KnockOff]
 public partial class StrictModeStubOverrideStub : IStrictModeStubOverrideTest
 {
-}
-
-public partial class StrictModeStubOverrideStub
-{
 	// Stub override - bypasses strict mode
 	protected override int GetValue_(int x)
 	{

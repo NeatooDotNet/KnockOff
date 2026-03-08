@@ -17,9 +17,7 @@ public interface IRepo
 
 #region skill-readme-stub-overrides
 [KnockOff]
-public partial class RepoStub : IRepo { }
-
-public partial class RepoStub
+public partial class RepoStub : IRepo
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };

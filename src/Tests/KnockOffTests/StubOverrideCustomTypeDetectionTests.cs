@@ -227,10 +227,7 @@ public partial class CustomTypeStubOverrideStub : ICustomTypeStubOverrideService
 
     /// <summary>Tracks whether UpdateUser_ stub override was called.</summary>
     public UserRecord? LastUpdatedRecord { get; set; }
-}
 
-public partial class CustomTypeStubOverrideStub
-{
     /// <summary>
     /// Stub override for FindUser - takes custom type UserQuery.
     /// BUG: This override will NOT be detected by the generator because

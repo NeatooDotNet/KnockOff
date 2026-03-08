@@ -493,9 +493,7 @@ public interface ISkillUserSvc
 }
 
 [KnockOff]
-public partial class SkillUserSvcStub : ISkillUserSvc { }
-
-public partial class SkillUserSvcStub
+public partial class SkillUserSvcStub : ISkillUserSvc
 {
     private int _count;
     private string _name = "";
@@ -524,9 +522,7 @@ public partial class SkillUserSvcStub
 
 // Strict mode stub for user properties
 [KnockOff(Strict = true)]
-public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
-
-public partial class StrictSkillUserSvcStub
+public partial class StrictSkillUserSvcStub : ISkillUserSvc
 {
     protected override int Count_ => 10;  // This IS configured
     protected override string Name_ { get => ""; set { } }

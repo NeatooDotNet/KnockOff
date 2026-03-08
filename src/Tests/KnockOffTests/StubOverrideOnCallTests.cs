@@ -300,10 +300,6 @@ public interface IMultiParamStubOverrideService
 [KnockOff]
 public partial class MultiParamStubOverrideStub : IMultiParamStubOverrideService
 {
-}
-
-public partial class MultiParamStubOverrideStub
-{
     protected override int Calculate_(int a, int b)
     {
         return a + b; // Default: addition
@@ -320,10 +316,6 @@ public interface IAsyncStubOverrideTestService
 /// <summary>Stub with async stub overrides.</summary>
 [KnockOff]
 public partial class AsyncStubOverrideTestStub : IAsyncStubOverrideTestService
-{
-}
-
-public partial class AsyncStubOverrideTestStub
 {
     protected override async Task<string> ProcessAsync_(string input)
     {

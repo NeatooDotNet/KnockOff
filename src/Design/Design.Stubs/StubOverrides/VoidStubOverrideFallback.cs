@@ -44,11 +44,9 @@ namespace Design.Stubs.StubOverrides;
 // recognized by the generator due to the signature key mismatch bug.
 // =============================================================================
 
-[KnockOff]
-public partial class VoidStubOverrideFallbackStub : IVoidStubOverrideService { }
-
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class VoidStubOverrideFallbackStub
+[KnockOff]
+public partial class VoidStubOverrideFallbackStub : IVoidStubOverrideService
 {
     // Track whether void stub overrides were called
     public bool SaveOrderCalled { get; private set; }

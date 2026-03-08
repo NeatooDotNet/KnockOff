@@ -15,10 +15,7 @@ KnockOff generates a base class with virtual methods for each interface member. 
 <!-- snippet: stub-overrides-basic -->
 ```cs
 [KnockOff]
-public partial class StubOverridesRepoStub : IStubOverridesRepo { }
-
-// Stub overrides provide default behavior
-public partial class StubOverridesRepoStub
+public partial class StubOverridesRepoStub : IStubOverridesRepo
 {
     // Protected override method with underscore suffix
     // This is the fallback when no Return is configured
@@ -171,9 +168,7 @@ Stub overrides enable a powerful pattern: define sensible defaults in a stub cla
 <!-- snippet: stub-overrides-shareable-base -->
 ```cs
 [KnockOff]
-public partial class NotificationServiceStub : INotificationService { }
-
-public partial class NotificationServiceStub
+public partial class NotificationServiceStub : INotificationService
 {
     // Default: emails succeed
     protected override bool SendEmail_(string to, string subject) => true;
@@ -233,7 +228,8 @@ Stub overrides work naturally with method overloads. Each overload gets its own 
 
 <!-- snippet: stub-overrides-overloads -->
 ```cs
-public partial class StubOverrideFormatterStub
+[KnockOff]
+public partial class StubOverrideFormatterStub : IFormatter
 {
     // Override only the overloads you need
     protected override string Format_(string input) => input.ToUpperInvariant();

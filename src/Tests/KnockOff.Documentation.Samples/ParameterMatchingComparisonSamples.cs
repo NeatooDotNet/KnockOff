@@ -25,12 +25,6 @@ public interface IUserSearch
 
 [KnockOff<IPricingService>]
 [KnockOff<IUserSearch>]
-public partial class ParameterMatchingComparisonTests { }
-
-// =============================================================================
-// Test Methods
-// =============================================================================
-
 public partial class ParameterMatchingComparisonTests
 {
     [Fact]

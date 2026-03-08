@@ -131,10 +131,6 @@ public partial class EventPatternsDemo
 [KnockOffBase<EventServiceBase>]
 public partial class EventServiceBaseStub
 {
-}
-
-public partial class EventServiceBaseStub
-{
     // =========================================================================
     // ACCEPTANCE CRITERIA: Standalone class events have Raise() and HasSubscribers
     // =========================================================================
@@ -190,10 +186,6 @@ public partial class EventServiceBaseStub
 // =============================================================================
 
 [KnockOff(typeof(IGenericEventSource<>))]
-public partial class OpenGenericEventDemo
-{
-}
-
 public partial class OpenGenericEventDemo
 {
     // =========================================================================

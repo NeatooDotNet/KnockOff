@@ -22,8 +22,6 @@ public abstract class ServiceBase
 // =============================================================================
 
 [KnockOff<ServiceBase>]
-public partial class ProtectedMethodsTests { }
-
 public partial class ProtectedMethodsTests
 {
     [Fact]

@@ -39,10 +39,6 @@ namespace Design.Stubs.ProtectedMembers;
 [KnockOffBase<ServiceBase>]
 public partial class ProtectedMemberServiceStub
 {
-}
-
-public partial class ProtectedMemberServiceStub
-{
     // =========================================================================
     // ACCEPTANCE CRITERIA: Protected event interceptor accessible on wrapper
     // =========================================================================
@@ -93,10 +89,6 @@ public partial class ProtectedMemberServiceStub
 // Same verification for inline class stubs, which use ClassRenderer.
 
 [KnockOff<ServiceBase>]
-public partial class InlineProtectedMemberDemo
-{
-}
-
 public partial class InlineProtectedMemberDemo
 {
     public void AcceptanceCriteria_InlineClass_ProtectedEvent_Compiles()

@@ -49,8 +49,6 @@ public interface IGenericRefOutService
 [KnockOff<IMixedRefOutService>]
 [KnockOff<IRefOutService>]
 [KnockOff<IGenericRefOutService>]
-public partial class RefOutTests { }
-
 public partial class RefOutTests
 {
     // =========================================================================

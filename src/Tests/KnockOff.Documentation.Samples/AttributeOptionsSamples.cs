@@ -67,11 +67,9 @@ public class StandAlonePatternTests
 #region attr-inline-interface
 // Inline interface pattern: [KnockOff<IInterface>] generates stub in Stubs namespace
 [KnockOff<IAttrUserRepository>]
-public partial class InlineInterfacePatternTests { }
-#endregion
-
 public partial class InlineInterfacePatternTests
 {
+#endregion
     [Fact]
     public void InlineInterface_GeneratesStubInStubsNamespace()
     {
@@ -96,11 +94,9 @@ public partial class InlineInterfacePatternTests
 #region attr-inline-class
 // Inline class pattern: [KnockOff<ConcreteClass>] generates stub inheriting from class
 [KnockOff<EmailServiceBase>]
-public partial class InlineClassPatternTests { }
-#endregion
-
 public partial class InlineClassPatternTests
 {
+#endregion
     [Fact]
     public void InlineClass_ProvidesObjectProperty()
     {
@@ -128,11 +124,9 @@ public partial class InlineClassPatternTests
 [KnockOff<IAttrUserRepository>]
 [KnockOff<IAttrEmailService>]
 [KnockOff<IAttrLogger>]
-public partial class MultipleStubsPatternTests { }
-#endregion
-
 public partial class MultipleStubsPatternTests
 {
+#endregion
     [Fact]
     public void MultipleStubs_GeneratesEachInStubsNamespace()
     {

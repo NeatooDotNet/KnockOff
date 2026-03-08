@@ -56,9 +56,7 @@ Create a standalone stub with constructor parameters and stub overrides:
 <!-- snippet: reusable-stub-definition -->
 ```cs
 [KnockOff]
-public partial class OrderRepoStub(List<Order> orders) : IOrderRepository { }
-
-public partial class OrderRepoStub
+public partial class OrderRepoStub(List<Order> orders) : IOrderRepository
 {
     protected override Order? GetOrder_(int orderId)
     {
@@ -192,9 +190,7 @@ All four standalone patterns produce reusable classes. The only difference is wh
 <!-- snippet: reusable-stub-definition -->
 ```cs
 [KnockOff]
-public partial class OrderRepoStub(List<Order> orders) : IOrderRepository { }
-
-public partial class OrderRepoStub
+public partial class OrderRepoStub(List<Order> orders) : IOrderRepository
 {
     protected override Order? GetOrder_(int orderId)
     {

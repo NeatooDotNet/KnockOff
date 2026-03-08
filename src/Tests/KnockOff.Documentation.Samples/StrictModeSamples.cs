@@ -35,11 +35,9 @@ public partial class StrictUserRepoStub : IStrictUserRepo { }
 // For generic attribute pattern
 #region strict-inline-attribute
 [KnockOff<IStrictUserRepo>(Strict = true)]
-public partial class StrictMyTests { }
-#endregion
-
 public partial class StrictMyTests
 {
+#endregion
     [Fact]
     public void InlineStrict_ConstructorOverride()
     {
@@ -126,11 +124,9 @@ public class StrictModeStandaloneTests
 
 #region strict-assembly-usage
 [KnockOff<IStrictUserService>]
-public partial class StrictUserTests { }
-#endregion
-
 public partial class StrictUserTests
 {
+#endregion
     [Fact]
     public void AssemblyStrict_Example()
     {
@@ -155,11 +151,9 @@ public partial class StrictUserTests
 #region strict-opt-out-attribute
 // Opt out via attribute property
 [KnockOff<IStrictLegacyService>(Strict = false)]
-public partial class StrictLegacyTests { }
-#endregion
-
 public partial class StrictLegacyTests
 {
+#endregion
     [Fact]
     public void OptOut_ViaAttribute_ReturnsDefault()
     {

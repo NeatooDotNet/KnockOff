@@ -164,7 +164,8 @@ public delegate int CalcOperation(int a, int b);
 
 // Then use it:
 [KnockOff<CalcOperation>]
-public partial class CalcDelegateTests { }
+public partial class CalcDelegateTests
+{
 ```
 <!-- endSnippet -->
 

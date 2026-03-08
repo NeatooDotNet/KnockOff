@@ -669,10 +669,7 @@ public partial class SCStubOverrideStub
 	// State for verifying stub override was called
 	public string? LastExecutedCommand { get; set; }
 	public bool InitializeCalled { get; set; }
-}
 
-public partial class SCStubOverrideStub
-{
 	protected override void Execute_(string command)
 	{
 		LastExecutedCommand = command;
@@ -734,10 +731,7 @@ public partial class SCGenericStubOverrideStub<T> where T : class
 	public T? DefaultEntity { get; set; }
 	public T? LastSavedEntity { get; set; }
 	public T? DefaultGetDefaultEntity { get; set; }
-}
 
-public partial class SCGenericStubOverrideStub<T> where T : class
-{
 	protected override T? GetById_(int id)
 	{
 		return DefaultEntity;

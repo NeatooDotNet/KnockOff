@@ -56,9 +56,7 @@ namespace Design.Stubs.StubOverrideProperties;
 // =============================================================================
 
 [KnockOff]
-public partial class BasicStubOverridePropertyStub : IStubOverridePropertyService { }
-
-public partial class BasicStubOverridePropertyStub
+public partial class BasicStubOverridePropertyStub : IStubOverridePropertyService
 {
     // =========================================================================
     // User Property Definition - Base Class Pattern
@@ -310,9 +308,7 @@ public partial class StubOverridePropertyBasicsDemo
 // =============================================================================
 
 [KnockOff]
-public partial class MixedStubOverridePropertyStub : IMixedStubOverridePropertyService { }
-
-public partial class MixedStubOverridePropertyStub
+public partial class MixedStubOverridePropertyStub : IMixedStubOverridePropertyService
 {
     // Only override SOME interface properties as user properties
     // Others will use the regular interceptor API (no override needed)
@@ -374,9 +370,7 @@ public partial class MixedStubOverridePropertyDemo
 // =============================================================================
 
 [KnockOff(Strict = true)]
-public partial class StrictStubOverridePropertyStub : IStubOverridePropertyService { }
-
-public partial class StrictStubOverridePropertyStub
+public partial class StrictStubOverridePropertyStub : IStubOverridePropertyService
 {
     // Stub overrides bypass strict mode - they ARE the configuration
     private int _count = 10;
@@ -426,9 +420,7 @@ public partial class StrictModeStubOverridePropertyDemo
 // =============================================================================
 
 [KnockOff]
-public partial class GenericStubOverridePropertyStub<T> : IGenericStubOverridePropertyService<T> where T : class { }
-
-public partial class GenericStubOverridePropertyStub<T> where T : class
+public partial class GenericStubOverridePropertyStub<T> : IGenericStubOverridePropertyService<T> where T : class
 {
     // =========================================================================
     // Generic User Properties
@@ -510,8 +502,6 @@ public partial class GenericStubOverridePropertyDemo
 // =============================================================================
 
 [KnockOffBase<ConfigBase>]
-public partial class ConfigStubOverridePropertyStub { }
-
 public partial class ConfigStubOverridePropertyStub
 {
     // =========================================================================
@@ -610,8 +600,6 @@ public partial class StandaloneClassStubOverridePropertyDemo
 // =============================================================================
 
 [KnockOffBase(typeof(CacheBase<>))]
-public partial class CacheStubOverridePropertyStub<T> where T : class { }
-
 public partial class CacheStubOverridePropertyStub<T> where T : class
 {
     // =========================================================================

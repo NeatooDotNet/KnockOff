@@ -440,8 +440,6 @@ public class AsyncTierTests
 public delegate Task<int> AsyncOp(int x);
 
 [KnockOff<AsyncOp>]
-public partial class AsyncDelegateHost { }
-
 public partial class AsyncDelegateHost
 {
     [Fact]

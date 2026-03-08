@@ -54,8 +54,6 @@ namespace Design.Stubs.StubOverrides;
 // =============================================================================
 
 [KnockOffBase<ServiceBase>]
-public partial class StandaloneClassStubOverrideStub { }
-
 public partial class StandaloneClassStubOverrideStub
 {
     // Override abstract method -- stub override provides default behavior
@@ -100,8 +98,6 @@ public partial class StandaloneClassStubOverrideStub
 // =============================================================================
 
 [KnockOffBase(typeof(RepositoryBase<>))]
-public partial class RepositoryStubOverrideStub<T> where T : class { }
-
 public partial class RepositoryStubOverrideStub<T> where T : class
 {
     // Virtual method returning generic type T? with stub override

@@ -39,9 +39,6 @@ public partial class SvcVerifyStub : ISvcVerify { }
 [KnockOff]
 public partial class ConfigVerifyStub : IConfigVerify { }
 
-[KnockOff<VerifyArithmeticOp>]
-public partial class DelegateVerificationHost { }
-
 // =============================================================================
 // Basic Call Verification
 // =============================================================================
@@ -630,6 +627,7 @@ public class VerifyRefResetTests
 // Delegate Verification
 // =============================================================================
 
+[KnockOff<VerifyArithmeticOp>]
 public partial class DelegateVerificationHost
 {
     [Fact]

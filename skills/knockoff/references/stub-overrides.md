@@ -13,10 +13,7 @@ KnockOff generates a base class with `virtual protected` members suffixed with u
 <!-- snippet: stub-overrides-basic -->
 ```cs
 [KnockOff]
-public partial class StubOverridesRepoStub : IStubOverridesRepo { }
-
-// Stub overrides provide default behavior
-public partial class StubOverridesRepoStub
+public partial class StubOverridesRepoStub : IStubOverridesRepo
 {
     // Protected override method with underscore suffix
     // This is the fallback when no Return is configured
@@ -56,9 +53,7 @@ public interface ISkillUserSvc
 }
 
 [KnockOff]
-public partial class SkillUserSvcStub : ISkillUserSvc { }
-
-public partial class SkillUserSvcStub
+public partial class SkillUserSvcStub : ISkillUserSvc
 {
     private int _count;
     private string _name = "";
@@ -116,9 +111,7 @@ Standalone stubs combine constructor parameters with stub overrides to create re
 <!-- snippet: skill-stub-override-constructor -->
 ```cs
 [KnockOff]
-public partial class CurrentUserStub : ICurrentUser { }
-
-public partial class CurrentUserStub
+public partial class CurrentUserStub : ICurrentUser
 {
     private long _userId;
     private string _role = "";
@@ -239,7 +232,8 @@ Each overload gets its own virtual method in the base class:
 
 <!-- snippet: stub-overrides-overloads -->
 ```cs
-public partial class StubOverrideFormatterStub
+[KnockOff]
+public partial class StubOverrideFormatterStub : IFormatter
 {
     // Override only the overloads you need
     protected override string Format_(string input) => input.ToUpperInvariant();

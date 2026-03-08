@@ -79,8 +79,6 @@ public class MyService
 // =============================================================================
 
 [KnockOff<IStore>]
-public partial class HierarchyTests { }
-
 public partial class HierarchyTests
 {
     [Fact]
@@ -121,8 +119,6 @@ public partial class HierarchyTests
 
 [KnockOff<IRepository>]
 [KnockOff<IUnitOfWork>]
-public partial class UnrelatedInterfacesTests { }
-
 public partial class UnrelatedInterfacesTests
 {
     [Fact]

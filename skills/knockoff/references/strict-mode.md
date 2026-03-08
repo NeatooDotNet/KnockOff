@@ -24,7 +24,8 @@ public partial class StrictUserRepoStub : IStrictUserRepo { }
 <!-- snippet: strict-inline-attribute -->
 ```cs
 [KnockOff<IStrictUserRepo>(Strict = true)]
-public partial class StrictMyTests { }
+public partial class StrictMyTests
+{
 ```
 <!-- endSnippet -->
 
@@ -73,7 +74,8 @@ All stubs now default to strict mode:
 <!-- snippet: strict-assembly-usage -->
 ```cs
 [KnockOff<IStrictUserService>]
-public partial class StrictUserTests { }
+public partial class StrictUserTests
+{
 ```
 <!-- endSnippet -->
 
@@ -105,7 +107,8 @@ Individual stubs can opt out when assembly-wide strict mode is enabled:
 ```cs
 // Opt out via attribute property
 [KnockOff<IStrictLegacyService>(Strict = false)]
-public partial class StrictLegacyTests { }
+public partial class StrictLegacyTests
+{
 ```
 <!-- endSnippet -->
 

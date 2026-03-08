@@ -39,10 +39,6 @@ public partial class OverloadSameTypesStub : IOverloadSameTypes { }
 [KnockOff<IOverloadSameTypes>]
 public partial class OverloadSameTypesInlineTests
 {
-}
-
-public partial class OverloadSameTypesInlineTests
-{
     // -----------------------------------------------------------------
     // Basic tests using Return(value) -- these work fine today because
     // Return(value) takes a concrete type (bool), not a delegate/lambda,

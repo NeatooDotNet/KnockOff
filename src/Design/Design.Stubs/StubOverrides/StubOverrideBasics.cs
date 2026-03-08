@@ -55,9 +55,7 @@ namespace Design.Stubs.StubOverrides;
 // =============================================================================
 
 [KnockOff]
-public partial class BasicStubOverrideStub : IStubOverrideService { }
-
-public partial class BasicStubOverrideStub
+public partial class BasicStubOverrideStub : IStubOverrideService
 {
     // =========================================================================
     // Stub Override Definition - Base Class Pattern
@@ -293,11 +291,9 @@ public partial class StubOverrideBasicsDemo
 // =============================================================================
 
 // Generator produces per-signature RecordCall methods for stub override methods
-[KnockOff]
-public partial class OverloadedStubOverrideStub : IOverloadedStubOverrideService { }
-
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class OverloadedStubOverrideStub
+[KnockOff]
+public partial class OverloadedStubOverrideStub : IOverloadedStubOverrideService
 {
     protected override string Format_(string input) => input.ToUpperInvariant();
     protected override string Format_(string input, bool uppercase) => uppercase ? input.ToUpperInvariant() : input;
@@ -312,9 +308,7 @@ public partial class OverloadedStubOverrideStub
 // =============================================================================
 
 [KnockOff]
-public partial class MixedStubOverrideStub : IMixedStubOverrideService { }
-
-public partial class MixedStubOverrideStub
+public partial class MixedStubOverrideStub : IMixedStubOverrideService
 {
     // Only override SOME interface methods as stub overrides
     // Others will use the regular interceptor API (no override needed)
@@ -388,11 +382,9 @@ public partial class MixedStubOverrideDemo
 // All overloads share the same interceptor (stub.Format) for tracking.
 // =============================================================================
 
-[KnockOff]
-public partial class PartialOverloadStubOverrideStub : IOverloadedStubOverrideService { }
-
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class PartialOverloadStubOverrideStub
+[KnockOff]
+public partial class PartialOverloadStubOverrideStub : IOverloadedStubOverrideService
 {
     // Only Format(string) is overridden - the other two Format overloads are NOT
     protected override string Format_(string input) => $"[User1: {input}]";
@@ -408,9 +400,7 @@ public partial class PartialOverloadStubOverrideStub
 // =============================================================================
 
 [KnockOff(Strict = true)]
-public partial class StrictStubOverrideStub : IStubOverrideService { }
-
-public partial class StrictStubOverrideStub
+public partial class StrictStubOverrideStub : IStubOverrideService
 {
     // Stub overrides bypass strict mode - they ARE the configuration
     protected override string Process_(string input) => $"[Strict: {input}]";
@@ -448,9 +438,7 @@ public partial class StrictModeStubOverrideDemo
 // =============================================================================
 
 [KnockOff]
-public partial class AsyncStubOverrideStub : IAsyncStubOverrideService { }
-
-public partial class AsyncStubOverrideStub
+public partial class AsyncStubOverrideStub : IAsyncStubOverrideService
 {
     // =========================================================================
     // Async Stub Overrides - Task<T>, Task, ValueTask<T>
@@ -529,9 +517,7 @@ public partial class AsyncStubOverrideDemo
 // =============================================================================
 
 [KnockOff]
-public partial class GenericStubOverrideStub : IGenericStubOverrideService { }
-
-public partial class GenericStubOverrideStub
+public partial class GenericStubOverrideStub : IGenericStubOverrideService
 {
     // =========================================================================
     // Generic Stub Overrides - NOT SUPPORTED in Base Class Pattern

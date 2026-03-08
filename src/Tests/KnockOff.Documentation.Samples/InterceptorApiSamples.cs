@@ -166,10 +166,6 @@ public class AccessPatternsTests
 [KnockOff<ApiServiceClass>]
 public partial class InlinePatternTests
 {
-}
-
-public partial class InlinePatternTests
-{
     [Fact]
     public void InlineInterface_PatternAccess()
     {
@@ -545,12 +541,6 @@ public delegate void VoidArithmeticOperation(int a, int b);
 [KnockOff<ArithmeticOperation>]
 [KnockOff<AsyncOperation>]
 [KnockOff<VoidArithmeticOperation>]
-public partial class DelegateApiTests { }
-
-// =============================================================================
-// Delegate Interceptor API Samples
-// =============================================================================
-
 public partial class DelegateApiTests
 {
     [Fact]

@@ -102,22 +102,12 @@ public partial class GenericRepoStub : IGenericRepo { }
 [KnockOff]
 public partial class SkSourceDelegationStub : ISourceRepo { }
 
-// Class stub
-[KnockOff<ServiceBase>]
-public partial class ClassStubHost { }
-
 // Generic interface for closed generic example
 public interface IRepository<T> where T : class
 {
     T? GetById(int id);
 }
 
-[KnockOff<IRepository<User>>]
-public partial class ClosedGenericHost { }
-
-// Delegate stub
-[KnockOff<SkillArithmeticOp>]
-public partial class DelegateHost { }
 
 // Strict mode stub
 [KnockOff(Strict = true)]
@@ -126,9 +116,7 @@ public partial class StrictStub : ISvc { }
 // Stub override method stubs
 #region skill-stub-override-define
 [KnockOff]
-public partial class SkStubOverrideRepoStub : IUserRepo { }
-
-public partial class SkStubOverrideRepoStub
+public partial class SkStubOverrideRepoStub : IUserRepo
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
@@ -138,9 +126,7 @@ public partial class SkStubOverrideRepoStub
 // Stub override property stubs
 #region skill-stub-override-property-define
 [KnockOff]
-public partial class SkUserPropServiceStub : IUserService { }
-
-public partial class SkUserPropServiceStub
+public partial class SkUserPropServiceStub : IUserService
 {
     private int _count;
 
@@ -162,9 +148,7 @@ public interface ICurrentUser
 
 #region skill-stub-override-constructor
 [KnockOff]
-public partial class CurrentUserStub : ICurrentUser { }
-
-public partial class CurrentUserStub
+public partial class CurrentUserStub : ICurrentUser
 {
     private long _userId;
     private string _role = "";
@@ -256,6 +240,7 @@ public class EventGotchaTests
 // Gotcha #4: Class Stubs Use .Object Property
 // =============================================================================
 
+[KnockOff<ServiceBase>]
 public partial class ClassStubHost
 {
     [Fact]
@@ -269,12 +254,26 @@ public partial class ClassStubHost
         service.Initialize();
         #endregion
     }
+
+    [Fact]
+    public void ForgettingObject()
+    {
+        #region skill-mistake-forgetting-object
+        // WRONG:
+        // MyClass service = stub;  // Won't compile
+
+        // RIGHT:
+        var stub = new Stubs.ServiceBase();
+        ServiceBase service = stub.Object;
+        #endregion
+    }
 }
 
 // =============================================================================
 // Gotcha #5: Closed Generic Stubs Use Simple Names
 // =============================================================================
 
+[KnockOff<IRepository<User>>]
 public partial class ClosedGenericHost
 {
     [Fact]
@@ -579,6 +578,7 @@ public class Product
 // Delegate Configuration
 // =============================================================================
 
+[KnockOff<SkillArithmeticOp>]
 public partial class DelegateHost
 {
     [Fact]
@@ -993,22 +993,6 @@ public class CommonMistakeTests
 
         // RIGHT: Match signature exactly
         stub.Process.Call((int id) => { });
-        #endregion
-    }
-}
-
-public partial class ClassStubHost
-{
-    [Fact]
-    public void ForgettingObject()
-    {
-        #region skill-mistake-forgetting-object
-        // WRONG:
-        // MyClass service = stub;  // Won't compile
-
-        // RIGHT:
-        var stub = new Stubs.ServiceBase();
-        ServiceBase service = stub.Object;
         #endregion
     }
 }

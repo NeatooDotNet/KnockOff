@@ -59,9 +59,7 @@ public class OrderService(IOrderRepository repository)
 
 #region reusable-stub-definition
 [KnockOff]
-public partial class OrderRepoStub(List<Order> orders) : IOrderRepository { }
-
-public partial class OrderRepoStub
+public partial class OrderRepoStub(List<Order> orders) : IOrderRepository
 {
     protected override Order? GetOrder_(int orderId)
     {
