@@ -26,6 +26,18 @@ public partial class KnockOffGenerator
 		if (classSymbol is null)
 			return null;
 
+		// Resolve the user's stub class accessibility for the generated Base class
+		var stubClassAccessibility = classSymbol.DeclaredAccessibility switch
+		{
+			Accessibility.Public => "public",
+			Accessibility.Internal => "internal",
+			Accessibility.Private => "private",
+			Accessibility.Protected => "protected",
+			Accessibility.ProtectedOrInternal => "protected internal",
+			Accessibility.ProtectedAndInternal => "private protected",
+			_ => "public"
+		};
+
 		// Get namespace
 		var ns = classSymbol.ContainingNamespace;
 		var namespaceName = ns.IsGlobalNamespace ? "" : ns.ToDisplayString();
@@ -186,7 +198,8 @@ public partial class KnockOffGenerator
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			Strict: strict,
 			StubOverrideProperties: stubOverridePropertiesArray,
-			StubOverrideMethods: stubOverrideMethodsArray);
+			StubOverrideMethods: stubOverrideMethodsArray,
+			StubClassAccessibility: stubClassAccessibility);
 	}
 
 	/// <summary>
@@ -243,4 +256,9 @@ internal sealed record StandaloneClassStubInfo(
 	/// <summary>Property names (with _ suffix) that have stub overrides in the partial class.</summary>
 	EquatableArray<string> StubOverrideProperties = default,
 	/// <summary>Method signature keys (format: "MethodName_(ParamType1,...)") that have stub overrides in the partial class.</summary>
-	EquatableArray<string> StubOverrideMethods = default) : IEquatable<StandaloneClassStubInfo>;
+	EquatableArray<string> StubOverrideMethods = default,
+	/// <summary>
+	/// The accessibility modifier of the user's standalone class stub (e.g., "public", "internal").
+	/// Used by StandaloneClassModelBuilder to set the generated Base class accessibility to match.
+	/// </summary>
+	string StubClassAccessibility = "public") : IEquatable<StandaloneClassStubInfo>;

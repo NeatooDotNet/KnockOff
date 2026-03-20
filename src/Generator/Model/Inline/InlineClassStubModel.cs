@@ -56,7 +56,9 @@ internal sealed record InlineClassStubModel(
     /// True when the target class is a C# record type.
     /// When true, the Impl class is emitted as 'sealed record' instead of 'sealed class'.
     /// </summary>
-    bool IsRecord = false);
+    bool IsRecord = false,
+    /// <summary>Accessibility modifier for the generated wrapper stub class (e.g., "public", "internal"). Matches the target class's accessibility.</summary>
+    string Accessibility = "public");
 
 /// <summary>
 /// Model for a constructor in class stub generation.

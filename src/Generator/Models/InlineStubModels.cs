@@ -46,13 +46,18 @@ internal sealed record DelegateInfo(
 	/// Type parameters for open generic delegates (e.g., T, TKey, TValue).
 	/// Empty for closed generic or non-generic delegates.
 	/// </summary>
-	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<DelegateInfo>
+	EquatableArray<TypeParameterInfo> TypeParameters = default,
+	/// <summary>
+	/// The accessibility modifier of the target delegate (e.g., "public", "internal").
+	/// Used by inline renderer to match the generated stub class accessibility.
+	/// </summary>
+	string Accessibility = "public") : IEquatable<DelegateInfo>
 {
 	/// <summary>
 	/// Extracts delegate info for inline delegate stubs.
 	/// Returns null if the delegate cannot be processed.
 	/// </summary>
-	public static DelegateInfo? Extract(INamedTypeSymbol delegateType, bool isOpenGeneric = false, EquatableArray<TypeParameterInfo> typeParameters = default)
+	public static DelegateInfo? Extract(INamedTypeSymbol delegateType, bool isOpenGeneric = false, EquatableArray<TypeParameterInfo> typeParameters = default, string accessibility = "public")
 	{
 		// Get the Invoke method - all delegates have one
 		var invokeMethod = delegateType.DelegateInvokeMethod;
@@ -78,6 +83,7 @@ internal sealed record DelegateInfo(
 			IsVoid: isVoid,
 			Parameters: new EquatableArray<ParameterInfo>(parameters),
 			IsOpenGeneric: isOpenGeneric,
-			TypeParameters: typeParameters);
+			TypeParameters: typeParameters,
+			Accessibility: accessibility);
 	}
 }

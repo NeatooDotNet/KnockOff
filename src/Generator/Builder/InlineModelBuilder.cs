@@ -228,7 +228,8 @@ internal static class InlineModelBuilder
             Events: events.ToEquatableArray(),
             InterceptorProperties: interceptorProperties,
             Implementations: implementations,
-            SourceProviders: sourceProviders);
+            SourceProviders: sourceProviders,
+            Accessibility: iface.Accessibility);
     }
 
     private static InlinePropertyModel BuildPropertyModel(
@@ -1247,7 +1248,8 @@ internal static class InlineModelBuilder
             CallType: callType,
             LastCallArgType: lastCallArgType,
             LastCallArgsType: lastCallArgsType,
-            DefaultExpression: defaultExpr);
+            DefaultExpression: defaultExpr,
+            Accessibility: del.Accessibility);
     }
 
     #endregion

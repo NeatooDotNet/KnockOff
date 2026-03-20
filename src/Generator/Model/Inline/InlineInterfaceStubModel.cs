@@ -38,4 +38,6 @@ internal sealed record InlineInterfaceStubModel(
     /// <summary>All explicit interface implementations needed.</summary>
     EquatableArray<InlineInterfaceImplementation> Implementations,
     /// <summary>Source providers for Source(T) methods - one per interface in the hierarchy.</summary>
-    EquatableArray<SourceProviderInfo> SourceProviders);
+    EquatableArray<SourceProviderInfo> SourceProviders,
+    /// <summary>Accessibility modifier for the generated stub class (e.g., "public", "internal"). Matches the target interface's accessibility.</summary>
+    string Accessibility = "public");

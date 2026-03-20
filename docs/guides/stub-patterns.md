@@ -21,6 +21,8 @@ KnockOff supports nine distinct patterns for creating test stubs, organized into
 
 > **All KnockOff classes must be `partial`.** Standalone stub classes must be `partial` so the generator can emit a base class. Inline pattern test classes must be `partial` so the generator can emit nested `Stubs` types. If you forget `partial`, the generator silently skips your class and nothing is generated.
 
+> **Internal types are fully supported.** When the target interface, class, or delegate is `internal`, the generated stub class uses `internal` accessibility. For standalone patterns, declare the stub class as `internal partial class` and the generated Base class will match. For inline patterns, the generator automatically matches the target type's accessibility. See the [API Consistency Matrix](api-consistency-matrix.md#feature-13-type-accessibility) for details.
+
 ## Pattern Relationships
 
 ```

@@ -346,7 +346,8 @@ internal static class StandaloneClassModelBuilder
             Strict: info.Strict,
             BaseClassProperties: baseClassProperties,
             BaseClassMethods: baseClassMethods,
-            IsRecord: cls.IsRecord);
+            IsRecord: cls.IsRecord,
+            BaseClassAccessibility: info.StubClassAccessibility);
     }
 
     #region Method Grouping

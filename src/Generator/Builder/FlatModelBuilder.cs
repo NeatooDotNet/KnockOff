@@ -86,7 +86,8 @@ internal static class FlatModelBuilder
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
 			ImplementsIKnockOffStub: true,
 			Strict: typeInfo.Strict,
-			HasPrimaryConstructor: typeInfo.HasPrimaryConstructor);
+			HasPrimaryConstructor: typeInfo.HasPrimaryConstructor,
+			BaseClassAccessibility: typeInfo.StubClassAccessibility);
 	}
 
 	#region Name Map Building

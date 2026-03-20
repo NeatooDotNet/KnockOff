@@ -377,6 +377,31 @@ stub.GetDataAsync.Call((int id) => Task.FromResult($"Full-{id}"));
 
 ---
 
+## Feature 13: Type Accessibility
+
+Generated stub classes match the accessibility of the target type. When the target interface, class, or delegate is `internal`, the generated stub class is also `internal`. All 9 patterns (including Pattern 7: Inline Delegate) are supported.
+
+| | **Interface** | **Class** |
+|---|---|---|
+| **Standalone** | User's stub class controls accessibility.<br>Generated `Base` class matches.<br>`internal partial class Stub : IFoo` -> `internal class StubBase` | User's stub class controls accessibility.<br>Generated `Base` class matches.<br>`internal partial class Stub` -> `internal class StubBase` |
+| **Standalone Generic** | Same as Standalone | Same as Standalone |
+| **Inline** | Generated stub matches target type.<br>`internal interface IFoo` -> `internal class IFoo` | Generated stub matches target type.<br>`internal class Foo` -> `internal class Foo` |
+| **Inline Generic** | Same as Inline | Same as Inline |
+
+| Feature | All 9 Patterns |
+|---------|:--------------:|
+| `public` target -> `public` stub | ✓ |
+| `internal` target -> `internal` stub | ✓ |
+| Inline Delegate: `internal` delegate -> `internal sealed class` | ✓ |
+
+**Rule:** Standalone patterns derive accessibility from the user's stub class declaration. Inline patterns derive accessibility from the target type's declaration.
+
+**Why:** A `public` class cannot implement an `internal` interface (CS0060) or inherit from an `internal` class (CS0060). For standalone patterns, the user controls the stub class accessibility (which allows a `public` stub for an `internal` interface when `InternalsVisibleTo` is configured). For inline patterns, the generator controls the stub class and must match the target type.
+
+**Design.Stubs reference:** `src/Design/Design.Stubs/Advanced/InternalAccessibility.cs` (Patterns 1, 3, 5, 6, 7, 8). Added via [internal-interface-stub-accessibility](../plans/internal-interface-stub-accessibility.md).
+
+---
+
 ## Summary: Consistency Status
 
 | Feature Category | Status |
@@ -393,6 +418,7 @@ stub.GetDataAsync.Call((int id) => Task.FromResult($"Full-{id}"));
 | Target Access | ✓ **Logical split** (Interface=direct, Class=`.Object`) |
 | Stub Overrides | ✓ **Logical split** (Standalone=yes, Inline=no) |
 | Async Auto-Wrapping | ✓ **100% consistent** (all 9 patterns) |
+| Type Accessibility | ✓ **Logical split** (Standalone=user's class, Inline=target type) |
 
 ---
 

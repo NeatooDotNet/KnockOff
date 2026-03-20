@@ -29,4 +29,6 @@ internal sealed record FlatGenerationUnit(
     bool ImplementsIKnockOffStub,
     bool Strict,
     /// <summary>When true, the user's partial class uses a primary constructor. Generated constructors need `: this()` initializer.</summary>
-    bool HasPrimaryConstructor = false);
+    bool HasPrimaryConstructor = false,
+    /// <summary>Accessibility modifier for the generated Base class (e.g., "public", "internal"). Matches the user's stub class accessibility.</summary>
+    string BaseClassAccessibility = "public");

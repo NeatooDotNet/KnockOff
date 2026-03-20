@@ -270,7 +270,7 @@ internal static class StandaloneClassRenderer
         var typeParams = FormatTypeParameters(unit.TypeParameters);
         var constraints = FormatConstraints(unit.TypeParameters);
 
-        using (w.Block($"public class {unit.ClassName}Base{typeParams}{constraints}"))
+        using (w.Block($"{unit.BaseClassAccessibility} class {unit.ClassName}Base{typeParams}{constraints}"))
         {
             // Generate virtual protected properties for each target class property
             foreach (var property in unit.BaseClassProperties)
