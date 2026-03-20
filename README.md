@@ -1,10 +1,8 @@
 # KnockOff
 
-A .NET mocking library that lets you define reusable stub classes — with full mocking capabilities built in. 
+A fake with mock capabilities. Define a stub that owns its state, behaves like a real implementation, and still has Verify, When, and Return — all in one object.
 
-Define your test double once. Reuse it across your test project. Customize it per-test with Return, Call, Verify, and When chains. No more copying mock setups between tests or maintaining shared factory methods full of `Arg.Any<>()`.
-
-Powered by Roslyn source generation for [tighter type safety](docs/type-safety.md) — more issues surface as compile errors instead of runtime surprises.
+Powered by Roslyn source generation. [9 stub patterns](docs/guides/stub-patterns.md). [Tighter type safety](docs/type-safety.md) than runtime mocking.
 
 Claude Code was used to write this library. Skip to more [AI discussion](#ai).
 
@@ -12,111 +10,154 @@ Claude Code was used to write this library. Skip to more [AI discussion](#ai).
 [![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-We've confirmed KnockOff matches Moq and NSubstitute [performance](#performance) across 5,000 unit tests — build and execution — even with source generation overhead.
+KnockOff matches Moq and NSubstitute [performance](#performance) across 5,000 unit tests — build and execution — even with source generation overhead.
 
-## KnockOff Stub
 
-There are [9 patterns](docs/guides/stub-patterns.md) total, including a [standard fluent mocking approach](docs/guides/stub-patterns.md#inline-interface-pattern) with inline stubs. But reusable stub classes are where KnockOff stands apart:
+## The Problem: Mocking Frameworks Can't Be Fakes
 
-<!-- snippet: readme-knockoff-stub -->
+Integration tests that construct full domain models through DI need fake repositories — not mocks. The repository needs to *behave*: Add puts things in, GetById finds them, Delete removes them. All sharing real state.
+
+With mocking frameworks, you end up with two objects pretending to be one:
+
+<!-- snippet: readme-nsub-split-abstraction -->
 ```cs
-[KnockOff]
-public partial class MyRepoStub(List<User> Users) : IMyRepo
+public static IUserRepository CreateNSubstituteRepository(List<User> users)
 {
-    protected override User? GetUser_(int id)
-    {
-        return Users.Single(u => u.Id == id);
-    }
+    var repo = Substitute.For<IUserRepository>();
 
-    protected override void Update_(User user)
-    {
-        Assert.Contains(user, Users);
-    }
-}
-```
-<!-- endSnippet -->
+    // Wire each method to the backing list via lambda callbacks
+    repo.When(x => x.Add(Arg.Any<User>()))
+        .Do(callInfo => users.Add(callInfo.Arg<User>()));
 
-- **`[KnockOff]` + `partial class`** — KnockOff generates a base class that implements every member of `IMyRepo`. Your stub is a real class — define it once, reuse it across your entire test project. Pass it around, register it in DI, share it between test fixtures.
-- **Constructor parameters** — `List<User> Users` is a primary constructor. Test data flows in naturally, just like any other C# class.
-- **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [Return/Call](docs/guides/methods.md), [Return(value)](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
-- **Tighter type safety** — Every Return, Call, and When call is complete in a single step — no forgotten `.Returns()` that [silently breaks at runtime](docs/type-safety.md). No manual `<T1, T2>` type parameters that can drift. [Details →](docs/type-safety.md)
-
-This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/guides/strict-mode.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
-
-
-## Why I Wrote KnockOff
-
-I often wanted to reuse my mocks.
-Especially in my integration test library where I may even register my mocks.
-I found myself either copying my mock definitions code or creating shared methods like this:
-
-**NSubstitute:**
-<!-- snippet: readme-nsub-shared-mock -->
-```cs
-public static IMyRepo NSubstituteMock(List<User> users)
-{
-    var myRepoMock = Substitute.For<IMyRepo>();
-
-    // Setup: configure GetUser to look up from the list based on id
-    myRepoMock.GetUser(Arg.Any<int>())
+    repo.GetById(Arg.Any<int>())
         .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
 
-    // Setup: configure Update to assert user exists in list
-    myRepoMock.When(x => x.Update(Arg.Any<User>()))
-        .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
+    repo.GetAll()
+        .Returns(callInfo => users.ToList());
 
-    return myRepoMock;
+    repo.Delete(Arg.Any<int>())
+        .Returns(callInfo =>
+        {
+            var id = callInfo.Arg<int>();
+            var user = users.SingleOrDefault(u => u.Id == id);
+            return user != null && users.Remove(user);
+        });
+
+    return repo;
 }
 ```
 <!-- endSnippet -->
 
-Here's another [example from PowerToys](https://github.com/microsoft/PowerToys/blob/main/src/settings-ui/Settings.UI.UnitTests/Mocks/ISettingsUtilsMocks.cs).
+A `List<User>` and a `Substitute.For<IUserRepository>()` — wired together through lambda callbacks. Assertions hit the list, but there's no visible connection to the mock that populated it. They're conceptually one thing split across two objects.
 
-But I find that hard to read and unintuitive. Also, my shared methods accumulated extra parameters for variations across different tests.
+The "right" answer is a hand-written fake:
 
-
-## So I Created KnockOff
-
-You can create a stub to implement [interfaces](docs/guides/stub-patterns.md) or non-sealed [classes](docs/guides/stub-patterns.md) with virtual methods.
-Yet, you can still customize the stub per test.
-All while having the features you would expect with a full mocking library.
-
-With the stub above, your tests are:
-
-<!-- snippet: readme-knockoff-fetch-test -->
+<!-- snippet: readme-manual-fake -->
 ```cs
-var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
-var userDomainModel = new UserDomainModel(myRepoKO);
+public class ManualUserRepositoryFake(List<User> users) : IUserRepository
+{
+    public void Add(User user) => users.Add(user);
 
-Assert.True(userDomainModel.Fetch(1));
+    public User? GetById(int id) => users.SingleOrDefault(u => u.Id == id);
 
-// I have Verify on my Stub!
-myRepoKO.GetUser.Verify(Called.Once);
+    public List<User> GetAll() => users.ToList();
+
+    public bool Delete(int id)
+    {
+        var user = users.SingleOrDefault(u => u.Id == id);
+        return user != null && users.Remove(user);
+    }
+    // Every new interface member requires a manual implementation here
+}
 ```
 <!-- endSnippet -->
 
-Need different behavior for a specific test? Override with Return/Call:
+One object. Owns its state. But now you've lost Verify, and you're implementing every interface member by hand.
 
-<!-- snippet: readme-knockoff-oncall-test -->
+
+## The KnockOff Solution
+
+<!-- snippet: readme-knockoff-fake -->
 ```cs
-var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
-var myRepoKO = new MyRepoStub([user1]);
-var userDomainModel = new UserDomainModel(myRepoKO);
+[KnockOff]
+public partial class ReadmeUserRepositoryStub(List<User> users) : IUserRepository
+{
+    protected override void Add_(User user) => users.Add(user);
 
-var user2 = new User { Id = 2 };
+    protected override User? GetById_(int id) => users.SingleOrDefault(u => u.Id == id);
 
-// When and Return overrides the stub methods
-myRepoKO.GetUser.When(2).Return(user2).Verifiable();
-myRepoKO.Update.Call(u => Assert.Same(u, user2)).Verifiable();
+    protected override List<User> GetAll_() => users.ToList();
 
-userDomainModel.Fetch(2);
-userDomainModel.Update();
-
-myRepoKO.Verify();
+    protected override bool Delete_(int id)
+    {
+        var user = users.SingleOrDefault(u => u.Id == id);
+        return user != null && users.Remove(user);
+    }
+}
 ```
 <!-- endSnippet -->
 
-**Now I have my stubs and mocks in one!**
+- **It's a real class** — owns its `List<User>`, implements every member of `IUserRepository`. Pass it through constructors, register it in DI, share it between test fixtures.
+- **Overrides are optional** — only override the methods you need. Everything else still works with [Return/Call](docs/guides/methods.md) or [When chains](docs/guides/parameter-matching.md).
+- **It's still a full mock** — [Verify](docs/guides/verification.md), [Strict mode](docs/guides/strict-mode.md), [Async](docs/guides/async-patterns.md), [Source Delegation](docs/guides/source-delegation.md), and [tighter type safety](docs/type-safety.md) — all on the same class.
+
+The stub owns its state. Mutations through Add are visible through GetAll and GetById — because they share the same list, inside the same object:
+
+<!-- snippet: readme-fake-add-and-query -->
+```cs
+var stub = new ReadmeUserRepositoryStub(new List<User>());
+IUserRepository repo = stub;
+
+// Add users through the interface
+repo.Add(new User { Id = 1, Name = "Alice" });
+repo.Add(new User { Id = 2, Name = "Bob" });
+
+// Query them back — the stub owns its state
+var alice = repo.GetById(1);
+Assert.NotNull(alice);
+Assert.Equal("Alice", alice.Name);
+
+var all = repo.GetAll();
+Assert.Equal(2, all.Count);
+```
+<!-- endSnippet -->
+
+And it's still a mock — Verify works:
+
+<!-- snippet: readme-fake-verify -->
+```cs
+var stub = new ReadmeUserRepositoryStub(new List<User>
+{
+    new() { Id = 1, Name = "Alice" }
+});
+IUserRepository repo = stub;
+
+// Delete through the interface
+var deleted = repo.Delete(1);
+Assert.True(deleted);
+
+// Verify the call was made — it's still a full mock
+stub.Delete.Verify(Called.Once);
+```
+<!-- endSnippet -->
+
+Need different behavior for a specific test? Return overrides the stub's default:
+
+<!-- snippet: readme-fake-per-test-override -->
+```cs
+var stub = new ReadmeUserRepositoryStub(new List<User>());
+IUserRepository repo = stub;
+
+// Override GetById for this test only — Return takes priority over stub override
+var specialUser = new User { Id = 99, Name = "Override" };
+stub.GetById.Return(specialUser);
+
+var result = repo.GetById(99);
+Assert.Same(specialUser, result);
+```
+<!-- endSnippet -->
+
+KnockOff also supports a [standard fluent mocking approach](docs/guides/stub-patterns.md#inline-interface-pattern) with inline stubs — [9 patterns](docs/guides/stub-patterns.md) total. But fakes with mock capabilities are where KnockOff stands apart.
 
 ---
 
