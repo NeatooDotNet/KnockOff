@@ -1,186 +1,158 @@
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KnockOff.Documentation.Samples.Readme;
 
+// =============================================================================
+// Interface: The contract our code depends on
+// =============================================================================
 
-#region readme-manual-stub-interface
-public interface IMyRepo
+#region readme-repo-interface
+public interface IUserRepository
 {
-    User? GetUser(int id);
-    void Update(User user);
+    void Add(User user);
+    User? GetById(int id);
+    List<User> GetAll();
+    bool Delete(int id);
 }
 #endregion
 
-#region readme-manual-stub-desired
-public class MyRepoManualStub(List<User> Users) : IMyRepo
+// =============================================================================
+// The Split-Abstraction Problem: NSubstitute requires two separate objects
+// =============================================================================
+
+public class NSubstituteSplitAbstractionExample
 {
-    public User? GetUser(int id)
+    #region readme-nsub-split-abstraction
+    public static IUserRepository CreateNSubstituteRepository(List<User> users)
     {
-        return Users.Single(u => u.Id == id);
-    }
+        var repo = Substitute.For<IUserRepository>();
 
-    public void Update(User user)
-    {
-        Assert.Contains(user, Users);
-    }
-}
-#endregion
+        // Wire each method to the backing list via lambda callbacks
+        repo.When(x => x.Add(Arg.Any<User>()))
+            .Do(callInfo => users.Add(callInfo.Arg<User>()));
 
-
-#region readme-knockoff-stub
-[KnockOff]
-public partial class MyRepoStub(List<User> Users) : IMyRepo
-{
-    protected override User? GetUser_(int id)
-    {
-        return Users.Single(u => u.Id == id);
-    }
-
-    protected override void Update_(User user)
-    {
-        Assert.Contains(user, Users);
-    }
-}
-#endregion
-
-public class UserDomainModel(IMyRepo repo)
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Email { get; set; } = "";
-    public bool IsActive { get; set; } = true;
-
-    public bool Fetch(int userId)
-    {
-        var user = repo.GetUser(userId);
-
-        if (user == null) { return false; }
-
-        Id = user.Id;
-        Name = user.Name;
-        Email = user.Email;
-        IsActive = user.IsActive;
-
-        return true;
-    }
-
-    public void Update()
-    {
-        var user = repo.GetUser(this.Id);
-
-        if (user == null) { throw new NotFoundException(); }
-
-        user.Name = this.Name;
-        user.Email = this.Email;
-        user.IsActive = this.IsActive;
-
-        repo.Update(user);
-    }
-}
-
-
-public class UserDomainModelTests
-{
-
-    #region readme-nsub-shared-mock
-    public static IMyRepo NSubstituteMock(List<User> users)
-    {
-        var myRepoMock = Substitute.For<IMyRepo>();
-
-        // Setup: configure GetUser to look up from the list based on id
-        myRepoMock.GetUser(Arg.Any<int>())
+        repo.GetById(Arg.Any<int>())
             .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
 
-        // Setup: configure Update to assert user exists in list
-        myRepoMock.When(x => x.Update(Arg.Any<User>()))
-            .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
+        repo.GetAll()
+            .Returns(callInfo => users.ToList());
 
-        return myRepoMock;
+        repo.Delete(Arg.Any<int>())
+            .Returns(callInfo =>
+            {
+                var id = callInfo.Arg<int>();
+                var user = users.SingleOrDefault(u => u.Id == id);
+                return user != null && users.Remove(user);
+            });
+
+        return repo;
     }
     #endregion
+}
 
+// =============================================================================
+// The Manual Solution: Hand-written fake with full boilerplate
+// =============================================================================
 
-    [Fact]
-    public void FetchTest_KnockOff()
+#region readme-manual-fake
+public class ManualUserRepositoryFake(List<User> users) : IUserRepository
+{
+    public void Add(User user) => users.Add(user);
+
+    public User? GetById(int id) => users.SingleOrDefault(u => u.Id == id);
+
+    public List<User> GetAll() => users.ToList();
+
+    public bool Delete(int id)
     {
-        #region readme-knockoff-fetch-test
-        var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
+        var user = users.SingleOrDefault(u => u.Id == id);
+        return user != null && users.Remove(user);
+    }
+    // Every new interface member requires a manual implementation here
+}
+#endregion
 
-        Assert.True(userDomainModel.Fetch(1));
+// =============================================================================
+// The KnockOff Solution: Stub overrides + full mock capabilities
+// =============================================================================
 
-        // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Called.Once);
+#region readme-knockoff-fake
+[KnockOff]
+public partial class ReadmeUserRepositoryStub(List<User> users) : IUserRepository
+{
+    protected override void Add_(User user) => users.Add(user);
+
+    protected override User? GetById_(int id) => users.SingleOrDefault(u => u.Id == id);
+
+    protected override List<User> GetAll_() => users.ToList();
+
+    protected override bool Delete_(int id)
+    {
+        var user = users.SingleOrDefault(u => u.Id == id);
+        return user != null && users.Remove(user);
+    }
+}
+#endregion
+
+// =============================================================================
+// Tests: Demonstrating KnockOff's fake repository in action
+// =============================================================================
+
+public class FakeRepositoryTests
+{
+    [Fact]
+    public void AddAndQuery()
+    {
+        #region readme-fake-add-and-query
+        var stub = new ReadmeUserRepositoryStub(new List<User>());
+        IUserRepository repo = stub;
+
+        // Add users through the interface
+        repo.Add(new User { Id = 1, Name = "Alice" });
+        repo.Add(new User { Id = 2, Name = "Bob" });
+
+        // Query them back — the stub owns its state
+        var alice = repo.GetById(1);
+        Assert.NotNull(alice);
+        Assert.Equal("Alice", alice.Name);
+
+        var all = repo.GetAll();
+        Assert.Equal(2, all.Count);
         #endregion
     }
 
     [Fact]
-    public void FetchTest_NSubstitute()
+    public void VerifyCalls()
     {
-        var myRepoNSub = NSubstituteMock([new User { Id = 1 }, new User { Id = 2 }]);
-        var userDomainModel = new UserDomainModel(myRepoNSub);
+        #region readme-fake-verify
+        var stub = new ReadmeUserRepositoryStub(new List<User>
+        {
+            new() { Id = 1, Name = "Alice" }
+        });
+        IUserRepository repo = stub;
 
-        Assert.True(userDomainModel.Fetch(1));
+        // Delete through the interface
+        var deleted = repo.Delete(1);
+        Assert.True(deleted);
 
-        myRepoNSub.Received(1).GetUser(1);
-    }
-
-    [Fact]
-    public void UpdateTest_KnockOff()
-    {
-        var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
-
-        userDomainModel.Fetch(1);
-        userDomainModel.Update();
-
-        // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Called.Exactly(2));
-        myRepoKO.Update.Verify(Called.Once);
-    }
-
-
-    [Fact]
-    public void UpdateTest_KnockOff_Return()
-    {
-        #region readme-knockoff-oncall-test
-        var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
-        var myRepoKO = new MyRepoStub([user1]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
-
-        var user2 = new User { Id = 2 };
-
-        // When and Return overrides the stub methods
-        myRepoKO.GetUser.When(2).Return(user2).Verifiable();
-        myRepoKO.Update.Call(u => Assert.Same(u, user2)).Verifiable();
-
-        userDomainModel.Fetch(2);
-        userDomainModel.Update();
-
-        myRepoKO.Verify();
+        // Verify the call was made — it's still a full mock
+        stub.Delete.Verify(Called.Once);
         #endregion
     }
 
     [Fact]
-    public void UpdateTest_KnockOff_Return_Verify()
+    public void PerTestOverride()
     {
-        var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
-        var myRepoKO = new MyRepoStub([user1]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
+        #region readme-fake-per-test-override
+        var stub = new ReadmeUserRepositoryStub(new List<User>());
+        IUserRepository repo = stub;
 
-        var user2 = new User { Id = 2 };
+        // Override GetById for this test only — Return takes priority over stub override
+        var specialUser = new User { Id = 99, Name = "Override" };
+        stub.GetById.Return(specialUser);
 
-        // When and Return overrides the stub methods
-        myRepoKO.GetUser.When(2).Return(user2).Verifiable();
-
-        userDomainModel.Fetch(1);
-        userDomainModel.Update();
-
-        Assert.Throws<VerificationException>(() => myRepoKO.Verify());
+        var result = repo.GetById(99);
+        Assert.Same(specialUser, result);
+        #endregion
     }
 }
