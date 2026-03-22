@@ -1508,7 +1508,8 @@ internal static class InlineRenderer
         else if (propertyInfoByName.TryGetValue(interceptorName, out var prop))
         {
             var expr = PreCompiledInterceptorRenderer.GetPropertySourceFallbackExpression(
-                interceptorName, prop.PropertyName, "source", prop.HasGetter, prop.HasSetter);
+                interceptorName, prop.PropertyName, "source", prop.HasGetter, prop.HasSetter, prop.ReturnType,
+                mapping.SourceInterfaceType);
             w.Line($"\t\t\t\t{expr}");
         }
         else if (indexerInfoByName.TryGetValue(interceptorName, out var indexer))

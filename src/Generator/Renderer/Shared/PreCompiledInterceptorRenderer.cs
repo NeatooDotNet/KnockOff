@@ -543,18 +543,42 @@ internal static class PreCompiledInterceptorRenderer
 		string propertyName,
 		string sourceParamName,
 		bool hasGetter,
-		bool hasSetter)
+		bool hasSetter,
+		string propertyType = "",
+		string declaringInterface = "")
 	{
+		// When propertyType is provided, use explicit casts to avoid CS1503 with target-typed conditionals.
+		// Without casts, `source != null ? () => source.Prop : null` fails because the compiler
+		// cannot infer the delegate type for the lambda in a conditional expression.
+		//
+		// When declaringInterface is provided, cast source to the declaring interface to avoid CS0229
+		// ambiguity when a property name exists in multiple sibling interfaces (diamond inheritance).
+		var sourceAccess = !string.IsNullOrEmpty(declaringInterface)
+			? $"(({declaringInterface}){sourceParamName})"
+			: sourceParamName;
+
 		if (hasGetter && hasSetter)
 		{
-			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? () => {sourceParamName}.{propertyName} : null, {sourceParamName} != null ? (value) => {sourceParamName}.{propertyName} = value : null);";
+			if (!string.IsNullOrEmpty(propertyType))
+			{
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? (global::System.Func<{propertyType}>)(() => {sourceAccess}.{propertyName}) : null, {sourceParamName} != null ? (global::System.Action<{propertyType}>)((value) => {sourceAccess}.{propertyName} = value) : null);";
+			}
+			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? () => {sourceAccess}.{propertyName} : null, {sourceParamName} != null ? (value) => {sourceAccess}.{propertyName} = value : null);";
 		}
 		if (hasGetter)
 		{
-			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? () => {sourceParamName}.{propertyName} : null);";
+			if (!string.IsNullOrEmpty(propertyType))
+			{
+				return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? (global::System.Func<{propertyType}>)(() => {sourceAccess}.{propertyName}) : null);";
+			}
+			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? () => {sourceAccess}.{propertyName} : null);";
 		}
 		// Set-only
-		return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? (value) => {sourceParamName}.{propertyName} = value : null);";
+		if (!string.IsNullOrEmpty(propertyType))
+		{
+			return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? (global::System.Action<{propertyType}>)((value) => {sourceAccess}.{propertyName} = value) : null);";
+		}
+		return $"{interceptorName}.SetSourceFallback({sourceParamName} != null ? (value) => {sourceAccess}.{propertyName} = value : null);";
 	}
 
 	/// <summary>

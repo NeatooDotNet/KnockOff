@@ -1771,12 +1771,16 @@ internal static class FlatRenderer
 									var propInfo = GetPropertyInfoForInterceptor(unit, mapping.InterceptorName);
 									if (propInfo != null)
 									{
+										// Use interface disambiguation for properties to avoid CS0229
+										// when properties with the same name exist on multiple sibling interfaces
 										w.Line(PreCompiledInterceptorRenderer.GetPropertySourceFallbackExpression(
 											mapping.InterceptorName,
 											propInfo.Value.PropertyName,
 											"source",
 											propInfo.Value.HasGetter,
-											propInfo.Value.HasSetter));
+											propInfo.Value.HasSetter,
+											propInfo.Value.ReturnType,
+											mapping.SourceInterfaceType));
 									}
 									break;
 								case SourceMemberKind.Indexer:
@@ -1883,13 +1887,15 @@ internal static class FlatRenderer
 		return matchingMethods.Count > 1;
 	}
 
-	private static (string PropertyName, bool HasGetter, bool HasSetter)?
+	private static (string PropertyName, bool HasGetter, bool HasSetter, string ReturnType, string DeclaringInterface)?
 		GetPropertyInfoForInterceptor(FlatGenerationUnit unit, string interceptorName)
 	{
 		var prop = unit.Properties.FirstOrDefault(p => p.InterceptorName == interceptorName);
 		if (prop == null) return null;
-		return (prop.MemberName, prop.HasGetter, prop.HasSetter);
+		return (prop.MemberName, prop.HasGetter, prop.HasSetter, prop.ReturnType, prop.DeclaringInterface);
 	}
+
+
 
 	private static (string KeyParamName, bool HasGetter, bool HasSetter)?
 		GetIndexerInfoForInterceptor(FlatGenerationUnit unit, string interceptorName)
