@@ -10,9 +10,11 @@
 //
 // Patterns tested:
 // - Pattern 1 (Standalone Interface) for interfaces
-// - Pattern 5 (Inline Interface) for interfaces
+// - Pattern 2 (Generic Standalone) for ISourceUpdater
 // - Pattern 3 (Standalone Class) for classes
+// - Pattern 5 (Inline Interface) for interfaces
 // - Pattern 6 (Inline Class) for classes
+// - Pattern 8 (Open Generic Interface) for ISourceUpdater
 // ============================================================================
 
 using KnockOff;
@@ -47,6 +49,14 @@ namespace KnockOff.Analysis.Tests.GenericTestTypes
 	// Pattern 1: Standalone stub for ISourceUpdater<string, Guid>
 	[KnockOff]
 	public partial class SourceUpdaterStandaloneKnockOff : ISourceUpdater<string, Guid>
+	{
+	}
+
+	// Pattern 2: Generic standalone stub for ISourceUpdater<TObject, TKey>
+	[KnockOff]
+	public partial class SourceUpdaterGenericStub<TObject, TKey> : ISourceUpdater<TObject, TKey>
+		where TObject : notnull
+		where TKey : notnull
 	{
 	}
 
@@ -103,6 +113,12 @@ namespace KnockOff.Analysis.Tests
 	[KnockOff<IGenericContainer>]
 	[KnockOff<GenericContainer>]
 	public partial class GenericInlineTests
+	{
+	}
+
+	// Pattern 8: Open Generic Interface for ISourceUpdater<,>
+	[KnockOff(typeof(ISourceUpdater<,>))]
+	public partial class GenericOpenInlineTests
 	{
 	}
 
@@ -234,6 +250,167 @@ namespace KnockOff.Analysis.Tests
 			Assert.NotNull(capturedGuids);
 			Assert.Single(capturedGuids!);
 			Assert.Equal(testGuid, capturedGuids[0]);
+		}
+
+		#endregion
+
+		// ====================================================================
+		// Pattern 2: Generic Standalone — ISourceUpdater<TObject, TKey>
+		// ====================================================================
+
+		#region Generic Standalone: ISourceUpdater<string, Guid>
+
+		[Fact]
+		public void SourceUpdater_GenericStandalone_CompilesAndImplementsInterface()
+		{
+			var knockOff = new SourceUpdaterGenericStub<string, Guid>();
+			ISourceUpdater<string, Guid> service = knockOff;
+
+			Assert.NotNull(knockOff);
+		}
+
+		[Fact]
+		public void SourceUpdater_GenericStandalone_AddOrUpdate_CanCall()
+		{
+			var knockOff = new SourceUpdaterGenericStub<string, Guid>();
+			ISourceUpdater<string, Guid> service = knockOff;
+
+			string? captured = null;
+			knockOff.AddOrUpdate.Call((item) => captured = item);
+
+			service.AddOrUpdate("test-item");
+
+			Assert.Equal("test-item", captured);
+		}
+
+		[Fact]
+		public void SourceUpdater_GenericStandalone_BothRefreshOverloads_WorkIndependently()
+		{
+			var knockOff = new SourceUpdaterGenericStub<string, Guid>();
+			ISourceUpdater<string, Guid> service = knockOff;
+
+			List<string>? capturedStrings = null;
+			List<Guid>? capturedGuids = null;
+
+			knockOff.Refresh.Call((IEnumerable<string> items) =>
+			{
+				capturedStrings = items.ToList();
+			});
+			knockOff.Refresh.Call((IEnumerable<Guid> keys) =>
+			{
+				capturedGuids = keys.ToList();
+			});
+
+			var testGuid = Guid.NewGuid();
+			service.Refresh(new[] { "a", "b" });
+			service.Refresh(new[] { testGuid });
+
+			Assert.NotNull(capturedStrings);
+			Assert.Equal(2, capturedStrings!.Count);
+			Assert.Equal("a", capturedStrings[0]);
+
+			Assert.NotNull(capturedGuids);
+			Assert.Single(capturedGuids!);
+			Assert.Equal(testGuid, capturedGuids[0]);
+		}
+
+		[Fact]
+		public void SourceUpdater_GenericStandalone_Refresh_VerifyPerOverload()
+		{
+			var knockOff = new SourceUpdaterGenericStub<string, Guid>();
+			ISourceUpdater<string, Guid> service = knockOff;
+
+			var stringTracking = knockOff.Refresh.Call((IEnumerable<string> items) => { });
+			var guidTracking = knockOff.Refresh.Call((IEnumerable<Guid> keys) => { });
+
+			service.Refresh(new[] { "a" });
+			service.Refresh(new[] { Guid.NewGuid() });
+			service.Refresh(new[] { Guid.NewGuid() });
+
+			stringTracking.Verify(Called.Once);
+			guidTracking.Verify(Called.Exactly(2));
+
+			// Total across all overloads
+			knockOff.Refresh.Verify(Called.Exactly(3));
+		}
+
+		#endregion
+
+		// ====================================================================
+		// Pattern 8: Open Generic Interface — ISourceUpdater<,>
+		// ====================================================================
+
+		#region Open Generic Interface: ISourceUpdater<string, Guid>
+
+		[Fact]
+		public void SourceUpdater_OpenGeneric_CompilesAndImplementsInterface()
+		{
+			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
+			ISourceUpdater<string, Guid> service = stub;
+
+			Assert.NotNull(stub);
+		}
+
+		[Fact]
+		public void SourceUpdater_OpenGeneric_AddOrUpdate_CanCall()
+		{
+			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
+			ISourceUpdater<string, Guid> service = stub;
+
+			string? captured = null;
+			stub.AddOrUpdate.Call((item) => captured = item);
+
+			service.AddOrUpdate("test-item");
+
+			Assert.Equal("test-item", captured);
+		}
+
+		[Fact]
+		public void SourceUpdater_OpenGeneric_BothRefreshOverloads_WorkIndependently()
+		{
+			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
+			ISourceUpdater<string, Guid> service = stub;
+
+			List<string>? capturedStrings = null;
+			List<Guid>? capturedGuids = null;
+
+			stub.Refresh.Call((IEnumerable<string> items) =>
+			{
+				capturedStrings = items.ToList();
+			});
+			stub.Refresh.Call((IEnumerable<Guid> keys) =>
+			{
+				capturedGuids = keys.ToList();
+			});
+
+			var testGuid = Guid.NewGuid();
+			service.Refresh(new[] { "x", "y" });
+			service.Refresh(new[] { testGuid });
+
+			Assert.NotNull(capturedStrings);
+			Assert.Equal(2, capturedStrings!.Count);
+			Assert.NotNull(capturedGuids);
+			Assert.Single(capturedGuids!);
+			Assert.Equal(testGuid, capturedGuids[0]);
+		}
+
+		[Fact]
+		public void SourceUpdater_OpenGeneric_Refresh_VerifyPerOverload()
+		{
+			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
+			ISourceUpdater<string, Guid> service = stub;
+
+			var stringTracking = stub.Refresh.Call((IEnumerable<string> items) => { });
+			var guidTracking = stub.Refresh.Call((IEnumerable<Guid> keys) => { });
+
+			service.Refresh(new[] { "a" });
+			service.Refresh(new[] { Guid.NewGuid() });
+			service.Refresh(new[] { Guid.NewGuid() });
+
+			stringTracking.Verify(Called.Once);
+			guidTracking.Verify(Called.Exactly(2));
+
+			stub.Refresh.Verify(Called.Exactly(3));
 		}
 
 		#endregion

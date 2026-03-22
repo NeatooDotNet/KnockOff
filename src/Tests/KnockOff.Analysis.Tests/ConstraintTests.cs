@@ -12,7 +12,9 @@
 //
 // Patterns tested:
 // - Pattern 3 (Standalone Class): [KnockOffBase<BaseForConstraintCase<string>>]
+// - Pattern 4 (Generic Standalone Class): [KnockOffBase(typeof(BaseForConstraintCase<>))]
 // - Pattern 6 (Inline Class): [KnockOff<BaseForConstraintCase<string>>]
+// - Pattern 9 (Open Generic Class): [KnockOff(typeof(BaseForConstraintCase<>))]
 // ============================================================================
 
 using KnockOff;
@@ -36,6 +38,12 @@ namespace KnockOff.Analysis.Tests.ConstraintTestTypes
 	public partial class ConstraintCaseStandaloneKnockOff
 	{
 	}
+
+	// Pattern 4: Generic standalone class stub
+	[KnockOffBase(typeof(BaseForConstraintCase<>))]
+	public partial class ConstraintCaseOpenStandaloneKnockOff<T> where T : class
+	{
+	}
 }
 
 // ============================================================================
@@ -49,6 +57,12 @@ namespace KnockOff.Analysis.Tests
 	// Pattern 6: Inline class stub
 	[KnockOff<BaseForConstraintCase<string>>]
 	public partial class ConstraintInlineTests
+	{
+	}
+
+	// Pattern 9: Open Generic Class stub
+	[KnockOff(typeof(BaseForConstraintCase<>))]
+	public partial class ConstraintOpenInlineTests
 	{
 	}
 
@@ -115,6 +129,64 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		// ====================================================================
+		// Pattern 4: Generic Standalone Class — BaseForConstraintCase<T>
+		// ====================================================================
+
+		#region Generic Standalone Class: Constraint propagation
+
+		[Fact]
+		public void Constraint_GenericStandaloneClass_CompilesAndHasObject()
+		{
+			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			Assert.NotNull(obj);
+		}
+
+		[Fact]
+		public void Constraint_GenericStandaloneClass_As_CanCallWithConstrainedType()
+		{
+			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			// As<TTarget>() where TTarget : class — call with a reference type
+			var result = obj.As<string>();
+
+			// Unconfigured abstract method should return default (null)
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public void Constraint_GenericStandaloneClass_As_ConfigureReturnValue()
+		{
+			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			BaseForConstraintCase<string>? returnValue = null;
+			stub.As.Of<string>().Call(() => returnValue!);
+
+			var result = obj.As<string>();
+
+			Assert.Same(returnValue, result);
+		}
+
+		[Fact]
+		public void Constraint_GenericStandaloneClass_As_VerifyTracking()
+		{
+			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			obj.As<string>();
+			obj.As<object>();
+
+			stub.As.Of<string>().Verify(Called.Once);
+			stub.As.Of<object>().Verify(Called.Once);
+			stub.As.Verify(Called.Exactly(2));
+		}
+
+		#endregion
+
+		// ====================================================================
 		// Pattern 6: Inline class — BaseForConstraintCase<string>
 		// ====================================================================
 
@@ -158,6 +230,64 @@ namespace KnockOff.Analysis.Tests
 		public void Constraint_Inline_As_VerifyTracking()
 		{
 			var stub = new ConstraintInlineTests.Stubs.BaseForConstraintCase();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			obj.As<string>();
+			obj.As<object>();
+
+			stub.As.Of<string>().Verify(Called.Once);
+			stub.As.Of<object>().Verify(Called.Once);
+			stub.As.Verify(Called.Exactly(2));
+		}
+
+		#endregion
+
+		// ====================================================================
+		// Pattern 9: Open Generic Class — BaseForConstraintCase<>
+		// ====================================================================
+
+		#region Open Generic Class: Constraint propagation
+
+		[Fact]
+		public void Constraint_OpenGenericClass_CompilesAndHasObject()
+		{
+			var stub = new ConstraintOpenInlineTests.Stubs.BaseForConstraintCase<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			Assert.NotNull(obj);
+		}
+
+		[Fact]
+		public void Constraint_OpenGenericClass_As_CanCallWithConstrainedType()
+		{
+			var stub = new ConstraintOpenInlineTests.Stubs.BaseForConstraintCase<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			// As<TTarget>() where TTarget : class — call with a reference type
+			var result = obj.As<string>();
+
+			// Unconfigured abstract method should return default (null)
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public void Constraint_OpenGenericClass_As_ConfigureReturnValue()
+		{
+			var stub = new ConstraintOpenInlineTests.Stubs.BaseForConstraintCase<string>();
+			BaseForConstraintCase<string> obj = stub.Object;
+
+			BaseForConstraintCase<string>? returnValue = null;
+			stub.As.Of<string>().Call(() => returnValue!);
+
+			var result = obj.As<string>();
+
+			Assert.Same(returnValue, result);
+		}
+
+		[Fact]
+		public void Constraint_OpenGenericClass_As_VerifyTracking()
+		{
+			var stub = new ConstraintOpenInlineTests.Stubs.BaseForConstraintCase<string>();
 			BaseForConstraintCase<string> obj = stub.Object;
 
 			obj.As<string>();
