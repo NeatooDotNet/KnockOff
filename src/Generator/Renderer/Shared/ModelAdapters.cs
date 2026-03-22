@@ -36,7 +36,8 @@ internal static class ModelAdapters
 			DefaultExpression: m.DefaultExpression,
 			ThrowsOnDefault: m.ThrowsOnDefault,
 			ReturnsByRef: m.ReturnsByRef,
-			ReturnsByRefReadonly: m.ReturnsByRefReadonly)).ToList();
+			ReturnsByRefReadonly: m.ReturnsByRefReadonly,
+			HasRefStructParameter: m.Parameters.Any(p => p.IsRefStruct))).ToList();
 
 		// Get unique signatures
 		var uniqueSignatures = GetUniqueSignatures(signatures);
@@ -63,6 +64,7 @@ internal static class ModelAdapters
 	{
 		// Recompute delegate types using UnifiedInterceptorBuilder for consistency.
 		var hasRefOrOut = first.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+		var hasRefStruct = first.Parameters.Any(p => p.IsRefStruct);
 		var sig = new MethodSignatureInfo(
 			Parameters: first.Parameters,
 			TrackableParameters: first.TrackableParameters,
@@ -74,7 +76,8 @@ internal static class ModelAdapters
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			ReturnsByRef: first.ReturnsByRef,
 			ReturnsByRefReadonly: first.ReturnsByRefReadonly,
-			XmlDocSummary: first.XmlDocSummary);
+			XmlDocSummary: first.XmlDocSummary,
+			HasRefStructParameter: hasRefStruct);
 
 		var callDelegateType = UnifiedInterceptorBuilder.BuildCallDelegateType(first.MethodName, sig, className, typeParameters);
 		var customDelegateSignature = UnifiedInterceptorBuilder.BuildCustomDelegateSignature(first.MethodName, sig, className, typeParameters);
@@ -87,13 +90,19 @@ internal static class ModelAdapters
 		var builderFriendlyName = $"{first.MethodName}Impl";
 		var sequenceFriendlyName = $"{first.MethodName}Sequence";
 
+		// When any parameter is a ref struct, disable args tracking entirely
+		var effectiveTrackableParams = hasRefStruct
+			? EquatableArray<ParameterModel>.Empty
+			: first.TrackableParameters;
+		var effectiveLastCallType = hasRefStruct ? null : first.LastCallType;
+
 		// Predicate delegate: only for 2+ trackable params
 		string? predicateFriendlyName = null;
 		string? predicateDelegateSignature = null;
-		if (first.TrackableParameters.Count >= 2)
+		if (effectiveTrackableParams.Count >= 2)
 		{
 			predicateFriendlyName = $"{first.MethodName}Predicate";
-			var predicateParamList = BuildDelegateParamList(first.TrackableParameters);
+			var predicateParamList = BuildDelegateParamList(effectiveTrackableParams);
 			predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
 		}
 
@@ -104,16 +113,16 @@ internal static class ModelAdapters
 			OwnerClassName: className,
 			OwnerTypeParameters: typeParameters,
 			Parameters: first.Parameters,
-			TrackableParameters: first.TrackableParameters,
+			TrackableParameters: effectiveTrackableParams,
 			ParameterDeclarations: first.ParameterDeclarations,
 			ReturnType: first.ReturnType,
 			IsVoid: first.IsVoid,
 			CallDelegateType: callDelegateType,
 			NeedsCustomDelegate: true,
 			CustomDelegateSignature: customDelegateSignature,
-			LastArgType: GetLastArgType(first.TrackableParameters),
-			LastArgsType: GetLastArgsType(first.TrackableParameters, first.LastCallType),
-			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder, first.IsVoid),
+			LastArgType: GetLastArgType(effectiveTrackableParams),
+			LastArgsType: GetLastArgsType(effectiveTrackableParams, effectiveLastCallType),
+			BuilderInterface: GetBuilderInterface(effectiveTrackableParams, effectiveLastCallType, delegateTypeForBuilder, first.IsVoid),
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			// Stub override name: if HasStubOverride, the stub override name is MethodName + "_"
@@ -126,7 +135,8 @@ internal static class ModelAdapters
 			PredicateFriendlyName: predicateFriendlyName,
 			PredicateDelegateSignature: predicateDelegateSignature,
 			BuilderFriendlyName: builderFriendlyName,
-			SequenceFriendlyName: sequenceFriendlyName);
+			SequenceFriendlyName: sequenceFriendlyName,
+			HasRefStructParameter: hasRefStruct);
 	}
 
 	private static UnifiedMethodInterceptorModel BuildMultiOverloadModel(

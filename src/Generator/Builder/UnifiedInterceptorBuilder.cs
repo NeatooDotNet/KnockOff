@@ -56,13 +56,19 @@ internal static class UnifiedInterceptorBuilder
 			var builderFriendlyName = $"{methodName}Impl";
 			var sequenceFriendlyName = $"{methodName}Sequence";
 
+			// When any parameter is a ref struct, disable args tracking entirely
+			// (ref structs can't be boxed, stored in tuples, or used as generic type args)
+			var effectiveTrackableParams = sig.HasRefStructParameter
+				? EquatableArray<ParameterModel>.Empty
+				: sig.TrackableParameters;
+
 			// Predicate delegate: only for 2+ trackable params
 			string? predicateFriendlyName = null;
 			string? predicateDelegateSignature = null;
-			if (sig.TrackableParameters.Count >= 2)
+			if (effectiveTrackableParams.Count >= 2)
 			{
 				predicateFriendlyName = $"{methodName}Predicate";
-				var predicateParamList = BuildDelegateParamList(sig.TrackableParameters);
+				var predicateParamList = BuildDelegateParamList(effectiveTrackableParams);
 				predicateDelegateSignature = $"public delegate bool {predicateFriendlyName}({predicateParamList});";
 			}
 
@@ -73,16 +79,16 @@ internal static class UnifiedInterceptorBuilder
 				OwnerClassName: ownerClassName,
 				OwnerTypeParameters: ownerTypeParameters,
 				Parameters: sig.Parameters,
-				TrackableParameters: sig.TrackableParameters,
+				TrackableParameters: effectiveTrackableParams,
 				ParameterDeclarations: sig.ParameterDeclarations,
 				ReturnType: sig.ReturnType,
 				IsVoid: sig.IsVoid,
 				CallDelegateType: callDelegateType,
 				NeedsCustomDelegate: true,
 				CustomDelegateSignature: customDelegateSignature,
-				LastArgType: GetLastArgType(sig.TrackableParameters),
-				LastArgsType: GetLastArgsType(sig.TrackableParameters),
-				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder, sig.IsVoid),
+				LastArgType: GetLastArgType(effectiveTrackableParams),
+				LastArgsType: GetLastArgsType(effectiveTrackableParams),
+				BuilderInterface: GetBuilderInterface(effectiveTrackableParams, delegateTypeForBuilder, sig.IsVoid),
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
 				StubOverrideName: stubOverrideName,
@@ -94,7 +100,8 @@ internal static class UnifiedInterceptorBuilder
 				PredicateFriendlyName: predicateFriendlyName,
 				PredicateDelegateSignature: predicateDelegateSignature,
 				BuilderFriendlyName: builderFriendlyName,
-				SequenceFriendlyName: sequenceFriendlyName);
+				SequenceFriendlyName: sequenceFriendlyName,
+				HasRefStructParameter: sig.HasRefStructParameter);
 		}
 		else
 		{
@@ -645,4 +652,6 @@ internal sealed record MethodSignatureInfo(
 	/// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
 	bool ReturnsByRefReadonly = false,
 	/// <summary>XML documentation summary text for this method, extracted from the original interface/class. Null if none.</summary>
-	string? XmlDocSummary = null);
+	string? XmlDocSummary = null,
+	/// <summary>True if any parameter is a ref struct type (e.g., ReadOnlySpan&lt;T&gt;, Span&lt;T&gt;). Disables args tracking.</summary>
+	bool HasRefStructParameter = false);

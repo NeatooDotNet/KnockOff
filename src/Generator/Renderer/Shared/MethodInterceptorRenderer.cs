@@ -151,24 +151,38 @@ internal static class MethodInterceptorRenderer
 		// Both InvokeDelegate and InvokeVoidDelegate are abstract and MUST be overridden by all subclasses.
 		var isEffectivelyVoid = model.IsVoid && !isVoidAsync;
 
-		// InvokeVoidDelegate: typed cast + void invocation
-		RenderBaseClassInvokeVoidDelegate(w, delegateType, tArgs, model.Parameters);
-
-		// InvokeDelegate: typed cast + return boxed result
-		if (isEffectivelyVoid)
+		if (model.HasRefStructParameter)
 		{
-			// Sync void: InvokeDelegate forwards to InvokeVoidDelegate and returns null
-			w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args) { InvokeVoidDelegate(del, args); return null; }");
+			// Ref struct params: args can't be boxed/unboxed. Override with throw (never called from ref struct Invoke path).
+			w.Line("protected override void InvokeVoidDelegate(global::System.Delegate del, object? args) => throw new global::System.NotSupportedException(\"Ref struct parameters cannot be boxed.\");");
+			w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args) => throw new global::System.NotSupportedException(\"Ref struct parameters cannot be boxed.\");");
+			if (!model.IsVoid)
+			{
+				var discards = BuildDiscardLambdaPrefix(model.Parameters.Count);
+				w.Line($"protected override global::System.Delegate CreateValueDelegate(object? value) => ({delegateType})({discards} => ({model.ReturnType})value!);");
+			}
 		}
 		else
 		{
-			RenderBaseClassInvokeDelegate(w, delegateType, tArgs, model.ReturnType, model.Parameters);
-		}
+			// InvokeVoidDelegate: typed cast + void invocation
+			RenderBaseClassInvokeVoidDelegate(w, delegateType, tArgs, model.Parameters);
 
-		// CreateValueDelegate (non-void only, including async)
-		if (!model.IsVoid)
-		{
-			RenderBaseClassCreateValueDelegate(w, delegateType, model.ReturnType, model.Parameters);
+			// InvokeDelegate: typed cast + return boxed result
+			if (isEffectivelyVoid)
+			{
+				// Sync void: InvokeDelegate forwards to InvokeVoidDelegate and returns null
+				w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args) { InvokeVoidDelegate(del, args); return null; }");
+			}
+			else
+			{
+				RenderBaseClassInvokeDelegate(w, delegateType, tArgs, model.ReturnType, model.Parameters);
+			}
+
+			// CreateValueDelegate (non-void only, including async)
+			if (!model.IsVoid)
+			{
+				RenderBaseClassCreateValueDelegate(w, delegateType, model.ReturnType, model.Parameters);
+			}
 		}
 
 		// RecordArgs
@@ -184,9 +198,9 @@ internal static class MethodInterceptorRenderer
 		// Call/Return entry points (API rename: callback entry is always "Call", value is "Return")
 		RenderBaseClassEntryPoints(w, model, delegateType, fullInterceptorClassName, hasRefOrOut, isAsyncWithInnerType, isVoidAsync, isAsyncTaskT, isAsyncValueTaskT, isVoidTask, innerType);
 
-		// When entry points (no ref/out)
-		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
-		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+		// When entry points (no ref/out, no ref struct)
+		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut && !model.HasRefStructParameter;
+		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut && !model.HasRefStructParameter;
 		if (canHaveWhenChain)
 		{
 			RenderBaseClassWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, tArgs, methodName: model.MethodName, xmlDocSummary: model.XmlDocSummary, predicateFriendlyName: model.PredicateFriendlyName);
@@ -754,6 +768,7 @@ internal static class MethodInterceptorRenderer
 		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
 		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = model.IsVoid ? "void" : model.ReturnType;
+		var delegateType = model.CallDelegateType.TrimEnd('?');
 		var hasRefOrOut = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
 
 		// Check async info
@@ -777,12 +792,86 @@ internal static class MethodInterceptorRenderer
 				w.Line($"{p.EscapedName} = default!;");
 			}
 
-			if (hasRefOrOut)
+			if (model.HasRefStructParameter)
+			{
+				// Ref struct parameters cannot be boxed, stored in tuples, or used as generic type args.
+				// Generate a simplified invoke path: sequence > callback > unconfigured.
+				// No args tracking (LastArgs/RecordArgs/RecordUnconfiguredArgs).
+				var callbackArgs = BuildCallbackArgs(model.Parameters);
+
+				// Sequence
+				w.Line("if (_sequence != null && _sequenceIndex < _sequence.Count)");
+				using (w.Braces())
+				{
+					w.Line("var (__callback, __tracking) = _sequence[_sequenceIndex];");
+					w.Line("__tracking.RecordCallBase();");
+					w.Line("_sequenceIndex++;");
+					if (model.IsVoid)
+					{
+						w.Line($"(({delegateType})__callback)({callbackArgs});");
+						w.Line("return;");
+					}
+					else
+					{
+						w.Line($"return (({delegateType})__callback)({callbackArgs});");
+					}
+				}
+				w.Line();
+
+				// Callback
+				w.Line("if (_call != null && _callTracking != null)");
+				using (w.Braces())
+				{
+					w.Line("_callTracking.RecordCallBase();");
+					if (model.IsVoid)
+					{
+						w.Line($"(({delegateType})_call)({callbackArgs});");
+						w.Line("return;");
+					}
+					else
+					{
+						w.Line($"return (({delegateType})_call)({callbackArgs});");
+					}
+				}
+				w.Line();
+
+				// Unconfigured tail
+				w.Line("_unconfiguredCallCount++;");
+
+				// Sequence exhausted repeat
+				w.Line("if (_sequence != null && _sequenceIndex >= _sequence.Count)");
+				using (w.Braces())
+				{
+					w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.MethodName}\");");
+					w.Line("if (_repeatLastValue && _sequence.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line("var (__callback, __tracking) = _sequence[_sequence.Count - 1];");
+						w.Line("__tracking.RecordCallBase();");
+						if (model.IsVoid)
+						{
+							w.Line($"(({delegateType})__callback)({callbackArgs});");
+							w.Line("return;");
+						}
+						else
+						{
+							w.Line($"return (({delegateType})__callback)({callbackArgs});");
+						}
+					}
+					if (model.IsVoid)
+					{
+						w.Line("return;");
+					}
+				}
+
+				// Final fallback
+				RenderInvokeFinalFallback(w, model, options);
+			}
+			else if (hasRefOrOut)
 			{
 				// Ref/out methods: inline the priority chain to invoke delegates directly with
 				// the original ref/out parameters. Boxing into object? would lose ref modifications.
 				// Note: ref/out methods never have When chains or Return(value) overloads.
-				var delegateType = model.CallDelegateType.TrimEnd('?');
 				var callbackArgs = BuildCallbackArgs(model.Parameters);
 
 				// Build boxed args for tracking only (RecordArgs/RecordUnconfiguredArgs)

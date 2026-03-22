@@ -752,7 +752,8 @@ internal static class FlatModelBuilder
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
 			RefPrefix: GetRefKindPrefix(p.RefKind),
-			XmlDoc: p.XmlDoc)).ToEquatableArray();
+			XmlDoc: p.XmlDoc,
+			IsRefStruct: p.IsRefStruct)).ToEquatableArray();
 
 		// Trackable parameters (exclude out params)
 		var trackableParams = paramArray.Where(p => p.RefKind != RefKind.Out)
@@ -902,7 +903,8 @@ internal static class FlatModelBuilder
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
 			RefPrefix: GetRefKindPrefix(p.RefKind),
-			XmlDoc: p.XmlDoc)).ToEquatableArray();
+			XmlDoc: p.XmlDoc,
+			IsRefStruct: p.IsRefStruct)).ToEquatableArray();
 
 		// Trackable parameters for generic methods: exclude out params AND generic-typed params
 		var trackableParams = paramArray

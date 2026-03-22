@@ -317,7 +317,8 @@ internal static class StandaloneClassModelBuilder
                     NullableType: MakeNullable(p.Type),
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind),
-                    XmlDoc: p.XmlDoc)).ToEquatableArray(),
+                    XmlDoc: p.XmlDoc,
+                    IsRefStruct: p.IsRefStruct)).ToEquatableArray(),
                 ReturnsByRef: m.ReturnsByRef,
                 ReturnsByRefReadonly: m.ReturnsByRefReadonly))
             .ToEquatableArray();
@@ -397,11 +398,13 @@ internal static class StandaloneClassModelBuilder
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
-                XmlDoc: p.XmlDoc))
+                XmlDoc: p.XmlDoc,
+                IsRefStruct: p.IsRefStruct))
             .ToEquatableArray();
 
         var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
         var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+        var hasRefStruct = parameters.Any(p => p.IsRefStruct);
         var isVoid = member.ReturnType == "void";
         var defaultExpr = isVoid ? "" : "default!";
 
@@ -416,7 +419,8 @@ internal static class StandaloneClassModelBuilder
             ThrowsOnDefault: false,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            XmlDocSummary: member.XmlDocSummary);
+            XmlDocSummary: member.XmlDocSummary,
+            HasRefStructParameter: hasRefStruct);
     }
 
     #endregion
@@ -772,7 +776,8 @@ internal static class StandaloneClassModelBuilder
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
-                XmlDoc: p.XmlDoc)).ToEquatableArray();
+                XmlDoc: p.XmlDoc,
+                IsRefStruct: p.IsRefStruct)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{methodName}TypedHandler";

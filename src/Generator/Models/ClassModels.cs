@@ -128,7 +128,7 @@ internal sealed record ClassMemberInfo(
 
 			indexerParameters = new EquatableArray<ParameterInfo>(
 				property.Parameters
-					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind))
+					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind, IsRefStruct: p.Type.IsRefLikeType))
 					.ToArray());
 		}
 
@@ -228,7 +228,8 @@ internal sealed record ClassMemberInfo(
 				p.Name,
 				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
 				p.RefKind,
-				SymbolHelpers.GetXmlDocForParameter(method, p.Name)))
+				SymbolHelpers.GetXmlDocForParameter(method, p.Name),
+				IsRefStruct: p.Type.IsRefLikeType))
 			.ToArray();
 
 		var typeParameters = EquatableArray<TypeParameterInfo>.Empty;

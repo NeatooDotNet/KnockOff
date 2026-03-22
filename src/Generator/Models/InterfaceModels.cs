@@ -145,7 +145,7 @@ internal sealed record InterfaceMemberInfo(
 
 			indexerParameters = new EquatableArray<ParameterInfo>(
 				property.Parameters
-					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind))
+					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability), p.RefKind, IsRefStruct: p.Type.IsRefLikeType))
 					.ToArray());
 		}
 
@@ -263,7 +263,8 @@ internal sealed record InterfaceMemberInfo(
 				p.Name,
 				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
 				p.RefKind,
-				SymbolHelpers.GetXmlDocForParameter(method, p.Name)))
+				SymbolHelpers.GetXmlDocForParameter(method, p.Name),
+				IsRefStruct: p.Type.IsRefLikeType))
 			.ToArray();
 
 		// Extract type parameters for generic methods
@@ -310,7 +311,13 @@ internal sealed record ParameterInfo(
 	/// XML documentation text for this parameter, extracted from the original interface/class.
 	/// Null if no documentation was provided. Already XML-escaped.
 	/// </summary>
-	string? XmlDoc = null) : IEquatable<ParameterInfo>;
+	string? XmlDoc = null,
+	/// <summary>
+	/// True if the parameter type is a ref struct (e.g., ReadOnlySpan&lt;T&gt;, Span&lt;T&gt;).
+	/// Ref struct types cannot be boxed, used as generic type arguments, or stored in tuples.
+	/// Methods with ref struct parameters have degraded interceptor support (no args tracking).
+	/// </summary>
+	bool IsRefStruct = false) : IEquatable<ParameterInfo>;
 
 /// <summary>
 /// Represents a type parameter for generic methods (e.g., T in Method&lt;T&gt;).
