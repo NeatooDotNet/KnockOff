@@ -514,7 +514,8 @@ internal static class StandaloneClassModelBuilder
 
     private static InlineConstructorModel BuildConstructorModel(ClassConstructorInfo ctor, string typeParamList)
     {
-        var paramList = string.Join(", ", ctor.Parameters.Select(p => $"{p.Type} {p.Name}"));
+        var paramList = string.Join(", ", ctor.Parameters.Select(p =>
+            p.DefaultValueSyntax != null ? $"{p.Type} {p.Name} = {p.DefaultValueSyntax}" : $"{p.Type} {p.Name}"));
         var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
         return new InlineConstructorModel(
             ParameterDeclarations: paramList,

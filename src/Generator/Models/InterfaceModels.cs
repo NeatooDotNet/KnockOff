@@ -317,7 +317,13 @@ internal sealed record ParameterInfo(
 	/// Ref struct types cannot be boxed, used as generic type arguments, or stored in tuples.
 	/// Methods with ref struct parameters have degraded interceptor support (no args tracking).
 	/// </summary>
-	bool IsRefStruct = false) : IEquatable<ParameterInfo>;
+	bool IsRefStruct = false,
+	/// <summary>
+	/// The default value expression for optional parameters (e.g., "null", "\"b\"", "3.2", "default").
+	/// Null if the parameter has no default value.
+	/// Used to preserve optional parameter defaults in generated constructor declarations.
+	/// </summary>
+	string? DefaultValueSyntax = null) : IEquatable<ParameterInfo>;
 
 /// <summary>
 /// Represents a type parameter for generic methods (e.g., T in Method&lt;T&gt;).
