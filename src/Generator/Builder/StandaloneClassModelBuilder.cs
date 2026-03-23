@@ -518,8 +518,13 @@ internal static class StandaloneClassModelBuilder
     private static InlineConstructorModel BuildConstructorModel(ClassConstructorInfo ctor, string typeParamList)
     {
         var paramList = string.Join(", ", ctor.Parameters.Select(p =>
-            p.DefaultValueSyntax != null ? $"{p.Type} {p.Name} = {p.DefaultValueSyntax}" : $"{p.Type} {p.Name}"));
-        var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
+        {
+            var paramsPrefix = p.IsParams ? "params " : "";
+            var refPrefix = GetRefKindPrefix(p.RefKind);
+            var decl = $"{paramsPrefix}{refPrefix}{p.Type} {p.Name}";
+            return p.DefaultValueSyntax != null ? $"{decl} = {p.DefaultValueSyntax}" : decl;
+        }));
+        var argList = string.Join(", ", ctor.Parameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Name}"));
         return new InlineConstructorModel(
             ParameterDeclarations: paramList,
             BaseCallArguments: argList);

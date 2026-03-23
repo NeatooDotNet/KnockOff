@@ -521,7 +521,8 @@ public partial class KnockOffGenerator
 					param.Name,
 					param.Type.ToDisplayString(FullyQualifiedWithNullability),
 					param.RefKind,
-					DefaultValueSyntax: SymbolHelpers.GetDefaultValueSyntax(param)));
+					DefaultValueSyntax: SymbolHelpers.GetDefaultValueSyntax(param),
+					IsParams: param.IsParams));
 			}
 
 			var accessModifier = ctor.DeclaredAccessibility switch

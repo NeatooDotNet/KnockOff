@@ -323,7 +323,12 @@ internal sealed record ParameterInfo(
 	/// Null if the parameter has no default value.
 	/// Used to preserve optional parameter defaults in generated constructor declarations.
 	/// </summary>
-	string? DefaultValueSyntax = null) : IEquatable<ParameterInfo>;
+	string? DefaultValueSyntax = null,
+	/// <summary>
+	/// True if the parameter has the 'params' modifier.
+	/// Used to preserve params in generated constructor declarations.
+	/// </summary>
+	bool IsParams = false) : IEquatable<ParameterInfo>;
 
 /// <summary>
 /// Represents a type parameter for generic methods (e.g., T in Method&lt;T&gt;).
