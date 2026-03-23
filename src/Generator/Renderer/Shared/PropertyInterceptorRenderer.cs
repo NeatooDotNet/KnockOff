@@ -25,8 +25,8 @@ internal static class PropertyInterceptorRenderer
 		var typeParams = options.InterceptorTypeParameters;
 		var constraints = options.InterceptorConstraints;
 
-		// Determine emission mode: base class mode for regular properties, inline mode for init-only and ref return
-		var useBaseClass = !model.IsInitOnly && !model.IsRefReturn;
+		// Determine emission mode: base class mode for regular properties, inline mode for init-only, ref return, and ref struct
+		var useBaseClass = !model.IsInitOnly && !model.IsRefReturn && !model.IsRefStructType;
 
 		string classDecl;
 		if (useBaseClass)

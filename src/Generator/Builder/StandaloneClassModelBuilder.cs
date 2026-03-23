@@ -318,7 +318,8 @@ internal static class StandaloneClassModelBuilder
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind),
                     XmlDoc: p.XmlDoc,
-                    IsRefStruct: p.IsRefStruct)).ToEquatableArray(),
+                    IsRefStruct: p.IsRefStruct,
+                    IsScoped: p.IsScoped)).ToEquatableArray(),
                 ReturnsByRef: m.ReturnsByRef,
                 ReturnsByRefReadonly: m.ReturnsByRefReadonly,
                 OutParameterDefaults: string.Join(" ", m.Parameters
@@ -402,12 +403,13 @@ internal static class StandaloneClassModelBuilder
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
                 XmlDoc: p.XmlDoc,
-                IsRefStruct: p.IsRefStruct))
+                IsRefStruct: p.IsRefStruct,
+                IsScoped: p.IsScoped))
             .ToEquatableArray();
 
         var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
         var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
-        var hasRefStruct = parameters.Any(p => p.IsRefStruct);
+        var hasRefStruct = parameters.Any(p => p.IsRefStruct) || member.IsRefStructReturn;
         var isVoid = member.ReturnType == "void";
         var defaultExpr = isVoid ? "" : "default!";
 
@@ -810,7 +812,8 @@ internal static class StandaloneClassModelBuilder
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
                 XmlDoc: p.XmlDoc,
-                IsRefStruct: p.IsRefStruct)).ToEquatableArray();
+                IsRefStruct: p.IsRefStruct,
+                IsScoped: p.IsScoped)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{methodName}TypedHandler";
@@ -863,7 +866,7 @@ internal static class StandaloneClassModelBuilder
         parameters.Where(p => p.RefKind != RefKind.Out);
 
     private static string FormatParameter(ParameterInfo p) =>
-        $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
+        $"{(p.IsScoped ? "scoped " : "")}{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
 
     private static string FormatArgument(ParameterInfo p) =>
         $"{GetRefKindPrefix(p.RefKind)}{p.Name}";

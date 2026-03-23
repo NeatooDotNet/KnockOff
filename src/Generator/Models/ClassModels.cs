@@ -97,7 +97,12 @@ internal sealed record ClassMemberInfo(
 	/// </summary>
 	bool DoesNotReturn = false,
 	/// <summary>XML documentation summary text for the method, extracted from the original class. Null if none.</summary>
-	string? XmlDocSummary = null) : IEquatable<ClassMemberInfo>
+	string? XmlDocSummary = null,
+	/// <summary>
+	/// True if the return type (or property value type) is a ref struct (e.g., Span&lt;T&gt;).
+	/// Ref struct return types cannot be boxed, stored in object?, or used as generic type arguments.
+	/// </summary>
+	bool IsRefStructReturn = false) : IEquatable<ClassMemberInfo>
 {
 	/// <summary>
 	/// Creates ClassMemberInfo for a property (including indexers).
@@ -181,7 +186,8 @@ internal sealed record ClassMemberInfo(
 			IsRequired: isRequired,
 			ReturnsByRef: property.ReturnsByRef,
 			ReturnsByRefReadonly: property.ReturnsByRefReadonly,
-			SetterHasAllowNull: setterHasAllowNull);
+			SetterHasAllowNull: setterHasAllowNull,
+			IsRefStructReturn: property.Type.IsRefLikeType);
 	}
 
 	/// <summary>
@@ -229,7 +235,8 @@ internal sealed record ClassMemberInfo(
 				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
 				p.RefKind,
 				SymbolHelpers.GetXmlDocForParameter(method, p.Name),
-				IsRefStruct: p.Type.IsRefLikeType))
+				IsRefStruct: p.Type.IsRefLikeType,
+				IsScoped: p.ScopedKind != ScopedKind.None))
 			.ToArray();
 
 		var typeParameters = EquatableArray<TypeParameterInfo>.Empty;
@@ -280,7 +287,8 @@ internal sealed record ClassMemberInfo(
 			ReturnsByRef: method.ReturnsByRef,
 			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
 			DoesNotReturn: doesNotReturn,
-			XmlDocSummary: xmlDocSummary);
+			XmlDocSummary: xmlDocSummary,
+			IsRefStructReturn: method.ReturnType.IsRefLikeType);
 	}
 }
 

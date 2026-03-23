@@ -506,7 +506,7 @@ internal static class UnifiedInterceptorBuilder
 	/// </summary>
 	public static string BuildParameterDeclarations(EquatableArray<ParameterModel> parameters)
 	{
-		return string.Join(", ", parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+		return string.Join(", ", parameters.Select(p => $"{(p.IsScoped ? "scoped " : "")}{p.RefPrefix}{p.Type} {p.EscapedName}"));
 	}
 
 	/// <summary>

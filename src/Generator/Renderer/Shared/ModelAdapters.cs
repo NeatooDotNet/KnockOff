@@ -37,7 +37,7 @@ internal static class ModelAdapters
 			ThrowsOnDefault: m.ThrowsOnDefault,
 			ReturnsByRef: m.ReturnsByRef,
 			ReturnsByRefReadonly: m.ReturnsByRefReadonly,
-			HasRefStructParameter: m.Parameters.Any(p => p.IsRefStruct))).ToList();
+			HasRefStructParameter: m.Parameters.Any(p => p.IsRefStruct) || m.IsRefStructReturn)).ToList();
 
 		// Get unique signatures
 		var uniqueSignatures = GetUniqueSignatures(signatures);
@@ -64,7 +64,7 @@ internal static class ModelAdapters
 	{
 		// Recompute delegate types using UnifiedInterceptorBuilder for consistency.
 		var hasRefOrOut = first.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
-		var hasRefStruct = first.Parameters.Any(p => p.IsRefStruct);
+		var hasRefStruct = first.Parameters.Any(p => p.IsRefStruct) || first.IsRefStructReturn;
 		var sig = new MethodSignatureInfo(
 			Parameters: first.Parameters,
 			TrackableParameters: first.TrackableParameters,

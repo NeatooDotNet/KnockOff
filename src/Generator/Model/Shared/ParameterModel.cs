@@ -24,4 +24,9 @@ internal sealed record ParameterModel(
     /// Ref struct types cannot be boxed, used as generic type arguments, or stored in tuples.
     /// Methods with ref struct parameters get simplified interceptors (no args tracking).
     /// </summary>
-    bool IsRefStruct = false);
+    bool IsRefStruct = false,
+    /// <summary>
+    /// True if the parameter has the 'scoped' modifier.
+    /// Scoped ref struct parameters must have 'scoped' on the implementing method.
+    /// </summary>
+    bool IsScoped = false);

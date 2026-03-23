@@ -114,7 +114,14 @@ internal sealed record InterfaceMemberInfo(
 	/// XML documentation summary text for this method, extracted from the original interface/class.
 	/// Null if no documentation was provided. Already XML-escaped.
 	/// </summary>
-	string? XmlDocSummary = null) : IEquatable<InterfaceMemberInfo>
+	string? XmlDocSummary = null,
+	/// <summary>
+	/// True if the return type (or property value type) is a ref struct (e.g., Span&lt;T&gt;).
+	/// Ref struct return types cannot be boxed, stored in object?, or used as generic type arguments.
+	/// Methods with ref struct returns need degraded interceptors (no Return(value), no params T[]).
+	/// Properties with ref struct types need inline rendering (no generic base class).
+	/// </summary>
+	bool IsRefStructReturn = false) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -208,7 +215,8 @@ internal sealed record InterfaceMemberInfo(
 			IndexerTypeSuffix: indexerTypeSuffix,
 			IsInitOnly: isInitOnly,
 			ReturnsByRef: property.ReturnsByRef,
-			ReturnsByRefReadonly: property.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: property.ReturnsByRefReadonly,
+			IsRefStructReturn: property.Type.IsRefLikeType);
 	}
 
 	/// <summary>
@@ -264,7 +272,8 @@ internal sealed record InterfaceMemberInfo(
 				p.Type.ToDisplayString(SymbolHelpers.FullyQualifiedWithNullability),
 				p.RefKind,
 				SymbolHelpers.GetXmlDocForParameter(method, p.Name),
-				IsRefStruct: p.Type.IsRefLikeType))
+				IsRefStruct: p.Type.IsRefLikeType,
+				IsScoped: p.ScopedKind != ScopedKind.None))
 			.ToArray();
 
 		// Extract type parameters for generic methods
@@ -299,7 +308,8 @@ internal sealed record InterfaceMemberInfo(
 			DeclaringInterfaceFullName: declaringInterfaceFullName,
 			ReturnsByRef: method.ReturnsByRef,
 			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
-			XmlDocSummary: xmlDocSummary);
+			XmlDocSummary: xmlDocSummary,
+			IsRefStructReturn: method.ReturnType.IsRefLikeType);
 	}
 }
 
@@ -328,7 +338,12 @@ internal sealed record ParameterInfo(
 	/// True if the parameter has the 'params' modifier.
 	/// Used to preserve params in generated constructor declarations.
 	/// </summary>
-	bool IsParams = false) : IEquatable<ParameterInfo>;
+	bool IsParams = false,
+	/// <summary>
+	/// True if the parameter has the 'scoped' modifier.
+	/// Scoped ref struct parameters must have 'scoped' on the implementing method to match the interface.
+	/// </summary>
+	bool IsScoped = false) : IEquatable<ParameterInfo>;
 
 /// <summary>
 /// Represents a type parameter for generic methods (e.g., T in Method&lt;T&gt;).

@@ -153,14 +153,9 @@ internal static class MethodInterceptorRenderer
 
 		if (model.HasRefStructParameter)
 		{
-			// Ref struct params: args can't be boxed/unboxed. Override with throw (never called from ref struct Invoke path).
+			// Ref struct params/returns: args can't be boxed/unboxed. Override with throw (never called from ref struct Invoke path).
 			w.Line("protected override void InvokeVoidDelegate(global::System.Delegate del, object? args) => throw new global::System.NotSupportedException(\"Ref struct parameters cannot be boxed.\");");
 			w.Line("protected override object? InvokeDelegate(global::System.Delegate del, object? args) => throw new global::System.NotSupportedException(\"Ref struct parameters cannot be boxed.\");");
-			if (!model.IsVoid)
-			{
-				var discards = BuildDiscardLambdaPrefix(model.Parameters.Count);
-				w.Line($"protected override global::System.Delegate CreateValueDelegate(object? value) => ({delegateType})({discards} => ({model.ReturnType})value!);");
-			}
 		}
 		else
 		{
@@ -490,7 +485,7 @@ internal static class MethodInterceptorRenderer
 		bool isVoidTask,
 		string innerType)
 	{
-		var hasValueOverload = !model.IsVoid && !hasRefOrOut;
+		var hasValueOverload = !model.IsVoid && !hasRefOrOut && !model.HasRefStructParameter;
 		var isEffectivelyVoid = model.IsVoid && !isVoidAsync;
 		var builderClassName = model.BuilderFriendlyName ?? "MethodCallBuilderImpl";
 		var sequenceClassName = model.SequenceFriendlyName ?? "MethodSequenceImpl";
@@ -1289,9 +1284,9 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// ThenReturn(value) for non-void (skip for ref/out methods -- value overloads not supported)
+			// ThenReturn(value) for non-void (skip for ref/out and ref struct -- value overloads not supported)
 			var hasRefOrOutInBuilder = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
-			if (!model.IsVoid && !hasRefOrOutInBuilder)
+			if (!model.IsVoid && !hasRefOrOutInBuilder && !model.HasRefStructParameter)
 			{
 				var (valueType, isTaskTBuilder, isValueTaskTBuilder) = GetAsyncTypeInfo(model.ReturnType);
 				var isAsyncBuilder = isTaskTBuilder || isValueTaskTBuilder;
@@ -1423,9 +1418,9 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// ThenReturn(value) for non-void (skip for ref/out methods)
+			// ThenReturn(value) for non-void (skip for ref/out and ref struct methods)
 			var hasRefOrOutInSeq = model.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
-			if (!model.IsVoid && !hasRefOrOutInSeq)
+			if (!model.IsVoid && !hasRefOrOutInSeq && !model.HasRefStructParameter)
 			{
 				var (valueType, isTaskTSeq, isValueTaskTSeq) = GetAsyncTypeInfo(model.ReturnType);
 				var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
@@ -4822,7 +4817,8 @@ internal static class MethodInterceptorRenderer
 			parts.Add($"{stubTypeName} stub");
 		foreach (var p in parameters)
 		{
-			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");
+			var scopedPrefix = p.IsScoped ? "scoped " : "";
+			parts.Add($"{scopedPrefix}{p.RefPrefix}{p.Type} {p.EscapedName}");
 		}
 		return string.Join(", ", parts);
 	}
