@@ -1005,11 +1005,9 @@ internal static class MethodInterceptorRenderer
 					w.Line($"if (__handled) return ({model.ReturnType})__result!;");
 				}
 
-				// Unconfigured tail
-				w.Line("_unconfiguredCallCount++;");
-				w.Line($"RecordUnconfiguredArgs({argsExpr});");
-
-				// Sequence exhausted repeat
+				// Sequence exhausted repeat (checked BEFORE incrementing unconfigured count,
+				// because sequence repeat is configured behavior and should not trigger
+				// the class stub's "unconfigured -> fall back to base" logic)
 				if (useVoidPriorityChain)
 				{
 					w.Line($"if (HandleVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr})) return;");
@@ -1020,6 +1018,10 @@ internal static class MethodInterceptorRenderer
 					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? $"default({model.ReturnType})!" : model.DefaultExpression;
 					w.Line($"if (__seqHandled) return __seqResult is null ? {defaultExpr} : ({model.ReturnType})__seqResult;");
 				}
+
+				// Unconfigured tail (only reached if no configured behavior handled the call)
+				w.Line("_unconfiguredCallCount++;");
+				w.Line($"RecordUnconfiguredArgs({argsExpr});");
 
 				// Final fallback: Stub Override > Source > Strict > Default
 				RenderInvokeFinalFallback(w, model, options);
@@ -1116,14 +1118,15 @@ internal static class MethodInterceptorRenderer
 			w.Line($"var (__handled, __result) = RunPriorityChain({argsExpr});");
 			w.Line($"if (__handled) {{ _refReturnBacking = ({model.ReturnType})__result!; return; }}");
 
-			w.Line("_unconfiguredCallCount++;");
-			w.Line($"RecordUnconfiguredArgs({argsExpr});");
-
+			// Sequence exhausted repeat (checked BEFORE incrementing unconfigured count)
 			w.Line($"var (__seqHandled, __seqResult) = HandleNonVoidSequenceExhaustedRepeat({options.StrictAccessExpression}, {argsExpr});");
 			{
 				var defaultExprRef = string.IsNullOrEmpty(model.DefaultExpression) ? $"default({model.ReturnType})!" : model.DefaultExpression;
 				w.Line($"if (__seqHandled) {{ _refReturnBacking = __seqResult is null ? {defaultExprRef} : ({model.ReturnType})__seqResult; return; }}");
 			}
+
+			w.Line("_unconfiguredCallCount++;");
+			w.Line($"RecordUnconfiguredArgs({argsExpr});");
 
 			if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
 			{

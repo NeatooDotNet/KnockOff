@@ -306,8 +306,10 @@ public class ProtectedMemberTests
 	}
 
 	[Fact]
-	public void ProtectedVirtualMethod_Sequence_FallsToBaseAfterExhausted()
+	public void ProtectedVirtualMethod_Sequence_RepeatsLastAfterExhausted()
 	{
+		// After sequence exhaustion, sequences repeat the last value (NSubstitute-compatible).
+		// Use .ThenDefault() to opt into returning default(T) instead.
 		var stub = new ProtectedMemberStub();
 		stub.GetInternalId.Call(() => "X");
 		stub.FormatLabel
@@ -316,9 +318,9 @@ public class ProtectedMemberTests
 
 		stub.Object.GetDescription(); // label-1
 		stub.Object.GetDescription(); // label-2
-		var d3 = stub.Object.GetDescription(); // sequence exhausted → base: "[]"
+		var d3 = stub.Object.GetDescription(); // sequence exhausted → repeats last: "label-2"
 
-		Assert.Equal("X: []", d3);
+		Assert.Equal("X: label-2", d3);
 	}
 
 	#endregion
