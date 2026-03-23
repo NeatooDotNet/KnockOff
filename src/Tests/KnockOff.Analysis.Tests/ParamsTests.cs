@@ -85,15 +85,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: params array method
 
 		[Fact]
-		public void ParamsMethod_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new ParamsArrayStandaloneKnockOff();
-			IHaveParamsArray service = knockOff;
-
-			Assert.NotNull(knockOff.Foo);
-		}
-
-		[Fact]
 		public void ParamsMethod_Standalone_CanCallWithArgs()
 		{
 			var knockOff = new ParamsArrayStandaloneKnockOff();
@@ -238,15 +229,6 @@ namespace KnockOff.Analysis.Tests
 		// ====================================================================
 
 		#region Standalone: params array indexer
-
-		[Fact]
-		public void ParamsIndexer_Standalone_CompilesAndHasInterceptor()
-		{
-			var knockOff = new ParamsArrayStandaloneKnockOff();
-			IHaveParamsArray service = knockOff;
-
-			Assert.NotNull(knockOff.Indexer);
-		}
 
 		[Fact]
 		public void ParamsIndexer_Standalone_GetCallback()
@@ -442,16 +424,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone Class: params array method
 
 		[Fact]
-		public void ParamsMethod_StandaloneClass_CompilesAndHasObject()
-		{
-			var stub = new ParamsClassStandaloneKnockOff();
-			HaveParamsBase obj = stub.Object;
-
-			Assert.NotNull(obj);
-			Assert.NotNull(stub.Foo);
-		}
-
-		[Fact]
 		public void ParamsMethod_StandaloneClass_CanCallWithArgs()
 		{
 			var stub = new ParamsClassStandaloneKnockOff();
@@ -541,14 +513,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Standalone Class: params array indexer
-
-		[Fact]
-		public void ParamsIndexer_StandaloneClass_CompilesAndHasInterceptor()
-		{
-			var stub = new ParamsClassStandaloneKnockOff();
-
-			Assert.NotNull(stub.Indexer);
-		}
 
 		[Fact]
 		public void ParamsIndexer_StandaloneClass_GetCallback()
@@ -649,16 +613,6 @@ namespace KnockOff.Analysis.Tests
 		// ====================================================================
 
 		#region Inline Class: params array method
-
-		[Fact]
-		public void ParamsMethod_InlineClass_CompilesAndHasObject()
-		{
-			var stub = new ParamsInlineTests.Stubs.HaveParamsBase();
-			HaveParamsBase obj = stub.Object;
-
-			Assert.NotNull(obj);
-			Assert.NotNull(stub.Foo);
-		}
 
 		[Fact]
 		public void ParamsMethod_InlineClass_CanCallWithArgs()

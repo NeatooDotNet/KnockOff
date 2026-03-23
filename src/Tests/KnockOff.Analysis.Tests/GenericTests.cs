@@ -134,15 +134,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: ISourceUpdater<string, Guid>
 
 		[Fact]
-		public void SourceUpdater_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new SourceUpdaterStandaloneKnockOff();
-			ISourceUpdater<string, Guid> service = knockOff;
-
-			Assert.NotNull(knockOff);
-		}
-
-		[Fact]
 		public void SourceUpdater_Standalone_AddOrUpdate_CanCall()
 		{
 			var knockOff = new SourceUpdaterStandaloneKnockOff();
@@ -215,15 +206,6 @@ namespace KnockOff.Analysis.Tests
 		#region Inline: ISourceUpdater<string, Guid>
 
 		[Fact]
-		public void SourceUpdater_Inline_CompilesAndCanCall()
-		{
-			var stub = new GenericInlineTests.Stubs.ISourceUpdater();
-			ISourceUpdater<string, Guid> service = stub;
-
-			Assert.NotNull(stub);
-		}
-
-		[Fact]
 		public void SourceUpdater_Inline_BothRefreshOverloads_WorkIndependently()
 		{
 			var stub = new GenericInlineTests.Stubs.ISourceUpdater();
@@ -259,15 +241,6 @@ namespace KnockOff.Analysis.Tests
 		// ====================================================================
 
 		#region Generic Standalone: ISourceUpdater<string, Guid>
-
-		[Fact]
-		public void SourceUpdater_GenericStandalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new SourceUpdaterGenericStub<string, Guid>();
-			ISourceUpdater<string, Guid> service = knockOff;
-
-			Assert.NotNull(knockOff);
-		}
 
 		[Fact]
 		public void SourceUpdater_GenericStandalone_AddOrUpdate_CanCall()
@@ -343,15 +316,6 @@ namespace KnockOff.Analysis.Tests
 		#region Open Generic Interface: ISourceUpdater<string, Guid>
 
 		[Fact]
-		public void SourceUpdater_OpenGeneric_CompilesAndImplementsInterface()
-		{
-			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
-			ISourceUpdater<string, Guid> service = stub;
-
-			Assert.NotNull(stub);
-		}
-
-		[Fact]
 		public void SourceUpdater_OpenGeneric_AddOrUpdate_CanCall()
 		{
 			var stub = new GenericOpenInlineTests.Stubs.ISourceUpdater<string, Guid>();
@@ -424,15 +388,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone Class: GenericContainer
 
 		[Fact]
-		public void GenericContainer_Standalone_CompilesAndHasObject()
-		{
-			var stub = new GenericContainerStandaloneKnockOff();
-			GenericContainer obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void GenericContainer_Standalone_SetThings_DifferentTypeArgs()
 		{
 			var stub = new GenericContainerStandaloneKnockOff();
@@ -494,15 +449,6 @@ namespace KnockOff.Analysis.Tests
 		#region Inline Class: GenericContainer
 
 		[Fact]
-		public void GenericContainer_Inline_CompilesAndHasObject()
-		{
-			var stub = new GenericInlineTests.Stubs.GenericContainer();
-			GenericContainer obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void GenericContainer_Inline_SetThings_DifferentTypeArgs()
 		{
 			var stub = new GenericInlineTests.Stubs.GenericContainer();
@@ -550,15 +496,6 @@ namespace KnockOff.Analysis.Tests
 		// ====================================================================
 
 		#region Standalone: IGenericContainer
-
-		[Fact]
-		public void GenericContainerInterface_Standalone_CompilesAndImplements()
-		{
-			var knockOff = new GenericContainerInterfaceStandaloneKnockOff();
-			IGenericContainer service = knockOff;
-
-			Assert.NotNull(knockOff);
-		}
 
 		[Fact]
 		public void GenericContainerInterface_Standalone_Sprint_VoidGenericMethod()
@@ -623,15 +560,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Inline: IGenericContainer
-
-		[Fact]
-		public void GenericContainerInterface_Inline_CompilesAndCanCall()
-		{
-			var stub = new GenericInlineTests.Stubs.IGenericContainer();
-			IGenericContainer service = stub;
-
-			Assert.NotNull(stub);
-		}
 
 		[Fact]
 		public void GenericContainerInterface_Inline_Sprint_VoidGenericMethod()

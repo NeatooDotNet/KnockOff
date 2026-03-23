@@ -111,15 +111,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: optional args method
 
 		[Fact]
-		public void OptionalArgs_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new OptionalArgsStandaloneKnockOff();
-			IHaveOptionalArguments service = knockOff;
-
-			Assert.NotNull(knockOff.Foo);
-		}
-
-		[Fact]
 		public void OptionalArgs_Standalone_CallWithAllOptionalArgsOmitted()
 		{
 			var knockOff = new OptionalArgsStandaloneKnockOff();
@@ -219,15 +210,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Standalone: optional args indexer
-
-		[Fact]
-		public void OptionalIndexer_Standalone_CompilesAndHasInterceptor()
-		{
-			var knockOff = new OptionalArgsStandaloneKnockOff();
-			IHaveOptionalArguments service = knockOff;
-
-			Assert.NotNull(knockOff.Indexer);
-		}
 
 		[Fact]
 		public void OptionalIndexer_Standalone_GetWithOptionalArgOmitted()
@@ -526,15 +508,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone Class: nullable annotation
 
 		[Fact]
-		public void NullableAnnotation_StandaloneClass_CompilesAndHasObject()
-		{
-			var stub = new NullableAnnotationStandaloneKnockOff();
-			NeedNullableAnnotation obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void NullableAnnotation_StandaloneClass_IntReturn_DefaultNull()
 		{
 			var stub = new NullableAnnotationStandaloneKnockOff();
@@ -614,15 +587,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Inline Class: nullable annotation
-
-		[Fact]
-		public void NullableAnnotation_InlineClass_CompilesAndHasObject()
-		{
-			var stub = new OptionalArgumentsInlineTests.Stubs.NeedNullableAnnotation();
-			NeedNullableAnnotation obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
 
 		[Fact]
 		public void NullableAnnotation_InlineClass_IntReturn_DefaultNull()

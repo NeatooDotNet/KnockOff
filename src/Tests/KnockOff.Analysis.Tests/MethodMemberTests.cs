@@ -95,15 +95,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: 20 parameters
 
 		[Fact]
-		public void LotsOfParams_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new LotsOfParamsStandaloneKnockOff();
-			IHaveLotsOfParameters service = knockOff;
-
-			Assert.NotNull(knockOff.CallThis);
-		}
-
-		[Fact]
 		public void LotsOfParams_Standalone_CanCallMethod()
 		{
 			var knockOff = new LotsOfParamsStandaloneKnockOff();
@@ -214,15 +205,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: in parameters — method
 
 		[Fact]
-		public void InParam_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new InStandaloneKnockOff();
-			IHaveIn service = knockOff;
-
-			Assert.NotNull(knockOff.InArgument);
-		}
-
-		[Fact]
 		public void InParam_Standalone_CanCallMethod()
 		{
 			var knockOff = new InStandaloneKnockOff();
@@ -267,15 +249,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Standalone: in parameters — indexer
-
-		[Fact]
-		public void InIndexer_Standalone_CompilesAndHasInterceptor()
-		{
-			var knockOff = new InStandaloneKnockOff();
-			IHaveIn service = knockOff;
-
-			Assert.NotNull(knockOff.Indexer);
-		}
 
 		[Fact]
 		public void InIndexer_Standalone_CanCallIndexer()
@@ -371,16 +344,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone: generic ref/out
 
 		[Fact]
-		public void GenericRefOut_Standalone_CompilesAndImplementsInterface()
-		{
-			var knockOff = new RefOutGenericsStandaloneKnockOff();
-			IHaveRefAndOutGenerics service = knockOff;
-
-			Assert.NotNull(knockOff.RefArgumentsWithGenerics);
-			Assert.NotNull(knockOff.OutArgumentsWithGenerics);
-		}
-
-		[Fact]
 		public void GenericOut_Standalone_CallbackSetsOutParam()
 		{
 			var knockOff = new RefOutGenericsStandaloneKnockOff();
@@ -460,15 +423,6 @@ namespace KnockOff.Analysis.Tests
 		#endregion
 
 		#region Inline: generic ref/out
-
-		[Fact]
-		public void GenericRefOut_Inline_CompilesAndCreatesStub()
-		{
-			var stub = new MethodMemberInlineTests.Stubs.IHaveRefAndOutGenerics();
-			IHaveRefAndOutGenerics service = stub;
-
-			Assert.NotNull(stub);
-		}
 
 		[Fact]
 		public void GenericOut_Inline_CallbackSetsOutParam()

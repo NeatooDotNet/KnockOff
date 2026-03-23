@@ -75,15 +75,6 @@ namespace KnockOff.Analysis.Tests
 		#region Standalone Class: Constraint propagation
 
 		[Fact]
-		public void Constraint_Standalone_CompilesAndHasObject()
-		{
-			var stub = new ConstraintCaseStandaloneKnockOff();
-			BaseForConstraintCase<string> obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void Constraint_Standalone_As_CanCallWithConstrainedType()
 		{
 			var stub = new ConstraintCaseStandaloneKnockOff();
@@ -135,15 +126,6 @@ namespace KnockOff.Analysis.Tests
 		#region Generic Standalone Class: Constraint propagation
 
 		[Fact]
-		public void Constraint_GenericStandaloneClass_CompilesAndHasObject()
-		{
-			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
-			BaseForConstraintCase<string> obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void Constraint_GenericStandaloneClass_As_CanCallWithConstrainedType()
 		{
 			var stub = new ConstraintCaseOpenStandaloneKnockOff<string>();
@@ -193,15 +175,6 @@ namespace KnockOff.Analysis.Tests
 		#region Inline Class: Constraint propagation
 
 		[Fact]
-		public void Constraint_Inline_CompilesAndHasObject()
-		{
-			var stub = new ConstraintInlineTests.Stubs.BaseForConstraintCase();
-			BaseForConstraintCase<string> obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
-
-		[Fact]
 		public void Constraint_Inline_As_CanCallWithConstrainedType()
 		{
 			var stub = new ConstraintInlineTests.Stubs.BaseForConstraintCase();
@@ -247,15 +220,6 @@ namespace KnockOff.Analysis.Tests
 		// ====================================================================
 
 		#region Open Generic Class: Constraint propagation
-
-		[Fact]
-		public void Constraint_OpenGenericClass_CompilesAndHasObject()
-		{
-			var stub = new ConstraintOpenInlineTests.Stubs.BaseForConstraintCase<string>();
-			BaseForConstraintCase<string> obj = stub.Object;
-
-			Assert.NotNull(obj);
-		}
 
 		[Fact]
 		public void Constraint_OpenGenericClass_As_CanCallWithConstrainedType()
