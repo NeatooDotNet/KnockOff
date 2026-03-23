@@ -309,17 +309,22 @@ internal static class StandaloneClassRenderer
 
         if (method.IsVoid)
         {
-            // Void method - empty body
+            // Void method - empty body, but out params must be assigned
             if (string.IsNullOrEmpty(method.ParameterDeclarations))
                 w.Line($"protected virtual void {methodName}() {{ }}");
+            else if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                w.Line($"protected virtual void {methodName}({method.ParameterDeclarations}) {{ {method.OutParameterDefaults} }}");
             else
                 w.Line($"protected virtual void {methodName}({method.ParameterDeclarations}) {{ }}");
         }
         else
         {
             // Non-void method - expression-bodied returning default!
+            // Note: if the method has out params AND returns a value, we need a block body
             if (string.IsNullOrEmpty(method.ParameterDeclarations))
                 w.Line($"protected virtual {returnType} {methodName}() => default!;");
+            else if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                w.Line($"protected virtual {returnType} {methodName}({method.ParameterDeclarations}) {{ {method.OutParameterDefaults} return default!; }}");
             else
                 w.Line($"protected virtual {returnType} {methodName}({method.ParameterDeclarations}) => default!;");
         }
@@ -1005,7 +1010,8 @@ internal static class StandaloneClassRenderer
             var backingField = string.IsNullOrEmpty(method.InvokeSuffix)
                 ? "_refReturnBacking"
                 : $"_refReturnBacking{method.InvokeSuffix}";
-            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+            // Ref return methods are never pre-compiled, so use ArgumentList to preserve ref/out keywords
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
 
             if (method.IsAbstract)
             {
@@ -1043,14 +1049,20 @@ internal static class StandaloneClassRenderer
                 // Null check for calls during base constructor
                 if (method.IsVoid)
                 {
-                    w.Line($"{indent1}if (_stub == null) return;");
-                    var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+                    if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                        w.Line($"{indent1}if (_stub == null) {{ {method.OutParameterDefaults} return; }}");
+                    else
+                        w.Line($"{indent1}if (_stub == null) return;");
+                    var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
                     w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
                 }
                 else
                 {
-                    w.Line($"{indent1}if (_stub == null) return default!;");
-                    var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+                    if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                        w.Line($"{indent1}if (_stub == null) {{ {method.OutParameterDefaults} return default!; }}");
+                    else
+                        w.Line($"{indent1}if (_stub == null) return default!;");
+                    var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
                     w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
                 }
             }
@@ -1063,6 +1075,8 @@ internal static class StandaloneClassRenderer
                 w.Line($"{indent1}{{");
                 if (method.IsAbstract)
                 {
+                    if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                        w.Line($"{indent1}\t{method.OutParameterDefaults}");
                     if (method.IsVoid)
                         w.Line($"{indent1}\treturn;");
                     else if (method.IsTask)
@@ -1089,6 +1103,8 @@ internal static class StandaloneClassRenderer
 
                 // Build invoke arguments: strict, then method parameters
                 // For pre-compiled interceptors, strip ref/in prefixes and wrap for TTuple
+                // For non-precompiled (custom delegate) interceptors, use ArgumentList which
+                // preserves ref/out prefixes needed by the Invoke method signature
                 var rawInputArgs = method.InputArgumentList;
                 var cleanInputArgs = isPreCompiled ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
                 string invokeArgs;
@@ -1100,7 +1116,8 @@ internal static class StandaloneClassRenderer
                 }
                 else
                 {
-                    invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
+                    // Non-precompiled: use ArgumentList to preserve ref/out keywords
+                    invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
                 }
 
                 // Determine if ValueTask wrapping is needed (only for pre-compiled)

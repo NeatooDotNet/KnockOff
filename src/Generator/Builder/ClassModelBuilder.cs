@@ -508,6 +508,10 @@ internal static class ClassModelBuilder
 
         var callArgs = inputArgList; // No stub parameter - callbacks only get method parameters
 
+        var outParamDefaults = string.Join(" ", member.Parameters
+            .Where(p => p.RefKind == RefKind.Out)
+            .Select(p => $"{p.Name} = default!;"));
+
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
             MethodName: member.Name,
@@ -524,7 +528,8 @@ internal static class ClassModelBuilder
             InvokeSuffix: invokeSuffix,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            DoesNotReturn: member.DoesNotReturn);
+            DoesNotReturn: member.DoesNotReturn,
+            OutParameterDefaults: outParamDefaults);
     }
 
     /// <summary>

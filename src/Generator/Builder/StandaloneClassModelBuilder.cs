@@ -320,7 +320,10 @@ internal static class StandaloneClassModelBuilder
                     XmlDoc: p.XmlDoc,
                     IsRefStruct: p.IsRefStruct)).ToEquatableArray(),
                 ReturnsByRef: m.ReturnsByRef,
-                ReturnsByRefReadonly: m.ReturnsByRefReadonly))
+                ReturnsByRefReadonly: m.ReturnsByRefReadonly,
+                OutParameterDefaults: string.Join(" ", m.Parameters
+                    .Where(p => p.RefKind == RefKind.Out)
+                    .Select(p => $"{p.Name} = default!;"))))
             .ToEquatableArray();
 
         return new StandaloneClassGenerationUnit(
@@ -592,6 +595,10 @@ internal static class StandaloneClassModelBuilder
 
         var callArgs = inputArgList;
 
+        var outParamDefaults = string.Join(" ", member.Parameters
+            .Where(p => p.RefKind == RefKind.Out)
+            .Select(p => $"{p.Name} = default!;"));
+
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
             MethodName: member.Name,
@@ -609,7 +616,8 @@ internal static class StandaloneClassModelBuilder
             HasStubOverride: hasStubOverride,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            DoesNotReturn: member.DoesNotReturn);
+            DoesNotReturn: member.DoesNotReturn,
+            OutParameterDefaults: outParamDefaults);
     }
 
     /// <summary>
