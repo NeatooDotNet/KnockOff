@@ -42,7 +42,7 @@ internal static class PreCompiledInterceptorRenderer
 
 	/// <summary>
 	/// Determines whether a property can use a pre-compiled interceptor.
-	/// Init-only and ref return properties use the existing generated-class approach.
+	/// Init-only, ref return, and ref struct properties use the existing generated-class approach.
 	/// </summary>
 	public static bool CanUsePreCompiled(UnifiedPropertyInterceptorModel model)
 	{
@@ -51,6 +51,9 @@ internal static class PreCompiledInterceptorRenderer
 
 		// Ref return properties need backing field
 		if (model.IsRefReturn) return false;
+
+		// Ref struct types (e.g., Span<T>, ReadOnlySpan<T>) cannot be used as generic type arguments
+		if (model.IsRefStructType) return false;
 
 		return true;
 	}

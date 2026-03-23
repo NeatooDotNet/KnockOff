@@ -341,7 +341,8 @@ internal static class ModelAdapters
 			HasSetter: prop.HasSetter,
 			IsInitOnly: prop.IsInitOnly,
 			ReturnsByRef: prop.ReturnsByRef,
-			ReturnsByRefReadonly: prop.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: prop.ReturnsByRefReadonly,
+			IsRefStructType: prop.IsRefStructType);
 	}
 
 	/// <summary>
@@ -360,7 +361,8 @@ internal static class ModelAdapters
 			HasSetter: prop.HasSetter,
 			IsInitOnly: prop.IsInitOnly,
 			ReturnsByRef: prop.ReturnsByRef,
-			ReturnsByRefReadonly: prop.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: prop.ReturnsByRefReadonly,
+			IsRefStructType: prop.IsRefStructType);
 	}
 
 	#endregion

@@ -258,7 +258,8 @@ internal static class InlineModelBuilder
             ConstraintClauses: constraintClause,
             DeclaringInterface: declaringInterface,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsRefStructType: member.IsRefStructReturn);
     }
 
     private static InlineIndexerModel BuildIndexerModel(

@@ -58,6 +58,13 @@ internal static class PropertyInterceptorRenderer
 			{
 				RenderInitOnlyPropertyContent(w, model, options);
 			}
+			else if (model.IsRefStructType)
+			{
+				// Degraded mode for ref struct property types (e.g., Span<T>, ReadOnlySpan<T>).
+				// Cannot use Func<T>/Action<T> or generic base classes since ref structs
+				// cannot be used as generic type arguments. Uses custom delegate types instead.
+				RenderRefStructPropertyContent(w, model, options);
+			}
 			else if (!useBaseClass)
 			{
 				// Inline mode for ref return properties
@@ -177,6 +184,222 @@ internal static class PropertyInterceptorRenderer
 		// Nested classes
 		RenderPropertyGetBuilderImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: true);
 		RenderPropertyGetSequenceImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: true);
+	}
+
+	#endregion
+
+	#region Ref Struct Property (degraded mode — custom delegates, no sequences)
+
+	/// <summary>
+	/// Renders a degraded property interceptor for ref struct value types.
+	/// Ref structs (e.g., Span&lt;T&gt;, ReadOnlySpan&lt;T&gt;) cannot be used as generic type arguments,
+	/// stored in class fields (for backing values), or used in tuples. This generates a minimal
+	/// interceptor with custom delegate types, callback support, and verification — but no
+	/// sequences (ThenGet), no Get(value), no LastSetValue, and no builder pattern.
+	/// </summary>
+	private static void RenderRefStructPropertyContent(
+		CodeWriter w,
+		UnifiedPropertyInterceptorModel model,
+		PropertyInterceptorRenderOptions options)
+	{
+		// Custom delegate types (ref structs can't be Func<T>/Action<T> type args)
+		if (model.HasGetter)
+		{
+			w.Line($"/// <summary>Custom delegate for getter callback (ref struct types cannot use Func&lt;T&gt;).</summary>");
+			w.Line($"public delegate {model.ValueType} GetterDelegate();");
+			w.Line();
+		}
+		if (model.HasSetter)
+		{
+			w.Line($"/// <summary>Custom delegate for setter callback (ref struct types cannot use Action&lt;T&gt;).</summary>");
+			w.Line($"public delegate void SetterDelegate({model.ValueType} value);");
+			w.Line();
+		}
+
+		// Source field for Source(T) feature
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
+		// Getter storage (if has getter)
+		if (model.HasGetter)
+		{
+			w.Line("private GetterDelegate? _get;");
+			w.Line("private int _getCount;");
+			w.Line("private bool _isGetVerifiable;");
+			w.Line("private global::KnockOff.Called? _getVerifiableTimes;");
+			w.Line();
+		}
+
+		// Setter storage (if has setter)
+		if (model.HasSetter)
+		{
+			w.Line("private SetterDelegate? _set;");
+			w.Line("private int _setCount;");
+			w.Line("private bool _isSetVerifiable;");
+			w.Line("private global::KnockOff.Called? _setVerifiableTimes;");
+			w.Line();
+		}
+
+		// Get(callback) method (if has getter)
+		if (model.HasGetter)
+		{
+			w.Line($"/// <summary>Configures getter callback. Ref struct properties do not support Get(value) or sequences.</summary>");
+			w.Line($"public void Get(GetterDelegate callback)");
+			using (w.Braces())
+			{
+				w.Line("_get = callback;");
+			}
+			w.Line();
+		}
+
+		// Set(callback) method (if has setter)
+		if (model.HasSetter)
+		{
+			w.Line($"/// <summary>Configures setter callback. Ref struct properties do not support sequences.</summary>");
+			w.Line($"public void Set(SetterDelegate callback)");
+			using (w.Braces())
+			{
+				w.Line("_set = callback;");
+			}
+			w.Line();
+		}
+
+		// InvokeGet method (if has getter)
+		if (model.HasGetter)
+		{
+			var strictParam = options.IncludeStrictParameter ? "bool strict" : "";
+			w.Line($"/// <summary>Called by the generated stub when the property getter is accessed.</summary>");
+			w.Line($"public {model.ValueType} InvokeGet({strictParam})");
+			using (w.Braces())
+			{
+				w.Line("_getCount++;");
+				w.Line("if (_get != null) return _get();");
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line($"if (_source != null) return _source.{model.PropertyName};");
+				}
+				if (options.IncludeStrictParameter)
+				{
+					w.Line($"if (strict) throw new global::KnockOff.StubException(\"{model.PropertyName}\");");
+				}
+				w.Line("return default!;");
+			}
+			w.Line();
+		}
+
+		// InvokeSet method (if has setter)
+		if (model.HasSetter)
+		{
+			var strictParam = options.IncludeStrictParameter ? "bool strict, " : "";
+			w.Line($"/// <summary>Called by the generated stub when the property setter is accessed.</summary>");
+			w.Line($"internal void InvokeSet({strictParam}{model.ValueType} value)");
+			using (w.Braces())
+			{
+				w.Line("_setCount++;");
+				w.Line("if (_set != null) { _set(value); return; }");
+				if (options.IncludeStrictParameter)
+				{
+					w.Line($"if (strict) throw new global::KnockOff.StubException(\"{model.PropertyName}\");");
+				}
+			}
+			w.Line();
+		}
+
+		// Reset method
+		w.Line("/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>");
+		w.Line("public void Reset()");
+		using (w.Braces())
+		{
+			if (model.HasGetter)
+				w.Line("_getCount = 0;");
+			if (model.HasSetter)
+				w.Line("_setCount = 0;");
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				w.Line("_source = null;");
+		}
+		w.Line();
+
+		// Verification methods - VerifyGet / VerifySet
+		if (model.HasGetter)
+		{
+			w.Line("/// <summary>Verifies getter was accessed the specified number of times.</summary>");
+			w.Line("public void VerifyGet(global::KnockOff.Called times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(_getCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.PropertyName} (get)\", times, _getCount));");
+			}
+			w.Line();
+		}
+
+		if (model.HasSetter)
+		{
+			w.Line("/// <summary>Verifies setter was accessed the specified number of times.</summary>");
+			w.Line("public void VerifySet(global::KnockOff.Called times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(_setCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.PropertyName} (set)\", times, _setCount));");
+			}
+			w.Line();
+		}
+
+		// Verify() - aggregate
+		w.Line("/// <summary>Verifies the property was accessed at least once (get + set combined).</summary>");
+		w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
+		w.Line();
+		w.Line("/// <summary>Verifies total access count satisfies the constraint.</summary>");
+		w.Line("public void Verify(global::KnockOff.Called times)");
+		using (w.Braces())
+		{
+			var totalCountExpr = model.HasGetter && model.HasSetter
+				? "_getCount + _setCount"
+				: (model.HasGetter ? "_getCount" : "_setCount");
+			w.Line($"var totalCount = {totalCountExpr};");
+			w.Line("if (!times.Validate(totalCount))");
+			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", times, totalCount));");
+		}
+		w.Line();
+
+		// Verifiable methods (fluent)
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify().</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable() {{ _isGetVerifiable = true; _getVerifiableTimes = null; return this; }}");
+		w.Line();
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ _isGetVerifiable = true; _getVerifiableTimes = times; return this; }}");
+		w.Line();
+
+		// CheckVerification / CheckVerificationAll for Stub.Verify() / Stub.VerifyAll()
+		var totalExpr = model.HasGetter && model.HasSetter
+			? "_getCount + _setCount"
+			: (model.HasGetter ? "_getCount" : "_setCount");
+		w.Line("/// <summary>Internal: checks verifiable marking.</summary>");
+		w.Line("public global::KnockOff.VerificationFailure? CheckVerification()");
+		using (w.Braces())
+		{
+			w.Line("if (!_isGetVerifiable) return null;");
+			w.Line($"var totalCount = {totalExpr};");
+			w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
+			w.Line("if (times.Validate(totalCount)) return null;");
+			w.Line($"return new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", times, totalCount);");
+		}
+		w.Line();
+
+		w.Line("/// <summary>Internal: checks all-configured verification.</summary>");
+		w.Line("public global::KnockOff.VerificationFailure? CheckVerificationAll()");
+		using (w.Braces())
+		{
+			w.Line($"var isConfigured = _get != null;");
+			w.Line("if (!isConfigured) return null;");
+			w.Line($"var totalCount = {totalExpr};");
+			w.Line("if (totalCount > 0) return null;");
+			w.Line($"return new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", global::KnockOff.Called.AtLeastOnce, 0);");
+		}
 	}
 
 	#endregion

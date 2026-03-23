@@ -330,7 +330,8 @@ internal static class FlatModelBuilder
 					DelegationTargetInterface: delegationInterface,
 					HasStubOverride: hasStubOverride,
 					ReturnsByRef: member.ReturnsByRef,
-					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
+					ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+					IsRefStructType: member.IsRefStructReturn));
 			}
 		}
 
