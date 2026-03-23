@@ -1,145 +1,126 @@
 # Rocks Edge Case Integration
 
-**Goal:** Port edge case tests from `Rocks.Analysis.IntegrationTests` into a new `KnockOff.Analysis.Tests` project. Each file gets triaged, rewritten for KnockOff's 9 patterns, and bugs get fixed.
+**Status:** Complete
+**Result:** 1,336 tests, 16 bugs fixed, 12 pointer tests skipped (unsafe not supported)
+
+**Goal:** Port edge case tests from `Rocks.Analysis.IntegrationTests` into `KnockOff.Analysis.Tests`. Each file triaged, rewritten for KnockOff's 9 patterns, bugs fixed as found.
 
 **Source:** `Rocks/src/Rocks.Analysis.IntegrationTests/` (63 files, ~425 tests)
 
-## Workflow Per File
+---
 
-1. Triage — confirm applicability rating
-2. Map — which KnockOff patterns (1-9) and member types (Methods/Properties/Indexers/Events) apply
-3. Rewrite — translate Rocks API to KnockOff API for each applicable pattern
-4. Fix — fix any compiler errors or behavioral bugs exposed
-5. Check off
+## Bugs Fixed (16)
+
+1. **Source() lambda cast** — CS1503 in conditional with lambda (PreCompiledInterceptorRenderer)
+2. **Diamond ambiguity** — CS0229 on diamond-inherited interface members (FlatRenderer, InlineRenderer)
+3. **Open generic inherited members** — Pattern 8 missing inherited interface members (KnockOffGenerator.Transform)
+4. **Ref struct parameter support** — ReadOnlySpan<T> params couldn't be boxed (11 generator files)
+5. **Constructor default values** — Not preserved in generated constructors (SymbolHelpers, both class builders)
+6. **Class ref/out Invoke args** — Used InputArgumentList instead of ArgumentList (ClassRenderer, StandaloneClassRenderer)
+7. **Class out param early return** — CS0177, out params not assigned on early return (both class renderers)
+8. **Class virtual out param body** — CS0177, empty body for virtual override with out params (StandaloneClassRenderer)
+9. **Class sequence exhaustion** — Fell back to base instead of repeating last value (MethodInterceptorRenderer)
+10. **Constructor ref/out/params** — Modifiers stripped from generated constructor params (both class builders)
+11. **Nullable unconstrained generics** — CS0453, TData? emitted verbatim in overrides (both class builders)
+12. **Ref struct return types** — Not detected, caused boxing attempts (all 4 pipelines)
+13. **Return(value) for ref struct** — Generated boxed Return/ThenReturn for ref structs (MethodInterceptorRenderer)
+14. **Scoped modifier** — Not detected or emitted (all 4 pipelines)
+15. **Ref struct property types** — Used generic PropertyGetInterceptor<T> (PropertyInterceptorRenderer)
+16. **Ref struct property pipeline** — IsRefStructType not propagated through model pipeline (6 files)
 
 ---
 
-## Group 1: Interface Tests (11 files, 126 tests)
+## Group 1: Interface Tests (11 files) — COMPLETE
 
-All High applicability. Primary patterns: 1, 2, 5, 8.
+| Status | File | KnockOff Tests | Bugs |
+|--------|------|---------------|------|
+| [x] | InterfaceMethodReturnTests.cs | 20 | 0 |
+| [x] | InterfaceMethodVoidTests.cs | 24 | 0 |
+| [x] | InterfacePropertyTests.cs | 36 | 0 |
+| [x] | InterfaceIndexerTests.cs | 40 | 0 |
+| [x] | InterfaceGenericMethodTests.cs | 42 | 0 |
+| [x] | InterfaceGenericPropertyTests.cs | 29 | 0 |
+| [x] | InterfaceGenericEventsTests.cs | 14 | 0 |
+| [x] | InterfaceGenericIndexerTests.cs | 26 | 0 |
+| [x] | InterfaceMethodReturnWithEventsTests.cs | 10 | 0 |
+| [x] | InterfaceMethodVoidWithEventsTests.cs | 10 | 0 |
+| [x] | InterfaceStaticVirtualTests.cs | 6 | 0 |
 
-| Status | File | Tests | Members | Priority | Notes |
-|--------|------|-------|---------|----------|-------|
-| [ ] | InterfaceMethodReturnTests.cs | 17 | Methods | Critical | Return values, callbacks, call counts |
-| [ ] | InterfaceMethodVoidTests.cs | 11 | Methods | Critical | Void execution, callbacks, verification |
-| [ ] | InterfacePropertyTests.cs | 13 | Properties, Events | Critical | Get/Set/Init variants, event raising |
-| [ ] | InterfaceIndexerTests.cs | 32 | Indexers, Events | Critical | Multi-param indexers, all accessor variants |
-| [ ] | InterfaceGenericMethodTests.cs | 16 | Methods | Critical | Type params, method generics, nullable |
-| [ ] | InterfaceGenericPropertyTests.cs | 10 | Properties | Critical | Generic properties, init variants |
-| [ ] | InterfaceGenericEventsTests.cs | 1 | Events | Important | Generic event raising (sparse) |
-| [ ] | InterfaceGenericIndexerTests.cs | 16 | Indexers | Critical | Generic indexers, multi-overloads |
-| [ ] | InterfaceMethodReturnWithEventsTests.cs | 4 | Methods, Events | Important | Method + event composition |
-| [ ] | InterfaceMethodVoidWithEventsTests.cs | 4 | Methods, Events | Important | Void method + event composition |
-| [ ] | InterfaceStaticVirtualTests.cs | 2 | Methods, Properties | Low | Static virtuals excluded (C# 11) |
+## Group 2: Class Tests (11 files) — COMPLETE
 
-## Group 2: Class Tests (11 files, ~132 tests)
+| Status | File | KnockOff Tests | Bugs |
+|--------|------|---------------|------|
+| [x] | ClassMethodReturnTests.cs | 20 | 1 |
+| [x] | ClassMethodVoidTests.cs | 24 | 0 |
+| [x] | ClassPropertyTests.cs | 34 | 0 |
+| [x] | ClassIndexerTests.cs | 40 | 0 |
+| [x] | ClassGenericMethodTests.cs | 60 | 1 |
+| [x] | ClassGenericPropertyTests.cs | 40 | 0 |
+| [x] | ClassGenericEventsTests.cs | 16 | 0 |
+| [x] | ClassGenericIndexerTests.cs | 45 | 0 |
+| [x] | ClassMethodReturnWithEventsTests.cs | 10 | 0 |
+| [x] | ClassMethodVoidWithEventsTests.cs | 10 | 0 |
+| [x] | ClassConstructorTests.cs | 24 | 1 |
 
-All High applicability. Primary patterns: 3, 4, 6, 9.
+## Group 3: Abstract Class Tests (11 files) — COMPLETE
 
-| Status | File | Tests | Members | Priority | Notes |
-|--------|------|-------|---------|----------|-------|
-| [ ] | ClassMethodReturnTests.cs | 18 | Methods | Critical | Return values, callbacks, call counts |
-| [ ] | ClassMethodVoidTests.cs | 15 | Methods | Critical | Void execution, callbacks, verification |
-| [ ] | ClassPropertyTests.cs | 13 | Properties, Events | Critical | Get/Set/Init, event raising |
-| [ ] | ClassIndexerTests.cs | 32 | Indexers, Events | Critical | Multi-param, all accessor variants |
-| [ ] | ClassGenericMethodTests.cs | 19 | Methods | Critical | Type params, method generics |
-| [ ] | ClassGenericPropertyTests.cs | 10 | Properties | Critical | Generic properties, init |
-| [ ] | ClassGenericEventsTests.cs | 1 | Events | Important | Generic event raising (sparse) |
-| [ ] | ClassGenericIndexerTests.cs | 15 | Indexers | Critical | Generic indexers, multi-overloads |
-| [ ] | ClassMethodReturnWithEventsTests.cs | 5 | Methods, Events | Important | Method + event composition |
-| [ ] | ClassMethodVoidWithEventsTests.cs | 4 | Methods, Events | Important | Void method + event composition |
-| [ ] | ClassConstructorTests.cs | 6 | Constructors | Important | ref/out/params, required members |
+| Status | File | KnockOff Tests | Bugs |
+|--------|------|---------------|------|
+| [x] | AbstractClassMethodReturnTests.cs | 20 | 0 |
+| [x] | AbstractClassMethodVoidTests.cs | 24 | 0 |
+| [x] | AbstractClassPropertyTests.cs | 30 | 0 |
+| [x] | AbstractClassIndexerTests.cs | 34 | 0 |
+| [x] | AbstractClassGenericMethodTests.cs | 54 | 0 |
+| [x] | AbstractClassGenericPropertyTests.cs | 38 | 0 |
+| [x] | AbstractClassGenericEventsTests.cs | 12 | 0 |
+| [x] | AbstractClassGenericIndexerTests.cs | 38 | 0 |
+| [x] | AbstractClassMethodReturnWithEventsTests.cs | 10 | 0 |
+| [x] | AbstractClassMethodVoidWithEventsTests.cs | 10 | 0 |
+| [x] | AbstractClassConstructorTests.cs | 12 | 0 |
 
-## Group 3: Abstract Class Tests (11 files, 116 tests)
+## Group 4: Feature-Specific Tests — COMPLETE
 
-All High applicability. Primary patterns: 3, 4, 6, 9.
+| Status | File | KnockOff Tests | Bugs |
+|--------|------|---------------|------|
+| [x] | GenericTests.cs | 22 | 1 |
+| [x] | ConstraintTests.cs | 12 | 0 |
+| [x] | ExplicitInterfaceImplementationTests.cs | 48 | 2 |
+| [x] | EventTests.cs | 8 | 0 |
+| [x] | OptionalArgumentsTests.cs | 24 | 1 |
+| [x] | ParamsTests.cs | 45 | 1 |
+| [x] | AsynchronousTests.cs | 53 | 0 |
+| [x] | RefStructTests.cs | 20 | 4 |
+| [x] | RecordTests.cs | 10 | 0 |
+| [x] | RequiredInitPropertyTests.cs | 12 | 0 |
+| [x] | VirtualsWithImplementationsTests.cs | 38 | 0 |
+| [x] | OpenGenericsTests.cs | 24 | 0 |
+| [x] | AllowNullTests.cs | 20 | 0 |
+| [x] | AttributeTests.cs | 29 | 1 |
+| [x] | NonPublicMemberTests.cs | 8 | 0 |
+| [x] | HttpMessageHandlerTests.cs | 6 | 0 |
+| [x] | DoesNotReturnTests.cs | 8 | 0 |
+| [x] | PointerTests.cs | 12 (skipped) | 0 |
+| [x] | MethodMemberTests.cs | 43 | 3 |
 
-| Status | File | Tests | Members | Priority | Notes |
-|--------|------|-------|---------|----------|-------|
-| [ ] | AbstractClassMethodReturnTests.cs | 15 | Methods | Critical | Return values, callbacks, call counts |
-| [ ] | AbstractClassMethodVoidTests.cs | 12 | Methods | Critical | Void execution, callbacks |
-| [ ] | AbstractClassPropertyTests.cs | 11 | Properties, Events | Critical | Get/Set/Init, event raising |
-| [ ] | AbstractClassIndexerTests.cs | 26 | Indexers | Critical | Multi-param, all accessor variants |
-| [ ] | AbstractClassGenericMethodTests.cs | 16 | Methods | Critical | Type params, method generics |
-| [ ] | AbstractClassGenericPropertyTests.cs | 10 | Properties | Critical | Generic properties, init |
-| [ ] | AbstractClassGenericEventsTests.cs | 2 | Events | Important | Generic event raising |
-| [ ] | AbstractClassGenericIndexerTests.cs | 16 | Indexers | Critical | Generic indexers |
-| [ ] | AbstractClassMethodReturnWithEventsTests.cs | 5 | Methods, Events | Important | Method + event composition |
-| [ ] | AbstractClassMethodVoidWithEventsTests.cs | 5 | Methods, Events | Important | Void method + event composition |
-| [ ] | AbstractClassConstructorTests.cs | 4 | Constructors | Important | Public/protected constructors |
+## Group 5: Excluded (Rocks-Specific)
 
-## Group 4: Feature-Specific Tests (20 files, ~100 tests)
+These files test Rocks-specific API concepts that don't map to KnockOff:
 
-Mixed applicability. These test specific C# language features across interface/class boundaries.
+| Status | File | Reason |
+|--------|------|--------|
+| N/A | AnalyzerTests.cs | Rocks analyzer infrastructure |
+| N/A | ArgTests.cs | Rocks Arg matching API (no KnockOff equivalent) |
+| N/A | ExpectationExceptionTests.cs | Rocks strict mode expectations |
+| N/A | MockDefinitions.cs | Assembly attribute manifest |
+| N/A | MultipleRockCallsTests.cs | Rocks RockContext lifecycle |
+| N/A | RockContextTests.cs | Rocks context management |
+| N/A | ShimTests.cs | Rocks shim concept |
+| N/A | Shared.cs | NUnit config |
+| N/A | VerificationTests.cs | Rocks verification lifecycle |
+| N/A | PartialTests.cs | Rocks [RockPartial] attribute |
 
-| Status | File | Tests | Applicability | Members | Priority | Notes |
-|--------|------|-------|---------------|---------|----------|-------|
-| [ ] | GenericTests.cs | 5 | High | Methods | Critical | Generic overloads, type constraints |
-| [ ] | ConstraintTests.cs | 1 | High | Methods | Critical | where T : class (sparse, expand) |
-| [ ] | ExplicitInterfaceImplementationTests.cs | 9 | High | Methods, Props, Indexers | Critical | Duplicate member names across interfaces |
-| [ ] | EventTests.cs | 1 | High | Events | Critical | Event definition and raising |
-| [ ] | OptionalArgumentsTests.cs | 6 | High | Methods, Indexers | Critical | Default values, nullable context |
-| [ ] | ParamsTests.cs | 7 | High | Methods, Indexers | Critical | params array, ReadOnlySpan params |
-| [ ] | AsynchronousTests.cs | 4 | High | Methods | Critical | Task, ValueTask, IAsyncEnumerable |
-| [ ] | RefStructTests.cs | 10 | High | Methods, Properties | Critical | Span<T>, ReadOnlySpan<T>, scoped |
-| [ ] | RecordTests.cs | 2 | High | Methods | Important | Record types as stub sources |
-| [ ] | RequiredInitPropertyTests.cs | 7 | High | Properties | Important | required + init (C# 11) |
-| [ ] | VirtualsWithImplementationsTests.cs | 6 | High | Methods, Props, Indexers | Important | Default interface members, virtual base calls |
-| [ ] | OpenGenericsTests.cs | 4 | High | Methods | Important | Open generic interfaces |
-| [ ] | AllowNullTests.cs | 4 | Medium | Properties | Nice-to-have | [AllowNull] attribute |
-| [ ] | AttributeTests.cs | 4 | Medium | Properties, Methods | Nice-to-have | [MemberNotNullWhen], [Conditional], etc. |
-| [ ] | VisibilityTests.cs | 4 | Medium | Methods | Nice-to-have | Internal types as parameters |
-| [ ] | NonPublicMemberTests.cs | 1 | Medium | Methods | Nice-to-have | Protected abstract methods |
-| [ ] | HttpMessageHandlerTests.cs | 1 | Medium | Methods | Nice-to-have | Real-world abstract class |
-| [ ] | DoesNotReturnTests.cs | 8 | Low | Methods | Defer | [DoesNotReturn] attribute |
-| [ ] | PointerTests.cs | 13 | Low | Methods | Defer | Unsafe code, function pointers |
-| [ ] | PartialTests.cs | 4 | Skip | N/A | Skip | Rocks-specific [RockPartial] |
+## Not Ported
 
-## Group 5: Rocks-Specific / Infrastructure (10 files, 51 tests)
-
-Mixed applicability. Underlying edge cases may still be valuable.
-
-| Status | File | Tests | Applicability | Members | Priority | Notes |
-|--------|------|-------|---------------|---------|----------|-------|
-| [ ] | MethodMemberTests.cs | 23 | High | Methods | Critical | ref/out/in params, ref returns, 20+ params |
-| [ ] | ExpectationExceptionTests.cs | 7 | High | Methods, Props, Indexers | Important | Verification system edge cases |
-| [ ] | VerificationTests.cs | 6 | High | Methods, Properties | Important | Callback exceptions, verification errors |
-| [ ] | ArgTests.cs | 8 | Medium | Methods, Indexers | Nice-to-have | Argument matching concepts |
-| [ ] | MultipleRockCallsTests.cs | 2 | Medium | Methods | Nice-to-have | Multiple stubs of same type |
-| [ ] | RockContextTests.cs | 4 | Medium | Methods | Nice-to-have | Verification lifecycle |
-| [ ] | ShimTests.cs | 1 | Medium | Methods | Nice-to-have | Interface inheritance |
-| [ ] | MockDefinitions.cs | 0 | Low | N/A | Skip | Assembly attribute manifest |
-| [ ] | Shared.cs | 0 | Skip | N/A | Skip | NUnit config only |
-| [ ] | AnalyzerTests.cs | 0 | Skip | N/A | Skip | Rocks analyzer infrastructure |
-
----
-
-## Priority Summary
-
-| Priority | File Count | Test Count | Description |
-|----------|-----------|------------|-------------|
-| Critical | ~30 | ~280 | Core stub behavior across all member types |
-| Important | ~13 | ~75 | Generics, events, constructors, verification |
-| Nice-to-have | ~10 | ~30 | Attributes, visibility, argument matching |
-| Defer | 2 | 21 | Pointers, [DoesNotReturn] |
-| Skip | 5 | 4 | Rocks-specific, infrastructure |
-
-## Rocks API to KnockOff Translation Reference
-
-| Rocks Concept | KnockOff Equivalent |
-|----------------|---------------------|
-| `RockContext` + `Create<T>()` | `new StubType()` |
-| `Make<T>()` (no expectations) | `new StubType()` with no setup |
-| `.Setups.Method()` | `stub.Method.Return(value)` / `stub.Method.Call(callback)` |
-| `.Setups.Prop.Gets()` | `stub.Prop.Get(value)` |
-| `.Setups.Prop.Sets(value)` | `stub.Prop.Set(callback)` |
-| `.Setups[key].Gets()` | `stub.Indexer.Get(callback)` |
-| `.ReturnValue(val)` | `.Return(val)` |
-| `.Callback(fn)` | `.Call(fn)` |
-| `.ExpectedCallCount(n)` | `stub.Method.Verify(n)` |
-| `.Verify` | `stub.Method.Verify()` |
-| `ExpectationException` | Strict mode behavior |
-| `VerificationException` | `stub.Method.Verify()` failure |
-| `.Instance()` | `stub` (patterns 1,2,5,7,8) or `stub.Object` (patterns 3,4,6,9) |
-| `Arg.Any<T>()` | No equivalent yet |
-| `.RaiseMyEvent()` | No equivalent yet |
+| File | Reason |
+|------|--------|
+| VisibilityTests.cs | Requires separate referenced project for InternalsVisibleTo |
