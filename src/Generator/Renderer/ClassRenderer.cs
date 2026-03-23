@@ -1210,6 +1210,11 @@ internal static class ClassRenderer
     /// </summary>
     internal static void RenderImplGenericMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        if (method.HasNullableUnconstrainedTypeParams)
+        {
+            w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
+            w.Line("#pragma warning disable CS8603 // Possible null reference return");
+        }
         if (method.DoesNotReturn)
         {
             w.Line("#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return");
@@ -1312,6 +1317,11 @@ internal static class ClassRenderer
         w.Line($"{indent}}}");
         if (method.DoesNotReturn)
             w.Line("#pragma warning restore CS8763");
+        if (method.HasNullableUnconstrainedTypeParams)
+        {
+            w.Line("#pragma warning restore CS8603");
+            w.Line("#pragma warning restore CS8765");
+        }
         w.Line();
     }
 
