@@ -320,7 +320,8 @@ public partial class KnockOffGenerator
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
 
-		// For unbound generic types, GetMembers() returns empty - use OriginalDefinition instead
+		// For unbound generic types, GetMembers() and AllInterfaces return empty -
+		// use OriginalDefinition instead which has the actual members and base interfaces
 		var memberSource = isOpenGeneric && iface.IsUnboundGenericType
 			? iface.OriginalDefinition
 			: iface;
@@ -350,8 +351,8 @@ public partial class KnockOffGenerator
 			}
 		}
 
-		// Also get inherited interface members
-		foreach (var baseInterface in iface.AllInterfaces)
+		// Also get inherited interface members (use memberSource for open generics)
+		foreach (var baseInterface in memberSource.AllInterfaces)
 		{
 			var baseIfaceFullName = baseInterface.ToDisplayString(FullyQualifiedWithNullability);
 			foreach (var member in baseInterface.GetMembers())
@@ -380,8 +381,8 @@ public partial class KnockOffGenerator
 
 		var simpleName = GetSimpleInterfaceName(iface.Name);
 
-		// Collect base interfaces for Source(T) hierarchy
-		var baseInterfaceNames = iface.AllInterfaces
+		// Collect base interfaces for Source(T) hierarchy (use memberSource for open generics)
+		var baseInterfaceNames = memberSource.AllInterfaces
 			.Select(bi => bi.ToDisplayString(FullyQualifiedWithNullability))
 			.ToArray();
 
@@ -395,7 +396,7 @@ public partial class KnockOffGenerator
 			new EquatableArray<string>(baseInterfaceNames)));
 
 		// Add entries for each base interface
-		foreach (var baseInterface in iface.AllInterfaces)
+		foreach (var baseInterface in memberSource.AllInterfaces)
 		{
 			var baseIfaceFullName = baseInterface.ToDisplayString(FullyQualifiedWithNullability);
 			var baseOfBaseNames = baseInterface.AllInterfaces
@@ -519,7 +520,9 @@ public partial class KnockOffGenerator
 				ctorParams.Add(new ParameterInfo(
 					param.Name,
 					param.Type.ToDisplayString(FullyQualifiedWithNullability),
-					param.RefKind));
+					param.RefKind,
+					DefaultValueSyntax: SymbolHelpers.GetDefaultValueSyntax(param),
+					IsParams: param.IsParams));
 			}
 
 			var accessModifier = ctor.DeclaredAccessibility switch

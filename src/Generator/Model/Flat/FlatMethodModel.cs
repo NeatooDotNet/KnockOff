@@ -62,7 +62,10 @@ internal sealed record FlatMethodModel(
     bool NeedsNullableDisable = false,
 
     /// <summary>XML documentation summary text for the method, extracted from the original interface/class. Null if none.</summary>
-    string? XmlDocSummary = null)
+    string? XmlDocSummary = null,
+
+    /// <summary>True if the return type is a ref struct (e.g., Span&lt;T&gt;). Cannot be boxed or used as generic type arg.</summary>
+    bool IsRefStructReturn = false)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

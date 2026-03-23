@@ -28,7 +28,11 @@ internal sealed record BaseClassMethodModel(
     /// <summary>True if the method returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>Default assignments for out parameters (e.g., "a = default!; b = default!;").
+    /// Used in virtual base methods where out params must be assigned before returning.
+    /// Empty when the method has no out parameters.</summary>
+    string OutParameterDefaults = "")
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

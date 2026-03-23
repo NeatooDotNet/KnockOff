@@ -316,11 +316,14 @@ internal static class ClassModelBuilder
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
-                XmlDoc: p.XmlDoc))
+                XmlDoc: p.XmlDoc,
+                IsRefStruct: p.IsRefStruct,
+                IsScoped: p.IsScoped))
             .ToEquatableArray();
 
         var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
         var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+        var hasRefStruct = parameters.Any(p => p.IsRefStruct) || member.IsRefStructReturn;
         var isVoid = member.ReturnType == "void";
         var defaultExpr = isVoid ? "" : "default!";
 
@@ -335,7 +338,8 @@ internal static class ClassModelBuilder
             ThrowsOnDefault: false,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            XmlDocSummary: member.XmlDocSummary);
+            XmlDocSummary: member.XmlDocSummary,
+            HasRefStructParameter: hasRefStruct);
     }
 
     #endregion
@@ -429,8 +433,14 @@ internal static class ClassModelBuilder
 
     private static InlineConstructorModel BuildConstructorModel(ClassConstructorInfo ctor, string typeParamList)
     {
-        var paramList = string.Join(", ", ctor.Parameters.Select(p => $"{p.Type} {p.Name}"));
-        var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
+        var paramList = string.Join(", ", ctor.Parameters.Select(p =>
+        {
+            var paramsPrefix = p.IsParams ? "params " : "";
+            var refPrefix = GetRefKindPrefix(p.RefKind);
+            var decl = $"{paramsPrefix}{refPrefix}{p.Type} {p.Name}";
+            return p.DefaultValueSyntax != null ? $"{decl} = {p.DefaultValueSyntax}" : decl;
+        }));
+        var argList = string.Join(", ", ctor.Parameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Name}"));
         return new InlineConstructorModel(
             ParameterDeclarations: paramList,
             BaseCallArguments: argList);
@@ -504,6 +514,10 @@ internal static class ClassModelBuilder
 
         var callArgs = inputArgList; // No stub parameter - callbacks only get method parameters
 
+        var outParamDefaults = string.Join(" ", member.Parameters
+            .Where(p => p.RefKind == RefKind.Out)
+            .Select(p => $"{p.Name} = default!;"));
+
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
             MethodName: member.Name,
@@ -520,7 +534,8 @@ internal static class ClassModelBuilder
             InvokeSuffix: invokeSuffix,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            DoesNotReturn: member.DoesNotReturn);
+            DoesNotReturn: member.DoesNotReturn,
+            OutParameterDefaults: outParamDefaults);
     }
 
     /// <summary>
@@ -538,7 +553,18 @@ internal static class ClassModelBuilder
         // Build set of method-level type parameter names for filtering
         var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
 
-        var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+        // Build set of unconstrained type parameter names. In C# overrides,
+        // nullable annotations (T?) on unconstrained type parameters must be
+        // stripped because the override inherits nullability from the base method.
+        // Emitting T? for an unconstrained T causes CS0453 ("must be a non-nullable
+        // value type to use as Nullable<T>").
+        var unconstrainedTypeParams = new HashSet<string>(
+            typeParams
+                .Where(tp => !tp.Constraints.Contains("struct"))
+                .Select(tp => tp.Name));
+
+        var paramList = string.Join(", ", member.Parameters.Select(p =>
+            FormatParameterForOverride(p, unconstrainedTypeParams)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
 
         // Non-generic parameters for RecordCall (exclude params typed with method-level type params)
@@ -547,32 +573,39 @@ internal static class ClassModelBuilder
             .ToArray();
         var nonGenericArgList = string.Join(", ", nonGenericParams.Select(p => p.Name));
 
-        var isVoid = member.ReturnType == "void";
+        // Strip nullable from return type for unconstrained type parameters in override
+        var returnType = StripNullableFromUnconstrainedTypeParams(member.ReturnType, unconstrainedTypeParams);
+        var isVoid = returnType == "void";
+
+        // Detect if nullable annotations were stripped (need pragma suppression in generated code)
+        var hasNullableUnconstrainedTypeParams = returnType != member.ReturnType
+            || member.Parameters.Any(p =>
+                StripNullableFromUnconstrainedTypeParams(p.Type, unconstrainedTypeParams) != p.Type);
 
         // Detect Task<T>/ValueTask<T> return types for async handling
         var isTask = false;
         var isValueTask = false;
         var taskTypeArg = "";
 
-        if (member.ReturnType.StartsWith("global::System.Threading.Tasks.Task<"))
+        if (returnType.StartsWith("global::System.Threading.Tasks.Task<"))
         {
             isTask = true;
-            taskTypeArg = member.ReturnType.Substring(
+            taskTypeArg = returnType.Substring(
                 "global::System.Threading.Tasks.Task<".Length,
-                member.ReturnType.Length - "global::System.Threading.Tasks.Task<".Length - 1);
+                returnType.Length - "global::System.Threading.Tasks.Task<".Length - 1);
         }
-        else if (member.ReturnType.StartsWith("global::System.Threading.Tasks.ValueTask<"))
+        else if (returnType.StartsWith("global::System.Threading.Tasks.ValueTask<"))
         {
             isValueTask = true;
-            taskTypeArg = member.ReturnType.Substring(
+            taskTypeArg = returnType.Substring(
                 "global::System.Threading.Tasks.ValueTask<".Length,
-                member.ReturnType.Length - "global::System.Threading.Tasks.ValueTask<".Length - 1);
+                returnType.Length - "global::System.Threading.Tasks.ValueTask<".Length - 1);
         }
-        else if (member.ReturnType == "global::System.Threading.Tasks.Task")
+        else if (returnType == "global::System.Threading.Tasks.Task")
         {
             isTask = true;
         }
-        else if (member.ReturnType == "global::System.Threading.Tasks.ValueTask")
+        else if (returnType == "global::System.Threading.Tasks.ValueTask")
         {
             isValueTask = true;
         }
@@ -580,7 +613,7 @@ internal static class ClassModelBuilder
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
             MethodName: member.Name,
-            ReturnType: member.ReturnType,
+            ReturnType: returnType,
             AccessModifier: member.AccessModifier,
             IsVoid: isVoid,
             IsTask: isTask,
@@ -599,7 +632,8 @@ internal static class ClassModelBuilder
             TaskTypeArg: taskTypeArg,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-            DoesNotReturn: member.DoesNotReturn);
+            DoesNotReturn: member.DoesNotReturn,
+            HasNullableUnconstrainedTypeParams: hasNullableUnconstrainedTypeParams);
     }
 
     /// <summary>
@@ -688,7 +722,9 @@ internal static class ClassModelBuilder
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
-                XmlDoc: p.XmlDoc)).ToEquatableArray();
+                XmlDoc: p.XmlDoc,
+                IsRefStruct: p.IsRefStruct,
+                IsScoped: p.IsScoped)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{methodName}TypedHandler";
@@ -741,7 +777,7 @@ internal static class ClassModelBuilder
         parameters.Where(p => p.RefKind != RefKind.Out);
 
     private static string FormatParameter(ParameterInfo p) =>
-        $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
+        $"{(p.IsScoped ? "scoped " : "")}{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
 
     private static string FormatArgument(ParameterInfo p) =>
         $"{GetRefKindPrefix(p.RefKind)}{p.Name}";
@@ -789,6 +825,43 @@ internal static class ClassModelBuilder
                 return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Formats a parameter for an override method signature, stripping nullable annotations
+    /// from unconstrained type parameters. C# overrides inherit nullability from the base
+    /// method, so emitting T? for unconstrained T causes CS0453.
+    /// </summary>
+    private static string FormatParameterForOverride(ParameterInfo p, HashSet<string> unconstrainedTypeParams)
+    {
+        var type = StripNullableFromUnconstrainedTypeParams(p.Type, unconstrainedTypeParams);
+        return $"{GetRefKindPrefix(p.RefKind)}{type} {p.Name}";
+    }
+
+    /// <summary>
+    /// Strips nullable annotations (?) from type names that are unconstrained type parameters.
+    /// In C# override signatures, T? on an unconstrained T is invalid (CS0453) because
+    /// the compiler interprets it as Nullable&lt;T&gt; which requires a struct constraint.
+    /// The override inherits nullability from the base method automatically.
+    /// </summary>
+    private static string StripNullableFromUnconstrainedTypeParams(string type, HashSet<string> unconstrainedTypeParams)
+    {
+        if (unconstrainedTypeParams.Count == 0)
+            return type;
+
+        foreach (var tp in unconstrainedTypeParams)
+        {
+            // Direct match: "TData?" -> "TData"
+            if (type == tp + "?")
+                return tp;
+
+            // Inside angle brackets: "List<TData?>" -> "List<TData>"
+            type = type.Replace($"<{tp}?>", $"<{tp}>");
+            type = type.Replace($"<{tp}?,", $"<{tp},");
+            type = type.Replace($", {tp}?>", $", {tp}>");
+            type = type.Replace($", {tp}?,", $", {tp},");
+        }
+        return type;
     }
 
     private static string GetConstraintClauses(TypeParameterInfo[] typeParams)

@@ -86,7 +86,13 @@ internal sealed record UnifiedMethodInterceptorModel(
     /// <summary>Builder class friendly name (e.g., "AddImpl").</summary>
     string? BuilderFriendlyName = null,
     /// <summary>Sequence class friendly name (e.g., "AddSequence").</summary>
-    string? SequenceFriendlyName = null)
+    string? SequenceFriendlyName = null,
+    /// <summary>
+    /// True if any parameter is a ref struct (e.g., ReadOnlySpan&lt;T&gt;, Span&lt;T&gt;).
+    /// When true, the interceptor generates degraded support: no args tracking, no When chains,
+    /// no LastArgs/LastArg. Call() and Verify() still work.
+    /// </summary>
+    bool HasRefStructParameter = false)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

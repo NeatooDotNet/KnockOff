@@ -330,7 +330,8 @@ internal static class FlatModelBuilder
 					DelegationTargetInterface: delegationInterface,
 					HasStubOverride: hasStubOverride,
 					ReturnsByRef: member.ReturnsByRef,
-					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
+					ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+					IsRefStructType: member.IsRefStructReturn));
 			}
 		}
 
@@ -752,7 +753,9 @@ internal static class FlatModelBuilder
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
 			RefPrefix: GetRefKindPrefix(p.RefKind),
-			XmlDoc: p.XmlDoc)).ToEquatableArray();
+			XmlDoc: p.XmlDoc,
+			IsRefStruct: p.IsRefStruct,
+			IsScoped: p.IsScoped)).ToEquatableArray();
 
 		// Trackable parameters (exclude out params)
 		var trackableParams = paramArray.Where(p => p.RefKind != RefKind.Out)
@@ -856,7 +859,8 @@ internal static class FlatModelBuilder
 			IsPartOfOverloadGroup: false, // Will be updated in third pass
 			ReturnsByRef: member.ReturnsByRef,
 			ReturnsByRefReadonly: member.ReturnsByRefReadonly,
-			XmlDocSummary: member.XmlDocSummary);
+			XmlDocSummary: member.XmlDocSummary,
+			IsRefStructReturn: member.IsRefStructReturn);
 	}
 
 	/// <summary>
@@ -902,7 +906,9 @@ internal static class FlatModelBuilder
 			NullableType: MakeNullable(p.Type),
 			RefKind: p.RefKind,
 			RefPrefix: GetRefKindPrefix(p.RefKind),
-			XmlDoc: p.XmlDoc)).ToEquatableArray();
+			XmlDoc: p.XmlDoc,
+			IsRefStruct: p.IsRefStruct,
+			IsScoped: p.IsScoped)).ToEquatableArray();
 
 		// Trackable parameters for generic methods: exclude out params AND generic-typed params
 		var trackableParams = paramArray
@@ -995,7 +1001,8 @@ internal static class FlatModelBuilder
 			ReturnsByRef: member.ReturnsByRef,
 			ReturnsByRefReadonly: member.ReturnsByRefReadonly,
 			NeedsNullableDisable: needsNullableDisable,
-			XmlDocSummary: member.XmlDocSummary);
+			XmlDocSummary: member.XmlDocSummary,
+			IsRefStructReturn: member.IsRefStructReturn);
 	}
 
 	/// <summary>
@@ -1447,7 +1454,8 @@ internal static class FlatModelBuilder
 					o.IsGenericMethod,
 					o.TypeParameters,
 					ReturnsByRef: o.ReturnsByRef,
-					ReturnsByRefReadonly: o.ReturnsByRefReadonly))
+					ReturnsByRefReadonly: o.ReturnsByRefReadonly,
+					IsRefStructReturn: o.IsRefStructReturn))
 				.ToArray();
 
 			result[methodName] = new MethodGroupInfo(
@@ -1625,8 +1633,9 @@ internal static class FlatModelBuilder
 	/// </summary>
 	private static string FormatParameterWithRefKind(ParameterInfo p)
 	{
+		var scopedPrefix = p.IsScoped ? "scoped " : "";
 		var refKindPrefix = GetRefKindPrefix(p.RefKind);
-		return $"{refKindPrefix}{p.Type} {EscapeIdentifier(p.Name)}";
+		return $"{scopedPrefix}{refKindPrefix}{p.Type} {EscapeIdentifier(p.Name)}";
 	}
 
 	/// <summary>

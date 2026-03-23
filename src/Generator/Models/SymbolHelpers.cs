@@ -577,4 +577,84 @@ internal static class SymbolHelpers
 	}
 
 	#endregion
+
+	#region Default Value Helpers
+
+	/// <summary>
+	/// Gets the default value syntax for an optional parameter.
+	/// Returns null if the parameter has no default value.
+	/// Returns a string like "null", "\"b\"", "3.2", "default" that can be
+	/// used directly in generated code as a default value expression.
+	/// </summary>
+	public static string? GetDefaultValueSyntax(IParameterSymbol param)
+	{
+		if (!param.HasExplicitDefaultValue)
+			return null;
+
+		var defaultValue = param.ExplicitDefaultValue;
+
+		// null default
+		if (defaultValue is null)
+		{
+			return "default!";
+		}
+
+		// String default: needs quoting
+		if (defaultValue is string s)
+		{
+			return $"\"{s.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
+		}
+
+		// Boolean default
+		if (defaultValue is bool b)
+		{
+			return b ? "true" : "false";
+		}
+
+		// Char default
+		if (defaultValue is char c)
+		{
+			return $"'{c}'";
+		}
+
+		// Numeric defaults — handle various numeric types
+		if (defaultValue is double d)
+		{
+			// Use "R" format for round-trip fidelity
+			return d.ToString("R") + (d == (int)d && !double.IsInfinity(d) && !double.IsNaN(d) ? ".0" : "");
+		}
+
+		if (defaultValue is float f)
+		{
+			return f.ToString("R") + "f";
+		}
+
+		if (defaultValue is decimal m)
+		{
+			return m.ToString() + "m";
+		}
+
+		if (defaultValue is long l)
+		{
+			return l.ToString() + "L";
+		}
+
+		if (defaultValue is ulong ul)
+		{
+			return ul.ToString() + "UL";
+		}
+
+		// Default struct value — Roslyn returns the actual struct instance for value types with default
+		// But ExplicitDefaultValue for a struct with `= default` returns null in some Roslyn versions
+		// If we get here with a value type, use default
+		if (param.Type.IsValueType)
+		{
+			return "default";
+		}
+
+		// Fallback: use the object's ToString
+		return defaultValue.ToString();
+	}
+
+	#endregion
 }

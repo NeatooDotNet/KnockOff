@@ -27,7 +27,9 @@ internal sealed record MethodOverloadInfo(
 	EquatableArray<TypeParameterInfo> TypeParameters,
 	// Ref return support
 	bool ReturnsByRef = false,
-	bool ReturnsByRefReadonly = false) : IEquatable<MethodOverloadInfo>;
+	bool ReturnsByRefReadonly = false,
+	/// <summary>True if the return type is a ref struct (e.g., Span&lt;T&gt;).</summary>
+	bool IsRefStructReturn = false) : IEquatable<MethodOverloadInfo>;
 
 /// <summary>
 /// Represents a parameter in the combined tuple (nullable if not in all overloads)

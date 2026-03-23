@@ -38,7 +38,9 @@ internal sealed record FlatPropertyModel(
     /// <summary>True if the property returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>True if the property value type is a ref struct (e.g., Span&lt;T&gt;, ReadOnlySpan&lt;T&gt;). Cannot use generic base class.</summary>
+    bool IsRefStructType = false)
 {
     /// <summary>True if the property returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

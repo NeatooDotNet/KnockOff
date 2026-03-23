@@ -352,7 +352,15 @@ internal sealed record InlineClassImplMethodModel(
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
     bool ReturnsByRefReadonly = false,
     /// <summary>True if the method has [DoesNotReturn]. Generated override must also have it.</summary>
-    bool DoesNotReturn = false)
+    bool DoesNotReturn = false,
+    /// <summary>Default assignments for out parameters (e.g., "a = default!; b = default!;").
+    /// Used in early return paths where out params must be assigned before returning.
+    /// Empty when the method has no out parameters.</summary>
+    string OutParameterDefaults = "",
+    /// <summary>True when the override method has unconstrained type parameters whose nullable
+    /// annotations were stripped. Requires #pragma warning disable CS8765, CS8603 around the
+    /// override because C# cannot express the exact nullability in the override signature.</summary>
+    bool HasNullableUnconstrainedTypeParams = false)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

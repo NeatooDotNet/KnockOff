@@ -258,7 +258,8 @@ internal static class InlineModelBuilder
             ConstraintClauses: constraintClause,
             DeclaringInterface: declaringInterface,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsRefStructType: member.IsRefStructReturn);
     }
 
     private static InlineIndexerModel BuildIndexerModel(
@@ -348,11 +349,14 @@ internal static class InlineModelBuilder
                     NullableType: MakeNullable(p.Type),
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind),
-                    XmlDoc: p.XmlDoc))
+                    XmlDoc: p.XmlDoc,
+                    IsRefStruct: p.IsRefStruct,
+                    IsScoped: p.IsScoped))
                 .ToEquatableArray();
 
             var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
             var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+            var hasRefStruct = parameters.Any(p => p.IsRefStruct) || overload.IsRefStructReturn;
 
             // Determine default expression - use per-overload return type for mixed return type groups
             var defaultExpr = overload.IsVoid ? "" : GetDefaultExpressionForReturn(overload.ReturnType, overload.IsNullable);
@@ -389,7 +393,8 @@ internal static class InlineModelBuilder
                 DefaultExpression: defaultExpr,
                 ThrowsOnDefault: throwsOnDefault,
                 ReturnsByRef: overload.ReturnsByRef,
-                ReturnsByRefReadonly: overload.ReturnsByRefReadonly));
+                ReturnsByRefReadonly: overload.ReturnsByRefReadonly,
+                HasRefStructParameter: hasRefStruct));
         }
 
         // If no non-generic overloads, create empty model
@@ -552,7 +557,9 @@ internal static class InlineModelBuilder
                 NullableType: MakeNullable(p.Type),
                 RefKind: p.RefKind,
                 RefPrefix: GetRefKindPrefix(p.RefKind),
-                XmlDoc: p.XmlDoc)).ToEquatableArray();
+                XmlDoc: p.XmlDoc,
+                IsRefStruct: p.IsRefStruct,
+                IsScoped: p.IsScoped)).ToEquatableArray();
 
             // Typed handler class name: append arity count for arities > 1 when multiple arities exist
             var typedHandlerClassName = $"{group.Name}TypedHandler";
@@ -933,7 +940,9 @@ internal static class InlineModelBuilder
                     NullableType: MakeNullable(p.Type),
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind),
-                    XmlDoc: p.XmlDoc))
+                    XmlDoc: p.XmlDoc,
+                    IsRefStruct: p.IsRefStruct,
+                    IsScoped: p.IsScoped))
                 .ToEquatableArray();
             // Use member.ReturnType (not group.ReturnType) - each member needs its own suffix
             // when overloads have different return types
@@ -1228,7 +1237,8 @@ internal static class InlineModelBuilder
             Type: p.Type,
             NullableType: MakeNullable(p.Type),
             RefKind: p.RefKind,
-            RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+            RefPrefix: GetRefKindPrefix(p.RefKind),
+            IsRefStruct: p.IsRefStruct)).ToEquatableArray();
 
         var defaultExpr = GetDefaultForType(del.ReturnType, DefaultValueStrategy.Default, null);
 
@@ -1349,7 +1359,8 @@ internal static class InlineModelBuilder
                 o.IsGenericMethod,
                 o.TypeParameters,
                 ReturnsByRef: o.ReturnsByRef,
-                ReturnsByRefReadonly: o.ReturnsByRefReadonly))
+                ReturnsByRefReadonly: o.ReturnsByRefReadonly,
+                IsRefStructReturn: o.IsRefStructReturn))
             .ToArray();
 
         return new MethodGroupInfo(
@@ -1443,7 +1454,7 @@ internal static class InlineModelBuilder
         parameters.Where(p => p.RefKind != RefKind.Out);
 
     private static string FormatParameter(ParameterInfo p) =>
-        $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
+        $"{(p.IsScoped ? "scoped " : "")}{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
 
     private static string FormatArgument(ParameterInfo p) =>
         $"{GetRefKindPrefix(p.RefKind)}{p.Name}";

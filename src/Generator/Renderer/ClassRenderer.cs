@@ -1011,7 +1011,8 @@ internal static class ClassRenderer
             var backingField = string.IsNullOrEmpty(method.InvokeSuffix)
                 ? "_refReturnBacking"
                 : $"_refReturnBacking{method.InvokeSuffix}";
-            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+            // Ref return methods are never pre-compiled, so use ArgumentList to preserve ref/out keywords
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
 
             if (method.IsAbstract)
             {
@@ -1039,7 +1040,9 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             if (method.IsAbstract)
             {
-                // Abstract - return default
+                // Abstract - return default, but assign out params first
+                if (!string.IsNullOrEmpty(method.OutParameterDefaults))
+                    w.Line($"{indent1}\t{method.OutParameterDefaults}");
                 if (method.IsVoid)
                 {
                     w.Line($"{indent1}\treturn;");
@@ -1080,6 +1083,8 @@ internal static class ClassRenderer
 
             // Build invoke arguments: strict, then method parameters
             // For pre-compiled interceptors, strip ref/in prefixes and wrap for TTuple
+            // For non-precompiled (custom delegate) interceptors, use ArgumentList which
+            // preserves ref/out prefixes needed by the Invoke method signature
             var rawInputArgs = method.InputArgumentList;
             var cleanInputArgs = isPreCompiled ? StripRefPrefixes(rawInputArgs) : rawInputArgs;
             string invokeArgs;
@@ -1091,7 +1096,8 @@ internal static class ClassRenderer
             }
             else
             {
-                invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(cleanInputArgs) ? "" : $", {cleanInputArgs}");
+                // Non-precompiled: use ArgumentList to preserve ref/out keywords
+                invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.ArgumentList) ? "" : $", {method.ArgumentList}");
             }
 
             // Determine if ValueTask wrapping is needed (only for pre-compiled interceptors)
@@ -1204,6 +1210,11 @@ internal static class ClassRenderer
     /// </summary>
     internal static void RenderImplGenericMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        if (method.HasNullableUnconstrainedTypeParams)
+        {
+            w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
+            w.Line("#pragma warning disable CS8603 // Possible null reference return");
+        }
         if (method.DoesNotReturn)
         {
             w.Line("#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return");
@@ -1306,6 +1317,11 @@ internal static class ClassRenderer
         w.Line($"{indent}}}");
         if (method.DoesNotReturn)
             w.Line("#pragma warning restore CS8763");
+        if (method.HasNullableUnconstrainedTypeParams)
+        {
+            w.Line("#pragma warning restore CS8603");
+            w.Line("#pragma warning restore CS8765");
+        }
         w.Line();
     }
 
