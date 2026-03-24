@@ -1,9 +1,9 @@
 # Warnings as Errors Cleanup
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-03-23
-**Last Updated:** 2026-03-23 (developer review approved)
+**Last Updated:** 2026-03-23
 
 
 ---
@@ -38,10 +38,10 @@ Work towards having warnings as errors fully enabled across the solution:
 - [x] Business requirements review (Step 3)
 - [x] Architect plan creation & design (Step 4)
 - [x] Developer review (Step 5)
-- [ ] Implementation (Step 7)
-- [ ] Verification (Step 8)
-- [ ] Documentation (Step 9)
-- [ ] Completion (Step 10)
+- [x] Implementation (Step 7)
+- [x] Verification (Step 8)
+- [x] Documentation (Step 9 — N/A, no behavioral or user-facing doc changes)
+- [x] Completion (Step 10)
 
 ## Clarifications
 
@@ -126,4 +126,21 @@ The 10 solution-wide codes (CA1861, CA1865, CA1510, IDE0021-IDE0023, IDE1006, CA
 
 ## Results / Conclusions
 
-_(populated on completion)_
+**All 4 phases complete. Architect verified. Requirements satisfied.**
+
+### Before → After
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Directory.Build.props NoWarn entries | 10 | 1 (MSB3277, justified) |
+| Test project .csproj NoWarn codes | ~60 total | ~6 total (xUnit1051 + justified per-project) |
+| CA1062 pragmas in interceptors | 4 | 1 (justified) |
+| SYSLIB0050 in MethodInterceptorRenderer inline pairs | 6 | 0 (redundant with file-level) |
+
+### Key Findings
+
+1. **SYSLIB0050 is NOT cargo-culted** — it's required because KnockOff generates stubs for `ISerializable` whose method signatures reference obsolete types. Retained with justification.
+2. **9 of 10 solution-wide NoWarn entries removed** — most produced zero warnings because code was already compliant.
+3. **CA1062 pragmas partially eliminated** — replaced with `ArgumentNullException.ThrowIfNull` null checks in `InterceptorExtensions.cs` and `PropertyGetInterceptorBase.cs`.
+4. **Test projects switched to $(NoWarn) inheritance** — prevents future duplication of suppressions.
+5. **Every remaining suppression now has documented justification.**

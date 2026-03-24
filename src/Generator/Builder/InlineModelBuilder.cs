@@ -1624,6 +1624,14 @@ internal static class InlineModelBuilder
     private static bool NeedsNewKeyword(string interceptorName) =>
         ObjectMemberNames.Contains(interceptorName);
 
+    /// <summary>
+    /// Gets the nullability attribute declaration for a setter, if needed.
+    /// </summary>
+    /// <remarks>
+    /// Justification: When an interface property/indexer setter uses [DisallowNull] or [AllowNull],
+    /// the implementing class cannot express the exact nullability contract on the setter parameter.
+    /// CS8769 is inherent to interface implementation with nullability attributes on setters.
+    /// </remarks>
     private static string GetSetterNullabilityAttribute(InterfaceMemberInfo member)
     {
         if (member.SetterHasDisallowNull || member.SetterHasAllowNull)

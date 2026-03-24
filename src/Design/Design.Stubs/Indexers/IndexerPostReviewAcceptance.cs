@@ -100,8 +100,8 @@ public partial class IndexerPostReviewAcceptanceDemo
         var stub = new Stubs.ICollection();
 
         stub.Indexer
-            .When(key => key.StartsWith("a", global::System.StringComparison.Ordinal)).Returns(1)
-            .ThenWhen(key => key.StartsWith("b", global::System.StringComparison.Ordinal)).Returns(2);
+            .When(key => key.StartsWith('a')).Returns(1)
+            .ThenWhen(key => key.StartsWith('b')).Returns(2);
 
         ICollection<string, int> collection = stub;
         var val1 = collection["alpha"]; // 1
@@ -151,10 +151,10 @@ public partial class IndexerPostReviewAcceptanceDemo
         var stub = new Stubs.ICollection();
 
         // Configure getter When chain
-        stub.Indexer.When(key => key.StartsWith("a", global::System.StringComparison.Ordinal)).Returns(1);
+        stub.Indexer.When(key => key.StartsWith('a')).Returns(1);
 
         // Configure setter When chain (separate from getter)
-        stub.Indexer.When(key => key.StartsWith("a", global::System.StringComparison.Ordinal)).Set((key, value) => { });
+        stub.Indexer.When(key => key.StartsWith('a')).Set((key, value) => { });
 
         ICollection<string, int> collection = stub;
 

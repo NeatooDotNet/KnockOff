@@ -528,6 +528,9 @@ internal static class PropertyInterceptorRenderer
 		RenderUserOverrideSupportMethods(w, model);
 
 		// Ref return backing field (for ref return properties)
+		// Justification: Ref return properties need a backing field to hold the value between InvokeRefGet
+		// and the ref return. The field must match the non-nullable return type but cannot be initialized in
+		// the constructor because the value comes from the interceptor at invocation time. CS8618 is inherent.
 		if (model.IsRefReturn)
 		{
 			w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRefGet before use");

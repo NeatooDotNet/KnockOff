@@ -1,3 +1,6 @@
+// Suppressions justified: Generated interceptor classes inherit from this type
+// and directly access public fields, nested types, and generic lists. Changing
+// visibility or structure would break all generated code across all 9 patterns.
 #pragma warning disable CA1034 // Do not nest type
 #pragma warning disable CA1051 // Do not declare visible instance fields
 #pragma warning disable CA1002 // Do not expose generic lists
@@ -215,11 +218,10 @@ public abstract class PropertyGetInterceptorBase<TValue>
 
         public IPropertyGetSequence<TValue> ThenGet(params TValue[] values)
         {
-#pragma warning disable CA1062 // Validate arguments of public methods
+            ArgumentNullException.ThrowIfNull(values);
             if (values.Length == 0) { ThenGet(() => default!); return new PropertyGetSequenceBase(_interceptor); }
             var seq = ThenGet(values[0]);
             for (int i = 1; i < values.Length; i++) seq = seq.ThenGet(values[i]);
-#pragma warning restore CA1062
             return seq;
         }
 
@@ -268,9 +270,8 @@ public abstract class PropertyGetInterceptorBase<TValue>
 
         public IPropertyGetSequence<TValue> ThenGet(params TValue[] values)
         {
-#pragma warning disable CA1062 // Validate arguments of public methods
+            ArgumentNullException.ThrowIfNull(values);
             foreach (var v in values) ThenGet(v);
-#pragma warning restore CA1062
             return this;
         }
 

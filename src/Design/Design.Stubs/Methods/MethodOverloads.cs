@@ -171,7 +171,7 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // 1-param predicate: explicit type needed for disambiguation
-        stub.Format.When((string input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
+        stub.Format.When((string input) => input.StartsWith('X')).Return("X-PREFIX");
         // 2-param predicate: named parameters for disambiguation
         stub.Format.When((string input, FormatOptions options) => options.Uppercase).Return("UPPER-MODE");
 

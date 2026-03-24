@@ -1,3 +1,8 @@
+// Suppressions justified: Generated interceptor classes inherit from this type
+// and directly access public fields, nested types, and generic lists. Changing
+// visibility or structure would break all generated code across all 9 patterns.
+// CA1716: Indexer API method names like "Get" are natural and clear;
+// VB.NET keyword conflicts are accepted for API usability.
 #pragma warning disable CA1034 // Do not nest type
 #pragma warning disable CA1051 // Do not declare visible instance fields
 #pragma warning disable CA1002 // Do not expose generic lists

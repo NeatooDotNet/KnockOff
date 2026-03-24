@@ -72,7 +72,7 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         stub.Format.Call((string input) => "default");
-        stub.Format.When((string input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
+        stub.Format.When((string input) => input.StartsWith('X')).Return("X-PREFIX");
 
         IFormatter formatter = stub;
 

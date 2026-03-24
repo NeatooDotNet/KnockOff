@@ -7,7 +7,8 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 		<!-- Disable noisy code analysis rules for benchmark project -->
-		<NoWarn>$(NoWarn);CA1515;CA2227;CA1002;CA1724;CA1707</NoWarn>
+		<!-- CA1822: BenchmarkDotNet requires instance methods for [Benchmark] methods -->
+		<NoWarn>$(NoWarn);CA1515;CA2227;CA1002;CA1724;CA1707;CA1822</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
