@@ -6,7 +6,8 @@
 		<AnalysisMode>default</AnalysisMode>
 		<RootNamespace>KnockOff.Tests</RootNamespace>
 		<!-- xUnit1051: Tests intentionally call CancellationToken overloads to verify KnockOff stub behavior -->
-		<NoWarn>$(NoWarn);xUnit1051</NoWarn>
+		<!-- SYSLIB0050: Tests intentionally stub ISerializable which has obsolete members -->
+		<NoWarn>$(NoWarn);xUnit1051;SYSLIB0050</NoWarn>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>
