@@ -45,6 +45,23 @@ public partial class ServiceWithInitPropsStub : IServiceWithInitProps { }
 public partial class ConfigPropsStub : IConfigProps { }
 
 // =============================================================================
+// Shadowed Properties — interface hierarchy with C# `new` modifier
+// =============================================================================
+
+public interface IWideConfig
+{
+    int Version { get; set; }
+}
+
+public interface INarrowConfig : IWideConfig
+{
+    new int Version { get; }
+}
+
+[KnockOff]
+public partial class NarrowConfigStub : INarrowConfig { }
+
+// =============================================================================
 // Static Value Samples
 // =============================================================================
 
@@ -714,5 +731,34 @@ public class CompletePropertyExampleTests
         Assert.True(service.IsConnected);
         Assert.Single(connectionStrings);
         Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);
+    }
+}
+
+// =============================================================================
+// Shadowed Properties Samples
+// =============================================================================
+
+public class ShadowedPropertiesTests
+{
+    [Fact]
+    public void ShadowedProperty_UnionAccessors_RoutesViaBothFaces()
+    {
+        #region shadowed-properties-narrow-first
+        // IInterfaceWide declares { get; set; }; IInterfaceNarrow hides it with { get; }.
+        // The generated stub exposes one interceptor whose accessor set is the UNION
+        // across shadowed declarations — so both Get and Set are available.
+        var stub = new NarrowConfigStub();
+        stub.Version.Get(42);
+
+        INarrowConfig narrow = stub;
+        IWideConfig wide = stub;
+
+        Assert.Equal(42, narrow.Version);   // Read via narrow face (get-only declaration).
+        wide.Version = 7;                   // Write via wide face (hidden setter).
+        Assert.Equal(7, stub.Version.LastSetValue);
+
+        stub.Version.VerifyGet(Called.Once);
+        stub.Version.VerifySet(Called.Once);
+        #endregion
     }
 }

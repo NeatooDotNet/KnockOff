@@ -97,9 +97,13 @@ internal static class InlineModelBuilder
         // Group methods by name for overload handling
         var (methodGroups, memberKeyToGroupName) = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
-        // Deduplicate property/indexer members for interceptor class generation
-        // Properties dedup by name; indexers dedup by key type (all share interceptor name "Indexer")
-        var processedPropertyNames = new HashSet<string>();
+        // Deduplicate property/indexer members for interceptor class generation.
+        // Properties dedup by name; indexers dedup by key type (all share interceptor name "Indexer").
+        // For properties: when `new`-shadowed declarations share a name, the interceptor's accessor set
+        // must be the UNION of accessors across all shadowed declarations (interceptor-as-property
+        // principle: one interceptor per property name). Explicit interface implementations continue to
+        // use each declaration's own accessor set.
+        var propertyIndexByName = new Dictionary<string, int>();
         var processedIndexerKeys = new HashSet<string>();
         var deduplicatedPropertyMembers = new List<InterfaceMemberInfo>();
         foreach (var member in iface.Members)
@@ -117,8 +121,18 @@ internal static class InlineModelBuilder
                 }
                 else
                 {
-                    if (processedPropertyNames.Add(member.Name))
+                    if (propertyIndexByName.TryGetValue(member.Name, out var existingIndex))
                     {
+                        var existing = deduplicatedPropertyMembers[existingIndex];
+                        deduplicatedPropertyMembers[existingIndex] = existing with
+                        {
+                            HasGetter = existing.HasGetter || member.HasGetter,
+                            HasSetter = existing.HasSetter || member.HasSetter,
+                        };
+                    }
+                    else
+                    {
+                        propertyIndexByName[member.Name] = deduplicatedPropertyMembers.Count;
                         deduplicatedPropertyMembers.Add(member);
                     }
                 }
@@ -1889,10 +1903,31 @@ internal static class InlineModelBuilder
                 // For Source(IEnumerable<T>): includes only IEnumerable<T> and IEnumerable
                 var setSource = inheritedInterfaces.Contains(declaringInterface);
 
+                // For properties/indexers: use the member declaration on the SOURCE interface itself
+                // (not the unioned/shared declaration). When `new`-shadowing narrows or widens accessors,
+                // the fallback must only bind to accessors declared on the source face.
+                bool? sourceHasGetter = null;
+                bool? sourceHasSetter = null;
+                if (setSource)
+                {
+                    // Resolve the source interface to its unbound form to match hierarchy entries.
+                    var sourceMember = iface.Members.FirstOrDefault(m =>
+                        (m.IsProperty || m.IsIndexer)
+                        && ((m.IsIndexer && interceptorName == "Indexer") || (!m.IsIndexer && m.Name == interceptorName))
+                        && ToBindGeneric(m.DeclaringInterfaceFullName) == sourceIfaceFullName);
+                    if (sourceMember != null)
+                    {
+                        sourceHasGetter = sourceMember.HasGetter;
+                        sourceHasSetter = sourceMember.HasSetter;
+                    }
+                }
+
                 memberMappings.Add(new SourceMemberMapping(
                     InterceptorName: interceptorName,
                     SourceInterfaceType: setSource ? declaringInterface : "",
-                    SetSource: setSource));
+                    SetSource: setSource,
+                    SourceHasGetter: sourceHasGetter,
+                    SourceHasSetter: sourceHasSetter));
             }
 
             sourceProviders.Add(new SourceProviderInfo(

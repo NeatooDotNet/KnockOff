@@ -293,6 +293,45 @@ stub.Name.Get(() => "dynamic");
 
 ---
 
+## Shadowed Properties (C# `new` modifier)
+
+When an interface hierarchy uses the `new` modifier to shadow a property with a different accessor set, the generated stub exposes **one interceptor** per property name. That interceptor supports the **union** of accessors across every shadowed declaration, so `stub.Prop.Get(...)` and `stub.Prop.Set(...)` are each available whenever any shadowed face declares the matching accessor.
+
+Example hierarchy and routing:
+
+<!-- snippet: shadowed-properties-narrow-first -->
+```cs
+// IInterfaceWide declares { get; set; }; IInterfaceNarrow hides it with { get; }.
+// The generated stub exposes one interceptor whose accessor set is the UNION
+// across shadowed declarations — so both Get and Set are available.
+var stub = new NarrowConfigStub();
+stub.Version.Get(42);
+
+INarrowConfig narrow = stub;
+IWideConfig wide = stub;
+
+Assert.Equal(42, narrow.Version);   // Read via narrow face (get-only declaration).
+wide.Version = 7;                   // Write via wide face (hidden setter).
+Assert.Equal(7, stub.Version.LastSetValue);
+
+stub.Version.VerifyGet(Called.Once);
+stub.Version.VerifySet(Called.Once);
+```
+<!-- endSnippet -->
+
+Routing rules:
+
+- Reading via the narrow face (`IInterfaceNarrow`) invokes the interceptor's getter.
+- Writing via the wide face (`IInterfaceWide`) invokes the interceptor's setter, and `stub.Prop.LastSetValue` reflects the value.
+- `stub.Prop.VerifyGet(...)` and `stub.Prop.VerifySet(...)` count invocations across all faces.
+- `stub.Source(IInterfaceNarrow)(real)` only binds to accessors declared on the narrow face; the union interceptor emits `null` for the missing side.
+
+**Scope:** Interface-based patterns (1, 2, 5, 7, 8). Class patterns (3, 4, 6, 9) with shadowed properties are tracked under [property-new-narrowing-class-patterns](../todos/property-new-narrowing-class-patterns.md). Shadowed indexers are tracked under [shadowed-indexers](../todos/shadowed-indexers.md).
+
+**Design reference:** `src/Design/Design.Stubs/Properties/NarrowingPropertyRepro.cs`.
+
+---
+
 ## Resetting Properties
 
 Calling `Reset()` on a property interceptor clears tracking state but preserves the configured callbacks.

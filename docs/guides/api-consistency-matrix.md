@@ -83,6 +83,24 @@ stub.Name.VerifySet(Called.Never);
 | `VerifySet(Called.X)` | ✓ |
 | `LastSetValue` | ✓ |
 
+### Shadowed Properties (C# `new` modifier)
+
+When an interface hierarchy uses `new` to shadow a property with a different accessor set (e.g., a derived interface narrows `int Prop { get; set; }` to `new int Prop { get; }`), the generated stub exposes **one interceptor** whose accessor set is the **union** of all shadowed declarations. Routing via any interface face works, and `stub.Prop.Get(...)` / `stub.Prop.Set(...)` are available whenever any declaration requires the corresponding accessor.
+
+| Pattern | Shadowed Properties |
+|---------|:--------------------:|
+| 1 — Standalone `[KnockOff]` | ✓ |
+| 2 — Generic Standalone `[KnockOff]` on `<T>` | ✓ |
+| 5 — Inline `[KnockOff<IFoo>]` | ✓ |
+| 8 — Inline Generic `[KnockOff(typeof(IFoo<>))]` | ✓ |
+| 3, 4, 6, 9 — Class patterns | ✓ (intercepts the derived `new` slot; see note below) |
+
+**Rule:** The single shared interceptor carries the union of accessors across all shadowed declarations that share a name; explicit interface implementations still route through that interceptor using each declaration's own accessor set.
+
+**Why:** Interceptor-as-property requires one interceptor per property name. C# interface shadowing permits a narrower or wider accessor set on each face; the interceptor must support every accessor that any face requires. Per-face source fallbacks (e.g., `stub.Source(IInterfaceNarrow)`) bind only to accessors declared on the source face and emit `null` for the missing side. Added by [property-new-narrowing-bug](../plans/property-new-narrowing-bug.md). Design reference: `src/Design/Design.Stubs/Properties/NarrowingPropertyRepro.cs` and `src/Design/Design.Tests/PropertyTests/NarrowingPropertyTests.cs`.
+
+**Class patterns note:** Class `new virtual` creates a genuinely separate v-table slot. The stub's target type is the derived class, so the stub intercepts the `new` slot — access via a base-typed reference targets the base slot unchanged (correct C# `new` semantics). If the caller wants to intercept the base slot, they should target the base class with its own stub. Design reference: `src/Design/Design.Stubs/Properties/ShadowedClassPropertyRepro.cs` and `src/Design/Design.Tests/PropertyTests/ShadowedClassPropertyTests.cs`.
+
 ---
 
 ## Feature 4: Indexer Interception
@@ -407,7 +425,7 @@ Generated stub classes match the accessibility of the target type. When the targ
 | Feature Category | Status |
 |------------------|--------|
 | Method Interception | ✓ **100% consistent** |
-| Property Interception | ✓ **100% consistent** |
+| Property Interception | ✓ **100% consistent** (shadowed properties: interface patterns 1, 2, 5, 8 only — class patterns 3, 4, 6, 9 tracked) |
 | Indexer Interception | ✓ **100% consistent** |
 | Event Interception | ✓ **100% consistent** |
 | Sequences | ✓ **100% consistent** |

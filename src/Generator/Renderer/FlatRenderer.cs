@@ -76,11 +76,26 @@ internal static class FlatRenderer
 				BaseIndent: 0,
 				IncludeStrictParameter: true,
 				StrictAccessExpression: "strict");
+			// Compute union-accessor representative per interceptor class name so that `new`-shadowed
+			// property declarations (which share one interceptor) get an interceptor type that
+			// supports the UNION of accessors across all shadowed declarations.
+			var propertyRepresentativesByClass = unit.Properties
+				.GroupBy(p => p.InterceptorClassName)
+				.ToDictionary(
+					g => g.Key,
+					g =>
+					{
+						var hasGetter = g.Any(p => p.HasGetter);
+						var hasSetter = g.Any(p => p.HasSetter);
+						var first = g.First();
+						return first with { HasGetter = hasGetter, HasSetter = hasSetter };
+					});
 			foreach (var prop in unit.Properties)
 			{
 				if (renderedInterceptorClasses.Add(prop.InterceptorClassName))
 				{
-					var unifiedModel = ModelAdapters.ToUnifiedPropertyModel(prop);
+					var representative = propertyRepresentativesByClass[prop.InterceptorClassName];
+					var unifiedModel = ModelAdapters.ToUnifiedPropertyModel(representative);
 					// For primary constructor classes with stub override properties,
 					// we cannot generate a constructor to wire SetFallback, so fall back to generated class.
 					var canUsePreCompiled = PreCompiledInterceptorRenderer.CanUsePreCompiled(unifiedModel)
@@ -1771,16 +1786,23 @@ internal static class FlatRenderer
 									var propInfo = GetPropertyInfoForInterceptor(unit, mapping.InterceptorName);
 									if (propInfo != null)
 									{
-										// Use interface disambiguation for properties to avoid CS0229
-										// when properties with the same name exist on multiple sibling interfaces
+										// For `new`-shadowed properties the interceptor holds the UNION of
+										// accessors across declarations, but the source fallback must bind
+										// only to accessors declared on the source face.
+										var unionHasGetter = unit.Properties.Where(p => p.InterceptorName == mapping.InterceptorName).Any(p => p.HasGetter);
+										var unionHasSetter = unit.Properties.Where(p => p.InterceptorName == mapping.InterceptorName).Any(p => p.HasSetter);
+										var srcHasGetter = mapping.SourceHasGetter ?? propInfo.Value.HasGetter;
+										var srcHasSetter = mapping.SourceHasSetter ?? propInfo.Value.HasSetter;
 										w.Line(PreCompiledInterceptorRenderer.GetPropertySourceFallbackExpression(
 											mapping.InterceptorName,
 											propInfo.Value.PropertyName,
 											"source",
-											propInfo.Value.HasGetter,
-											propInfo.Value.HasSetter,
+											srcHasGetter,
+											srcHasSetter,
 											propInfo.Value.ReturnType,
-											mapping.SourceInterfaceType));
+											mapping.SourceInterfaceType,
+											interceptorHasGetter: unionHasGetter,
+											interceptorHasSetter: unionHasSetter));
 									}
 									break;
 								case SourceMemberKind.Indexer:
@@ -1819,7 +1841,10 @@ internal static class FlatRenderer
 									var propInfo = GetPropertyInfoForInterceptor(unit, mapping.InterceptorName);
 									if (propInfo != null)
 									{
-										if (propInfo.Value.HasGetter && propInfo.Value.HasSetter)
+										// Use union across shadowed declarations to match the interceptor's actual overload.
+										var unionHasGetter = unit.Properties.Where(p => p.InterceptorName == mapping.InterceptorName).Any(p => p.HasGetter);
+										var unionHasSetter = unit.Properties.Where(p => p.InterceptorName == mapping.InterceptorName).Any(p => p.HasSetter);
+										if (unionHasGetter && unionHasSetter)
 											w.Line($"{mapping.InterceptorName}.SetSourceFallback(null, null);");
 										else
 											w.Line($"{mapping.InterceptorName}.SetSourceFallback(null);");
