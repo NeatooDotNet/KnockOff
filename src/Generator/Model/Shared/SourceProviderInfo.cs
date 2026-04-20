@@ -46,4 +46,17 @@ internal sealed record SourceMemberMapping(
 	/// If true, set _source = source; if false, clear _source = null.
 	/// False when the source interface doesn't cover this member.
 	/// </summary>
-	bool SetSource) : IEquatable<SourceMemberMapping>;
+	bool SetSource,
+
+	/// <summary>
+	/// For properties/indexers: does the declaration on the SOURCE interface have a getter?
+	/// Null for methods/events, or when the source interface doesn't cover this member.
+	/// Needed because a `new`-shadowed property may widen/narrow accessors per interface;
+	/// the source fallback for Source(IInterfaceNarrow) must only bind to accessors present on IInterfaceNarrow.
+	/// </summary>
+	bool? SourceHasGetter = null,
+
+	/// <summary>
+	/// For properties/indexers: does the declaration on the SOURCE interface have a setter?
+	/// </summary>
+	bool? SourceHasSetter = null) : IEquatable<SourceMemberMapping>;

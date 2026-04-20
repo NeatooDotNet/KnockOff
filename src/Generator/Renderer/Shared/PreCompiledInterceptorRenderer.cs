@@ -548,7 +548,9 @@ internal static class PreCompiledInterceptorRenderer
 		bool hasGetter,
 		bool hasSetter,
 		string propertyType = "",
-		string declaringInterface = "")
+		string declaringInterface = "",
+		bool? interceptorHasGetter = null,
+		bool? interceptorHasSetter = null)
 	{
 		// When propertyType is provided, use explicit casts to avoid CS1503 with target-typed conditionals.
 		// Without casts, `source != null ? () => source.Prop : null` fails because the compiler
@@ -559,6 +561,26 @@ internal static class PreCompiledInterceptorRenderer
 		var sourceAccess = !string.IsNullOrEmpty(declaringInterface)
 			? $"(({declaringInterface}){sourceParamName})"
 			: sourceParamName;
+
+		// When interceptor-side accessor set differs from source-side (shadowed `new` property:
+		// interceptor holds the union, source face has a narrower subset), emit the 2-arg form
+		// that matches the PropertyGetSetInterceptor overload, passing null for the missing side.
+		var ihg = interceptorHasGetter ?? hasGetter;
+		var ihs = interceptorHasSetter ?? hasSetter;
+		if (ihg && ihs && !(hasGetter && hasSetter))
+		{
+			var getterArg = hasGetter
+				? (!string.IsNullOrEmpty(propertyType)
+					? $"{sourceParamName} != null ? (global::System.Func<{propertyType}>)(() => {sourceAccess}.{propertyName}) : null"
+					: $"{sourceParamName} != null ? () => {sourceAccess}.{propertyName} : null")
+				: "null";
+			var setterArg = hasSetter
+				? (!string.IsNullOrEmpty(propertyType)
+					? $"{sourceParamName} != null ? (global::System.Action<{propertyType}>)((value) => {sourceAccess}.{propertyName} = value) : null"
+					: $"{sourceParamName} != null ? (value) => {sourceAccess}.{propertyName} = value : null")
+				: "null";
+			return $"{interceptorName}.SetSourceFallback({getterArg}, {setterArg});";
+		}
 
 		if (hasGetter && hasSetter)
 		{

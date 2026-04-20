@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.56.0](v0.56.0.md) | 2026-04-20 | Fix shadowed property interception across interface hierarchies using C# `new` modifier |
 | [v0.55.0](v0.55.0.md) | 2026-03-07 | Fix CS0060 when stubbing internal interfaces, classes, and delegates |
 | [v0.49.0](v0.49.0.md) | 2026-02-13 | Eliminate generated thin subclasses, fix Verifiable(Called times) bug |
 | [v0.47.0](v0.47.0.md) | 2026-02-09 | **Breaking:** Major indexer API redesign — per-key builders, When(predicate), per-key verification |

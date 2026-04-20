@@ -1911,10 +1911,29 @@ internal static class FlatModelBuilder
 				// This is the interface where we'll call the member from
 				var sourceInterfaceType = setSource ? declaringInterface : "";
 
+				// For properties/indexers, look up the accessor set on the source interface itself
+				// (not the unioned shared declaration). Shadowed `new` properties may narrow/widen
+				// accessors per interface; the fallback must only bind to accessors declared on the source face.
+				bool? sourceHasGetter = null;
+				bool? sourceHasSetter = null;
+				if (setSource)
+				{
+					var sourceMember = iface.Members.FirstOrDefault(m =>
+						(m.IsProperty || m.IsIndexer)
+						&& ((m.IsIndexer && interceptorName == "Indexer") || (!m.IsIndexer && m.Name == interceptorName)));
+					if (sourceMember != null)
+					{
+						sourceHasGetter = sourceMember.HasGetter;
+						sourceHasSetter = sourceMember.HasSetter;
+					}
+				}
+
 				memberMappings.Add(new SourceMemberMapping(
 					InterceptorName: interceptorName,
 					SourceInterfaceType: sourceInterfaceType,
-					SetSource: setSource));
+					SetSource: setSource,
+					SourceHasGetter: sourceHasGetter,
+					SourceHasSetter: sourceHasSetter));
 			}
 
 			sourceProviders.Add(new SourceProviderInfo(

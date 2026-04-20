@@ -1507,9 +1507,16 @@ internal static class InlineRenderer
         }
         else if (propertyInfoByName.TryGetValue(interceptorName, out var prop))
         {
+            // Shadowed-property case: interceptor's HasGetter/HasSetter is the UNION across shadowed
+            // declarations, but a source fallback must only bind to accessors present on the SOURCE
+            // interface face. Prefer the per-source flags when provided.
+            var getter = mapping.SourceHasGetter ?? prop.HasGetter;
+            var setter = mapping.SourceHasSetter ?? prop.HasSetter;
             var expr = PreCompiledInterceptorRenderer.GetPropertySourceFallbackExpression(
-                interceptorName, prop.PropertyName, "source", prop.HasGetter, prop.HasSetter, prop.ReturnType,
-                mapping.SourceInterfaceType);
+                interceptorName, prop.PropertyName, "source", getter, setter, prop.ReturnType,
+                mapping.SourceInterfaceType,
+                interceptorHasGetter: prop.HasGetter,
+                interceptorHasSetter: prop.HasSetter);
             w.Line($"\t\t\t\t{expr}");
         }
         else if (indexerInfoByName.TryGetValue(interceptorName, out var indexer))
