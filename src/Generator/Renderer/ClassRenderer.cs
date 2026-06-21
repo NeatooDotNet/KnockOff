@@ -688,7 +688,9 @@ internal static class ClassRenderer
     {
         var stubClassName = cls.StubClassName + cls.TypeParameterList;
 
-        // Suppress CS8618 for classes with required members
+        // Justification: When stubbing a class with 'required' properties, the generated inner class
+        // constructor cannot initialize them (they are designed to be set by the caller after construction).
+        // CS8618 is inherent to this pattern and cannot be eliminated without violating the 'required' contract.
         if (cls.HasRequiredMembers)
         {
             w.Line("#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor");
@@ -801,6 +803,8 @@ internal static class ClassRenderer
         var indent2 = indent1 + "\t";
         var requiredKeyword = prop.IsRequired ? "required " : "";
 
+        // Justification: When the base class property setter has [AllowNull], the override cannot express
+        // the same nullability annotation without CS8765. This is a C# limitation for override setters.
         if (prop.SetterHasAllowNull)
             w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
         w.Line($"{indent}/// <inheritdoc />");
@@ -891,6 +895,8 @@ internal static class ClassRenderer
         var indent2 = indent1 + "\t";
         var invokeSuffix = indexer.InvokeSuffix;
 
+        // Justification: When the base class indexer setter has [AllowNull], the override cannot express
+        // the same nullability annotation without CS8765. This is a C# limitation for override setters.
         if (indexer.SetterHasAllowNull)
             w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
         w.Line($"{indent}/// <inheritdoc />");
@@ -992,6 +998,9 @@ internal static class ClassRenderer
 
         var isPreCompiled = preCompiledInterceptors.ContainsKey(method.HandlerName);
 
+        // Justification: Stubs override [DoesNotReturn] methods but the stub implementation may return
+        // (e.g., when no callback is configured, or when the interceptor returns a default value).
+        // The [DoesNotReturn] attribute is preserved for API fidelity, but the stub cannot guarantee never returning.
         if (method.DoesNotReturn)
         {
             w.Line("#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return");
@@ -1210,11 +1219,17 @@ internal static class ClassRenderer
     /// </summary>
     internal static void RenderImplGenericMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        // Justification: Methods with unconstrained generic type parameters (T where T may or may not be
+        // nullable) cannot have matching nullability annotations in overrides. CS8765 fires because the
+        // override's parameter nullability doesn't match. CS8603 fires because the return type may be null
+        // for unconstrained T. Both are inherent to overriding methods with unconstrained nullable type params.
         if (method.HasNullableUnconstrainedTypeParams)
         {
             w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
             w.Line("#pragma warning disable CS8603 // Possible null reference return");
         }
+        // Justification: Same as RenderImplMethodOverride — stubs override [DoesNotReturn] methods
+        // but the stub implementation may return. The attribute is preserved for API fidelity.
         if (method.DoesNotReturn)
         {
             w.Line("#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return");

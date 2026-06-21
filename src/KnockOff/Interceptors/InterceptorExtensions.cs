@@ -1,5 +1,3 @@
-#pragma warning disable CA1062 // Validate arguments of public methods
-
 using System.Collections.Generic;
 
 namespace KnockOff.Interceptors;
@@ -16,6 +14,7 @@ public static class InterceptorExtensions
     /// </summary>
     public static void VerifyAll(this IReadOnlyList<IInterceptor> interceptors)
     {
+        ArgumentNullException.ThrowIfNull(interceptors);
         foreach (var i in interceptors)
         {
             var failure = i.CheckVerificationAll();
@@ -29,6 +28,7 @@ public static class InterceptorExtensions
     /// </summary>
     public static void ResetAll(this IReadOnlyList<IInterceptor> interceptors)
     {
+        ArgumentNullException.ThrowIfNull(interceptors);
         foreach (var i in interceptors)
             i.Reset();
     }

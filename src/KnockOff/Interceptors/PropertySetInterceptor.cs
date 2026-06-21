@@ -1,3 +1,6 @@
+// Suppressions justified: Generated interceptor classes inherit from this type
+// and directly access public fields and nested types. Changing visibility would
+// break all generated code across all 9 patterns.
 #pragma warning disable CA1034 // Do not nest type
 #pragma warning disable CA1051 // Do not declare visible instance fields
 

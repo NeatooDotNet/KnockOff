@@ -5,7 +5,10 @@
 		<IsPackable>false</IsPackable>
 		<RootNamespace>KnockOff.Sandbox</RootNamespace>
 		<AnalysisMode>default</AnalysisMode>
-		<NoWarn>CA1303;CA1515;CA1859</NoWarn>
+		<!-- CA1303: String literals in sandbox console output are fine -->
+		<!-- CA1515: Public types needed for console app entry point -->
+		<!-- CA1859: Interface types used intentionally in sandbox demos -->
+		<NoWarn>$(NoWarn);CA1303;CA1515;CA1859</NoWarn>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>

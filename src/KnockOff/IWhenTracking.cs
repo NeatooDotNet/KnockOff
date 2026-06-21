@@ -59,6 +59,8 @@ public interface IWhenBuilder<TDelegate, TReturn>
     /// For async methods, the value is automatically wrapped with Task.FromResult().
     /// </summary>
     /// <param name="value">The value to return when matched.</param>
+    // CA1716 justified: "Return" is the natural KnockOff API name for specifying
+    // a return value. VB.NET keyword conflict is accepted for API usability.
 #pragma warning disable CA1716
     IWhenChain<TDelegate, TReturn> Return(TReturn value);
 #pragma warning restore CA1716
@@ -82,6 +84,8 @@ public interface IVoidWhenChain<TDelegate> : IWhenTracking
     /// Returns this for fluent chaining.
     /// </summary>
     /// <param name="callback">The callback to invoke when matched.</param>
+    // CA1716 justified: "Call" is the natural KnockOff API name for specifying
+    // a callback on void When chains. VB.NET keyword conflict is accepted for API usability.
 #pragma warning disable CA1716
     IVoidWhenChain<TDelegate> Call(TDelegate callback);
 #pragma warning restore CA1716

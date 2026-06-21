@@ -1052,7 +1052,11 @@ internal static class MethodInterceptorRenderer
 		{
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
-				w.Line("#pragma warning disable CS8601, SYSLIB0050");
+				// Justification: Source delegation passes through the source's return value and out parameters.
+				// The compiler cannot prove nullability matches the interceptor's declared types (e.g., out parameters
+				// on TryGetValue-style methods, or return types with nullable mismatches). This is inherent to
+				// source delegation where the stub proxies an unknown implementation.
+				w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 				var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				if (model.IsVoid)
 				{
@@ -1062,7 +1066,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
 				}
-				w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				w.Line("#pragma warning restore CS8601");
 			}
 
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
@@ -1133,10 +1137,12 @@ internal static class MethodInterceptorRenderer
 			{
 				if (!string.IsNullOrEmpty(model.DeclaringInterface))
 				{
-					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					// Justification: Source delegation assigns the source's return value to the ref backing field.
+					// Nullability mismatch is inherent to source delegation proxying an unknown implementation.
+					w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 					w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src.{model.MethodName}({sourceCallArgs}); return; }}");
-					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+					w.Line("#pragma warning restore CS8601");
 				}
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
 				var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
@@ -2213,6 +2219,9 @@ internal static class MethodInterceptorRenderer
 		}
 
 		// Ref return backing fields for overloads that return by ref
+		// Justification: Ref return methods need a backing field to hold the value between InvokeRef
+		// and the ref return. The field must match the non-nullable return type but cannot be initialized
+		// in the constructor because the value comes from the interceptor at invocation time. CS8618 is inherent.
 		foreach (var overload in model.Overloads)
 		{
 			if (overload.IsRefReturn)
@@ -2478,7 +2487,11 @@ internal static class MethodInterceptorRenderer
 				// Standard fallback: Source > Strict > Default
 				if (!string.IsNullOrEmpty(model.DeclaringInterface))
 				{
-					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					// Justification: Source delegation passes through the source's return value and out parameters.
+					// The compiler cannot prove nullability matches the interceptor's declared types (e.g., out parameters
+					// on TryGetValue-style methods, or return types with nullable mismatches). This is inherent to
+					// source delegation where the stub proxies an unknown implementation.
+					w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 					if (model.IsVoid)
 					{
@@ -2488,7 +2501,7 @@ internal static class MethodInterceptorRenderer
 					{
 						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
 					}
-					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+					w.Line("#pragma warning restore CS8601");
 				}
 
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
@@ -2693,7 +2706,11 @@ internal static class MethodInterceptorRenderer
 				// Standard fallback: Source > Strict > Default
 				if (!string.IsNullOrEmpty(model.DeclaringInterface))
 				{
-					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					// Justification: Source delegation passes through the source's return value and out parameters.
+					// The compiler cannot prove nullability matches the interceptor's declared types (e.g., out parameters
+					// on TryGetValue-style methods, or return types with nullable mismatches). This is inherent to
+					// source delegation where the stub proxies an unknown implementation.
+					w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 					var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 					if (overload.IsVoid)
 					{
@@ -2703,7 +2720,7 @@ internal static class MethodInterceptorRenderer
 					{
 						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
 					}
-					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+					w.Line("#pragma warning restore CS8601");
 				}
 
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
@@ -2905,11 +2922,13 @@ internal static class MethodInterceptorRenderer
 				// Standard fallback: Source > Strict > Default
 				if (!string.IsNullOrEmpty(model.DeclaringInterface))
 				{
-					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					// Justification: Source delegation assigns the source's return value to the ref backing field.
+					// Nullability mismatch is inherent to source delegation proxying an unknown implementation.
+					w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 					// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection, acceptable for stubs)
 					w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src.{model.MethodName}({sourceCallArgs}); return; }}");
-					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+					w.Line("#pragma warning restore CS8601");
 				}
 
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
@@ -3014,10 +3033,12 @@ internal static class MethodInterceptorRenderer
 			{
 				if (!string.IsNullOrEmpty(model.DeclaringInterface))
 				{
-					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					// Justification: Source delegation assigns the source's return value to the ref backing field.
+					// Nullability mismatch is inherent to source delegation proxying an unknown implementation.
+					w.Line("#pragma warning disable CS8601 // Possible null reference assignment");
 					var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 					w.Line($"if (_source is {{ }} src) {{ {backingField} = src.{model.MethodName}({sourceCallArgs}); return; }}");
-					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+					w.Line("#pragma warning restore CS8601");
 				}
 
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");

@@ -255,6 +255,9 @@ internal static class IndexerInterceptorRenderer
 			}
 
 			// Ref return backing fields (per key type for multi-indexer)
+			// Justification: Ref return indexers need a backing field to hold the value between InvokeRefGet
+			// and the ref return. The field must match the non-nullable return type but cannot be initialized
+			// in the constructor because the value comes from the interceptor at invocation time. CS8618 is inherent.
 			foreach (var model in models)
 			{
 				if (model.IsRefReturn)

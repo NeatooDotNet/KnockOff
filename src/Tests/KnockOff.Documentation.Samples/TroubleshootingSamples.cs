@@ -87,7 +87,7 @@ public partial class TroubleshootEmailServiceTests
 public class ReturnSignatureTests
 {
     [Fact]
-    public void ReturnSignature_MustMatchParameters()
+    public async Task ReturnSignature_MustMatchParameters()
     {
         var stub = new TroubleshootRepoStub();
 
@@ -98,7 +98,7 @@ public class ReturnSignatureTests
         #endregion
 
         ITroubleshootRepo repository = stub;
-        var user = repository.GetByIdAsync(42).Result;
+        var user = await repository.GetByIdAsync(42);
 
         Assert.NotNull(user);
         Assert.Equal(42, user.Id);
@@ -406,7 +406,7 @@ public partial class EmailServiceAdditionalTests
 public class AsyncReturnTests
 {
     [Fact]
-    public void AsyncReturn_WrongAndCorrect()
+    public async Task AsyncReturn_WrongAndCorrect()
     {
         var stub = new UserServiceStub();
 
@@ -435,7 +435,7 @@ public class AsyncReturnTests
         #endregion
 
         IUserService service = stub;
-        var result = service.GetUserAsync(1).Result;
+        var result = await service.GetUserAsync(1);
         Assert.NotNull(result);
     }
 }
@@ -444,7 +444,7 @@ public class VerificationTests
 {
     #region troubleshoot-verification-setup-order
     [Fact]
-    public void Verification_SetupBeforeAct()
+    public async Task Verification_SetupBeforeAct()
     {
         var stub = new UserServiceStub();
 
@@ -456,7 +456,7 @@ public class VerificationTests
         IUserService service = stub;
 
         // ACT: Call the method
-        service.GetUserAsync(42).Wait();
+        await service.GetUserAsync(42);
 
         // ASSERT: Verify the call was made
         stub.Verify();
@@ -465,7 +465,7 @@ public class VerificationTests
 
     #region troubleshoot-verification-same-instance
     [Fact]
-    public void Verification_SameInstanceThroughout()
+    public async Task Verification_SameInstanceThroughout()
     {
         // Create stub once
         var stub = new UserServiceStub();
@@ -479,7 +479,7 @@ public class VerificationTests
         var service = new NotificationService(stub);
 
         // Act via the service (which uses the stub)
-        service.NotifyUser(1).Wait();
+        await service.NotifyUser(1);
 
         // Verify on the original stub instance
         stub.Verify();

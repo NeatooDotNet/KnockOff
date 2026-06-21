@@ -1,6 +1,14 @@
 // Non-generic base class for generated interceptor classes.
 // Uses object?/Delegate? fields so no generic type parameters leak into IntelliSense.
 // Generated classes provide typed wrappers that cast to/from these fields.
+//
+// Suppressions justified: Generated interceptor classes inherit from this type
+// and directly access public fields, nested types, and generic lists.
+// Changing visibility or structure would break all generated code across all 9 patterns.
+// CA1062: This class has many internal/protected methods called by generated code with
+// guaranteed non-null arguments; adding null checks would add overhead with no safety benefit.
+// CA1716: Method names like "Return" and "Call" are the natural KnockOff API;
+// VB.NET keyword conflicts are accepted for API usability.
 #pragma warning disable CA1034 // Do not nest type
 #pragma warning disable CA1051 // Do not declare visible instance fields
 #pragma warning disable CA1002 // Do not expose generic lists

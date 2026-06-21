@@ -185,11 +185,11 @@ public class IndexerWhenPredicateTests
         var stub = new IndexerPostReviewAcceptanceDemo.Stubs.ICollection();
 
         // Configure getter When chain
-        stub.Indexer.When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1);
+        stub.Indexer.When(key => key.StartsWith('a')).Returns(1);
 
         // Configure setter When chain (separate from getter)
         bool setCallbackInvoked = false;
-        stub.Indexer.When(key => key.StartsWith("a", StringComparison.Ordinal)).Set((key, value) =>
+        stub.Indexer.When(key => key.StartsWith('a')).Set((key, value) =>
         {
             setCallbackInvoked = true;
         });
@@ -210,8 +210,8 @@ public class IndexerWhenPredicateTests
         var stub = new IndexerPostReviewAcceptanceDemo.Stubs.ICollection();
 
         stub.Indexer
-            .When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1)
-            .ThenWhen(key => key.StartsWith("b", StringComparison.Ordinal)).Returns(2);
+            .When(key => key.StartsWith('a')).Returns(1)
+            .ThenWhen(key => key.StartsWith('b')).Returns(2);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 
@@ -228,8 +228,8 @@ public class IndexerWhenPredicateTests
         var stub = new IndexerPostReviewAcceptanceDemo.Stubs.ICollection();
 
         stub.Indexer
-            .When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1)
-            .ThenWhen(key => key.StartsWith("b", StringComparison.Ordinal)).Returns(2);
+            .When(key => key.StartsWith('a')).Returns(1)
+            .ThenWhen(key => key.StartsWith('b')).Returns(2);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 
